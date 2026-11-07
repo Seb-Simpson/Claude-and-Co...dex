@@ -24,6 +24,8 @@ export interface CinematicRequest {
   readonly position?: Vector3 | null;
   /** 0..1 scales the strength of the beat. */
   readonly intensity?: number;
+  /** Ignore the cooldown (explicit requests from other modules). */
+  readonly force?: boolean;
 }
 
 interface Step { readonly at: number; readonly run: () => void }
@@ -53,7 +55,7 @@ export class CinematicDirector {
   /** Returns false when the beat is still cooling down. */
   play(kind: CinematicKind, request: CinematicRequest = {}): boolean {
     const last = this.lastPlayed.get(kind);
-    if (last !== undefined && this.time - last < COOLDOWNS[kind]) return false;
+    if (!request.force && last !== undefined && this.time - last < COOLDOWNS[kind]) return false;
     this.lastPlayed.set(kind, this.time);
     this.history.push({ kind, time: this.time });
     if (this.history.length > 50) this.history.shift();

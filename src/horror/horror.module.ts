@@ -167,7 +167,7 @@ export default {
         const kind = event.triggerId.slice('nw:scare:'.length) as CinematicKind;
         if (!CINEMATIC_KINDS.includes(kind)) return;
         const at = event.position ? new Vector3(event.position.x, event.position.y, event.position.z) : position.clone();
-        cinematics.play(kind, { position: at, intensity: event.intensity });
+        cinematics.play(kind, { position: at, intensity: event.intensity, force: true });
       });
 
       let nearMissCooldown = 0;

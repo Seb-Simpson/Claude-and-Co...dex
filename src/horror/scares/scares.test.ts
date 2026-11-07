@@ -65,6 +65,7 @@ describe('CinematicDirector', () => {
     expect(director.play('near-miss')).toBe(true);
     expect(director.play('near-miss')).toBe(false);
     expect(director.play('disappear', { position: new Vector3() })).toBe(true);
+    expect(director.play('near-miss', { force: true })).toBe(true);
     director.update(13);
     expect(director.play('near-miss')).toBe(true);
   });

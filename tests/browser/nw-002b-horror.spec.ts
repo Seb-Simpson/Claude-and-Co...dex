@@ -39,16 +39,18 @@ test('renders all four bodied entities and survives every cinematic beat', async
     p.emit('chase:ended', { chaseId: 'c', entityId: 'patient', playerId: 'p', reason: 'escaped', timeSeconds: 8 });
     p.emit('horror:scare', { triggerId: 'nw:scare:lighting-failure', position: { x: -6, y: 1, z: 0 }, intensity: 1 });
   });
-  await page.waitForTimeout(1500);
+  // Software WebGL runs at a few frames per second and the engine clamps frame time, so give
+  // the beat enough wall time to reach its blackout.
+  await page.waitForTimeout(4000);
   await page.screenshot({ path: testInfo.outputPath('lighting-failure.png') });
   await preview(page)(() => {
     const p = (window as unknown as { __nwPreview: Preview }).__nwPreview;
     p.showcase([]);
     // Treatment-room mirror, seen from beside the sink.
-    p.setCamera(5.2, 1.62, -1.9, -1.15, 0.0);
+    p.setCamera(5.0, 1.62, -3.3, -2.0, 0.0);
     p.emit('horror:reflection', { id: 'r1', anchorId: 'any', visible: true, durationSeconds: 4 });
   });
-  await page.waitForTimeout(1500);
+  await page.waitForTimeout(4000);
   await page.screenshot({ path: testInfo.outputPath('reflection.png') });
   for (const kind of ['distant-reveal', 'disappear', 'near-miss', 'post-chase-silence']) {
     await preview(page)((k) => (window as unknown as { __nwPreview: Preview }).__nwPreview.emit('horror:scare', { triggerId: `nw:scare:${k}`, position: { x: 3, y: 1, z: -3 }, intensity: 1 }), kind);

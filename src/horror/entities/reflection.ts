@@ -11,7 +11,7 @@ function figureTexture(): CanvasTexture | null {
   if (!ctx) return null;
   ctx.clearRect(0, 0, 128, 256);
   ctx.filter = 'blur(3px)';
-  ctx.fillStyle = 'rgba(6,7,8,0.95)';
+  ctx.fillStyle = 'rgba(46,50,52,0.92)';
   ctx.beginPath();
   ctx.ellipse(64, 62, 22, 30, 0, 0, Math.PI * 2);
   ctx.fill();
@@ -23,8 +23,8 @@ function figureTexture(): CanvasTexture | null {
   ctx.fillRect(80, 50, 10, 120);
   ctx.filter = 'blur(5px)';
   const face = ctx.createRadialGradient(64, 66, 2, 64, 66, 20);
-  face.addColorStop(0, 'rgba(168,170,160,0.55)');
-  face.addColorStop(1, 'rgba(168,170,160,0)');
+  face.addColorStop(0, 'rgba(196,198,186,0.85)');
+  face.addColorStop(1, 'rgba(150,152,144,0)');
   ctx.fillStyle = face;
   ctx.beginPath(); ctx.ellipse(64, 66, 16, 22, 0, 0, Math.PI * 2); ctx.fill();
   ctx.filter = 'blur(2px)';
