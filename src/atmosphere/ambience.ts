@@ -9,11 +9,13 @@ import type { SoundEmitter } from '../world/extras';
 export type CueId =
   | 'nw:pipe-knock' | 'nw:distant-door' | 'nw:drip' | 'nw:trolley' | 'nw:lift-chime' | 'nw:lift-doors' | 'nw:metal-creak'
   | 'nw:settle' | 'nw:light-pop' | 'nw:static' | 'nw:curtain' | 'nw:vent-breath' | 'nw:monitor-beep' | 'nw:flatline'
-  | 'nw:wheel-creak' | 'nw:brownout';
+  | 'nw:wheel-creak' | 'nw:brownout'
+  | 'nw:chase-stinger' | 'nw:heartbeat' | 'nw:reveal' | 'nw:power-down' | 'nw:power-up' | 'nw:presence-out' | 'nw:distant-steps';
 
 export const CUE_IDS: readonly CueId[] = [
   'nw:pipe-knock', 'nw:distant-door', 'nw:drip', 'nw:trolley', 'nw:lift-chime', 'nw:lift-doors', 'nw:metal-creak', 'nw:settle',
   'nw:light-pop', 'nw:static', 'nw:curtain', 'nw:vent-breath', 'nw:monitor-beep', 'nw:flatline', 'nw:wheel-creak', 'nw:brownout',
+  'nw:chase-stinger', 'nw:heartbeat', 'nw:reveal', 'nw:power-down', 'nw:power-up', 'nw:presence-out', 'nw:distant-steps',
 ];
 
 export interface PlayOptions {
@@ -26,13 +28,13 @@ interface Voice { readonly stop: () => void; readonly endsAt: number }
 
 const EMITTER_CUES: Record<SoundEmitter['kind'], readonly CueId[]> = {
   pipes: ['nw:pipe-knock', 'nw:metal-creak', 'nw:pipe-knock'],
-  stairwell: ['nw:distant-door', 'nw:settle', 'nw:metal-creak'],
+  stairwell: ['nw:distant-door', 'nw:settle', 'nw:metal-creak', 'nw:distant-steps'],
   lift: ['nw:metal-creak', 'nw:settle'],
   drip: [],
   vent: ['nw:vent-breath', 'nw:settle'],
-  distant: ['nw:settle', 'nw:distant-door'],
+  distant: ['nw:settle', 'nw:distant-door', 'nw:distant-steps'],
   trolley: ['nw:trolley', 'nw:wheel-creak'],
-  door: ['nw:distant-door'],
+  door: ['nw:distant-door', 'nw:distant-steps'],
 };
 
 export class Ambience {
@@ -390,6 +392,106 @@ export class Ambience {
         end = t + dur + 0.1;
         break;
       }
+      case 'nw:chase-stinger': {
+        const boom = osc('sine', 62);
+        boom.frequency.exponentialRampToValueAtTime(28, t + 0.9);
+        const bg = ctx.createGain();
+        env(bg, vol * 0.9, 0.005, 1.4);
+        boom.connect(bg).connect(out);
+        boom.start(t); boom.stop(t + 1.6);
+        noiseBurst(t, 0.6, filt('lowpass', 400), vol * 0.6);
+        for (const f of [233, 247, 277, 311]) {
+          const o = osc('sawtooth', f * (0.995 + this.random() * 0.01));
+          const g = ctx.createGain();
+          env(g, vol * 0.05, 0.01, 1.8);
+          o.connect(filt('bandpass', 900, 1.5)).connect(g).connect(out);
+          o.start(t); o.stop(t + 2);
+        }
+        end = t + 2.1;
+        break;
+      }
+      case 'nw:heartbeat': {
+        const beats = Math.max(1, Math.round(options.duration ?? 3));
+        for (let i = 0; i < beats; i++) {
+          for (const [dt, peak] of [[0, 1], [0.16, 0.7]] as const) {
+            const at = t + i * 0.82 + dt;
+            const o = osc('sine', 58);
+            o.frequency.setValueAtTime(64, at);
+            o.frequency.exponentialRampToValueAtTime(38, at + 0.12);
+            const g = ctx.createGain();
+            env(g, vol * 0.6 * peak, 0.008, 0.18, at);
+            o.connect(g).connect(out);
+            o.start(at); o.stop(at + 0.3);
+          }
+        }
+        end = t + beats * 0.82 + 0.4;
+        break;
+      }
+      case 'nw:reveal': {
+        const dur = 3.2;
+        const src = this.noiseSource(ctx, true);
+        const f = filt('bandpass', 300, 2);
+        f.frequency.exponentialRampToValueAtTime(1600, t + dur * 0.8);
+        const g = ctx.createGain();
+        g.gain.setValueAtTime(0.0001, t);
+        g.gain.linearRampToValueAtTime(vol * 0.12, t + dur * 0.75);
+        g.gain.linearRampToValueAtTime(0.0001, t + dur);
+        src.connect(f).connect(g).connect(out);
+        src.start(t); src.stop(t + dur + 0.1);
+        stops.push(() => src.stop());
+        const ring = osc('sine', 5200);
+        const rg = ctx.createGain();
+        rg.gain.setValueAtTime(0.0001, t);
+        rg.gain.linearRampToValueAtTime(vol * 0.006, t + 1.5);
+        rg.gain.linearRampToValueAtTime(0.0001, t + dur + 1);
+        ring.connect(rg).connect(out);
+        ring.start(t); ring.stop(t + dur + 1.1);
+        end = t + dur + 1.2;
+        break;
+      }
+      case 'nw:power-down':
+      case 'nw:power-up': {
+        const down = cue === 'nw:power-down';
+        const dur = down ? 1.3 : 0.7;
+        const o = osc('sawtooth', down ? 120 : 40);
+        o.frequency.exponentialRampToValueAtTime(down ? 28 : 120, t + dur);
+        const g = ctx.createGain();
+        g.gain.setValueAtTime(vol * 0.12, t);
+        g.gain.linearRampToValueAtTime(0.0001, t + dur);
+        o.connect(filt('lowpass', 500)).connect(g).connect(out);
+        o.start(t); o.stop(t + dur + 0.05);
+        noiseBurst(t + (down ? 0 : dur), 0.08, filt('bandpass', 300, 3), vol * 0.7);
+        end = t + dur + 0.2;
+        break;
+      }
+      case 'nw:presence-out': {
+        const src = this.noiseSource(ctx, true);
+        const g = ctx.createGain();
+        g.gain.setValueAtTime(0.0001, t);
+        g.gain.exponentialRampToValueAtTime(vol * 0.15, t + 0.9);
+        g.gain.setValueAtTime(0.0001, t + 0.92);
+        src.connect(filt('lowpass', 900)).connect(g).connect(out);
+        src.start(t); src.stop(t + 1);
+        stops.push(() => src.stop());
+        end = t + 1.1;
+        break;
+      }
+      case 'nw:distant-steps': {
+        const count = 4 + Math.floor(this.random() * 6);
+        const pace = 0.55 + this.random() * 0.3;
+        for (let i = 0; i < count; i++) {
+          const at = t + i * pace * (0.92 + this.random() * 0.16);
+          const o = osc('sine', 80);
+          o.frequency.exponentialRampToValueAtTime(40, at + 0.1);
+          const g = ctx.createGain();
+          env(g, vol * 0.22 * (1 - i / (count * 1.6)), 0.004, 0.12, at);
+          o.connect(g).connect(out);
+          o.start(at); o.stop(at + 0.2);
+          noiseBurst(at, 0.05, filt('lowpass', 500), vol * 0.12);
+        }
+        end = t + count * pace + 0.4;
+        break;
+      }
       case 'nw:brownout': {
         if (this.toneGain) {
           const g = this.toneGain.gain;
@@ -407,6 +509,36 @@ export class Ambience {
     this.track(stops, end);
     if (out !== this.master) setTimeout(() => { try { out.disconnect(); } catch { /* closed */ } }, Math.max(0, (end - ctx.currentTime) * 1000 + 300));
     return true;
+  }
+
+  /**
+   * Abrupt silence: room tone, buzz and ambient events cut out at once, then the building
+   * slowly comes back. Used after a chase ends, when the quiet is the scare.
+   */
+  silence(seconds: number): void {
+    if (!this.ctx) return;
+    const now = this.ctx.currentTime;
+    this.silenceUntil = Math.max(this.silenceUntil, now + seconds);
+    this.hushUntil = Math.max(this.hushUntil, now + seconds + 4);
+    for (const v of this.voices) v.stop();
+    this.voices.clear();
+    if (this.toneGain) {
+      const g = this.toneGain.gain;
+      g.cancelScheduledValues(now);
+      g.setValueAtTime(0.0001, now + 0.02);
+      g.setTargetAtTime(0.11, now + seconds, 3);
+    }
+    this.buzz?.gain.gain.setValueAtTime(0, now + 0.02);
+  }
+
+  /** Temporarily scale the whole ambience (near-miss muffling). */
+  duck(level: number, seconds: number): void {
+    if (!this.ctx || !this.master) return;
+    const g = this.master.gain;
+    const now = this.ctx.currentTime;
+    g.cancelScheduledValues(now);
+    g.setTargetAtTime(0.75 * level, now, 0.1);
+    g.setTargetAtTime(0.75, now + seconds, 1);
   }
 
   /** Repeat a cue until stopped (used by `atmosphere:sound` events with loop: true). */
