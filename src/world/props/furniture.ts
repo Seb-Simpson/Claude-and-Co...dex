@@ -188,6 +188,11 @@ export function sinkUnit(b: WorldBuilder, p: Place, roomId: ObjectId, options: {
     put(b, p, 'beigePlastic', box(0.5, 0.05, 0.003), 0, 1.86, 0.037, 0, 0, 0, { tint: 0.7 });
   } else {
     put(b, p, 'screenOff', box(0.46, 0.66, 0.01), 0, 1.55, 0.028, 0, 0, 0, { shade: 'flat', tint: [2.2, 2.3, 2.4] });
+    b.reflectiveSurfaces.push({
+      id: b.id('mirror', roomId.split(':').pop() ?? 'room'), kind: 'mirror', roomId,
+      position: worldPoint(p, 0, 1.55, 0.034), normal: worldPoint(p, 0, 0, 1).sub(worldPoint(p, 0, 0, 0)).normalize(),
+      width: 0.46, height: 0.66,
+    });
     if (mirror === 'cracked') {
       for (let i = 0; i < 6; i++) {
         const a = b.rng.range(0, Math.PI * 2);

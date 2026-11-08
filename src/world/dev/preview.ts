@@ -3,6 +3,8 @@
  * index.html). It registers just the NW-001A world/atmosphere/horror modules and drives the
  * shared camera with a free-fly debug camera — this is NOT the player controller (owned by NW-001B).
  */
+import { Group } from 'three';
+import type { EntityBehaviourState, EntityType } from '../../contracts';
 import { createEngine } from '../../engine';
 import { createEventBus, createModuleRegistry } from '../../integration';
 import atmosphere from '../../atmosphere/atmosphere.module';
@@ -32,6 +34,7 @@ export const VIEWS: Record<string, View> = {
   waiting: { x: 3.6, y: 1.62, z: -0.9, yaw: Math.PI + 0.25, pitch: -0.1 },
   lift: { x: 19.0, y: 1.62, z: -1.4, yaw: -0.8, pitch: 0 },
   overview: { x: 0.5, y: 34, z: -3.5, yaw: 0, pitch: -Math.PI / 2 + 0.0001 },
+  lineup: { x: -3.9, y: 1.6, z: 0.15, yaw: Math.PI / 2, pitch: -0.08 },
 };
 
 async function main(): Promise<void> {
@@ -86,9 +89,58 @@ async function main(): Promise<void> {
       if (keys.has('e')) view.y += speed;
       if (keys.has('q')) view.y -= speed;
       apply();
+      moveActors(frame.deltaSeconds);
       registry.update(frame);
     },
   });
+
+  // Showcase: stand-in nodes in NW-001B's model-binding format so the real presenter attaches
+  // bodies to them. Dev only — in the game, gameplay owns these nodes and moves them.
+  interface ShowcaseEntry { id: string; type: EntityType; x: number; z: number; yaw: number; behaviour: EntityBehaviourState; dx?: number; dz?: number; speed?: number; range?: number }
+  const showcaseRoot = new Group();
+  showcaseRoot.name = 'night-ward:entities';
+  scene.add(showcaseRoot);
+  const actors = new Map<string, { node: Group; entry: ShowcaseEntry; t: number }>();
+  const showcase = (entries: ShowcaseEntry[]): void => {
+    for (const [id, a] of actors) if (!entries.some((e) => e.id === id)) { a.node.removeFromParent(); actors.delete(id); }
+    for (const entry of entries) {
+      let actor = actors.get(entry.id);
+      if (!actor) {
+        const node = new Group();
+        node.name = `night-ward:entity:${entry.id}`;
+        showcaseRoot.add(node);
+        actor = { node, entry, t: 0 };
+        actors.set(entry.id, actor);
+      }
+      actor.entry = entry;
+      actor.node.userData = { entityId: entry.id, entityType: entry.type, behaviourState: entry.behaviour };
+      actor.node.position.set(entry.x, 0, entry.z);
+      actor.node.rotation.y = entry.yaw;
+    }
+  };
+  const moveActors = (dt: number): void => {
+    for (const a of actors.values()) {
+      const e = a.entry;
+      if (!e.speed || !e.range) continue;
+      a.t += dt * e.speed;
+      const s = (a.t % (2 * e.range));
+      const forward = s < e.range;
+      const d = forward ? s : 2 * e.range - s;
+      const dir = { x: e.dx ?? 0, z: e.dz ?? -1 };
+      a.node.position.set(e.x + dir.x * d, 0, e.z + dir.z * d);
+      const mx = forward ? dir.x : -dir.x;
+      const mz = forward ? dir.z : -dir.z;
+      a.node.rotation.y = Math.atan2(-mx, -mz);
+    }
+  };
+  if (params.get('showcase') === 'lineup') {
+    showcase([
+      { id: 'patient', type: 'patient', x: -8.6, z: 0.55, yaw: -Math.PI / 2, behaviour: 'idle' },
+      { id: 'nurse', type: 'nurse', x: -7.2, z: -0.65, yaw: -Math.PI / 2, behaviour: 'idle' },
+      { id: 'crawler', type: 'crawler', x: -5.9, z: 0.45, yaw: -Math.PI / 2 - 0.3, behaviour: 'idle' },
+      { id: 'watcher', type: 'watcher', x: -10.6, z: -0.5, yaw: -Math.PI / 2, behaviour: 'idle' },
+    ]);
+  }
 
   // Hooks for automated screenshots.
   (window as unknown as { __nwPreview: unknown }).__nwPreview = {
@@ -99,6 +151,8 @@ async function main(): Promise<void> {
       return { calls: info.render.calls, triangles: info.render.triangles, geometries: info.memory.geometries, textures: info.memory.textures, programs: info.programs?.length ?? 0 };
     },
     emit(type: string, payload: unknown) { (events.emit as (t: string, p: unknown) => void)(type, payload); },
+    showcase,
+    setCamera(x: number, y: number, z: number, yaw: number, pitch: number) { Object.assign(view, { x, y, z, yaw, pitch }); apply(); },
     ready: true,
   };
 }

@@ -1,5 +1,5 @@
 import { Matrix4, Vector3 } from 'three';
-import { cagedBulb } from '../architecture';
+import { cagedBulb, emergencyLight } from '../architecture';
 import type { WorldBuilder } from '../core/builder';
 import { box, cylinder, cylinderBetween, torus } from '../core/geometry';
 import { CEILING, DOORS, ROOMS, T, X, Z } from '../layout';
@@ -59,6 +59,15 @@ function corridorDressing(b: WorldBuilder): void {
   sign(b, '← WARD 4 WEST     STAIRS B  ·  LIFTS ↑', SIGN_ROOM, 1.6, 0.18, new Matrix4().makeRotationY(-HALF_PI).setPosition(X.eastCorridorE - 0.012, 2.45, -2.2), { canvas: [1024, 116] });
   sign(b, 'PLEASE KEEP DOORS CLOSED AT NIGHT', SIGN_PAPER, 0.42, 0.16, new Matrix4().makeRotationZ(-0.04).setPosition(-9.9, 1.55, Z.corridorN + 0.014), { canvas: [512, 196] });
 
+  // Battery emergency bulkheads: dim amber until the mains lighting fails around them.
+  for (const x of [-9.8, 4.6, 13.4]) emergencyLight(b, id, new Vector3(x, 2.45, Z.corridorN + 0.05), 0, { color: 0xffb060, intensity: 0.7, state: 'steady' });
+  // Long sight lines where a silhouette can be glimpsed far away (presentation only).
+  b.sightlines.push(
+    { id: 'nw:sightline:corridor-west', roomId: id, position: new Vector3(-19.2, 0, -0.75), yaw: -HALF_PI },
+    { id: 'nw:sightline:corridor-east', roomId: ROOMS.east, position: new Vector3(19.9, 0, 0.6), yaw: HALF_PI },
+    { id: 'nw:sightline:smoke-doors', roomId: id, position: new Vector3(DOORS.smoke + 0.9, 0, 0.0), yaw: HALF_PI },
+  );
+
   // Displaced ceiling tile hanging by a wire — sways when the building breathes.
   const pivot = new Vector3(12.5 - 0.3, CEILING.corridor - 0.01, -0.3);
   const wire = cylinderBetween(new Vector3(0, 0, 0.2), new Vector3(0.05, -0.12, 0.2), 0.004, 3);
@@ -103,6 +112,7 @@ function eastCorridor(b: WorldBuilder): void {
   sign(b, 'NO ACCESS', { ...SIGN_DANGER, subtext: 'STRUCTURAL SURVEY PENDING' }, 0.5, 0.3, new Matrix4().makeRotationZ(-0.03).setPosition(DOORS.stair + 1.0, 1.5, -11 + 0.014), { canvas: [512, 300] });
   inspectMarker(b, 'stairwell-notice', 'inspect', 'Read the notice', { x: DOORS.stair + 1.0, z: -10.95, yaw: 0 }, [0.5, 0.3, 0.06], 1.5, 1.8);
   b.emitter('stairwell', ROOMS.stairwell, 19.5, 3.0, -13.6);
+  b.sightlines.push({ id: 'nw:sightline:stair-lobby', roomId: id, position: new Vector3(19.4, 0, -10.1), yaw: 0 });
   wheelchair(b, { x: 18.75, z: -9.9, yaw: 0.9 }, id);
   cardboardBox(b, { x: 20.4, z: -10.5, yaw: 0.2 }, id, [0.5, 0.45, 0.45]);
   cardboardBox(b, { x: 20.42, z: -10.48, yaw: -0.15, y: 0.45 }, null, [0.4, 0.3, 0.38], true);
@@ -220,6 +230,10 @@ function maintenance(b: WorldBuilder): void {
   stepLadder(b, { x: 14.9, z: 7.72, yaw: Math.PI / 2 }, id);
   cardboardBox(b, { x: 17.2, z: 7.72, yaw: 0.1 }, id, [0.42, 0.4, 0.4]);
   cardboardBox(b, { x: 0.3, z: 7.76, yaw: -0.1 }, id, [0.38, 0.3, 0.34], true);
+  b.sightlines.push(
+    { id: 'nw:sightline:maintenance-east', roomId: id, position: new Vector3(17.3, 0, 7.25), yaw: HALF_PI },
+    { id: 'nw:sightline:maintenance-west', roomId: id, position: new Vector3(-6.2, 0, 7.15), yaw: -HALF_PI },
+  );
   b.emitter('pipes', id, -2.0, 2.6, 7.6);
   b.emitter('pipes', id, 8.0, 2.6, 7.6);
   b.emitter('pipes', id, 15.0, 2.6, 7.6);

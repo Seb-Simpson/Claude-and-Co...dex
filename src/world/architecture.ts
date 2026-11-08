@@ -226,6 +226,16 @@ export function windowUnit(b: WorldBuilder, spec: WindowSpec): void {
   b.add('laminate', box(w + 0.1, 0.03, 0.22), m(mid, spec.bottom - 0.015, inside * 0.1));
   // Glass and the night beyond it.
   const glass = plane(w - fw * 2, h - fw * 2);
+  {
+    const paneAlong = spec.from + w / 4 + fw * 0.25;
+    const across = inside * 0.02;
+    b.reflectiveSurfaces.push({
+      id: b.id('glass', spec.roomId.split(':').pop() ?? 'room'), kind: 'window', roomId: spec.roomId,
+      position: spec.axis === 'x' ? new Vector3(paneAlong, cy, spec.at + across) : new Vector3(spec.at + across, cy, paneAlong),
+      normal: spec.axis === 'x' ? new Vector3(0, 0, inside) : new Vector3(inside, 0, 0),
+      width: w / 2 - fw * 1.5, height: h - fw * 2,
+    });
+  }
   b.add('glass', glass, m(mid, cy, spec.outside * 0.01, spec.outside > 0 ? Math.PI : 0), { uv: 'local', shade: 'flat' });
   const sky = plane(w + 3.5, h + 2.4);
   b.add('sky', sky, m(mid, cy + 0.4, spec.outside * 1.4, spec.outside > 0 ? Math.PI : 0), { uv: 'local', shade: 'flat' });

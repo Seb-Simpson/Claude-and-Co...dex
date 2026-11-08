@@ -92,6 +92,29 @@ export interface SoundEmitter {
   readonly position: Vector3;
 }
 
+/** A mirror or pane of glass where The Reflection may be presented. */
+export interface ReflectiveSurface {
+  readonly id: ObjectId;
+  readonly kind: 'mirror' | 'window' | 'glass';
+  readonly roomId: ObjectId;
+  /** Centre of the reflective face (world space). */
+  readonly position: Vector3;
+  /** Unit normal pointing out of the surface into the room. */
+  readonly normal: Vector3;
+  readonly width: number;
+  readonly height: number;
+}
+
+/** Long sight lines where a distant silhouette can be glimpsed (presentation only). */
+export interface SightlineAnchor {
+  readonly id: ObjectId;
+  readonly roomId: ObjectId;
+  /** Floor position of the figure. */
+  readonly position: Vector3;
+  /** Yaw (contract convention: 0 faces -Z) the figure stands facing. */
+  readonly yaw: number;
+}
+
 export interface HospitalExtras {
   readonly fixtures: readonly LightFixture[];
   readonly anomalies: readonly AnomalyTarget[];
@@ -102,6 +125,8 @@ export interface HospitalExtras {
   readonly connections: readonly (readonly [ObjectId, ObjectId])[];
   /** Materials that atmosphere may tint during disturbances (kept for future use). */
   readonly sharedMaterials: readonly Material[];
+  readonly reflectiveSurfaces: readonly ReflectiveSurface[];
+  readonly sightlines: readonly SightlineAnchor[];
 }
 
 const EXTRAS_KEY = 'nightWardHospital';

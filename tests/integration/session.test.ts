@@ -141,10 +141,12 @@ describe('first playable application lifecycle with the actual hospital', () => 
       expect(ready.entities[0]?.position).toEqual(world.entitySpawns.find((spawn) => spawn.type === 'patient')?.position);
       fixture.tick(30);
       expect(app.snapshot().player?.position).toEqual(ready.player?.position);
+      expect(app.snapshot().performance.simulatedSeconds).toBe(0);
       app.play();
       expect(app.snapshot().state).toBe('playing');
       fixture.tick(30);
       const moved = app.snapshot().player;
+      expect(app.snapshot().performance.simulatedSeconds).toBeCloseTo(0.5, 6);
       expect(moved?.position.z).toBeLessThan(world.playerSpawn.position.z - 0.5);
       expect(moved?.position.y).toBeGreaterThanOrEqual(-0.02);
       expect(fixture.factory).toHaveBeenCalledTimes(1);
@@ -179,9 +181,11 @@ describe('first playable application lifecycle with the actual hospital', () => 
       fixture.tick(120);
       expect(app.snapshot().player?.position).toEqual(captured.player?.position);
       expect(app.snapshot().entities).toEqual(captured.entities);
+      expect(app.snapshot().performance.simulatedSeconds).toBe(captured.performance.simulatedSeconds);
       await app.restart();
       const restarted = app.snapshot();
       expect(restarted.state).toBe('ready');
+      expect(restarted.performance.simulatedSeconds).toBe(0);
       expect(restarted.sessionId).toBe(original.sessionId + 1);
       expect(restarted.player?.position).toEqual(original.player?.position);
       expect(restarted.player?.captured).toBe(false);

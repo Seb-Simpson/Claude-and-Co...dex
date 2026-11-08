@@ -40,6 +40,9 @@ export function nearestIndices(distances: readonly number[], count: number): num
 export class LightRig {
   readonly lights: PointLight[] = [];
   readonly ambient: HemisphereLight;
+  /** Dim, short-range fill that follows the camera so nearby surfaces stay readable in darkness. */
+  readonly fill: PointLight;
+  private darknessLevel = 0;
   private readonly runtimes: FixtureRuntime[];
   private readonly lit: FixtureRuntime[];
   private readonly overrides = new Map<string, LightOverride>();
@@ -69,6 +72,9 @@ export class LightRig {
     this.ambient = new HemisphereLight(0x50627a, 0x17130f, options.ambient ?? 0.4);
     this.ambient.name = 'nw:ambient';
     scene.add(this.ambient);
+    this.fill = new PointLight(0x8aa0b8, 0.28, 3.2, 2);
+    this.fill.name = 'nw:camera-fill';
+    scene.add(this.fill);
   }
 
   on(listener: (event: RigEvent) => void): () => void {
@@ -117,18 +123,45 @@ export class LightRig {
     if (this.disposed) return;
     this.time = elapsed;
     this.maybeDisturb(camera);
+    const emergencyBoost = 1 + this.darknessLevel * 1.3;
+    const chasePulse = this.chaseIntensity > 0 ? 0.65 + 0.35 * Math.sin(elapsed * 3.4) : 1;
+    let litWeight = 0;
+    let totalWeight = 0;
     for (const r of this.runtimes) {
       let b = r.poppedUntil > elapsed ? 0 : fixtureBrightness(r.fixture.state, elapsed, r.seed);
       const override = this.overrides.get(r.fixture.id);
       if (override && elapsed >= override.end) this.overrides.delete(r.fixture.id);
       else b = applyOverride(b, override, elapsed);
+      if (r.fixture.kind === 'emergency') b *= emergencyBoost * (this.chaseIntensity > 0 ? chasePulse : 1);
       r.brightness = b;
       this.paint(r, b);
+      if (r.fixture.kind === 'fluorescent' && r.fixture.state !== 'dead') {
+        const d = r.fixture.position.distanceTo(camera);
+        if (d < 11) {
+          const w = 1 - d / 11;
+          totalWeight += w;
+          litWeight += w * Math.min(1, b);
+        }
+      }
     }
+    // How dark it has become around the camera compared with how lit it should be (0..1).
+    const target = totalWeight > 0.01 ? 1 - litWeight / totalWeight : 0;
+    this.darknessLevel += (target - this.darknessLevel) * Math.min(1, deltaSeconds * 2.5);
+    this.fill.position.copy(camera);
+    this.fill.intensity = 0.22 + this.darknessLevel * 0.18;
     for (const mesh of this.dirtyMeshes) if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
     this.dirtyMeshes.clear();
     this.assignPool(camera);
-    void deltaSeconds;
+  }
+
+  /** 0 when the mains lighting near the camera is working, 1 when it has all failed. */
+  get darkness(): number { return this.darknessLevel; }
+
+  /** Fixture IDs within `radius` of a point (optionally filtered by kind). */
+  fixturesNear(position: Vector3, radius: number, kinds?: readonly LightFixture['kind'][]): string[] {
+    return this.runtimes
+      .filter((r) => (!kinds || kinds.includes(r.fixture.kind)) && r.fixture.position.distanceTo(position) <= radius)
+      .map((r) => r.fixture.id);
   }
 
   private paint(r: FixtureRuntime, b: number): void {
@@ -238,6 +271,8 @@ export class LightRig {
     for (const light of this.lights) { this.scene.remove(light); light.dispose(); }
     this.scene.remove(this.ambient);
     this.ambient.dispose();
+    this.scene.remove(this.fill);
+    this.fill.dispose();
     this.listeners.clear();
     this.overrides.clear();
   }

@@ -13,10 +13,12 @@ Public exports are collected in `src/entities/index.ts`:
   perception-driven actor with `fixedUpdate(frame, noises?)`, `getSnapshot()`,
   `witnessesEntry()`, `observeHiding(event)`, `stop(reason?)`, and `dispose()`.
 - `createDoorNavigationAdapter(options: DoorNavigationOptions)` returns
-  `getDoorApproach(from, goal)` and `openNearbyDoor(from, goal)`. Pass these methods
+  `getDoorApproach(from, goal, localOnly?)` and `openNearbyDoor(from, goal)`. Pass these methods
   into the entity system. Options are `{ world, physics, navigation, agent,
   getDoorState, requestDoorOpen, interactionDistance? }`. The callbacks connect to
   `InteractionSystem.getDoorState` and `requestDoorOpen`.
+  `localOnly=true` restricts planning to nearby, directly reachable approaches
+  before a full detour search. Opening-side approaches wait outside the leaf arc.
 - `createEntityPresentation(scene, snapshots): EntityPresentation` exposes
   `getObject(entityId)`, `update()`, and `dispose()`.
 - `createPatientProxy(): PatientProxy` returns `{ object: Group, dispose() }`.
@@ -37,6 +39,10 @@ disposal settles every active chase. Restart creates a fresh entity system;
 there is no hidden teleport or retained target memory across sessions.
 
 ## Replacing the temporary model
+
+The merged NW-002B presenter already attaches the actual Patient model through
+this binding; its audio, animation and footprints remain presentation-owned.
+The fallback below is retained for installations without that module.
 
 Find the feet-pose node named `night-ward:entity:<entityId>` (the hospital Patient
 is `night-ward:entity:nw:entity:patient`), or call `getObject(entityId)`. Attach the

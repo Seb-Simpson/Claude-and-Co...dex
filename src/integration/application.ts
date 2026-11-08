@@ -54,6 +54,7 @@ export function createApplication(options: ApplicationOptions): Application {
   let fixedMaxMs = 0;
   let updateMaxMs = 0;
   let frameDeltaMaxMs = 0;
+  let simulatedSeconds = 0;
   const document = options.container.ownerDocument;
   function setState(value: ApplicationState): void { state = value; options.onState?.(value); }
   function now(): number { return performance.now(); }
@@ -114,7 +115,8 @@ export function createApplication(options: ApplicationOptions): Application {
     if (!active || disposed || state !== 'playing') return;
     const begin = now();
     active.fixedOffset ??= frame.elapsedSeconds - frame.deltaSeconds;
-    active.registry.fixedUpdate({ deltaSeconds: frame.deltaSeconds, elapsedSeconds: frame.elapsedSeconds - active.fixedOffset });
+    simulatedSeconds = frame.elapsedSeconds - active.fixedOffset;
+    active.registry.fixedUpdate({ deltaSeconds: frame.deltaSeconds, elapsedSeconds: simulatedSeconds });
     fixedMaxMs = Math.max(fixedMaxMs, now() - begin);
   }
   async function beginAttempt(): Promise<void> {
@@ -126,7 +128,7 @@ export function createApplication(options: ApplicationOptions): Application {
       records: [], fixedOffset: null, renderOffset: null,
     };
     attempt = active;
-    fixedMaxMs = 0; updateMaxMs = 0; frameDeltaMaxMs = 0;
+    fixedMaxMs = 0; updateMaxMs = 0; frameDeltaMaxMs = 0; simulatedSeconds = 0;
     const track: readonly (keyof GameEventMap)[] = [
       'player:captured', 'chase:started', 'chase:ended', 'entity:state', 'hiding:state',
       'door:state', 'interaction:completed', 'atmosphere:lighting', 'atmosphere:sound',
@@ -160,6 +162,7 @@ export function createApplication(options: ApplicationOptions): Application {
       else engine.services.renderer.domElement?.setAttribute?.('aria-label', 'NIGHT WARD hospital view');
       if (active.runtime) {
         active.encounter = createPatientEncounter({ events, audio: engine.services.audio,
+          presentationProvided: Boolean(engine.services.scene.getObjectByName('nw:horror-layer')),
           playerId: active.runtime.player.getSnapshot().id, onMessage: (message) => active.runtime?.notify(message) });
       }
       setState('ready');
@@ -213,7 +216,8 @@ export function createApplication(options: ApplicationOptions): Application {
           geometries: info?.memory.geometries ?? 0, textures: info?.memory.textures ?? 0 },
         audioState: engine?.services.audio.context?.state ?? 'locked', events: [...(attempt?.records ?? [])],
         doorStates, prompt: attempt?.runtime?.interactions.getPrompt() ?? null, error,
-        performance: { fixedMaxMs, updateMaxMs, frameDeltaMaxMs },
+        performance: { fixedMaxMs, updateMaxMs, frameDeltaMaxMs, simulatedSeconds,
+          ...(!backendDisposed && engine?.getPerformanceSnapshot ? { engine: engine.getPerformanceSnapshot() } : {}) },
       };
     },
     teleport(position, yaw) {

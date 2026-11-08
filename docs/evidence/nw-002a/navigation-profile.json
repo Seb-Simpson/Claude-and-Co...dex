@@ -1,0 +1,438 @@
+{
+  "measuredAtUtc": "2026-11-08T14:59:56Z",
+  "nodeVersion": "v24.22.1",
+  "branch": "feat/nw-002a-integration",
+  "baseCommit": "8831d8a8430438b1488041a125db6c47a21095f7",
+  "workingTreeChanges": "Door-first entity planning and opening-side leaf sweep clearance, measured before commit.",
+  "method": {
+    "hospital": "createHospitalWorld({textures:false}) with all 223 authored collider definitions",
+    "navigation": "cellSize 0.25, maxNodes 4096; Patient radius 0.3 m, height 1.8 m",
+    "simulation": "7,200 fixed ticks at 1/60 s = 120 simulated seconds; actual interactions, Patient FSM and collision movement; one shared Rapier step per tick",
+    "patrol": "Actual Patient spawn and ward-loop route; player idle in room 104. Capture disabled only to prevent diagnostic termination.",
+    "noise": "Same simulation plus player interaction noise with radius 60 m once per simulated second",
+    "reproduce": "node tests/performance/navigation-profile.mjs",
+    "timingLimits": "Accelerated CPU-only simulation on a shared machine. Load-dependent measurements, not browser FPS or timing assertions."
+  },
+  "originMainComparison": {
+    "commit": "84b819782f6384172c3089d514c9462ba8fc4d29",
+    "method": "Read adapter.ts and navigation.ts from origin/main into isolated temporary copies; separate Rapier instance; identical current hospital metadata and 223 colliders.",
+    "results": [
+      {
+        "version": "origin-main",
+        "cellSize": 0.5,
+        "colliders": 223,
+        "query": {
+          "from": {
+            "x": 19.5,
+            "y": 0,
+            "z": 7.2
+          },
+          "to": {
+            "x": 12,
+            "y": 0,
+            "z": 7.15
+          }
+        },
+        "samples": [
+          {
+            "ms": 4070.68,
+            "found": false
+          },
+          {
+            "ms": 3726.36,
+            "found": false
+          }
+        ]
+      },
+      {
+        "version": "current-samegrid",
+        "cellSize": 0.5,
+        "colliders": 223,
+        "query": {
+          "from": {
+            "x": 19.5,
+            "y": 0,
+            "z": 7.2
+          },
+          "to": {
+            "x": 12,
+            "y": 0,
+            "z": 7.15
+          }
+        },
+        "samples": [
+          {
+            "ms": 78.78,
+            "found": false
+          },
+          {
+            "ms": 0.02,
+            "found": false
+          }
+        ]
+      },
+      {
+        "version": "current-hospitalgrid",
+        "cellSize": 0.25,
+        "colliders": 223,
+        "query": {
+          "from": {
+            "x": 19.5,
+            "y": 0,
+            "z": 7.2
+          },
+          "to": {
+            "x": 12,
+            "y": 0,
+            "z": 7.15
+          }
+        },
+        "samples": [
+          {
+            "ms": 306.02,
+            "found": false
+          },
+          {
+            "ms": 0.02,
+            "found": false
+          }
+        ]
+      }
+    ]
+  },
+  "beforeDoorFirst": {
+    "patrol120s": {
+      "navigationQueries": 308,
+      "navigationTotalMs": 845.45,
+      "navigationMaxMs": 353.15,
+      "navigationP95Ms": 0.95,
+      "maxQueriesPerFixedTick": 3,
+      "fixedTickMaxMs": 353.55,
+      "fixedTickP95Ms": 0.36,
+      "lateSpikes": [
+        {
+          "fixedTick": 6230,
+          "queryMs": 334.97,
+          "from": {
+            "x": 19.493347651735565,
+            "y": 0.0029999985098838862,
+            "z": 6.980819649722573
+          },
+          "to": {
+            "x": 12,
+            "y": 0,
+            "z": 7.15
+          }
+        },
+        {
+          "fixedTick": 6254,
+          "queryMs": 353.15,
+          "from": {
+            "x": 19.215069791338028,
+            "y": 0.0029999985098838862,
+            "z": 7.0928974459738985
+          },
+          "to": {
+            "x": 12,
+            "y": 0,
+            "z": 7.15
+          }
+        }
+      ]
+    },
+    "noise120s": {
+      "navigationQueries": 354,
+      "navigationTotalMs": 447.62,
+      "navigationMaxMs": 58.7,
+      "navigationP95Ms": 6.52,
+      "maxQueriesPerFixedTick": 3,
+      "fixedTickP95Ms": 0.26
+    }
+  },
+  "afterDoorFirst": [
+    {
+      "scenario": "360 changing-start blocked paths",
+      "stats": {
+        "count": 360,
+        "totalMs": 1190.12,
+        "maxMs": 48.21,
+        "p95Ms": 5.43
+      },
+      "blocks": [
+        {
+          "count": 60,
+          "totalMs": 258.06,
+          "maxMs": 48.21,
+          "p95Ms": 8.71
+        },
+        {
+          "count": 60,
+          "totalMs": 197.18,
+          "maxMs": 8.14,
+          "p95Ms": 5.43
+        },
+        {
+          "count": 60,
+          "totalMs": 237.53,
+          "maxMs": 8.69,
+          "p95Ms": 8.29
+        },
+        {
+          "count": 60,
+          "totalMs": 190.98,
+          "maxMs": 6.68,
+          "p95Ms": 5.51
+        },
+        {
+          "count": 60,
+          "totalMs": 150.97,
+          "maxMs": 8.89,
+          "p95Ms": 4.23
+        },
+        {
+          "count": 60,
+          "totalMs": 155.4,
+          "maxMs": 4.96,
+          "p95Ms": 4.26
+        }
+      ]
+    },
+    {
+      "scenario": "patrol120s",
+      "queryTimes": {
+        "count": 305,
+        "totalMs": 57.79,
+        "maxMs": 0.71,
+        "p95Ms": 0.37
+      },
+      "frameTimes": {
+        "count": 7200,
+        "totalMs": 1333.18,
+        "maxMs": 24.64,
+        "p95Ms": 0.34
+      },
+      "maxQueriesPerTick": 2,
+      "queryCount": 305,
+      "uniqueFromYs": [
+        [
+          0.0029999985098838862,
+          305
+        ]
+      ],
+      "obstacleRevisions": 108,
+      "ending": {
+        "id": "nw:entity:patient",
+        "type": "patient",
+        "position": {
+          "x": 8.3105718559326,
+          "y": 0.0029999985098838862,
+          "z": 6.964548041242526
+        },
+        "state": "patrol",
+        "lastKnownPlayer": null
+      },
+      "worst": [],
+      "frameBlocks": [
+        {
+          "count": 1800,
+          "totalMs": 433.66,
+          "maxMs": 24.64,
+          "p95Ms": 0.43
+        },
+        {
+          "count": 1800,
+          "totalMs": 311.77,
+          "maxMs": 9.23,
+          "p95Ms": 0.31
+        },
+        {
+          "count": 1800,
+          "totalMs": 302.84,
+          "maxMs": 9.81,
+          "p95Ms": 0.3
+        },
+        {
+          "count": 1800,
+          "totalMs": 284.91,
+          "maxMs": 12.09,
+          "p95Ms": 0.26
+        }
+      ]
+    },
+    {
+      "scenario": "noise-blocked120s",
+      "queryTimes": {
+        "count": 346,
+        "totalMs": 296.03,
+        "maxMs": 51.86,
+        "p95Ms": 4.63
+      },
+      "frameTimes": {
+        "count": 7200,
+        "totalMs": 1449.21,
+        "maxMs": 52.13,
+        "p95Ms": 0.22
+      },
+      "maxQueriesPerTick": 3,
+      "queryCount": 346,
+      "uniqueFromYs": [
+        [
+          0,
+          3
+        ],
+        [
+          0.0029999985098838862,
+          343
+        ]
+      ],
+      "obstacleRevisions": 108,
+      "ending": {
+        "id": "nw:entity:patient",
+        "type": "patient",
+        "position": {
+          "x": -12.272426241707807,
+          "y": 0.0029999985098838862,
+          "z": 3.5311307147653923
+        },
+        "state": "pursue",
+        "lastKnownPlayer": {
+          "playerId": "player",
+          "position": {
+            "x": -12.400000091731744,
+            "y": 0.0029999985098838862,
+            "z": 4.100000409046823
+          },
+          "timeSeconds": 120,
+          "source": "vision"
+        }
+      },
+      "worst": [
+        {
+          "frame": 565,
+          "from": {
+            "x": -5.506548820567204,
+            "y": 0.0029999985098838862,
+            "z": 7.224586272931302
+          },
+          "to": {
+            "x": -12.4,
+            "y": 0.0029999985098838862,
+            "z": 4.1
+          },
+          "ms": 51.86,
+          "found": true
+        },
+        {
+          "frame": 0,
+          "from": {
+            "x": 6,
+            "y": 0,
+            "z": 7.2
+          },
+          "to": {
+            "x": -12.4,
+            "y": 0.0029999985098838862,
+            "z": 4.1
+          },
+          "ms": 29.24,
+          "found": false
+        },
+        {
+          "frame": 24,
+          "from": {
+            "x": 5.46000123273739,
+            "y": 0.0029999985098838862,
+            "z": 7.201153843519802
+          },
+          "to": {
+            "x": -12.4,
+            "y": 0.0029999985098838862,
+            "z": 4.1
+          },
+          "ms": 27.48,
+          "found": false
+        },
+        {
+          "frame": 955,
+          "from": {
+            "x": -7.423748602812458,
+            "y": 0.0029999985098838862,
+            "z": 0.8060513085791181
+          },
+          "to": {
+            "x": -12.4,
+            "y": 0.0029999985098838862,
+            "z": 4.1
+          },
+          "ms": 24.38,
+          "found": true
+        },
+        {
+          "frame": 1046,
+          "from": {
+            "x": -9.329231966802519,
+            "y": 0.0029999985098838862,
+            "z": 0.9097752019533174
+          },
+          "to": {
+            "x": -12.4,
+            "y": 0.0029999985098838862,
+            "z": 4.1
+          },
+          "ms": 13.94,
+          "found": true
+        },
+        {
+          "frame": 589,
+          "from": {
+            "x": -5.523112251762704,
+            "y": 0.0029999985098838862,
+            "z": 6.684840357942552
+          },
+          "to": {
+            "x": -12.4,
+            "y": 0.0029999985098838862,
+            "z": 4.1
+          },
+          "ms": 10.34,
+          "found": true
+        }
+      ],
+      "frameBlocks": [
+        {
+          "count": 1800,
+          "totalMs": 604.45,
+          "maxMs": 52.13,
+          "p95Ms": 0.3
+        },
+        {
+          "count": 1800,
+          "totalMs": 286.95,
+          "maxMs": 12.13,
+          "p95Ms": 0.19
+        },
+        {
+          "count": 1800,
+          "totalMs": 268.16,
+          "maxMs": 9.26,
+          "p95Ms": 0.18
+        },
+        {
+          "count": 1800,
+          "totalMs": 289.65,
+          "maxMs": 10.99,
+          "p95Ms": 0.21
+        }
+      ]
+    }
+  ],
+  "findings": [
+    "Main repeats multi-second blocked searches using linear collider scans and uncached A*.",
+    "Spatial indexing and caching remove repeated identical work. Cold searches remain synchronous and bounded.",
+    "The late integration patrol spike occurred at 104 simulated seconds: the moving east maintenance door invalidated clearance caches and full-goal A* searched a hospital detour.",
+    "Local doorway planning and waiting outside the leaf arc reduced the measured 120-second patrol maximum query from 353.15 ms to 0.71 ms.",
+    "All 305 post-fix patrol queries used the same exact floor height, 0.0029999985098838862. No floor-height cache-key churn was observed.",
+    "Navigation caches and entity queues are bounded. No progressive CPU degradation appeared in these 120-second simulations.",
+    "Generic remote blocked-goal searches can still exceed a frame budget: 51.86 ms in the post-fix noise profile. Browser profiling measures remaining frame pacing and presentation costs separately."
+  ]
+}

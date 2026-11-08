@@ -64,6 +64,8 @@ export function createHospitalWorld(options: CreateHospitalWorldOptions = {}): H
     rooms: builder.rooms,
     connections: builder.connections,
     sharedMaterials: [],
+    reflectiveSurfaces: builder.reflectiveSurfaces,
+    sightlines: builder.sightlines,
   };
   attachExtras(builder.root, extras);
   builder.root.updateMatrixWorld(true);
