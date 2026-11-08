@@ -2,6 +2,7 @@ import { Vector3 } from 'three';
 import type { FrameContext, GameEventMap, GameModule } from '../contracts';
 import { createEngine, createNeutralScene } from '../engine';
 import type { Engine, EngineOptions } from '../engine';
+import type { EngineServices } from '../contracts';
 import { createGameplayModule } from '../gameplay';
 import type { GameplayOptions, GameplayRuntime } from '../gameplay';
 import { createEventBus } from './events';
@@ -19,10 +20,35 @@ export interface ApplicationOptions {
   engineFactory?: (options: EngineOptions) => Promise<Engine>;
   onStatus?: (message: string, isError?: boolean) => void;
   onState?: (state: ApplicationState) => void;
+  /** Real loading milestones (engine, each module's setup, shader compilation) for the loading screen. */
+  onProgress?: (progress: ApplicationProgress) => void;
+}
+export interface ApplicationProgress {
+  readonly stage: 'engine' | 'module' | 'shaders';
+  readonly id: string;
+  readonly state: 'begin' | 'done' | 'failed';
 }
 export interface Application extends ApplicationDiagnostics {
   start(): Promise<void>;
   play(): void;
+  /**
+   * Freeze the running session in place: the engine loop stops (physics, player, entity AI,
+   * navigation, timers, animation and presentation all stand still on the current frame) and
+   * the game's AudioContext is suspended. Returns false when not playing.
+   */
+  pause(): boolean;
+  /** Continue the same paused session exactly where it stopped. */
+  resume(): void;
+  /** Dispose the active session (back to the title screen). The engine and its WebGL context stay. */
+  endSession(): Promise<void>;
+  /** Start a fresh session: boots the engine on first use, otherwise reuses it. */
+  newSession(): Promise<void>;
+  /** Re-render the current frame without advancing anything (a resize while paused). */
+  redraw(): void;
+  /** Look sensitivity for this and later sessions (vertical negative inverts Y). */
+  setLookSensitivity(horizontal: number, vertical: number): void;
+  /** Engine services, once booted (renderer for display settings, audio for the mixer). */
+  services(): EngineServices | null;
 }
 interface Attempt {
   id: number;
@@ -51,6 +77,9 @@ export function createApplication(options: ApplicationOptions): Application {
   let backendDisposed = false;
   let engineDisposal: Promise<void> | undefined;
   let attemptDisposal: Promise<void> | undefined;
+  let starting: Promise<void> | undefined;
+  let audioPausedBySession = false;
+  let look: [number, number] | null = null;
   let fixedMaxMs = 0;
   let updateMaxMs = 0;
   let frameDeltaMaxMs = 0;
@@ -61,7 +90,30 @@ export function createApplication(options: ApplicationOptions): Application {
     if (document?.pointerLockElement) document.exitPointerLock();
   }
   function onPointerLock(): void {
-    if (state === 'ready' && document.pointerLockElement === engine?.services.renderer.domElement) app.play();
+    const locked = document.pointerLockElement === engine?.services.renderer.domElement;
+    if (state === 'ready' && locked) app.play();
+    else if (state === 'paused' && locked) app.resume();
+  }
+  function progress(stage: ApplicationProgress['stage'], id: string, value: ApplicationProgress['state']): void {
+    try { options.onProgress?.({ stage, id, state: value }); } catch (failure) { console.error('NIGHT WARD progress listener failed:', failure); }
+  }
+  /** Report each module's setup as a loading milestone without changing what it does. */
+  function tracked(definition: GameModule): GameModule {
+    if (!options.onProgress) return definition;
+    return { ...definition, async setup(context) {
+      progress('module', definition.id, 'begin');
+      try {
+        const result = await definition.setup(context);
+        progress('module', definition.id, 'done');
+        return result;
+      } catch (failure) { progress('module', definition.id, 'failed'); throw failure; }
+    } };
+  }
+  function resumeAudio(): void {
+    if (!audioPausedBySession) return;
+    audioPausedBySession = false;
+    const context = engine?.services.audio.context;
+    if (context?.state === 'suspended') void context.resume().catch(() => { /* resumes on the next gesture */ });
   }
   document?.addEventListener('pointerlockchange', onPointerLock);
 
@@ -146,18 +198,29 @@ export function createApplication(options: ApplicationOptions): Application {
           ...options.gameplayOptions,
           onRestart: () => { void app.restart().catch(() => { /* restart reports and releases failures */ }); },
         });
-        registry.register({ ...module, async setup(context) {
+        registry.register(tracked({ ...module, async setup(context) {
           const result = await module.setup(context);
           if (result.player && 'physics' in result) active.runtime = result as GameplayRuntime;
           return result;
-        } });
-      } else registry.register(definition);
+        } }));
+      } else registry.register(tracked(definition));
     }
     try {
       await registry.start();
       if (disposed || attempt !== active) return;
       if (!registry.world) active.fixture = createNeutralScene(engine.services);
       else engine.services.renderer.domElement?.setAttribute?.('aria-label', 'NIGHT WARD hospital view');
+      // Compile every material's shaders now (a tracked loading stage) instead of stalling on the
+      // first frames in Room 104.
+      const { renderer, scene, camera } = engine.services;
+      if (options.onProgress && typeof renderer.compileAsync === 'function') {
+        progress('shaders', 'scene', 'begin');
+        try { await renderer.compileAsync(scene, camera); progress('shaders', 'scene', 'done'); }
+        catch { progress('shaders', 'scene', 'failed'); }
+        if (disposed || attempt !== active) return;
+      }
+      if (look) active.runtime?.player.setLookSensitivity(look[0], look[1]);
+      resumeAudio();
       if (active.runtime) {
         active.encounter = createPatientEncounter({ events, audio: engine.services.audio,
           playerId: active.runtime.player.getSnapshot().id, onMessage: (message) => active.runtime?.notify(message) });
@@ -178,18 +241,69 @@ export function createApplication(options: ApplicationOptions): Application {
       if (started) return started;
       if (disposed) return Promise.reject(new Error('Application disposed'));
       started = Promise.resolve().then(async () => {
+        progress('engine', 'renderer', 'begin');
         const created = await (options.engineFactory ?? createEngine)({ container: options.container, onError: (failure) => { void fail(failure).catch((cleanupError: unknown) => console.error('Cleanup failed:', cleanupError)); } });
         engine = created;
+        progress('engine', 'renderer', 'done');
         if (disposed) { await releaseEngine(); return; }
         await beginAttempt();
       }).catch(async (failure: unknown) => { await fail(failure); throw failure; });
       return started;
     },
     play() { if (state === 'ready' && !disposed) setState('playing'); },
+    pause() {
+      if (state !== 'playing' || disposed || !engine) return false;
+      setState('paused');
+      engine.stop();
+      const context = engine.services.audio.context;
+      if (context?.state === 'running') { audioPausedBySession = true; void context.suspend().catch(() => { /* already closed */ }); }
+      unlock();
+      return true;
+    },
+    resume() {
+      if (state !== 'paused' || disposed || !engine) return;
+      resumeAudio();
+      setState('playing');
+      engine.start({ fixedUpdate: fixed, update: render });
+    },
+    endSession() {
+      if (disposed || !engine) return Promise.resolve();
+      // Let any in-flight boot finish first: a half-started registry is never torn down mid-setup.
+      const pending = starting ?? restarting ?? (state === 'loading' ? started : undefined);
+      setState('menu'); engine.stop(); unlock();
+      return Promise.resolve().then(async () => {
+        if (pending) { try { await pending; } catch { /* the failure was reported */ } }
+        engine?.stop();
+        await clearAttempt();
+        if (!disposed) setState('menu');
+      });
+    },
+    newSession() {
+      if (disposed) return Promise.reject(new Error('Application disposed'));
+      if (!started) return app.start();
+      if (starting) return starting;
+      setState('loading');
+      starting = Promise.resolve().then(async () => {
+        await started;
+        if (attempt) { engine?.stop(); await clearAttempt(); }
+        if (!disposed && state === 'loading') await beginAttempt();
+      }).catch(async (failure: unknown) => { await fail(failure); throw failure; }).finally(() => { starting = undefined; });
+      return starting;
+    },
+    redraw() {
+      if (!engine || backendDisposed || !attempt) return;
+      engine.services.renderer.render(engine.services.scene, engine.services.camera);
+    },
+    setLookSensitivity(horizontal, vertical) {
+      look = [horizontal, vertical];
+      attempt?.runtime?.player.setLookSensitivity(horizontal, vertical);
+    },
+    services() { return engine && !backendDisposed ? engine.services : null; },
     restart() {
       if (restarting) return restarting;
       if (disposed || state === 'error' || !engine) return Promise.reject(new Error('Application cannot restart'));
       setState('restarting'); engine.stop(); unlock();
+      if (audioPausedBySession) resumeAudio();
       restarting = Promise.resolve().then(async () => {
         await clearAttempt();
         if (!disposed) await beginAttempt();

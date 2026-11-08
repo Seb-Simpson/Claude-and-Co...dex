@@ -106,6 +106,17 @@ describe('first-person movement', () => {
     expect(Math.abs(f.player.getSnapshot().position.z)).toBeLessThan(0.1);
   });
 
+  it('applies a live look sensitivity from settings, including inverted vertical look', () => {
+    const f = fixture();
+    f.player.setLookSensitivity(0.004, -0.004);
+    f.player.look(100, 50);
+    expect(f.player.getSnapshot().rotation.yaw).toBeCloseTo(-0.4);
+    expect(f.player.getSnapshot().rotation.pitch).toBeCloseTo(0.2);
+    f.player.setLookSensitivity(Number.NaN);
+    f.player.look(100, 0);
+    expect(f.player.getSnapshot().rotation.yaw).toBeCloseTo(-0.8);
+  });
+
   it('restricts hidden/captured movement and smoothly presents the hiding camera', () => {
     const f = fixture();
     f.advance(0.5);

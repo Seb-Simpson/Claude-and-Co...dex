@@ -2,6 +2,8 @@ import {
   type Group, type Material, type Mesh, type MeshStandardMaterial, NoColorSpace, type Object3D, type Texture, TextureLoader,
 } from 'three';
 import { type GLTF, GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { type PreloadEntry, takePreloaded } from '../../assets/preload';
+import setManifest from './assets/room104_set.json';
 
 /** Built by src/world/dressing/pipeline (Blender): see README there. Vite fingerprints both files. */
 export const ROOM104_SET_URL = new URL('./assets/room104_set.glb', import.meta.url).href;
@@ -56,8 +58,17 @@ function bakeLightIntoDirect(material: MeshStandardMaterial): void {
 
 export async function loadRoom104Set(options: LoadRoom104Options = {}): Promise<Room104Set> {
   const timeout = options.timeoutMs ?? 20000;
-  const loadGltf = options.loadGltf ?? ((url: string) => new GLTFLoader().loadAsync(url));
-  const loadTexture = options.loadTexture ?? ((url: string) => new TextureLoader().loadAsync(url));
+  // Bytes the loading screen already streamed are parsed from memory (no second download).
+  const loadGltf = options.loadGltf ?? ((url: string) => {
+    const buffer = takePreloaded(url);
+    return buffer ? new GLTFLoader().parseAsync(buffer, '') : new GLTFLoader().loadAsync(url);
+  });
+  const loadTexture = options.loadTexture ?? (async (url: string) => {
+    const buffer = takePreloaded(url);
+    if (!buffer || typeof URL.createObjectURL !== 'function') return new TextureLoader().loadAsync(url);
+    const blobUrl = URL.createObjectURL(new Blob([buffer], { type: 'image/jpeg' }));
+    try { return await new TextureLoader().loadAsync(blobUrl); } finally { URL.revokeObjectURL(blobUrl); }
+  });
   const [gltf, lightmap] = await Promise.all([
     withTimeout(loadGltf(options.setUrl ?? ROOM104_SET_URL), timeout, 'Room 104 set'),
     withTimeout(loadTexture(options.lightmapUrl ?? ROOM104_LIGHTMAP_URL), timeout, 'Room 104 light map'),
@@ -146,4 +157,12 @@ export async function loadRoom104Set(options: LoadRoom104Options = {}): Promise<
       for (const t of textures) t.dispose();
     },
   };
+}
+
+/** The Room 104 set files, with their manifest sizes, for the loading screen's byte-tracked preload. */
+export function room104Preloads(): PreloadEntry[] {
+  return [
+    { url: ROOM104_SET_URL, bytes: setManifest.bytes, label: 'Room 104 set' },
+    { url: ROOM104_LIGHTMAP_URL, bytes: setManifest.lightmapBytes, label: 'Room 104 light map' },
+  ];
 }

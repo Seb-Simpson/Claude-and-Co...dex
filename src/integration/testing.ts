@@ -1,6 +1,6 @@
 import type { DoorState, EntitySnapshot, GameEventMap, PlayerSnapshot, Vec3 } from '../contracts';
 import type { InteractionPrompt } from '../gameplay';
-export type ApplicationState = 'loading' | 'ready' | 'playing' | 'captured' | 'restarting' | 'error' | 'disposed';
+export type ApplicationState = 'menu' | 'loading' | 'ready' | 'playing' | 'paused' | 'captured' | 'restarting' | 'error' | 'disposed';
 export interface ApplicationSnapshot {
   state: ApplicationState;
   sessionId: number;

@@ -3,19 +3,15 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#141a20" />
-    <link rel="icon" href="data:," />
+    <meta name="theme-color" content="#040607" />
+    <meta name="description" content="NIGHT WARD — wake in Room 104 of Halden Vale Infirmary and find a way out of Ward 4 West. A browser horror game." />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>NIGHT WARD</title>
   </head>
   <body>
-    <main id="app" aria-label="NIGHT WARD renderer">
-      <section id="overlay" aria-live="polite">
-        <p class="eyebrow">WARD 4 WEST</p>
-        <h1>NIGHT WARD</h1>
-        <p id="status">Waking up…</p>
-        <button id="enable-audio" type="button" disabled>Enable audio</button>
-      </section>
-    </main>
+    <main id="app" aria-label="NIGHT WARD"></main>
+    <div id="nw-frontend"></div>
+    <noscript><p style="color:#dfe3d8;font-family:sans-serif;padding:2rem">NIGHT WARD needs JavaScript and WebGL 2.</p></noscript>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

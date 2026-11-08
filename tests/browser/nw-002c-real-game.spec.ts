@@ -17,6 +17,8 @@ async function enterWard(page: Page, query = ''): Promise<string[]> {
   page.on('pageerror', (error) => errors.push(error.message));
   page.on('console', (message) => { if (message.type() === 'error') errors.push(message.text()); });
   await page.goto(`/${query}`);
+  // NW-003: the real entry point opens on the title screen; start a game like a player would.
+  await page.getByRole('button', { name: /New Game/ }).click({ timeout: 60_000 });
   await expect(page.locator('#status')).toContainText('modules ready', { timeout: 120_000 });
   await page.waitForFunction(() => (window as unknown as { __nwHorrorDebug?: unknown }).__nwHorrorDebug !== undefined, null, { timeout: 30_000 });
   const enter = page.getByRole('button', { name: 'Enter ward', exact: true });
