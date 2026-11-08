@@ -1,0 +1,32 @@
+{
+ "glb": "room104_set.glb",
+ "bytes": 7214432,
+ "triangles": 56446,
+ "meshes": {
+  "props": 50962,
+  "wheelchair.001": 4096,
+  "set_floor_vinyl": 4,
+  "set_ceiling_tile": 4,
+  "set_wall_paint": 52,
+  "set_wainscot": 12,
+  "set_wood_rail": 1128,
+  "set_signage": 158,
+  "set_decals": 30
+ },
+ "materials": [
+  "ceiling_tile",
+  "decals",
+  "floor_vinyl",
+  "props_atlas",
+  "signage",
+  "wainscot",
+  "wall_paint",
+  "wheelchair_atlas",
+  "wood_rail"
+ ],
+ "atlas": 2048,
+ "lightmap": "room104_lightmap.jpg",
+ "lightmapSize": 2048,
+ "lightmapBytes": 930138,
+ "samples": 96
+}

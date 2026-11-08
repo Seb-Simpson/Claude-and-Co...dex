@@ -68,8 +68,8 @@ def camera(name, pos, target, lens=24):
 
 
 lights()
-scene.render.resolution_x, scene.render.resolution_y = (800, 450) if QUICK else (1600, 900)
-scene.cycles.samples = 24 if QUICK else 96
+scene.render.resolution_x, scene.render.resolution_y = (800, 450) if QUICK else (1280, 720)
+scene.cycles.samples = 24 if QUICK else 64
 scene.cycles.use_denoising = True
 try:
     scene.cycles.denoiser = 'OPENIMAGEDENOISE'
