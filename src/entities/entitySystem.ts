@@ -19,7 +19,7 @@ export interface EntitySystemOptions {
   readonly playerEyeHeights?: { readonly standing: number; readonly crouching: number };
   readonly profiles?: Partial<Record<EntityType, Partial<EntityProfile>>>;
   readonly openNearbyDoor?: (position: Vec3, goal: Vec3) => boolean;
-  readonly getDoorApproach?: (position: Vec3, goal: Vec3) => Vec3 | null;
+  readonly getDoorApproach?: (position: Vec3, goal: Vec3, localOnly?: boolean) => Vec3 | null;
 }
 export interface EntitySystem {
   readonly reflections: ReflectionEncounterController;

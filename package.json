@@ -13,7 +13,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "preview": "vite preview --host 0.0.0.0",
-    "test:browser": "playwright test"
+    "test:browser": "playwright test",
+    "test:soak": "node tests/performance/night-ward-soak.mjs"
   },
   "dependencies": {
     "@dimforge/rapier3d-compat": "^0.19.3",

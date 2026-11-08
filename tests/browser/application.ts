@@ -17,10 +17,13 @@ export async function bootHospital(page: Page): Promise<string[]> {
   });
   await page.goto('/?test=1');
   await page.waitForFunction(() => (window as Partial<DiagnosticWindow>).nightWardTest?.snapshot().state === 'ready', null, { timeout: 60_000 });
+  const initialFrame = (await snapshot(page)).frameCount;
+  await expect.poll(async () => (await snapshot(page)).frameCount, { timeout: 30_000 }).toBeGreaterThan(initialFrame + 1);
   await expect.poll(async () => (await snapshot(page)).renderer.triangles, { timeout: 30_000 }).toBeGreaterThan(0);
   const ready = await snapshot(page);
   expect(ready.worldId).toBe('nw:hospital:ward-4-west');
   expect(ready.colliderCount).toBeGreaterThanOrEqual(220);
+  expect(ready.entities.map(entity => entity.type)).toEqual(['patient']);
   await expect(page.locator('canvas')).toHaveCount(1);
   await expect(page.locator('[data-night-ward-hud]')).toHaveCount(1);
   return errors;

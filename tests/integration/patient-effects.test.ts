@@ -179,4 +179,45 @@ describe('Patient encounter atmosphere adapter', () => {
     expect(harness.oscillators.every((oscillator) => oscillator.start.mock.calls.length === 0)).toBe(true);
     expect(() => encounter.dispose()).not.toThrow();
   });
+
+  it('retains chase tracking and HUD messages without duplicating a registered presentation module', () => {
+    const events = createEventBus();
+    const harness = audioHarness('suspended');
+    const sound = vi.fn(), lighting = vi.fn(), message = vi.fn();
+    events.on('atmosphere:sound', sound);
+    events.on('atmosphere:lighting', lighting);
+    const encounter = createPatientEncounter({ events, audio: harness.audio,
+      presentationProvided: true, onMessage: message,
+    });
+    events.emit('chase:started', chase);
+    events.emit('chase:started', chase);
+    const other = { ...chase, chaseId: 'second-entity-chase' };
+    events.emit('chase:started', other);
+    expect(encounter.activeChases).toBe(2);
+    expect(message).toHaveBeenCalledExactlyOnceWith('The Patient has seen you. Break its line of sight.');
+    harness.context.state = 'running';
+    encounter.update(frame);
+    events.emit('chase:ended', { ...chase, reason: 'escaped' });
+    expect(encounter.activeChases).toBe(1);
+    expect(message).toHaveBeenCalledTimes(1);
+    events.emit('chase:ended', { ...other, reason: 'escaped' });
+    expect(encounter.activeChases).toBe(0);
+    expect(message).toHaveBeenLastCalledWith('The Patient lost your trail. Move quietly.');
+
+    events.emit('chase:started', { ...chase, chaseId: 'next-encounter' });
+    events.emit('player:captured', { playerId: chase.playerId, entityId: chase.entityId,
+      position: chase.position, timeSeconds: 14,
+    });
+    encounter.update(frame);
+    expect(encounter.activeChases).toBe(0);
+    encounter.dispose();
+    events.emit('chase:started', { ...chase, chaseId: 'after-dispose' });
+    expect(message).toHaveBeenCalledTimes(3);
+    expect(sound).not.toHaveBeenCalled();
+    expect(lighting).not.toHaveBeenCalled();
+    expect(harness.context.createOscillator).not.toHaveBeenCalled();
+    expect(harness.context.createGain).not.toHaveBeenCalled();
+    expect(harness.audio.resume).not.toHaveBeenCalled();
+    expect(harness.audio.dispose).not.toHaveBeenCalled();
+  });
 });

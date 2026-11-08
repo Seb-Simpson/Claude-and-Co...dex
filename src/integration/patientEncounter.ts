@@ -7,6 +7,8 @@ export interface PatientEncounterOptions {
   /** Restrict effects to this session's player when more than one player is present. */
   readonly playerId?: string;
   readonly onMessage?: (message: string) => void;
+  /** A registered presentation module already owns chase lighting and audio. */
+  readonly presentationProvided?: boolean;
 }
 
 export interface PatientEncounter {
@@ -126,7 +128,7 @@ export function createPatientEncounter(options: PatientEncounterOptions): Patien
   }
 
   function syncAudio(): void {
-    if (disposed || captured || chases.size === 0) return;
+    if (options.presentationProvided || disposed || captured || chases.size === 0) return;
     const context = audio.context;
     if (!context || context.state !== 'running') return;
     if (pendingCue) {
@@ -153,10 +155,12 @@ export function createPatientEncounter(options: PatientEncounterOptions): Patien
       const wasQuiet = chases.size === 0;
       chases.add(event.chaseId);
       if (wasQuiet) {
-        pendingCue = event;
-        events.emit('atmosphere:lighting', {
-          targetId: 'nw:lights:corridor-main', effect: 'flicker', durationSeconds: 1.6,
-        });
+        if (!options.presentationProvided) {
+          pendingCue = event;
+          events.emit('atmosphere:lighting', {
+            targetId: 'nw:lights:corridor-main', effect: 'flicker', durationSeconds: 1.6,
+          });
+        }
         options.onMessage?.('The Patient has seen you. Break its line of sight.');
       }
       syncAudio();

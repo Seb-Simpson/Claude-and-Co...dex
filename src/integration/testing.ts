@@ -1,5 +1,6 @@
 import type { DoorState, EntitySnapshot, GameEventMap, PlayerSnapshot, Vec3 } from '../contracts';
 import type { InteractionPrompt } from '../gameplay';
+import type { EnginePerformanceSnapshot } from '../engine';
 export type ApplicationState = 'menu' | 'loading' | 'ready' | 'playing' | 'paused' | 'captured' | 'restarting' | 'error' | 'disposed';
 export interface ApplicationSnapshot {
   state: ApplicationState;
@@ -15,7 +16,12 @@ export interface ApplicationSnapshot {
   doorStates: Record<string, DoorState>;
   prompt: InteractionPrompt | null;
   error: string | null;
-  performance: { fixedMaxMs: number; updateMaxMs: number; frameDeltaMaxMs: number };
+  performance: {
+    fixedMaxMs: number; updateMaxMs: number; frameDeltaMaxMs: number;
+    /** Gameplay simulation time in this attempt; excludes ready/captured frame work. */
+    simulatedSeconds: number;
+    engine?: EnginePerformanceSnapshot;
+  };
 }
 /** Opt-in QA bridge, installed only when the application URL contains ?test=1. */
 export interface ApplicationDiagnostics {

@@ -1,0 +1,363 @@
+{
+  "build": "index-BVyC75EZ.js",
+  "softwareWebGL": true,
+  "viewport": {
+    "width": 960,
+    "height": 540
+  },
+  "comparison": {
+    "earlyFps": 1.1562382094129962,
+    "noDrawFps": 41.38410040226505,
+    "diagnosticOnly": true
+  },
+  "earlyCpuTop": [
+    {
+      "functionName": "(idle) @ native:-1",
+      "milliseconds": 14775.336
+    },
+    {
+      "functionName": "(program) @ native:-1",
+      "milliseconds": 248.112
+    },
+    {
+      "functionName": "(garbage collector) @ native:-1",
+      "milliseconds": 56.452
+    },
+    {
+      "functionName": "dr @ http://127.0.0.1:4181/assets/three-B6KhIXl8.js:4010",
+      "milliseconds": 17.493
+    },
+    {
+      "functionName": "clear @ native:-1",
+      "milliseconds": 16.79
+    },
+    {
+      "functionName": "uniformMatrix4fv @ native:-1",
+      "milliseconds": 10.296
+    },
+    {
+      "functionName": "__wrap @ http://127.0.0.1:4181/assets/rapier-DBjBuyhF.js:0",
+      "milliseconds": 6.648
+    },
+    {
+      "functionName": "xo @ http://127.0.0.1:4181/assets/three-B6KhIXl8.js:4010",
+      "milliseconds": 6.494
+    },
+    {
+      "functionName": "determinant @ http://127.0.0.1:4181/assets/three-B6KhIXl8.js:0",
+      "milliseconds": 6.415
+    },
+    {
+      "functionName": "getVertexPosition @ http://127.0.0.1:4181/assets/three-B6KhIXl8.js:0",
+      "milliseconds": 5.812
+    }
+  ],
+  "observations": [
+    {
+      "label": "early-identical-pose",
+      "wallSeconds": 25.061,
+      "simulatedSeconds": 1.166666666666666,
+      "renderer": {
+        "calls": 187,
+        "triangles": 52522,
+        "geometries": 355,
+        "textures": 45
+      },
+      "engine": {
+        "sampleCount": 20,
+        "capacity": 240,
+        "totalFrames": 20,
+        "totalSubsteps": 92,
+        "frameIntervalMs": {
+          "last": 1166.7000000000007,
+          "mean": 1182.415789473684,
+          "p50": 1183.300000000003,
+          "p95": 2049.9,
+          "max": 2049.9
+        },
+        "frameCpuMs": {
+          "last": 12.200000002980232,
+          "mean": 79.42000000029802,
+          "p50": 17,
+          "p95": 126.59999999776483,
+          "max": 1094.5999999977648
+        },
+        "fixedMs": {
+          "last": 1.3999999985098839,
+          "mean": 5.029999999888242,
+          "p50": 1.6999999955296516,
+          "p95": 24.800000000745058,
+          "max": 43.69999999925494
+        },
+        "physicsMs": {
+          "last": 0.4000000022351742,
+          "mean": 1.2349999997764827,
+          "p50": 0.5,
+          "p95": 3.1999999955296516,
+          "max": 12.600000001490116
+        },
+        "updateMs": {
+          "last": 8,
+          "mean": 8.380000000074507,
+          "p50": 2.300000000745058,
+          "p95": 35.80000000074506,
+          "max": 74.20000000298023
+        },
+        "renderMs": {
+          "last": 2.400000002235174,
+          "mean": 64.73500000052154,
+          "p50": 8.700000002980232,
+          "p95": 48.30000000074506,
+          "max": 1058.699999999255
+        },
+        "substeps": {
+          "last": 5,
+          "mean": 4.6,
+          "p50": 5,
+          "p95": 5,
+          "max": 5
+        }
+      },
+      "nativeAudio": {
+        "available": true,
+        "nodes": 86,
+        "contexts": 1,
+        "created": 104,
+        "destroyed": 18
+      },
+      "audioHandlers": 86,
+      "jsHeapUsedBytes": 12742072
+    },
+    {
+      "label": "early-window-end",
+      "wallSeconds": 40.365,
+      "simulatedSeconds": 2.5833333333333277,
+      "renderer": {
+        "calls": 187,
+        "triangles": 52522,
+        "geometries": 355,
+        "textures": 45
+      },
+      "engine": {
+        "sampleCount": 39,
+        "capacity": 240,
+        "totalFrames": 39,
+        "totalSubsteps": 177,
+        "frameIntervalMs": {
+          "last": 1650,
+          "mean": 1023.6447368421053,
+          "p50": 966.5,
+          "p95": 2000,
+          "max": 2049.9
+        },
+        "frameCpuMs": {
+          "last": 4.100000001490116,
+          "mean": 45.0538461540754,
+          "p50": 10.899999998509884,
+          "p95": 126.59999999776483,
+          "max": 1094.5999999977648
+        },
+        "fixedMs": {
+          "last": 1.0000000037252903,
+          "mean": 3.4487179486224284,
+          "p50": 1.5999999977648258,
+          "p95": 24.800000000745058,
+          "max": 43.69999999925494
+        },
+        "physicsMs": {
+          "last": 0.09999999776482582,
+          "mean": 0.8076923075012672,
+          "p50": 0.4000000022351742,
+          "p95": 3.1999999955296516,
+          "max": 12.600000001490116
+        },
+        "updateMs": {
+          "last": 1,
+          "mean": 5.31538461569028,
+          "p50": 1.800000000745058,
+          "p95": 35.80000000074506,
+          "max": 74.20000000298023
+        },
+        "renderMs": {
+          "last": 2,
+          "mean": 35.45641025652488,
+          "p50": 5.900000002235174,
+          "p95": 48.30000000074506,
+          "max": 1058.699999999255
+        },
+        "substeps": {
+          "last": 5,
+          "mean": 4.538461538461538,
+          "p50": 5,
+          "p95": 5,
+          "max": 5
+        }
+      },
+      "nativeAudio": {
+        "available": true,
+        "nodes": 120,
+        "contexts": 1,
+        "created": 138,
+        "destroyed": 18
+      },
+      "audioHandlers": 120,
+      "jsHeapUsedBytes": 15197440
+    },
+    {
+      "label": "diagnostic-no-draw-start",
+      "wallSeconds": 40.382,
+      "simulatedSeconds": 2.5833333333333277,
+      "renderer": {
+        "calls": 187,
+        "triangles": 52522,
+        "geometries": 355,
+        "textures": 45
+      },
+      "engine": {
+        "sampleCount": 39,
+        "capacity": 240,
+        "totalFrames": 39,
+        "totalSubsteps": 177,
+        "frameIntervalMs": {
+          "last": 1650,
+          "mean": 1023.6447368421053,
+          "p50": 966.5,
+          "p95": 2000,
+          "max": 2049.9
+        },
+        "frameCpuMs": {
+          "last": 4.100000001490116,
+          "mean": 45.0538461540754,
+          "p50": 10.899999998509884,
+          "p95": 126.59999999776483,
+          "max": 1094.5999999977648
+        },
+        "fixedMs": {
+          "last": 1.0000000037252903,
+          "mean": 3.4487179486224284,
+          "p50": 1.5999999977648258,
+          "p95": 24.800000000745058,
+          "max": 43.69999999925494
+        },
+        "physicsMs": {
+          "last": 0.09999999776482582,
+          "mean": 0.8076923075012672,
+          "p50": 0.4000000022351742,
+          "p95": 3.1999999955296516,
+          "max": 12.600000001490116
+        },
+        "updateMs": {
+          "last": 1,
+          "mean": 5.31538461569028,
+          "p50": 1.800000000745058,
+          "p95": 35.80000000074506,
+          "max": 74.20000000298023
+        },
+        "renderMs": {
+          "last": 2,
+          "mean": 35.45641025652488,
+          "p50": 5.900000002235174,
+          "p95": 48.30000000074506,
+          "max": 1058.699999999255
+        },
+        "substeps": {
+          "last": 5,
+          "mean": 4.538461538461538,
+          "p50": 5,
+          "p95": 5,
+          "max": 5
+        }
+      },
+      "nativeAudio": {
+        "available": true,
+        "nodes": 120,
+        "contexts": 1,
+        "created": 138,
+        "destroyed": 18
+      },
+      "audioHandlers": 120,
+      "jsHeapUsedBytes": 14498860
+    },
+    {
+      "label": "diagnostic-no-draw-end",
+      "wallSeconds": 50.393,
+      "simulatedSeconds": 11.466666666666834,
+      "renderer": {
+        "calls": 187,
+        "triangles": 52522,
+        "geometries": 355,
+        "textures": 45
+      },
+      "engine": {
+        "sampleCount": 240,
+        "capacity": 240,
+        "totalFrames": 468,
+        "totalSubsteps": 710,
+        "frameIntervalMs": {
+          "last": 16.69999999999709,
+          "mean": 19.58291666666664,
+          "p50": 16.69999999999709,
+          "p95": 33.39999999999418,
+          "max": 50
+        },
+        "frameCpuMs": {
+          "last": 6.800000000745058,
+          "mean": 6.364583333410944,
+          "p50": 6.5,
+          "p95": 9.399999998509884,
+          "max": 40.099999997764826
+        },
+        "fixedMs": {
+          "last": 0.30000000074505806,
+          "mean": 0.45875000008381905,
+          "p50": 0.3999999985098839,
+          "p95": 0.9999999962747097,
+          "max": 5.800000000745058
+        },
+        "physicsMs": {
+          "last": 0.10000000149011612,
+          "mean": 0.14541666669150194,
+          "p50": 0.10000000149011612,
+          "p95": 0.30000000074505806,
+          "max": 4.700000002980232
+        },
+        "updateMs": {
+          "last": 0.3999999985098839,
+          "mean": 1.4404166666014742,
+          "p50": 0.6999999992549419,
+          "p95": 5.199999999254942,
+          "max": 37.399999998509884
+        },
+        "renderMs": {
+          "last": 6,
+          "mean": 4.31583333335196,
+          "p50": 2.600000001490116,
+          "p95": 7.699999999254942,
+          "max": 32.399999998509884
+        },
+        "substeps": {
+          "last": 1,
+          "mean": 1.175,
+          "p50": 1,
+          "p95": 2,
+          "max": 3
+        }
+      },
+      "nativeAudio": {
+        "available": true,
+        "nodes": 106,
+        "contexts": 1,
+        "created": 225,
+        "destroyed": 119
+      },
+      "audioHandlers": 106,
+      "jsHeapUsedBytes": 20837300
+    }
+  ],
+  "interpretation": [
+    "Normal drawing was already approximately 1 FPS at the start under SwiftShader; this was not an observed later collapse.",
+    "Suppressing only WebGL draw calls raised raw RAF rate above 41 FPS while the real simulation continued, isolating software raster/GPU cost.",
+    "This diagnostic does not establish native GPU performance, and draw suppression is not used during the real soak.",
+    "The standalone long-run regression uses identical 320x180 early and late viewports to reach at least 120 actual simulation seconds."
+  ]
+}
