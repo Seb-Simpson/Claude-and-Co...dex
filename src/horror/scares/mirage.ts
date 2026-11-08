@@ -32,8 +32,13 @@ export class SilhouetteMirage {
   private fadingOut = false;
   enabled = true;
 
-  constructor(parent: Object3D, private readonly anchors: readonly SightlineAnchor[], private readonly random: () => number = Math.random) {
-    this.visual = createEntityVisual('watcher', { seed: 77 });
+  constructor(
+    parent: Object3D,
+    private readonly anchors: readonly SightlineAnchor[],
+    private readonly random: () => number = Math.random,
+    createVisual: () => EntityVisual = () => createEntityVisual('watcher', { seed: 77 }),
+  ) {
+    this.visual = createVisual();
     this.root.name = 'nw:mirage';
     this.root.add(this.visual.object);
     this.root.visible = false;

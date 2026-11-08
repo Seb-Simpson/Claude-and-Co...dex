@@ -68,6 +68,11 @@ export interface EntityPresenterOptions {
   readonly onLostSight?: (entity: PresentedEntity) => void;
   /** Seconds between line-of-sight checks per entity. */
   readonly sightInterval?: number;
+  /**
+   * Builds the body for an entity. Defaults to the procedural body; the horror module passes a
+   * factory that returns the animated Blender model and falls back per entity.
+   */
+  readonly createVisual?: (type: BodiedEntityType, seed: number) => EntityVisual;
 }
 
 /**
@@ -105,7 +110,8 @@ export class EntityPresenter {
       const pos = record.node.getWorldPosition(new Vector3());
       if (!e || e.node !== record.node) {
         if (e) this.release(e);
-        const visual = createEntityVisual(record.type, { seed: hashId(record.id) });
+        const seed = hashId(record.id);
+        const visual = this.options.createVisual ? this.options.createVisual(record.type, seed) : createEntityVisual(record.type, { seed });
         record.node.add(visual.object);
         e = {
           id: record.id, type: record.type, node: record.node, visual, behaviour: record.behaviour, speed: 0,
