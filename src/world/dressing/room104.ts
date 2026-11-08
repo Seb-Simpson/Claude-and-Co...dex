@@ -1,0 +1,149 @@
+import {
+  type Group, type Material, type Mesh, type MeshStandardMaterial, NoColorSpace, type Object3D, type Texture, TextureLoader,
+} from 'three';
+import { type GLTF, GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+
+/** Built by src/world/dressing/pipeline (Blender): see README there. Vite fingerprints both files. */
+export const ROOM104_SET_URL = new URL('./assets/room104_set.glb', import.meta.url).href;
+export const ROOM104_LIGHTMAP_URL = new URL('./assets/room104_lightmap.jpg', import.meta.url).href;
+
+export interface Room104Set {
+  /** Static set: Room 104 shell + furniture and the west corridor, in world coordinates. */
+  readonly root: Group;
+  /** The Room 104 wheelchair in its own local frame (front +Z), to parent under the creep-anomaly group. */
+  readonly wheelchair: Object3D | null;
+  readonly stats: { readonly triangles: number; readonly meshes: number; readonly materials: number; readonly textures: number };
+  /** Slow pulse on the rot's cold glow. */
+  update(dt: number): void;
+  dispose(): void;
+}
+
+export interface LoadRoom104Options {
+  readonly setUrl?: string;
+  readonly lightmapUrl?: string;
+  readonly timeoutMs?: number;
+  /** Renderer anisotropy limit; tiling floor/wall/ceiling textures use up to 8. */
+  readonly maxAnisotropy?: number;
+  /** Injected for tests (Node has no fetch for file URLs). */
+  readonly loadGltf?: (url: string) => Promise<GLTF>;
+  readonly loadTexture?: (url: string) => Promise<Texture>;
+}
+
+const withTimeout = <T>(promise: Promise<T>, ms: number, what: string): Promise<T> => new Promise((resolve, reject) => {
+  const timer = setTimeout(() => reject(new Error(`${what} timed out after ${ms} ms`)), ms);
+  promise.then((v) => { clearTimeout(timer); resolve(v); }, (e: unknown) => { clearTimeout(timer); reject(e instanceof Error ? e : new Error(String(e))); });
+});
+
+/**
+ * The baked light/occlusion map normally only darkens indirect light (three applies aoMap to the
+ * ambient term). Here it also attenuates direct light, so the bed, cabinet and corners keep their
+ * baked contact shadows under the game's dynamic, unshadowed troffers. That stands in for
+ * real-time shadow maps, which the engine leaves off.
+ */
+function bakeLightIntoDirect(material: MeshStandardMaterial): void {
+  material.onBeforeCompile = (shader) => {
+    shader.fragmentShader = shader.fragmentShader.replace(
+      '#include <aomap_fragment>',
+      `#include <aomap_fragment>
+#ifdef USE_AOMAP
+  reflectedLight.directDiffuse *= ambientOcclusion;
+  reflectedLight.directSpecular *= mix( 1.0, ambientOcclusion, 0.85 );
+#endif`,
+    );
+  };
+  material.customProgramCacheKey = () => 'nw-room104-baked-light';
+}
+
+export async function loadRoom104Set(options: LoadRoom104Options = {}): Promise<Room104Set> {
+  const timeout = options.timeoutMs ?? 20000;
+  const loadGltf = options.loadGltf ?? ((url: string) => new GLTFLoader().loadAsync(url));
+  const loadTexture = options.loadTexture ?? ((url: string) => new TextureLoader().loadAsync(url));
+  const [gltf, lightmap] = await Promise.all([
+    withTimeout(loadGltf(options.setUrl ?? ROOM104_SET_URL), timeout, 'Room 104 set'),
+    withTimeout(loadTexture(options.lightmapUrl ?? ROOM104_LIGHTMAP_URL), timeout, 'Room 104 light map'),
+  ]);
+  // Same orientation convention as the glTF textures (the exporter already flipped TEXCOORD_1).
+  lightmap.flipY = false;
+  lightmap.colorSpace = NoColorSpace;
+  lightmap.channel = 1;
+  lightmap.needsUpdate = true;
+
+  const root = gltf.scene;
+  root.name = 'nw:room104-set';
+  // Blender may suffix the node (wheelchair.001 -> "wheelchair001" after GLTFLoader sanitising).
+  const found: Object3D[] = [];
+  root.traverse((o) => { if (o.name.toLowerCase().startsWith('wheelchair')) found.push(o); });
+  const wheelchair: Object3D | null = found[0] ?? null;
+  if (wheelchair) {
+    wheelchair.removeFromParent();
+    wheelchair.name = 'nw:room104-set:wheelchair';
+  }
+  const materials = new Set<Material>();
+  const textures = new Set<Texture>([lightmap]);
+  const glow: MeshStandardMaterial[] = [];
+  let triangles = 0;
+  let meshes = 0;
+  const visit = (object: Object3D, baked: boolean): void => {
+    object.traverse((o) => {
+      const mesh = o as Mesh;
+      if (!mesh.isMesh) return;
+      meshes += 1;
+      const index = mesh.geometry.index;
+      triangles += (index ? index.count : mesh.geometry.getAttribute('position').count) / 3;
+      mesh.matrixAutoUpdate = baked ? false : mesh.matrixAutoUpdate;
+      if (baked) mesh.updateMatrix();
+      for (const material of Array.isArray(mesh.material) ? mesh.material : [mesh.material]) {
+        const m = material as MeshStandardMaterial;
+        materials.add(m);
+        for (const t of [m.map, m.normalMap, m.roughnessMap, m.metalnessMap, m.emissiveMap]) {
+          if (!t) continue;
+          textures.add(t);
+          t.anisotropy = Math.min(8, options.maxAnisotropy ?? 1);
+        }
+        if (baked && mesh.geometry.getAttribute('uv1')) {
+          m.aoMap = lightmap;
+          m.aoMapIntensity = 1;
+          bakeLightIntoDirect(m);
+        }
+        if (m.name === 'decals') {
+          m.transparent = true;
+          m.depthWrite = false;
+          m.polygonOffset = true;
+          m.polygonOffsetFactor = -2;
+          m.polygonOffsetUnits = -2;
+          m.alphaTest = 0.02;
+          mesh.renderOrder = 2;
+          glow.push(m);
+        }
+        m.needsUpdate = true;
+      }
+    });
+  };
+  visit(root, true);
+  if (wheelchair) visit(wheelchair, false);
+
+  let time = 0;
+  let disposed = false;
+  return {
+    root,
+    wheelchair,
+    stats: { triangles: Math.round(triangles), meshes, materials: materials.size, textures: textures.size },
+    update(dt) {
+      time += dt;
+      // The rot breathes: a cold glow along its youngest veins, never bright enough to light the room.
+      const pulse = 0.55 + 0.35 * Math.sin(time * 0.7) + 0.1 * Math.sin(time * 2.3);
+      for (const m of glow) m.emissiveIntensity = pulse;
+    },
+    dispose() {
+      if (disposed) return;
+      disposed = true;
+      root.removeFromParent();
+      wheelchair?.removeFromParent();
+      for (const o of [root, ...(wheelchair ? [wheelchair] : [])]) {
+        o.traverse((c) => { const mesh = c as Mesh; if (mesh.isMesh) mesh.geometry.dispose(); });
+      }
+      for (const m of materials) m.dispose();
+      for (const t of textures) t.dispose();
+    },
+  };
+}

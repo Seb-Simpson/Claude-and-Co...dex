@@ -29,6 +29,12 @@ on a canvas at setup, and every sound is synthesised with Web Audio.
   The maintenance service doors start closed. NW-002A's door-aware navigation
   (`src/entities/doorNavigation.ts`) opens them for patrolling entities.
 
+## Room 104 visual prototype
+
+Room 104 and the west corridor use a Blender-built, light-baked visual set when it loads. See
+[`dressing/README.md`](dressing/README.md). Gameplay data is identical with or without it.
+`?nwSet=procedural` shows the original procedural room.
+
 ## Public API (`src/world/index.ts`)
 
 ```ts
