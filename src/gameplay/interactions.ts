@@ -30,7 +30,18 @@ export interface InteractionSystem {
   interact(timeSeconds: number): void;
   fixedUpdate(frame: FrameContext): void;
   getDoorState(id: string): DoorState | undefined;
+  /** Trusted actor automation; caller verifies its own proximity and perception. */
+  requestDoorOpen(id: string): boolean;
   dispose(): void;
+}
+
+interface LockerHingeRuntime {
+  readonly spotId: string;
+  readonly object: Object3D;
+  readonly initialRotation: Quaternion;
+  readonly axis: Vector3;
+  readonly openAngle: number;
+  angle: number;
 }
 
 interface DoorRuntime {
@@ -54,11 +65,25 @@ export function createInteractionSystem(options: InteractionOptions): Interactio
   const raycaster = new Raycaster();
   const center = new Vector2();
   const markers = new Map(world.interactables.map((marker) => [marker.object, marker]));
+  const markerObjects = [...markers.keys()];
+  const interactionRange = Math.max(0, ...world.interactables.map((marker) => marker.range));
   const hiding = createHidingSystem({
     locations: world.hidingLocations, player, physics, events,
     ...(options.witnesses ? { witnesses: options.witnesses } : {}),
   });
   const doors = new Map<string, DoorRuntime>();
+  const lockerHinges: LockerHingeRuntime[] = [];
+  // Locker envelopes remain solid. Only their own hiding corridor ignores that
+  // envelope; this optional visual hinge never removes collision from the world.
+  for (const spot of world.hidingLocations) {
+    if (spot.type !== 'locker') continue;
+    const marker = world.interactables.find((candidate) => candidate.id === spot.interactableId);
+    const object = marker?.object.getObjectByName('door');
+    const hinge = object?.userData.nwHinge as { axis?: unknown; openAngle?: unknown } | undefined;
+    if (!object || !hinge || typeof hinge.openAngle !== 'number' || !Number.isFinite(hinge.openAngle)) continue;
+    const axis = hinge.axis === 'x' ? new Vector3(1, 0, 0) : hinge.axis === 'z' ? new Vector3(0, 0, 1) : new Vector3(0, 1, 0);
+    lockerHinges.push({ spotId: spot.id, object, initialRotation: object.quaternion.clone(), axis, openAngle: hinge.openAngle, angle: 0 });
+  }
   const requests: InteractionRequest[] = [];
   let disposed = false;
   const unsubscribe = events.on('interaction:request', (request) => {
@@ -122,11 +147,14 @@ export function createInteractionSystem(options: InteractionOptions): Interactio
   }
   function target(): InteractableMarker | null {
     const snapshot = player.getSnapshot();
-    world.root.updateWorldMatrix(true, true);
+    // Detailed triangle tests are only needed for registered targets. Authored
+    // world solids provide authoritative occlusion below, including walls that
+    // share a large merged render mesh with the rest of the hospital.
+    for (const object of markerObjects) object.updateWorldMatrix(true, true);
     snapshot.camera.updateWorldMatrix(true, false);
     raycaster.setFromCamera(center, snapshot.camera);
-    raycaster.far = Math.max(0, ...world.interactables.map((marker) => marker.range));
-    const hit = raycaster.intersectObject(world.root, true).find((candidate) => visible(candidate.object));
+    raycaster.far = interactionRange;
+    const hit = raycaster.intersectObjects(markerObjects, true).find((candidate) => visible(candidate.object));
     if (!hit) return null;
     const marker = findMarker(hit.object);
     if (!marker || hit.distance > marker.range) return null;
@@ -238,6 +266,15 @@ export function createInteractionSystem(options: InteractionOptions): Interactio
       if (disposed) return;
       hiding.fixedUpdate(frame);
       for (const request of requests.splice(0, 8)) execute(request, frame.elapsedSeconds);
+      const concealment = player.getSnapshot().hiding;
+      for (const hinge of lockerHinges) {
+        const passingDoor = concealment.spotId === hinge.spotId && (concealment.state === 'entering' || concealment.state === 'exiting');
+        const targetAngle = passingDoor ? hinge.openAngle : 0;
+        const maximumDelta = Math.max(0, frame.deltaSeconds) * 9;
+        hinge.angle += Math.max(-maximumDelta, Math.min(maximumDelta, targetAngle - hinge.angle));
+        hinge.object.quaternion.copy(hinge.initialRotation).multiply(new Quaternion().setFromAxisAngle(hinge.axis, hinge.angle));
+        hinge.object.updateMatrixWorld(true);
+      }
       for (const door of doors.values()) {
         if (door.state !== 'opening' && door.state !== 'closing') continue;
         const goal = door.desiredOpen ? 1 : 0;
@@ -279,12 +316,28 @@ export function createInteractionSystem(options: InteractionOptions): Interactio
       }
     },
     getDoorState(id) { return doors.get(id)?.state; },
+    requestDoorOpen(id) {
+      if (disposed) return false;
+      const door = doors.get(id);
+      if (!door || door.state === 'locked' || occupiedDoor(door) ||
+          door.marker.requirements?.some((requirement) => !options.hasRequirement?.(requirement.id))) return false;
+      if (door.state === 'open' || door.state === 'opening') return true;
+      if (door.pending) emitResult(door.pending, 'blocked', 'Door movement interrupted');
+      door.pending = null;
+      door.desiredOpen = true;
+      setDoorState(door, 'opening');
+      return true;
+    },
     dispose() {
       if (disposed) return;
       disposed = true;
       unsubscribe();
       requests.length = 0;
       hiding.dispose();
+      for (const hinge of lockerHinges) {
+        hinge.object.quaternion.copy(hinge.initialRotation);
+        hinge.object.updateMatrixWorld(true);
+      }
       for (const door of doors.values()) {
         door.marker.object.position.copy(door.initialLocal.position);
         door.marker.object.quaternion.copy(door.initialLocal.rotation);

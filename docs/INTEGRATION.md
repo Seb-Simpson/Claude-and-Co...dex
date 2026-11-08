@@ -231,3 +231,13 @@ collider alignment, player spawn, camera ownership, interaction range, safe
 hiding exits, obstacle-aware navigation, credible perception and chase recovery
 need integration verification in NW-001A/NW-001B. Foundation contract tests alone
 cannot establish those future gameplay properties.
+
+
+## NW-002A assembled game
+
+The registered world, atmosphere, horror and gameplay modules now run together.
+The application host recreates their registry/event bus on capture restart against
+one shared engine. Hospital gameplay enables The Patient with a 0.25m navigation
+grid, proximity door operation, temporary model and chase effects. See
+[NW-002A.md](NW-002A.md) for exact application APIs, test setup, launch instructions
+and final-asset integration. No hospital implementation edits are required.

@@ -8,8 +8,7 @@ Dependencies are installed locally using npm and a committed lockfile.
 ## Boot sequence
 
 `index.html` loads `src/main.ts` and declares an explicit empty data-URL favicon
-so browsers do not request a missing `/favicon.ico`. The entry point creates the engine, discovers
-agent modules, starts the integration registry, and starts the render loop. If
+so browsers do not request a missing `/favicon.ico`. The entry point discovers agent modules. The application host creates one engine and a registry/event bus per attempt, then starts the render loop. Restart replaces the module session after reverse teardown while retaining the single engine. If
 there is no world module, the engine displays a small neutral test scene. This
 scene proves that rendering works; it is not part of the hospital.
 
@@ -104,3 +103,9 @@ server on port 4173, uses headless Chromium with software WebGL, and captures
 screenshots. It exercises actual renderer/Rapier startup, audio unlock, resizing
 and context-loss cleanup. This does not measure hardware GPU performance or
 validate future world/gameplay modules.
+
+
+NW-002A implements the assembled hospital game, capture/restart and Patient encounter.
+See [NW-002A.md](NW-002A.md) for the current session lifecycle, diagnostics, verified
+world compatibility and NW-002B model handoff. Earlier foundation-only scope notes
+describe NW-000; the actual hospital is now installed.

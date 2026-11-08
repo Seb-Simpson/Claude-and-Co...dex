@@ -26,9 +26,8 @@ on a canvas at setup, and every sound is synthesised with Web Audio.
 * Nurses' station, treatment room, storage (shelving aisles and lockers), waiting bay, service
   connector, maintenance passage, east corridor with the lift, and Stairwell B (locked).
 * Loop: corridor → connector → maintenance → east corridor → corridor. This gives chases a circuit.
-  Both maintenance service doors start ajar: entities cannot open doors, and the Patient spawns in
-  the passage and patrols this loop. `patrols.test.ts` checks that every patrol leg is walkable
-  with the doors in their initial state.
+  The maintenance service doors start closed. NW-002A's door-aware navigation
+  (`src/entities/doorNavigation.ts`) opens them for patrolling entities.
 
 ## Public API (`src/world/index.ts`)
 

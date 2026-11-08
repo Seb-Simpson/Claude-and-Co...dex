@@ -1,6 +1,6 @@
 import type {
   EntitySnapshot, EntityType, FrameContext, GameEvents, HidingLocation,
-  HospitalWorld, NavigationProvider, PlayerNoiseEvent, PlayerProvider,
+  HospitalWorld, NavigationProvider, PlayerNoiseEvent, PlayerProvider, Vec3,
 } from '../contracts';
 import type { PhysicsAdapter } from '../physics';
 import { createEntityAgent } from './entityAgent';
@@ -18,6 +18,8 @@ export interface EntitySystemOptions {
   readonly events: GameEvents;
   readonly playerEyeHeights?: { readonly standing: number; readonly crouching: number };
   readonly profiles?: Partial<Record<EntityType, Partial<EntityProfile>>>;
+  readonly openNearbyDoor?: (position: Vec3, goal: Vec3) => boolean;
+  readonly getDoorApproach?: (position: Vec3, goal: Vec3) => Vec3 | null;
 }
 export interface EntitySystem {
   readonly reflections: ReflectionEncounterController;
@@ -45,6 +47,8 @@ export function createEntitySystem(options: EntitySystemOptions): EntitySystem {
         ...(route ? { route } : {}), hidingLocations: world.hidingLocations,
         physics, navigation, player, events,
         ...(options.playerEyeHeights ? { playerEyeHeights: options.playerEyeHeights } : {}),
+        ...(options.openNearbyDoor ? { openNearbyDoor: options.openNearbyDoor } : {}),
+        ...(options.getDoorApproach ? { getDoorApproach: options.getDoorApproach } : {}),
       }));
     }
     unsubscribers.push(events.on('player:noise', (noise) => {
