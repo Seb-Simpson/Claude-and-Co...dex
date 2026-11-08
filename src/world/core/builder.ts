@@ -1,4 +1,5 @@
 import {
+  Box3,
   BufferAttribute,
   type BufferGeometry,
   Color,
@@ -25,7 +26,7 @@ import type {
   PatrolRoute,
   RoomMetadata,
 } from '../../contracts';
-import type { AnomalyTarget, FixtureKind, FixtureState, LightFixture, SoundEmitter, SoundEmitterKind } from '../extras';
+import type { AnomalyTarget, FixtureKind, FixtureState, LightFixture, ReflectiveSurface, SightlineAnchor, SoundEmitter, SoundEmitterKind } from '../extras';
 import { box, yawQuaternion } from './geometry';
 import { MaterialLibrary, type MaterialKey } from './materials';
 import { createRandom, type Random } from './random';
@@ -133,6 +134,8 @@ export class WorldBuilder {
   readonly anomalies: AnomalyTarget[] = [];
   readonly soundEmitters: SoundEmitter[] = [];
   readonly connections: [ObjectId, ObjectId][] = [];
+  readonly reflectiveSurfaces: ReflectiveSurface[] = [];
+  readonly sightlines: SightlineAnchor[] = [];
   readonly fixtures: LightFixture[] = [];
   private readonly pendingFixtures: PendingFixture[] = [];
   private readonly buckets = new Map<string, { material: MaterialKey; geometries: BufferGeometry[] }>();
@@ -140,7 +143,17 @@ export class WorldBuilder {
   private readonly counters = new Map<string, number>();
   private finalized = false;
 
-  constructor(seed: number, options: { textures?: boolean } = {}) {
+  /**
+   * Visual-only suppression: static pieces whose bounds lie entirely inside one of these boxes are
+   * not drawn (a Blender-built set replaces them). Colliders, doors, interactables, anomalies, lights
+   * and every other record are unaffected.
+   */
+  private readonly suppress: readonly Box3[];
+  /** What suppression dropped, for diagnostics and tests. */
+  readonly suppressed: { material: MaterialKey; center: Vector3 }[] = [];
+
+  constructor(seed: number, options: { textures?: boolean; suppressVisuals?: readonly Box3[] } = {}) {
+    this.suppress = options.suppressVisuals ?? [];
     this.textures = new TextureLibrary(seed, options.textures);
     this.materials = new MaterialLibrary(this.textures);
     this.rng = createRandom(seed);
@@ -161,6 +174,11 @@ export class WorldBuilder {
     const prepared = prepareGeometry(geometry, matrix, options);
     prepared.computeBoundingBox();
     const center = prepared.boundingBox!.getCenter(new Vector3());
+    if (this.suppress.some((region) => region.containsBox(prepared.boundingBox!))) {
+      this.suppressed.push({ material, center });
+      prepared.dispose();
+      return;
+    }
     const cell = `${Math.floor(center.x / 16)},${Math.floor(center.z / 12)}`;
     const key = `${material}|${cell}`;
     let bucket = this.buckets.get(key);
