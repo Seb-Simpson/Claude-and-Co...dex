@@ -1,5 +1,5 @@
 import RAPIER from '@dimforge/rapier3d-compat';
-import type { ColliderDefinition, Pose, Vec3 } from '../contracts';
+import type { Bounds3, ColliderDefinition, ColliderShape, Pose, Vec3 } from '../contracts';
 
 export interface CharacterOptions {
   position: Vec3;
@@ -20,6 +20,8 @@ export interface CharacterBody {
 }
 export interface PhysicsAdapter {
   createCharacter(options: CharacterOptions): CharacterBody;
+  /** Changes only when imported obstacle poses change, never for actor movement. */
+  getObstacleRevision?(): number;
   isPositionFree(position: Vec3, radius: number, height: number, ignoreColliderIds?: readonly string[], includeCharacters?: boolean): boolean;
   isSegmentFree(from: Vec3, to: Vec3, radius: number, height: number, ignoreColliderIds?: readonly string[], includeCharacters?: boolean): boolean;
   /** World-solid visibility; actor capsules are deliberately excluded. */
@@ -74,7 +76,13 @@ function boxSeparates(obstacle: RAPIER.Collider, shape: RAPIER.Capsule, from: Ve
     const normal = rotate(scale(axis, sign), obstacle.rotation());
     const plane = dot(origin, normal) + extent;
     const support = shape.radius + shape.halfHeight * Math.abs(normal.y);
-    if (Math.min(dot(from, normal), dot(to, normal)) - support >= plane + clearance - 1e-7) return true;
+    // Contact skin must not turn a supporting floor edge into a horizontal
+    // barrier. A tangent sweep whose true capsule stays outside a box face is
+    // geometrically separated even when it rests just inside the padded skin.
+    // Inward/vertical motion still keeps the full requested contact clearance.
+    const tangent = Math.abs(dot({ x: to.x - from.x, y: to.y - from.y, z: to.z - from.z }, normal)) < 1e-9;
+    const planeClearance = tangent ? 0 : clearance;
+    if (Math.min(dot(from, normal), dot(to, normal)) - support >= plane + planeClearance - 1e-7) return true;
   }
   return false;
 }
@@ -88,22 +96,99 @@ function shapeDescriptor(definition: ColliderDefinition): RAPIER.ColliderDesc {
   }
 }
 
+/** Conservative world bounds, independent of Rapier's deferred broad phase. */
+function shapeBounds(shape: ColliderShape, pose: Pose): Bounds3 {
+  const points: Vec3[] = [];
+  switch (shape.type) {
+    case 'box':
+      for (const x of [-shape.halfExtents.x, shape.halfExtents.x])
+        for (const y of [-shape.halfExtents.y, shape.halfExtents.y])
+          for (const z of [-shape.halfExtents.z, shape.halfExtents.z]) points.push({ x, y, z });
+      break;
+    case 'sphere': return capsuleBounds(pose.position, pose.position, shape.radius, 0);
+    case 'capsule': {
+      const axis = rotate({ x: 0, y: shape.halfHeight, z: 0 }, pose.rotation);
+      return capsuleBounds(add(pose.position, axis), add(pose.position, scale(axis, -1)), shape.radius, 0);
+    }
+    case 'trimesh':
+      for (let index = 0; index < shape.vertices.length; index += 3) {
+        points.push({ x: shape.vertices[index]!, y: shape.vertices[index + 1]!, z: shape.vertices[index + 2]! });
+      }
+      break;
+  }
+  const min = { x: Infinity, y: Infinity, z: Infinity };
+  const max = { x: -Infinity, y: -Infinity, z: -Infinity };
+  for (const point of points) {
+    const value = add(rotate(point, pose.rotation), pose.position);
+    min.x = Math.min(min.x, value.x); min.y = Math.min(min.y, value.y); min.z = Math.min(min.z, value.z);
+    max.x = Math.max(max.x, value.x); max.y = Math.max(max.y, value.y); max.z = Math.max(max.z, value.z);
+  }
+  return { min, max };
+}
+function capsuleBounds(from: Vec3, to: Vec3, radius: number, halfHeight: number): Bounds3 {
+  const skin = radius + 0.00001;
+  return {
+    min: { x: Math.min(from.x, to.x) - skin, y: Math.min(from.y, to.y) - skin - halfHeight, z: Math.min(from.z, to.z) - skin },
+    max: { x: Math.max(from.x, to.x) + skin, y: Math.max(from.y, to.y) + skin + halfHeight, z: Math.max(from.z, to.z) + skin },
+  };
+}
+function overlaps(a: Bounds3, b: Bounds3): boolean {
+  return a.min.x <= b.max.x && a.max.x >= b.min.x && a.min.y <= b.max.y && a.max.y >= b.min.y &&
+    a.min.z <= b.max.z && a.max.z >= b.min.z;
+}
+
 /**
- * Queries use current Rapier shapes directly rather than a one-step-old broad phase.
- * This guarantees fresh doors and spawn checks before the shared engine's physics step.
- * Cost is linear in the number of owned colliders; no extra world.step() is performed.
+ * Queries use current Rapier shapes behind a conservative owned spatial grid.
+ * Door poses update the grid synchronously, before the shared engine physics step.
+ * No extra world.step() or stale Rapier broad-phase query is required.
  */
 export function createPhysicsAdapter(world: RAPIER.World, definitions: readonly ColliderDefinition[]): PhysicsAdapter {
-  interface Entry { definition: ColliderDefinition; collider: RAPIER.Collider; body: RAPIER.RigidBody | null }
+  interface Entry { definition: ColliderDefinition; collider: RAPIER.Collider; body: RAPIER.RigidBody | null; bounds: Bounds3; cells: string[] }
   const entries = new Map<string, Entry>();
   const actors = new Set<RAPIER.Collider>();
+  const grid = new Map<string, Set<Entry>>();
+  const gridSize = 2;
+  let obstacleRevision = 0;
+  function cellKeys(bounds: Bounds3): string[] {
+    const keys: string[] = [];
+    for (let x = Math.floor(bounds.min.x / gridSize); x <= Math.floor(bounds.max.x / gridSize); x += 1)
+      for (let z = Math.floor(bounds.min.z / gridSize); z <= Math.floor(bounds.max.z / gridSize); z += 1) keys.push(`${x}:${z}`);
+    return keys;
+  }
+  function indexEntry(entry: Entry): void {
+    for (const key of entry.cells) {
+      const bucket = grid.get(key);
+      bucket?.delete(entry);
+      if (bucket?.size === 0) grid.delete(key);
+    }
+    entry.bounds = shapeBounds(entry.definition.shape, { position: entry.collider.translation(), rotation: entry.collider.rotation() });
+    entry.cells = cellKeys(entry.bounds);
+    for (const key of entry.cells) {
+      let bucket = grid.get(key);
+      if (!bucket) { bucket = new Set(); grid.set(key, bucket); }
+      bucket.add(entry);
+    }
+  }
   const actorDisposers = new Set<() => void>();
   let disposed = false;
   function assertActive(): void { if (disposed) throw new Error('Physics adapter disposed'); }
-  function* obstacles(ignore: readonly string[], includeCharacters: boolean, exclude?: RAPIER.Collider): Generator<RAPIER.Collider> {
-    for (const [id, entry] of entries) {
-      if (!ignore.includes(id) && !entry.collider.isSensor() && entry.collider.isEnabled()) yield entry.collider;
+  function* obstacles(bounds: Bounds3, ignore: readonly string[], includeCharacters: boolean, exclude?: RAPIER.Collider): Generator<RAPIER.Collider> {
+    const visited = new Set<Entry>();
+    // For very large rays, scanning imported bounds is cheaper than enumerating empty cells.
+    const columns = Math.floor(bounds.max.x / gridSize) - Math.floor(bounds.min.x / gridSize) + 1;
+    const rows = Math.floor(bounds.max.z / gridSize) - Math.floor(bounds.min.z / gridSize) + 1;
+    function* candidates(): Generator<Entry> {
+      if (columns * rows > entries.size * 2) { yield* entries.values(); return; }
+      for (const key of cellKeys(bounds)) for (const entry of grid.get(key) ?? []) {
+        if (visited.has(entry)) continue;
+        visited.add(entry); yield entry;
+      }
     }
+    for (const entry of candidates()) {
+      if (overlaps(bounds, entry.bounds) && !ignore.includes(entry.definition.id) &&
+          !entry.collider.isSensor() && entry.collider.isEnabled()) yield entry.collider;
+    }
+    // Actor count is small; their current capsule poses are always read directly.
     if (includeCharacters) for (const actor of actors) {
       if (actor !== exclude && actor.isEnabled()) yield actor;
     }
@@ -115,17 +200,18 @@ export function createPhysicsAdapter(world: RAPIER.World, definitions: readonly 
     // can return distance=0 for deeply overlapping, exactly coincident capsules.
     const shape = new RAPIER.Capsule(height / 2 - radius, Math.max(radius * 0.99, radius - PENETRATION_TOLERANCE));
     const shapePosition = center(position, height);
-    for (const obstacle of obstacles(ignore, includeCharacters, exclude)) {
+    for (const obstacle of obstacles(capsuleBounds(shapePosition, shapePosition, shape.radius, shape.halfHeight), ignore, includeCharacters, exclude)) {
       if (boxSeparates(obstacle, shape, shapePosition, shapePosition, 0)) continue;
       if (obstacle.intersectsShape(shape, shapePosition, IDENTITY)) return false;
     }
     return true;
   }
-  function sweep(position: Vec3, displacement: Vec3, shape: RAPIER.Shape, ignore: readonly string[], includeCharacters: boolean, exclude?: RAPIER.Collider, contactSkin = SKIN): { toi: number; normal: Vec3 } | null {
+  function sweep(position: Vec3, displacement: Vec3, shape: RAPIER.Capsule, ignore: readonly string[], includeCharacters: boolean, exclude?: RAPIER.Collider, contactSkin = SKIN): { toi: number; normal: Vec3 } | null {
     let nearest: { toi: number; normal: Vec3 } | null = null;
-    for (const obstacle of obstacles(ignore, includeCharacters, exclude)) {
+    const queryBounds = capsuleBounds(position, add(position, displacement), shape.radius + contactSkin, shape.halfHeight);
+    for (const obstacle of obstacles(queryBounds, ignore, includeCharacters, exclude)) {
       // Exact separating planes reject GJK's near-tangential box false positives.
-      if (shape instanceof RAPIER.Capsule && boxSeparates(obstacle, shape, position, add(position, displacement), contactSkin)) continue;
+      if (boxSeparates(obstacle, shape, position, add(position, displacement), contactSkin)) continue;
       const hit = obstacle.castShape(ZERO, shape, position, IDENTITY, displacement, contactSkin, 1, false);
       if (!hit) continue;
       let localNormal: Vec3 = hit.normal1;
@@ -170,6 +256,7 @@ export function createPhysicsAdapter(world: RAPIER.World, definitions: readonly 
       entry.collider.setTranslation(pose.position);
       entry.collider.setRotation(pose.rotation);
     }
+    indexEntry(entry);
   }
   function dispose(): void {
     if (disposed) return;
@@ -177,7 +264,7 @@ export function createPhysicsAdapter(world: RAPIER.World, definitions: readonly 
     for (const { body, collider } of entries.values()) {
       if (body) world.removeRigidBody(body); else world.removeCollider(collider, false);
     }
-    entries.clear();
+    entries.clear(); grid.clear();
     disposed = true;
   }
   try {
@@ -195,12 +282,14 @@ export function createPhysicsAdapter(world: RAPIER.World, definitions: readonly 
       if (!body) desc.setTranslation(definition.pose.position.x, definition.pose.position.y, definition.pose.position.z).setRotation(definition.pose.rotation);
       let collider: RAPIER.Collider;
       try { collider = world.createCollider(desc, body ?? undefined); } catch (error) { if (body) world.removeRigidBody(body); throw error; }
-      entries.set(definition.id, { definition, collider, body });
+      const entry: Entry = { definition, collider, body, bounds: shapeBounds(definition.shape, definition.pose), cells: [] };
+      entries.set(definition.id, entry); indexEntry(entry);
     }
     world.propagateModifiedBodyPositionsToColliders();
   } catch (error) { dispose(); throw error; }
 
   const adapter: PhysicsAdapter = {
+    getObstacleRevision() { assertActive(); return obstacleRevision; },
     isPositionFree(position, radius, height, ignore = [], includeCharacters = true) { return free(position, radius, height, ignore, includeCharacters); },
     isSegmentFree(from, to, radius, height, ignore = [], includeCharacters = true) { assertActive(); return segmentFree(from, to, radius, height, ignore, includeCharacters); },
     hasLineOfSight(from, to, ignore = []) {
@@ -208,7 +297,7 @@ export function createPhysicsAdapter(world: RAPIER.World, definitions: readonly 
       const delta = { x: to.x - from.x, y: to.y - from.y, z: to.z - from.z };
       if (length(delta) < 1e-8) return true;
       const ray = new RAPIER.Ray(from, delta);
-      for (const obstacle of obstacles(ignore, false)) {
+      for (const obstacle of obstacles(capsuleBounds(from, to, 0, 0), ignore, false)) {
         const toi = obstacle.castRay(ray, 1, true);
         if (toi !== null && toi >= 0 && toi < 1 - 1e-5) return false;
       }
@@ -219,11 +308,23 @@ export function createPhysicsAdapter(world: RAPIER.World, definitions: readonly 
       if (!Number.isFinite(maxDrop) || maxDrop < 0) throw new Error('maxDrop must be finite and nonnegative');
       const ray = new RAPIER.Ray(origin, { x: 0, y: -1, z: 0 });
       let closest = maxDrop + 1;
-      for (const obstacle of obstacles([], false)) {
+      let surfaceY = origin.y;
+      for (const obstacle of obstacles(capsuleBounds(origin, { ...origin, y: origin.y - maxDrop }, 0, 0), [], false)) {
         const hit = obstacle.castRayAndGetNormal(ray, maxDrop, false);
-        if (hit && hit.normal.y >= 0.65 && hit.timeOfImpact < closest) closest = hit.timeOfImpact;
+        if (hit && hit.normal.y >= 0.65 && hit.timeOfImpact < closest) {
+          closest = hit.timeOfImpact;
+          surfaceY = origin.y - closest;
+          const shape = obstacle.shape;
+          const rotation = obstacle.rotation();
+          // Rapier returns float32 TOI. Recover an authored horizontal box plane
+          // exactly so resting height and navigation floor keys do not jitter.
+          if (shape instanceof RAPIER.Cuboid && Math.abs(rotation.x) < 1e-8 && Math.abs(rotation.z) < 1e-8) {
+            const top = obstacle.translation().y + shape.halfExtents.y;
+            if (Math.abs(surfaceY - top) < 1e-4) surfaceY = top;
+          }
+        }
       }
-      return closest <= maxDrop ? { x: origin.x, y: origin.y - closest, z: origin.z } : null;
+      return closest <= maxDrop ? { x: origin.x, y: surfaceY, z: origin.z } : null;
     },
     hasSupport(position, radius, maxDrop = 0.15) {
       assertActive();
@@ -245,12 +346,13 @@ export function createPhysicsAdapter(world: RAPIER.World, definitions: readonly 
         const entry = entries.get(id);
         if (!entry) throw new Error(`Unknown collider ${id}`);
         if (entry.definition.bodyType !== 'kinematic') throw new Error(`Collider ${id} is not kinematic`);
-        for (const obstacle of obstacles(ignore, true)) {
+        for (const obstacle of obstacles(shapeBounds(entry.definition.shape, pose), ignore, true)) {
           const contact = obstacle.contactShape(entry.collider.shape, pose.position, pose.rotation, 0);
           if (contact && contact.distance < -PENETRATION_TOLERANCE) return false;
         }
       }
       for (const { id, pose } of poses) setPose(entries.get(id)!, pose);
+      if (poses.length > 0) obstacleRevision += 1;
       return true;
     },
     createCharacter(options) {
@@ -305,6 +407,9 @@ export function createPhysicsAdapter(world: RAPIER.World, definitions: readonly 
               remaining = scale(remaining, 1 - fraction);
               const inward = Math.min(0, dot(remaining, hit.normal));
               remaining = add(remaining, scale(hit.normal, -inward));
+              // This controller has no autostep. Numerical normals at adjacent
+              // coplanar floor edges must not turn horizontal travel into lift.
+              if (component.y === 0) remaining = { ...remaining, y: 0 };
             }
           }
           grounded = displacement.y <= 0 && adapter.hasSupport(feet, options.radius, 0.04);

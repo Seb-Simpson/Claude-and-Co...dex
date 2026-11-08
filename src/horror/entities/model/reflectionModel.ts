@@ -2,6 +2,7 @@ import { AnimationMixer, type AnimationAction, type Camera, Group, LoopOnce, Loo
 import { clone as cloneSkinned } from 'three/examples/jsm/utils/SkeletonUtils.js';
 import type { ReflectiveSurface } from '../../../world/extras';
 import type { LoadedModel } from './library';
+import { disposeSkeletons } from './modelVisual';
 
 interface MirrorUniforms {
   nwMirrorCenter: { value: Vector3 };
@@ -193,6 +194,7 @@ export class ReflectionModelPresenter {
     this.mixer.stopAllAction();
     this.mixer.uncacheRoot(this.figure);
     for (const m of this.materials) m.dispose();
+    disposeSkeletons(this.figure);
     this.root.removeFromParent();
   }
 }

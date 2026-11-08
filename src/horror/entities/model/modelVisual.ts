@@ -1,5 +1,5 @@
 import {
-  type AnimationAction, AnimationMixer, type Bone, Group, LoopOnce, LoopRepeat, type Material, type Mesh, type Object3D, Vector3,
+  type AnimationAction, AnimationMixer, type Bone, Group, LoopOnce, LoopRepeat, type Material, type Mesh, type Object3D, type SkinnedMesh, Vector3,
 } from 'three';
 import { clone as cloneSkinned } from 'three/examples/jsm/utils/SkeletonUtils.js';
 import type { EntityBehaviourState } from '../../../contracts';
@@ -204,7 +204,14 @@ export function createModelVisual(type: BodiedEntityType, model: LoadedModel, op
       mixer.stopAllAction();
       mixer.uncacheRoot(root);
       for (const m of materials) m.dispose();
+      // Each cloned skeleton owns a bone-matrix DataTexture once rendered; free it with the instance.
+      disposeSkeletons(root);
       object.removeFromParent();
     },
   };
+}
+
+/** Free the bone textures of every skinned mesh under `root` (clones own their skeletons). */
+export function disposeSkeletons(root: Object3D): void {
+  root.traverse((o) => { if ((o as SkinnedMesh).isSkinnedMesh) (o as SkinnedMesh).skeleton.dispose(); });
 }

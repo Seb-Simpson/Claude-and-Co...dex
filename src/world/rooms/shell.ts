@@ -143,10 +143,8 @@ export function buildShell(b: WorldBuilder): void {
   door(b, { name: 'room-106', roomId: ROOMS.r106, axis: 'x', at: south_, center: DOORS.r106, hinge: 'max', swing: 'pos', initial: 'closed' });
   door(b, { name: 'room-108', roomId: ROOMS.r108, axis: 'x', at: south_, center: DOORS.r108, hinge: 'max', swing: 'pos', initial: 'open', openAngle: Math.PI * 0.18 });
   door(b, { name: 'room-110', roomId: ROOMS.r110, axis: 'x', at: south_, center: DOORS.r110, hinge: 'min', swing: 'pos', initial: 'closed' });
-  // The maintenance passage is part of the Patient's patrol loop (it spawns there). Entities cannot
-  // open doors, so both service doors start ajar; closed, they sealed the Patient in for the game.
-  door(b, { name: 'maintenance-west', roomId: ROOMS.connector, axis: 'x', at: Z.southBack + T / 2, center: DOORS.maintenanceWest, hinge: 'min', swing: 'neg', initial: 'open', openAngle: Math.PI * 0.45, vision: 'none', leafTint: 0.6, prompt: 'Open maintenance door' });
-  door(b, { name: 'maintenance-east', roomId: ROOMS.east, axis: 'z', at: X.east + T / 2, center: DOORS.maintenanceEast, hinge: 'min', swing: 'pos', initial: 'open', openAngle: Math.PI * 0.45, vision: 'none', leafTint: 0.6, prompt: 'Open maintenance door' });
+  door(b, { name: 'maintenance-west', roomId: ROOMS.connector, axis: 'x', at: Z.southBack + T / 2, center: DOORS.maintenanceWest, hinge: 'min', swing: 'neg', initial: 'closed', vision: 'none', leafTint: 0.6, prompt: 'Open maintenance door' });
+  door(b, { name: 'maintenance-east', roomId: ROOMS.east, axis: 'z', at: X.east + T / 2, center: DOORS.maintenanceEast, hinge: 'min', swing: 'pos', initial: 'closed', vision: 'none', leafTint: 0.6, prompt: 'Open maintenance door' });
   door(b, {
     name: 'stairwell-b', roomId: ROOMS.east, axis: 'x', at: -11 - T / 2, center: DOORS.stair, hinge: 'min', swing: 'neg', initial: 'locked', vision: 'wide',
     chained: true, requirements: [KEY_STAIRWELL], prompt: 'Chained shut — Stairwell B', leafTint: 0.75,

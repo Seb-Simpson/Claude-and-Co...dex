@@ -176,14 +176,18 @@ describe('model visual', () => {
     v.dispose();
   });
 
-  it('frees its mixer and per-instance materials on dispose', () => {
+  it('frees its mixer, per-instance materials and skeleton bone textures on dispose', () => {
     const { node, v } = visual('crawler');
     const mats: { dispose(): void }[] = [];
     v.object.traverse((o) => { if ((o as Mesh).isMesh) mats.push((o as Mesh).material as never); });
     const spies = mats.map((m) => vi.spyOn(m, 'dispose'));
+    // Cloned skeletons own a bone-matrix texture once rendered; leaking it grew GPU textures on every restart.
+    const skeletons = skinned(v.object).map((m) => vi.spyOn(m.skeleton, 'dispose'));
+    expect(skeletons.length).toBeGreaterThan(0);
     v.update(0.1, { behaviour: 'patrol', speed: 0.6 });
     v.dispose();
     spies.forEach((s) => expect(s).toHaveBeenCalled());
+    skeletons.forEach((s) => expect(s).toHaveBeenCalled());
     expect(node.children).toHaveLength(0);
   });
 });

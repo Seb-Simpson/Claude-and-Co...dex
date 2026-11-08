@@ -1,7 +1,7 @@
 import type { EntityType, FrameContext, GameModule, ModuleContext, ModuleInstance } from '../contracts';
 import { createPhysicsAdapter, createNavigationProvider } from '../physics';
 import type { PhysicsAdapter, NavigationOptions } from '../physics';
-import { createEntitySystem, createEntityPresentation } from '../entities';
+import { createEntitySystem, createEntityPresentation, createDoorNavigationAdapter, ENTITY_PROFILES } from '../entities';
 import type { EntitySystem, EntityProfile, EntityPresentation } from '../entities';
 import { createBrowserInput } from './input';
 import { createPlayerController, DEFAULT_PLAYER_CONFIG } from './player';
@@ -17,6 +17,9 @@ export interface PlayerInputSource {
   dispose(): void;
 }
 export interface GameplayOptions {
+  readonly activeEntityTypes?: readonly EntityType[];
+  readonly onRestart?: () => void;
+  readonly inspectionText?: (targetId: string) => string | undefined;
   readonly playerId?: string;
   readonly playerRadius?: number;
   readonly playerConfig?: Partial<PlayerConfig>;
@@ -35,6 +38,7 @@ export interface GameplayRuntime extends ModuleInstance {
   readonly presentation: EntityPresentation;
   fixedUpdate(frame: FrameContext): void;
   update(frame: FrameContext): void;
+  notify(message: string): void;
   dispose(): void;
 }
 const idleInput: PlayerInput = { forward: 0, right: 0, sprint: false, crouch: false };
@@ -80,12 +84,24 @@ export function createGameplayRuntime(context: ModuleContext, options: GameplayO
       ...(options.hasRequirement === undefined ? {} : { hasRequirement: options.hasRequirement }),
     });
     cleanup.push(() => interactions.dispose());
+    cleanup.push(context.events.on('interaction:completed', (event) => {
+      if (event.outcome === 'completed' && event.action === 'inspect') {
+        const marker = world.interactables.find((value) => value.id === event.targetId);
+        hud?.notify(options.inspectionText?.(event.targetId) ?? marker?.prompt ?? 'Nothing useful here.');
+      } else if (event.outcome === 'blocked') hud?.notify(event.reason ?? 'The way is blocked.');
+    }));
     const captureSubscription = context.events.on('player:captured', (event) => {
       if (event.playerId === player.getSnapshot().id) player.setCaptured(true);
     });
     cleanup.push(captureSubscription);
+    const doors = createDoorNavigationAdapter({
+      world, physics, navigation, agent: options.entityProfiles?.patient?.agent ?? ENTITY_PROFILES.patient.agent,
+      getDoorState: (id) => interactions.getDoorState(id), requestDoorOpen: (id) => interactions.requestDoorOpen(id),
+    });
     entities = createEntitySystem({
-      world, physics, navigation, player, events: context.events,
+      ...doors,
+      world: options.activeEntityTypes ? { ...world, entitySpawns: world.entitySpawns.filter((spawn) => options.activeEntityTypes!.includes(spawn.type)) } : world,
+      physics, navigation, player, events: context.events,
       playerEyeHeights: {
         standing: options.playerConfig?.standingEyeHeight ?? DEFAULT_PLAYER_CONFIG.standingEyeHeight,
         crouching: options.playerConfig?.crouchingEyeHeight ?? DEFAULT_PLAYER_CONFIG.crouchingEyeHeight,
@@ -109,7 +125,7 @@ export function createGameplayRuntime(context: ModuleContext, options: GameplayO
       };
       canvas.addEventListener('click', onGesture);
       cleanup.push(() => canvas.removeEventListener('click', onGesture));
-      hud = createGameplayHud(canvas.ownerDocument, () => canvas.click());
+      hud = createGameplayHud(canvas.ownerDocument, () => canvas.click(), options.onRestart);
       cleanup.push(() => hud!.dispose());
     }
     const runtime: GameplayRuntime = {
@@ -134,6 +150,7 @@ export function createGameplayRuntime(context: ModuleContext, options: GameplayO
           hidden: snapshot.hiding.state !== 'outside', prompt: interactions.getPrompt(),
         });
       },
+      notify(message) { hud?.notify(message); },
       dispose() {
         const errors = release();
         if (errors.length) throw new AggregateError(errors, 'NIGHT WARD gameplay cleanup failed');

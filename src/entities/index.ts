@@ -12,3 +12,7 @@ export { createReflectionEncounterController } from './reflection';
 export type { ReflectionEncounterController } from './reflection';
 export { createEntityPresentation } from './presentation';
 export type { EntityPresentation } from './presentation';
+export { createPatientProxy } from './patientProxy';
+export type { PatientProxy } from './patientProxy';
+export { createDoorNavigationAdapter } from './doorNavigation';
+export type { DoorNavigationAdapter, DoorNavigationOptions } from './doorNavigation';

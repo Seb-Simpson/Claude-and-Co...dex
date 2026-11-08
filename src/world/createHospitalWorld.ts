@@ -1,3 +1,4 @@
+import type { Box3 } from 'three';
 import type { HospitalWorld } from '../contracts';
 import { WorldBuilder } from './core/builder';
 import { attachExtras, type HospitalExtras } from './extras';
@@ -15,6 +16,11 @@ export interface CreateHospitalWorldOptions {
    * headless metadata use (tests, tooling). Geometry, colliders and metadata are identical either way.
    */
   readonly textures?: boolean;
+  /**
+   * Static visuals fully inside these boxes are not drawn, because a Blender-built set replaces them.
+   * Colliders, doors, interactables, navigation, lights and anomalies are unchanged.
+   */
+  readonly suppressVisuals?: readonly Box3[];
 }
 
 export interface HospitalWorldBuild {
@@ -22,6 +28,8 @@ export interface HospitalWorldBuild {
   readonly world: HospitalWorld;
   /** Presentation metadata (light fixtures, anomaly targets, sound emitters) for atmosphere/horror. */
   readonly extras: HospitalExtras;
+  /** Static pieces left undrawn by `suppressVisuals` (material and centre), for diagnostics. */
+  readonly suppressed: readonly { readonly material: string; readonly center: { x: number; y: number; z: number } }[];
   /** Frees every geometry, material and texture created for this world. Idempotent. */
   dispose(): void;
 }
@@ -30,7 +38,10 @@ export const HOSPITAL_WORLD_ID = 'nw:hospital:ward-4-west';
 
 /** Builds the Ward 4 West hospital wing. Allocates GPU-side objects lazily (on first render). */
 export function createHospitalWorld(options: CreateHospitalWorldOptions = {}): HospitalWorldBuild {
-  const builder = new WorldBuilder(options.seed ?? 0x4e57, options.textures === undefined ? {} : { textures: options.textures });
+  const builder = new WorldBuilder(options.seed ?? 0x4e57, {
+    ...(options.textures === undefined ? {} : { textures: options.textures }),
+    ...(options.suppressVisuals ? { suppressVisuals: options.suppressVisuals } : {}),
+  });
   try {
     declareRooms(builder);
     buildShell(builder);
@@ -74,6 +85,7 @@ export function createHospitalWorld(options: CreateHospitalWorldOptions = {}): H
   return {
     world,
     extras,
+    suppressed: builder.suppressed,
     dispose() {
       if (disposed) return;
       disposed = true;

@@ -38,6 +38,31 @@ export function createNavigationProvider(
     throw new Error('Navigation bounds must be finite and ordered');
   }
 
+  // Actor capsules never participate in planning, so static clearance can be
+  // reused until an imported obstacle (typically a door) changes pose. Providers
+  // without a revision API retain the original live-query behavior.
+  let cachedRevision: number | undefined;
+  const positions = new Map<string, boolean>();
+  const segments = new Map<string, boolean>();
+  const paths = new Map<string, NavigationPath | null>();
+  const pointKey = (value: Vec3): string => `${value.x},${value.y},${value.z}`;
+  const agentKey = (value: NavigationAgent): string => `${value.radius},${value.height},${value.maxStepHeight},${value.maxSlopeRadians}`;
+  function refreshCache(): void {
+    const revision = physics.getObstacleRevision?.();
+    if (revision === undefined || revision !== cachedRevision) {
+      positions.clear(); segments.clear(); paths.clear(); cachedRevision = revision;
+    }
+    // Evict oldest entries independently. Unique chase endpoints must not flush
+    // the expensive reusable grid clearance when the small path cache fills.
+    trim(positions, 20000); trim(segments, 40000); trim(paths, 128);
+  }
+  function trim<T>(cache: Map<string, T>, limit: number): void {
+    while (cache.size > limit) {
+      const oldest = cache.keys().next().value;
+      if (oldest === undefined) break;
+      cache.delete(oldest);
+    }
+  }
   const distance = (a: Vec3, b: Vec3): number => Math.hypot(a.x - b.x, a.y - b.y, a.z - b.z);
   function validAgent(agent: NavigationAgent): boolean {
     return [agent.radius, agent.height, agent.maxStepHeight, agent.maxSlopeRadians].every(Number.isFinite) &&
@@ -57,10 +82,23 @@ export function createNavigationProvider(
     return floor !== null && Math.abs(floor.y - position.y) <= 0.06;
   }
   function validPosition(position: Vec3, agent: NavigationAgent): boolean {
-    return inside(position, agent) && supported(position, agent) &&
-      physics.isPositionFree(position, agent.radius, agent.height, [], false);
+    const key = `${agentKey(agent)}:${pointKey(position)}`;
+    let valid = positions.get(key);
+    if (valid === undefined) {
+      valid = inside(position, agent) && supported(position, agent) &&
+        physics.isPositionFree(position, agent.radius, agent.height, [], false);
+      positions.set(key, valid);
+    }
+    return valid;
   }
   function traversable(from: Vec3, to: Vec3, agent: NavigationAgent): boolean {
+    const first = pointKey(from), second = pointKey(to);
+    const key = `${agentKey(agent)}:${first < second ? `${first}:${second}` : `${second}:${first}`}`;
+    let clear = segments.get(key);
+    if (clear === undefined) { clear = testSegment(from, to, agent); segments.set(key, clear); }
+    return clear;
+  }
+  function testSegment(from: Vec3, to: Vec3, agent: NavigationAgent): boolean {
     if (!physics.isSegmentFree(from, to, agent.radius, agent.height, [], false)) return false;
     const length = distance(from, to);
     const count = Math.max(1, Math.ceil(length / Math.min(agent.radius, cellSize / 2)));
@@ -77,7 +115,7 @@ export function createNavigationProvider(
     return true;
   }
 
-  function findPath(query: NavigationQuery): NavigationPath | null {
+  function search(query: NavigationQuery): NavigationPath | null {
     const { from, to, agent } = query;
     if (!validAgent(agent) || !validPosition(from, agent) || !validPosition(to, agent)) return null;
     // One query represents a single floor. A floor graph can compose these queries later.
@@ -174,8 +212,15 @@ export function createNavigationProvider(
   }
 
   return {
-    findPath,
+    findPath(query) {
+      refreshCache();
+      const key = `${agentKey(query.agent)}:${pointKey(query.from)}:${pointKey(query.to)}`;
+      if (paths.has(key)) return paths.get(key)!;
+      const result = search(query);
+      paths.set(key, result);
+      return result;
+    },
     hasLineOfSight: (query) => physics.hasLineOfSight(query.from, query.to, query.ignoreColliderIds),
-    isPositionValid: (position, agent) => validAgent(agent) && validPosition(position, agent),
+    isPositionValid(position, agent) { refreshCache(); return validAgent(agent) && validPosition(position, agent); },
   };
 }
