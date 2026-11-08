@@ -1,15 +1,38 @@
-import { Group, type Material, type Mesh, Raycaster, Vector3 } from 'three';
+import { Group, type Material, type Mesh, type Object3D, Raycaster, type SkinnedMesh, Vector3 } from 'three';
 import type { GameModule } from '../contracts';
 import { getHospitalExtras } from '../world/extras';
 import { type AnomalyRuntime, createAnomaly, type CueRequest } from './anomalies';
 import { EntityAudio } from './audio/entityAudio';
 import { AnomalyDirector } from './director';
 import { FootprintTrail } from './entities/footprints';
+import { loadEntityModels, proceduralEntitiesRequested } from './entities/model/assets';
+import { MODEL_ENTITIES, type ModelLibrary } from './entities/model/library';
+import { createModelVisual } from './entities/model/modelVisual';
+import { ReflectionModelPresenter } from './entities/model/reflectionModel';
 import { EntityPresenter, sceneEntityNodes } from './entities/presenter';
 import { ReflectionPresenter } from './entities/reflection';
+import { type BodiedEntityType, createEntityVisual, type EntityVisual } from './entities/visual';
 import { CINEMATIC_KINDS, type CinematicKind, CinematicDirector } from './scares/cinematics';
 import { SilhouetteMirage } from './scares/mirage';
 import { ScreenOverlay } from './scares/overlay';
+
+/** Lowest skinned vertex (world y) of a visual — floor-contact probe for dev tooling. */
+function lowestVertex(object: Object3D): number {
+  let lowest = Infinity;
+  const v = new Vector3();
+  object.updateWorldMatrix(true, true);
+  object.traverse((o) => {
+    const mesh = o as SkinnedMesh;
+    if (!mesh.isMesh) return;
+    const position = mesh.geometry.getAttribute('position');
+    for (let i = 0; i < position.count; i += 7) {
+      if (mesh.isSkinnedMesh) mesh.getVertexPosition(i, v); else v.fromBufferAttribute(position, i);
+      v.applyMatrix4(mesh.matrixWorld);
+      lowest = Math.min(lowest, v.y);
+    }
+  });
+  return lowest;
+}
 
 /** Director-only pseudo anomalies (presentation beats rather than world objects). */
 const MIRROR_GLIMPSE = 'nw:anomaly:mirror-glimpse';
@@ -25,12 +48,31 @@ const POWER_FAILURE = 'nw:anomaly:power-failure';
 export default {
   id: 'nw:horror:hospital-anomalies',
   kind: 'horror',
-  setup(context) {
+  async setup(context) {
     const extras = getHospitalExtras(context.world);
     if (!extras || !context.world) return { dispose() { /* no hospital */ } };
+    // Animated Blender models; any entity whose model fails to load keeps its procedural body.
+    const procedural = proceduralEntitiesRequested();
+    let library: ModelLibrary | null = null;
+    if (!procedural) {
+      library = await loadEntityModels();
+      const failed = Object.entries(library.failures);
+      if (failed.length) console.warn('NIGHT WARD: using procedural fallback bodies for', Object.fromEntries(failed));
+      const loaded = MODEL_ENTITIES.filter((entity) => library!.get(entity));
+      if (loaded.length) console.info(`NIGHT WARD: Blender entity models loaded (${loaded.length}/${MODEL_ENTITIES.length}): ${loaded.join(', ')}`);
+    } else {
+      console.info('NIGHT WARD: ?nwEntities=procedural — using the procedural development bodies');
+    }
+    const models = library;
+    const createVisual = (type: BodiedEntityType, seed: number): EntityVisual => {
+      const model = models?.get(type);
+      return model ? createModelVisual(type, model, { seed }) : createEntityVisual(type, { seed });
+    };
     const world = context.world;
     const { camera, scene, renderer, audio } = context.engine;
     const cleanup: (() => void)[] = [];
+    // Shared model data is freed last, after every instance built from it.
+    if (library) { const lib = library; cleanup.push(() => lib.dispose()); }
     const layer = new Group();
     layer.name = 'nw:horror-layer';
     scene.add(layer);
@@ -88,6 +130,7 @@ export default {
         camera,
         doorways,
         lineOfSight,
+        createVisual,
         onFootstep: (entity, bone, position) => {
           entityAudio.footstep(entity.type, bone, position, entity.visual.visualState, entity.distance, entity.occluded);
           if (entity.type === 'patient') footprints.add(position, entity.node.rotation.y, bone === 'footL');
@@ -98,7 +141,10 @@ export default {
       cleanup.push(() => presenter.dispose());
 
       // ---- The Reflection. --------------------------------------------------------------------
-      const reflection = new ReflectionPresenter(layer, extras.reflectiveSurfaces, camera);
+      const reflectionModel = models?.get('reflection');
+      const reflection = reflectionModel
+        ? new ReflectionModelPresenter(layer, extras.reflectiveSurfaces, camera, reflectionModel, lineOfSight)
+        : new ReflectionPresenter(layer, extras.reflectiveSurfaces, camera);
       cleanup.push(() => reflection.dispose());
       context.events.on('horror:reflection', (event) => {
         if (event.visible) {
@@ -110,7 +156,7 @@ export default {
       });
 
       // ---- Distant silhouettes. ---------------------------------------------------------------
-      const mirage = new SilhouetteMirage(layer, extras.sightlines);
+      const mirage = new SilhouetteMirage(layer, extras.sightlines, Math.random, () => createVisual('watcher', 77));
       cleanup.push(() => mirage.dispose());
 
       // ---- Environmental anomalies (NW-001A) + director. ---------------------------------------
@@ -169,6 +215,27 @@ export default {
         const at = event.position ? new Vector3(event.position.x, event.position.y, event.position.z) : position.clone();
         cinematics.play(kind, { position: at, intensity: event.intensity, force: true });
       });
+
+      // Dev-only probe for browser verification (compiled out of production builds).
+      if (import.meta.env.DEV && typeof window !== 'undefined') {
+        const debug = {
+          modelFailures: library?.failures ?? null,
+          procedural,
+          entities: () => presenter.list.map((e) => ({
+            id: e.id, type: e.type, behaviour: e.behaviour, state: e.visual.visualState, model: e.visual.object.name.startsWith('nw:entity-model'),
+            node: e.node.getWorldPosition(new Vector3()).toArray(), speed: e.speed,
+            lowest: lowestVertex(e.visual.object),
+            distance: e.distance, observed: e.observed, visible: e.visual.object.visible,
+          })),
+          reflection: () => reflection.state,
+          camera: () => {
+            const forward = camera.getWorldDirection(new Vector3());
+            return { position: camera.getWorldPosition(new Vector3()).toArray(), yaw: Math.atan2(-forward.x, -forward.z) };
+          },
+        };
+        (window as unknown as { __nwHorrorDebug?: unknown }).__nwHorrorDebug = debug;
+        cleanup.push(() => { delete (window as unknown as { __nwHorrorDebug?: unknown }).__nwHorrorDebug; });
+      }
 
       let nearMissCooldown = 0;
       return {
