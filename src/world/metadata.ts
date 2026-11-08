@@ -41,14 +41,10 @@ export function declareActors(b: WorldBuilder): void {
     {
       id: 'nw:route:ward-loop',
       loop: true,
-      // Starts beside the Patient's spawn in the maintenance passage and leaves through the west
-      // service door. Legs stay short and skirt the passage props (tank at x 9, ladder at x 14.9):
-      // patrols follow straight navigable legs, and an unreachable leg strands the entity.
       points: [
-        { x: 2, y: 0, z: 7.2 }, { x: -5.7, y: 0, z: 7.2 }, { x: -5.7, y: 0, z: 4.0 }, { x: -5.7, y: 0, z: 0 },
         { x: -17, y: 0, z: 0 }, { x: -8, y: 0, z: 0 }, { x: 3, y: 0, z: -0.35 }, { x: 12, y: 0, z: 0 }, { x: 19.5, y: 0, z: 0 },
-        { x: 19.5, y: 0, z: 7.2 }, { x: 17, y: 0, z: 7.2 }, { x: 15.8, y: 0, z: 6.95 }, { x: 13.5, y: 0, z: 6.95 }, { x: 12, y: 0, z: 6.95 },
-        { x: 9, y: 0, z: 6.95 }, { x: 8, y: 0, z: 6.95 },
+        { x: 19.5, y: 0, z: 7.2 }, { x: 12, y: 0, z: 7.15 }, { x: 8, y: 0, z: 6.95 }, { x: 2, y: 0, z: 7.2 }, { x: -5.7, y: 0, z: 7.2 },
+        { x: -5.7, y: 0, z: 4.0 }, { x: -5.7, y: 0, z: 0 },
       ],
     },
     {

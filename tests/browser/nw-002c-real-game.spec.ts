@@ -29,7 +29,8 @@ async function enterWard(page: Page, query = ''): Promise<string[]> {
 test('the playable game loads all five assets and dresses the active Patient in its Blender model', async ({ page }, testInfo) => {
   test.setTimeout(420_000);
   const glbs: string[] = [];
-  page.on('response', (response) => { if (/\.glb(\?|$)/.test(response.url())) glbs.push(`${response.status()} ${response.url().split('/').pop()}`); });
+  // Entity models only (the world also loads the Room 104 set GLB).
+  page.on('response', (response) => { if (/\/(patient|nurse|crawler|watcher|reflection)(-[\w-]+)?\.glb(\?|$)/.test(response.url())) glbs.push(`${response.status()} ${response.url().split('/').pop()}`); });
   const errors = await enterWard(page);
   expect(glbs.sort()).toEqual(['200 crawler.glb', '200 nurse.glb', '200 patient.glb', '200 reflection.glb', '200 watcher.glb']);
   expect(await probe(page, (d) => d.modelFailures)).toEqual({});
@@ -41,8 +42,8 @@ test('the playable game loads all five assets and dresses the active Patient in 
   }
   await page.screenshot({ path: testInfo.outputPath('real-game-start.png') });
 
-  // The Patient must leave the maintenance passage it spawns in (it used to be sealed in by two
-  // closed service doors and stood there, idle-looking, for the whole game).
+  // The Patient must leave its spawn in the maintenance passage (NW-002A's door-aware navigation
+  // routes it through the closed service doors) and keep its animated model while it patrols.
   const spawn = spawned.find((e) => e.type === 'patient')!.node;
   await page.waitForFunction((from) => {
     const p = (window as unknown as { __nwHorrorDebug: Probe }).__nwHorrorDebug.entities().find((e) => e.type === 'patient');

@@ -8,3 +8,5 @@ coverage/
 !.env.example
 test-results/
 playwright-report/
+src/world/dressing/pipeline/.work/
+**/__pycache__/

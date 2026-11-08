@@ -26,10 +26,12 @@ let cdp;
 const errors = [];
 const observations = [];
 const captures = [];
+const assetResponses = [];
+const bootMessages = [];
 const sleep = ms => new Promise(done => setTimeout(done, ms));
 const save = async (name, value) => writeFile(join(output, name), JSON.stringify(value, null, 2));
 const startedAt = Date.now();
-const report = { url: String(url), startedAt: new Date().toISOString(), width, height, minWallSeconds, minSimulationSeconds, softwareWebGL: true, observations, errors, captures };
+const report = { url: String(url), startedAt: new Date().toISOString(), width, height, minWallSeconds, minSimulationSeconds, softwareWebGL: true, observations, errors, captures, assetResponses, bootMessages };
 const percentile = (values, p) => [...values].sort((a, b) => a - b)[Math.min(values.length - 1, Math.floor(values.length * p))] ?? 0;
 function aggregateCpu(profile) {
   const nodes = new Map(profile.nodes.map(node => [node.id, node]));
@@ -49,6 +51,21 @@ function validateSoak(data) {
   const failures = []; const limitations = [];
   const check = (condition, message) => { if (!condition) failures.push(message); };
   if (!early || !earlyEnd || !late || !lateEnd || !data.afterDispose || !data.afterRestart) return { failures: ['Incomplete soak observations'], limitations };
+  if (data.assetResponses) {
+    const query = new URL(data.url).searchParams;
+    const loaded = data.assetResponses.filter(asset => asset.status === 200).map(asset => asset.filename);
+    if (query.get('nwEntities') !== 'procedural') {
+      for (const entity of ['patient', 'nurse', 'crawler', 'watcher', 'reflection']) {
+        check(loaded.some(name => new RegExp(`^${entity}(?:-[\\w-]+)?\\.glb$`).test(name)), `${entity} production GLB did not load`);
+      }
+      check(data.bootMessages.some(message => /Blender entity models loaded \(5\/5\)/.test(message.text)), 'Complete entity-model load was not announced');
+    }
+    if (query.get('nwSet') !== 'procedural') {
+      check(loaded.some(name => /^room104_set(?:-[\w-]+)?\.glb$/.test(name)), 'Production Room 104 set did not load');
+      check(loaded.some(name => /^room104_lightmap(?:-[\w-]+)?\.jpg$/.test(name)), 'Production Room 104 light map did not load');
+      check(data.bootMessages.some(message => /Room 104 visual set loaded/.test(message.text)), 'Room 104 visual-set load was not announced');
+    }
+  } else limitations.push('Historical recording predates production asset-response auditing.');
   const fps = (start, end) => (end.page.frames - start.page.frames) * 1000 / (end.page.elapsedMs - start.page.elapsedMs);
   const earlyFps = fps(early, earlyEnd); const lateFps = fps(late, lateEnd);
   check(late.wallSeconds - earlyEnd.wallSeconds >= data.minWallSeconds, 'Measured soak was shorter than required wall time');
@@ -195,7 +212,16 @@ try {
   page = await context.newPage();
   page.setDefaultTimeout(60_000);
   page.on('pageerror', error => errors.push(error.message));
-  page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
+  page.on('console', message => {
+    if (message.type() === 'error') errors.push(message.text());
+    if (message.text().startsWith('NIGHT WARD:')) bootMessages.push({ type: message.type(), text: message.text() });
+  });
+  page.on('response', response => {
+    const assetUrl = new URL(response.url());
+    if (/\.glb$|room104_lightmap(?:-[\w-]+)?\.jpg$/.test(assetUrl.pathname)) {
+      assetResponses.push({ url: response.url(), filename: assetUrl.pathname.split('/').pop(), status: response.status() });
+    }
+  });
   cdp = await context.newCDPSession(page);
   await cdp.send('Performance.enable');
   await cdp.send('Profiler.enable');
@@ -316,6 +342,7 @@ try {
     if ((Date.now() - baselineStart) / 1000 > maxWallSeconds) throw new Error(`Soak timed out before ${minSimulationSeconds}s simulation/east-door visit`);
   }
   assert(await page.evaluate(point => window.nightWardTest.teleport(point, 0), pose));
+  await aim({ x: pose.x, y: 1.65, z: 0 });
   await cdp.send('HeapProfiler.collectGarbage');
   await sleep(3000);
   lateStart = await observe('late-identical-pose');

@@ -97,8 +97,8 @@ describe('actual Ward 4 collision and navigation integration', () => {
     const route = f.hospital.patrolRoutes.find(route => route.id === 'nw:route:ward-loop')!;
     const west = f.hospital.doors.find(door => door.id === 'nw:door:maintenance-west')!;
     const east = f.hospital.doors.find(door => door.id === 'nw:door:maintenance-east')!;
-    // The current hospital starts with both passage doors ajar. Close their
-    // actual colliders in this isolated fixture to exercise the blocked case.
+    // Close any initially-open passage leaves in this isolated fixture so the
+    // blocked case is independent of the authored starting poses.
     moveDoor(f, west, false);
     moveDoor(f, east, false);
     const query = { from: { x: -5.7, y: 0, z: 7.2 }, to: { x: -5.7, y: 0, z: 4 }, agent: patient };
