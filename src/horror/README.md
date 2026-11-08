@@ -37,6 +37,21 @@ SilhouetteMirage ── Watcher model
 * **Disposal.** Each instance owns its mixer and cloned materials, and frees them when its node
   disappears. The shared geometry and textures are freed when the horror module is cleaned up.
 
+### Checking the models in the playable game
+
+* The console logs `NIGHT WARD: Blender entity models loaded (5/5): patient, nurse, crawler, watcher, reflection`
+  at boot. A failed entity is listed in a `using procedural fallback bodies` warning.
+* The Network tab shows the five GLBs: `src/horror/entities/assets/*.glb` in dev, `assets/<name>-<hash>.glb`
+  in a build. If a `vite preview` session shows procedural figures, run `npm run build` again first:
+  `dist/` predating NW-002C has no models.
+* In dev, `window.__nwHorrorDebug.entities()` lists each presented entity with its gameplay behaviour,
+  visual state, `model: true/false` and world position. The probe is compiled out of production builds.
+* `tests/browser/nw-002c-real-game.spec.ts` covers the real entry point (`/`), not the showcase.
+
+Where to meet them: the Watcher creeps up while you are not looking, so turn around in the west
+corridor. The Patient patrols the corridor/maintenance loop, and the Nurse walks the station round.
+The Crawler waits behind the closed Room 101 isolation door.
+
 ### State → clip mapping (`CLIP_FOR_STATE`, `fadeFor`)
 
 The behaviour-to-state resolver (`resolveVisualState`) is unchanged. Each visual state maps to a
