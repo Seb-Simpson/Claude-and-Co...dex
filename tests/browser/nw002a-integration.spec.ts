@@ -208,9 +208,13 @@ test('capture transitions to restart and recreates a clean session repeatedly', 
     await expect(page.getByRole('button', { name: /restart/i })).toBeVisible();
     await expect.poll(() => page.evaluate(() => document.pointerLockElement)).toBeNull();
     if (attempt === 1) await page.screenshot({ path: testInfo.outputPath('nw002a-captured.png') });
+    const previousFrame = (await snapshot(page)).frameCount;
     await page.getByRole('button', { name: /restart/i }).click();
     await expect.poll(async () => (await snapshot(page)).sessionId, { timeout: 60_000 }).toBe(initial.sessionId + attempt);
     await expect.poll(async () => (await snapshot(page)).state).toBe('ready');
+    // Ready includes GLB loading; two fresh renders attach/upload the final model
+    // before comparing same-pose resources across complete session resets.
+    await expect.poll(async () => (await snapshot(page)).frameCount).toBeGreaterThan(previousFrame + 1);
     const restarted = await snapshot(page);
     expect(restarted.player!.captured).toBe(false);
     expect(restarted.player!.hiding.state).toBe('outside');
@@ -292,6 +296,13 @@ test('the player genuinely escapes The Patient by sprinting around the hospital 
   // Positioning is limited to scenario setup; every escape step below uses WASD.
   await positionPlayer(page, { x: -5.7, y: 0.01, z: 4.8 }, { x: -5.7, y: 1.2, z: 6.475 });
   await enterWard(page);
+  if ((await snapshot(page)).doorStates['nw:door:maintenance-west'] === 'open') {
+    await aimAt(page, { x: -6.25, y: 1.2, z: 5.925 });
+    await expect(page.locator('.nw-prompt')).toContainText('Close door');
+    await page.keyboard.press('e');
+    await expect.poll(async () => (await snapshot(page)).doorStates['nw:door:maintenance-west']).toBe('closed');
+  }
+  await aimAt(page, { x: -5.7, y: 1.2, z: 6.475 });
   await expect(page.locator('.nw-prompt')).toContainText('Open door');
   await page.keyboard.press('e');
   await expect.poll(async () => (await snapshot(page)).doorStates['nw:door:maintenance-west']).toBe('open');

@@ -78,8 +78,9 @@ For an accelerated CPU-only navigation profile, run
 - [Gameplay APIs](src/gameplay/README.md)
 - [Patient and model replacement APIs](src/entities/README.md)
 
-The Patient uses the merged NW-002B body, animation and audio, with a temporary
-fallback when that presentation module is absent. Secondary entity gameplay
+The Patient uses the merged NW-002C animated Blender model and NW-002B audio and
+presentation, with a fallback when models or the presentation module are absent.
+The models are committed; Blender is not required to play. Secondary entity gameplay
 remains profiles/framework, not finished encounters. Stairwell B is intentionally
 locked; navigation covers this hospital's single-floor loop. Browser automation
 uses software WebGL and does not establish hardware or cross-browser performance.

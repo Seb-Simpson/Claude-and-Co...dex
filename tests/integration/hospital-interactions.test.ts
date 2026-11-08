@@ -222,13 +222,32 @@ describe('real hospital interactions and hiding', () => {
       f.events.on('interaction:completed', (event) => results.push(event));
       const door = f.hospital.world.doors.find((candidate) => candidate.id === 'nw:door:maintenance-west')!;
       const original = matrixFor(f.physics.getColliderPose(door.colliderIds[0]!));
+      door.object.updateWorldMatrix(true, false);
+      const colliderLocal = door.object.matrixWorld.clone().invert().multiply(original);
+      expect(f.interactions.getDoorState(door.id)).toBe('open');
+      f.moveTo({ position: { x: -5.7, y: 0, z: 7.2 }, yaw: 0 });
+      const initialCenter = f.physics.getColliderPose(door.colliderIds[0]!).position;
+      f.aimAt({ ...initialCenter, y: 1.4 });
+      expect(f.interactions.getPrompt()).toMatchObject({ targetId: door.id, action: 'close' });
+      f.interactions.interact(f.time); f.advance(1.1);
+      expect(f.interactions.getDoorState(door.id)).toBe('closed');
+      expectPose(f.physics.getColliderPose(door.colliderIds[0]!), matrixFor(door.closedPose).multiply(colliderLocal));
+      const throughDoor = () => f.physics.isSegmentFree({ x: -5.7, y: 0, z: 7.2 }, { x: -5.7, y: 0, z: 5.4 }, f.body.radius, f.body.height, [], false);
+      expect(throughDoor()).toBe(false);
+      expect(results.at(-1)).toMatchObject({ targetId: door.id, action: 'close', outcome: 'completed' });
+      expect(noise).toHaveLength(1);
+      // Isolate the trusted actor request from the real player interaction that
+      // first closed this authored initially-open leaf.
+      noise.length = 0; results.length = 0;
       expect(f.interactions.requestDoorOpen('nw:door:stairwell-b')).toBe(false);
       expect(f.interactions.getDoorState('nw:door:stairwell-b')).toBe('locked');
       expect(f.interactions.requestDoorOpen('missing')).toBe(false);
       expect(f.interactions.requestDoorOpen(door.id)).toBe(true);
       f.advance(1.1);
       expect(f.interactions.getDoorState(door.id)).toBe('open');
-      expectPose(f.physics.getColliderPose(door.colliderIds[0]!), matrixFor(door.openPose).multiply(matrixFor(door.closedPose).invert()).multiply(original));
+      expectPose(f.physics.getColliderPose(door.colliderIds[0]!), matrixFor(door.openPose).multiply(colliderLocal));
+      expectPose(f.physics.getColliderPose(door.colliderIds[0]!), original);
+      expect(throughDoor()).toBe(true);
       expect(noise).toHaveLength(0);
       expect(results).toHaveLength(0);
       f.interactions.dispose();

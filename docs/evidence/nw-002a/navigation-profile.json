@@ -434,5 +434,402 @@
     "All 305 post-fix patrol queries used the same exact floor height, 0.0029999985098838862. No floor-height cache-key churn was observed.",
     "Navigation caches and entity queues are bounded. No progressive CPU degradation appeared in these 120-second simulations.",
     "Generic remote blocked-goal searches can still exceed a frame budget: 51.86 ms in the post-fix noise profile. Browser profiling measures remaining frame pacing and presentation costs separately."
-  ]
+  ],
+  "acceptedMainCompatibility": {
+    "mainCommit": "51e84cc",
+    "worldChange": "Accepted hospital now has a 16-point ward loop; both maintenance doors start open at 81 degrees. Public contracts and all223 collider definitions remain compatible.",
+    "method": "Actual accepted world metadata without asset/world edits. Closed-door stress cases first close both actual service doors through camera interaction prompts and swept animation; the DoorNavigationAdapter is initialized before these gameplay actions, as in the real runtime.",
+    "results": [
+      {
+        "scenario": "360 changing-start blocked paths",
+        "stats": {
+          "count": 360,
+          "totalMs": 965.86,
+          "maxMs": 48.57,
+          "p95Ms": 3.68
+        },
+        "blocks": [
+          {
+            "count": 60,
+            "totalMs": 271.62,
+            "maxMs": 48.57,
+            "p95Ms": 15.43
+          },
+          {
+            "count": 60,
+            "totalMs": 156.56,
+            "maxMs": 3.72,
+            "p95Ms": 3.69
+          },
+          {
+            "count": 60,
+            "totalMs": 155.79,
+            "maxMs": 3.68,
+            "p95Ms": 3.6
+          },
+          {
+            "count": 60,
+            "totalMs": 135.06,
+            "maxMs": 3.72,
+            "p95Ms": 3.09
+          },
+          {
+            "count": 60,
+            "totalMs": 123.79,
+            "maxMs": 2.76,
+            "p95Ms": 2.61
+          },
+          {
+            "count": 60,
+            "totalMs": 123.05,
+            "maxMs": 2.71,
+            "p95Ms": 2.43
+          }
+        ]
+      },
+      {
+        "scenario": "patrol120s",
+        "colliderCount": 223,
+        "patrolPointCount": 16,
+        "initialServiceDoors": [
+          {
+            "id": "nw:door:maintenance-west",
+            "state": "open"
+          },
+          {
+            "id": "nw:door:maintenance-east",
+            "state": "open"
+          }
+        ],
+        "queryTimes": {
+          "count": 302,
+          "totalMs": 76.52,
+          "maxMs": 10.72,
+          "p95Ms": 0.35
+        },
+        "frameTimes": {
+          "count": 7200,
+          "totalMs": 1218.38,
+          "maxMs": 18.73,
+          "p95Ms": 0.28
+        },
+        "maxQueriesPerTick": 1,
+        "queryCount": 302,
+        "uniqueFromYs": [
+          [
+            0.0029999985098838862,
+            302
+          ]
+        ],
+        "obstacleRevisions": 0,
+        "ending": {
+          "id": "nw:entity:patient",
+          "type": "patient",
+          "position": {
+            "x": 6.596216038248752,
+            "y": 0.0029999985098838862,
+            "z": 7.015281125948971
+          },
+          "state": "patrol",
+          "lastKnownPlayer": null
+        },
+        "worst": [
+          {
+            "frame": 4326,
+            "from": {
+              "x": 3.4072948591646486,
+              "y": 0.0029999985098838862,
+              "z": -0.320409220607427
+            },
+            "to": {
+              "x": 12,
+              "y": 0,
+              "z": 0
+            },
+            "ms": 10.72,
+            "found": true
+          }
+        ],
+        "frameBlocks": [
+          {
+            "count": 1800,
+            "totalMs": 319.05,
+            "maxMs": 9.86,
+            "p95Ms": 0.29
+          },
+          {
+            "count": 1800,
+            "totalMs": 272.33,
+            "maxMs": 9.77,
+            "p95Ms": 0.23
+          },
+          {
+            "count": 1800,
+            "totalMs": 310.24,
+            "maxMs": 11.71,
+            "p95Ms": 0.31
+          },
+          {
+            "count": 1800,
+            "totalMs": 316.76,
+            "maxMs": 18.73,
+            "p95Ms": 0.27
+          }
+        ]
+      },
+      {
+        "scenario": "closed-door-patrol120s",
+        "colliderCount": 223,
+        "patrolPointCount": 16,
+        "initialServiceDoors": [
+          {
+            "id": "nw:door:maintenance-west",
+            "state": "open"
+          },
+          {
+            "id": "nw:door:maintenance-east",
+            "state": "open"
+          }
+        ],
+        "queryTimes": {
+          "count": 306,
+          "totalMs": 56.08,
+          "maxMs": 2.58,
+          "p95Ms": 0.38
+        },
+        "frameTimes": {
+          "count": 7200,
+          "totalMs": 1172.94,
+          "maxMs": 15.14,
+          "p95Ms": 0.27
+        },
+        "maxQueriesPerTick": 2,
+        "queryCount": 306,
+        "uniqueFromYs": [
+          [
+            0.0029999985098838862,
+            306
+          ]
+        ],
+        "obstacleRevisions": 216,
+        "ending": {
+          "id": "nw:entity:patient",
+          "type": "patient",
+          "position": {
+            "x": 8.366690393898228,
+            "y": 0.0029999985098838862,
+            "z": 6.950008201969066
+          },
+          "state": "patrol",
+          "lastKnownPlayer": null
+        },
+        "worst": [],
+        "frameBlocks": [
+          {
+            "count": 1800,
+            "totalMs": 295.87,
+            "maxMs": 15.14,
+            "p95Ms": 0.28
+          },
+          {
+            "count": 1800,
+            "totalMs": 316.08,
+            "maxMs": 9.4,
+            "p95Ms": 0.3
+          },
+          {
+            "count": 1800,
+            "totalMs": 278.01,
+            "maxMs": 10.57,
+            "p95Ms": 0.25
+          },
+          {
+            "count": 1800,
+            "totalMs": 282.98,
+            "maxMs": 10.58,
+            "p95Ms": 0.25
+          }
+        ]
+      },
+      {
+        "scenario": "noise-blocked120s",
+        "colliderCount": 223,
+        "patrolPointCount": 16,
+        "initialServiceDoors": [
+          {
+            "id": "nw:door:maintenance-west",
+            "state": "open"
+          },
+          {
+            "id": "nw:door:maintenance-east",
+            "state": "open"
+          }
+        ],
+        "queryTimes": {
+          "count": 346,
+          "totalMs": 302.47,
+          "maxMs": 66.47,
+          "p95Ms": 3.94
+        },
+        "frameTimes": {
+          "count": 7200,
+          "totalMs": 1433.2,
+          "maxMs": 66.71,
+          "p95Ms": 0.21
+        },
+        "maxQueriesPerTick": 3,
+        "queryCount": 346,
+        "uniqueFromYs": [
+          [
+            0,
+            3
+          ],
+          [
+            0.0029999985098838862,
+            343
+          ]
+        ],
+        "obstacleRevisions": 216,
+        "ending": {
+          "id": "nw:entity:patient",
+          "type": "patient",
+          "position": {
+            "x": -12.272640852887445,
+            "y": 0.0029999985098838862,
+            "z": 3.53108193256571
+          },
+          "state": "pursue",
+          "lastKnownPlayer": {
+            "playerId": "player",
+            "position": {
+              "x": -12.4,
+              "y": 0.0029999985098838862,
+              "z": 4.1
+            },
+            "timeSeconds": 122.5,
+            "source": "vision"
+          }
+        },
+        "worst": [
+          {
+            "frame": 565,
+            "from": {
+              "x": -5.506548820567204,
+              "y": 0.0029999985098838862,
+              "z": 7.224586272931302
+            },
+            "to": {
+              "x": -12.4,
+              "y": 0.0029999985098838862,
+              "z": 4.1
+            },
+            "ms": 66.47,
+            "found": true
+          },
+          {
+            "frame": 24,
+            "from": {
+              "x": 5.46000123273739,
+              "y": 0.0029999985098838862,
+              "z": 7.201153843519802
+            },
+            "to": {
+              "x": -12.4,
+              "y": 0.0029999985098838862,
+              "z": 4.1
+            },
+            "ms": 28.16,
+            "found": false
+          },
+          {
+            "frame": 0,
+            "from": {
+              "x": 6,
+              "y": 0,
+              "z": 7.2
+            },
+            "to": {
+              "x": -12.4,
+              "y": 0.0029999985098838862,
+              "z": 4.1
+            },
+            "ms": 27.86,
+            "found": false
+          },
+          {
+            "frame": 953,
+            "from": {
+              "x": -7.423748602812458,
+              "y": 0.0029999985098838862,
+              "z": 0.8060513085791181
+            },
+            "to": {
+              "x": -12.4,
+              "y": 0.0029999985098838862,
+              "z": 4.1
+            },
+            "ms": 24.85,
+            "found": true
+          },
+          {
+            "frame": 662,
+            "from": {
+              "x": -5.57349268831571,
+              "y": 0.0029999985098838862,
+              "z": 5.043113199851772
+            },
+            "to": {
+              "x": -12.4,
+              "y": 0.0029999985098838862,
+              "z": 4.1
+            },
+            "ms": 14.53,
+            "found": true
+          },
+          {
+            "frame": 1104,
+            "from": {
+              "x": -10.478572461117327,
+              "y": 0.0029999985098838862,
+              "z": 0.9724852542766413
+            },
+            "to": {
+              "x": -12.4,
+              "y": 0.0029999985098838862,
+              "z": 4.1
+            },
+            "ms": 10.48,
+            "found": true
+          }
+        ],
+        "frameBlocks": [
+          {
+            "count": 1800,
+            "totalMs": 595.05,
+            "maxMs": 66.71,
+            "p95Ms": 0.26
+          },
+          {
+            "count": 1800,
+            "totalMs": 265.43,
+            "maxMs": 11.41,
+            "p95Ms": 0.21
+          },
+          {
+            "count": 1800,
+            "totalMs": 295.35,
+            "maxMs": 13.8,
+            "p95Ms": 0.2
+          },
+          {
+            "count": 1800,
+            "totalMs": 277.38,
+            "maxMs": 23.1,
+            "p95Ms": 0.17
+          }
+        ]
+      }
+    ],
+    "tests": "Full16-leg route/capsule traversal, hospitalPatient behavior, world patrols, all6 hiding locations and witnessedhiding tests pass. New120s planning test closes actual initiallyopen service doors and retains structural query bounds."
+  }
 }

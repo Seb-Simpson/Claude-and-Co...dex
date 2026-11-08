@@ -40,7 +40,7 @@ there is no hidden teleport or retained target memory across sessions.
 
 ## Replacing the temporary model
 
-The merged NW-002B presenter already attaches the actual Patient model through
+The merged NW-002B/NW-002C presenter already attaches the Blender Patient through
 this binding; its audio, animation and footprints remain presentation-owned.
 The fallback below is retained for installations without that module.
 

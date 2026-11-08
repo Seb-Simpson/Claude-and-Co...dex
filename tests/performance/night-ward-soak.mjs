@@ -244,9 +244,21 @@ try {
   // Prewarm the actual Patient's model while simulation is still waiting for user entry.
   assert(await page.evaluate(() => { const valid = window.nightWardTest.teleport({ x: -1, y: 0.01, z: 7.2 }); window.nightWardTest.aimAt({ x: 6, y: 1.35, z: 7.2 }); return valid; }));
   await page.screenshot({ path: join(output, 'patient-current-model.png') });
-  assert(await page.evaluate(() => window.nightWardTest.teleport({ x: -12.4, y: 0.01, z: 4.1 }, 0)));
+  const originalEastState = (await snapshot()).doorStates['nw:door:maintenance-east'];
+  // Current authored doors start open. Close this one through real input so the
+  // long run exercises The Patient's door-query regression rather than skipping it.
+  const start = originalEastState === 'open' ? { x: 19.55, y: 0.01, z: 7.45 } : { x: -12.4, y: 0.01, z: 4.1 };
+  assert(await page.evaluate(point => window.nightWardTest.teleport(point, 0), start));
   await page.getByRole('button', { name: 'Enter ward', exact: true }).click();
   await page.waitForFunction(() => document.pointerLockElement?.tagName === 'CANVAS' && window.nightWardTest.snapshot().audioState === 'running');
+  if (originalEastState === 'open') {
+    await aim({ x: 18.75, y: 1.2, z: 6.7 });
+    await page.waitForFunction(() => window.nightWardTest.snapshot().prompt?.action === 'close');
+    await page.keyboard.press('e');
+    await page.waitForFunction(() => window.nightWardTest.snapshot().doorStates['nw:door:maintenance-east'] === 'closed', null, { timeout: 60_000 });
+    assert(await page.evaluate(() => window.nightWardTest.teleport({ x: -12.4, y: 0.01, z: 4.1 }, 0)));
+  }
+  report.eastDoorScenario = { originalState: originalEastState, closedByPlayer: originalEastState === 'open' };
   // A genuinely walked route; positioning above was initial scenario setup only.
   await moveUntil('d', state => state.player.position.x > -12.2);
   await aim({ x: -12, y: 1.65, z: 0 });
