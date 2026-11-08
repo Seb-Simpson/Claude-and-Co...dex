@@ -6,7 +6,7 @@ import { EntityAudio } from './audio/entityAudio';
 import { AnomalyDirector } from './director';
 import { FootprintTrail } from './entities/footprints';
 import { loadEntityModels, proceduralEntitiesRequested } from './entities/model/assets';
-import type { ModelLibrary } from './entities/model/library';
+import { MODEL_ENTITIES, type ModelLibrary } from './entities/model/library';
 import { createModelVisual } from './entities/model/modelVisual';
 import { ReflectionModelPresenter } from './entities/model/reflectionModel';
 import { EntityPresenter, sceneEntityNodes } from './entities/presenter';
@@ -58,6 +58,10 @@ export default {
       library = await loadEntityModels();
       const failed = Object.entries(library.failures);
       if (failed.length) console.warn('NIGHT WARD: using procedural fallback bodies for', Object.fromEntries(failed));
+      const loaded = MODEL_ENTITIES.filter((entity) => library!.get(entity));
+      if (loaded.length) console.info(`NIGHT WARD: Blender entity models loaded (${loaded.length}/${MODEL_ENTITIES.length}): ${loaded.join(', ')}`);
+    } else {
+      console.info('NIGHT WARD: ?nwEntities=procedural — using the procedural development bodies');
     }
     const models = library;
     const createVisual = (type: BodiedEntityType, seed: number): EntityVisual => {
@@ -218,11 +222,16 @@ export default {
           modelFailures: library?.failures ?? null,
           procedural,
           entities: () => presenter.list.map((e) => ({
-            id: e.id, type: e.type, state: e.visual.visualState, model: e.visual.object.name.startsWith('nw:entity-model'),
+            id: e.id, type: e.type, behaviour: e.behaviour, state: e.visual.visualState, model: e.visual.object.name.startsWith('nw:entity-model'),
             node: e.node.getWorldPosition(new Vector3()).toArray(), speed: e.speed,
             lowest: lowestVertex(e.visual.object),
+            distance: e.distance, observed: e.observed, visible: e.visual.object.visible,
           })),
           reflection: () => reflection.state,
+          camera: () => {
+            const forward = camera.getWorldDirection(new Vector3());
+            return { position: camera.getWorldPosition(new Vector3()).toArray(), yaw: Math.atan2(-forward.x, -forward.z) };
+          },
         };
         (window as unknown as { __nwHorrorDebug?: unknown }).__nwHorrorDebug = debug;
         cleanup.push(() => { delete (window as unknown as { __nwHorrorDebug?: unknown }).__nwHorrorDebug; });
