@@ -25,7 +25,7 @@ import type {
   PatrolRoute,
   RoomMetadata,
 } from '../../contracts';
-import type { AnomalyTarget, FixtureKind, FixtureState, LightFixture, SoundEmitter, SoundEmitterKind } from '../extras';
+import type { AnomalyTarget, FixtureKind, FixtureState, LightFixture, ReflectiveSurface, SightlineAnchor, SoundEmitter, SoundEmitterKind } from '../extras';
 import { box, yawQuaternion } from './geometry';
 import { MaterialLibrary, type MaterialKey } from './materials';
 import { createRandom, type Random } from './random';
@@ -133,6 +133,8 @@ export class WorldBuilder {
   readonly anomalies: AnomalyTarget[] = [];
   readonly soundEmitters: SoundEmitter[] = [];
   readonly connections: [ObjectId, ObjectId][] = [];
+  readonly reflectiveSurfaces: ReflectiveSurface[] = [];
+  readonly sightlines: SightlineAnchor[] = [];
   readonly fixtures: LightFixture[] = [];
   private readonly pendingFixtures: PendingFixture[] = [];
   private readonly buckets = new Map<string, { material: MaterialKey; geometries: BufferGeometry[] }>();

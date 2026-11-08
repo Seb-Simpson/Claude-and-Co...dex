@@ -7,14 +7,25 @@ import { expect, test } from '@playwright/test';
  */
 const WORLD_ID = 'nw:hospital:ward-4-west';
 
+/** The foundation shell offers "Enable audio"; with NW-001B installed the gesture is "Enter ward". */
+async function unlockAudio(page: import('@playwright/test').Page): Promise<void> {
+  const enter = page.getByRole('button', { name: 'Enter ward', exact: true });
+  const enable = page.getByRole('button', { name: 'Enable audio', exact: true });
+  await expect(enter.or(enable).first()).toBeVisible({ timeout: 30_000 });
+  if (await enter.isVisible()) await enter.click();
+  else {
+    await enable.click();
+    await expect(page.getByRole('button', { name: 'Audio enabled', exact: true })).toBeDisabled();
+  }
+}
+
 test('the game boots with the hospital world, atmosphere and horror modules', async ({ page }, testInfo) => {
   const errors: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));
   page.on('console', (message) => { if (message.type() === 'error') errors.push(message.text()); });
   await page.goto('/');
   await expect(page.locator('#status')).toContainText(`World: ${WORLD_ID}`, { timeout: 30_000 });
-  await page.getByRole('button', { name: 'Enable audio', exact: true }).click();
-  await expect(page.getByRole('button', { name: 'Audio enabled', exact: true })).toBeDisabled();
+  await unlockAudio(page);
   await page.waitForTimeout(1500);
   const glError = await page.locator('canvas').evaluate((element) => {
     const gl = (element as HTMLCanvasElement).getContext('webgl2');
@@ -67,7 +78,7 @@ test('WebGL context loss tears down the hospital modules cleanly', async ({ page
   page.on('pageerror', (error) => pageErrors.push(error.message));
   await page.goto('/');
   await expect(page.locator('#status')).toContainText(`World: ${WORLD_ID}`, { timeout: 30_000 });
-  await page.getByRole('button', { name: 'Enable audio', exact: true }).click();
+  await unlockAudio(page);
   await page.waitForTimeout(500);
   await page.locator('canvas').evaluate((element) => {
     (element as HTMLCanvasElement).getContext('webgl2')?.getExtension('WEBGL_lose_context')?.loseContext();
