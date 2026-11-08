@@ -1,0 +1,622 @@
+{
+ "patient": {
+  "entity": "patient",
+  "clips": [
+   {
+    "name": "idle",
+    "state": "idle",
+    "duration": 8,
+    "loop": true,
+    "speed": 0,
+    "cycles": 0,
+    "steps": []
+   },
+   {
+    "name": "walk",
+    "state": "walk",
+    "duration": 4,
+    "loop": true,
+    "speed": 0.75,
+    "cycles": 2,
+    "steps": [
+     {
+      "time": 0,
+      "bone": "footR"
+     },
+     {
+      "time": 1,
+      "bone": "footL"
+     },
+     {
+      "time": 2,
+      "bone": "footR"
+     },
+     {
+      "time": 3,
+      "bone": "footL"
+     }
+    ]
+   },
+   {
+    "name": "alert",
+    "state": "alert",
+    "duration": 0.9,
+    "loop": false,
+    "speed": 0,
+    "cycles": 0,
+    "steps": []
+   },
+   {
+    "name": "run",
+    "state": "run",
+    "duration": 1.4146341463414636,
+    "loop": true,
+    "speed": 4.1,
+    "cycles": 2,
+    "steps": [
+     {
+      "time": 0,
+      "bone": "footR"
+     },
+     {
+      "time": 0.3536585365853659,
+      "bone": "footL"
+     },
+     {
+      "time": 0.7073170731707318,
+      "bone": "footR"
+     },
+     {
+      "time": 1.0609756097560976,
+      "bone": "footL"
+     }
+    ]
+   },
+   {
+    "name": "search",
+    "state": "search",
+    "duration": 9.6,
+    "loop": true,
+    "speed": 0.5,
+    "cycles": 4,
+    "steps": [
+     {
+      "time": 0,
+      "bone": "footR"
+     },
+     {
+      "time": 1.2,
+      "bone": "footL"
+     },
+     {
+      "time": 2.4,
+      "bone": "footR"
+     },
+     {
+      "time": 3.5999999999999996,
+      "bone": "footL"
+     },
+     {
+      "time": 4.8,
+      "bone": "footR"
+     },
+     {
+      "time": 6,
+      "bone": "footL"
+     },
+     {
+      "time": 7.199999999999999,
+      "bone": "footR"
+     },
+     {
+      "time": 8.4,
+      "bone": "footL"
+     }
+    ]
+   },
+   {
+    "name": "observe",
+    "state": "observe",
+    "duration": 8,
+    "loop": true,
+    "speed": 0,
+    "cycles": 0,
+    "steps": []
+   },
+   {
+    "name": "lost",
+    "state": "lost",
+    "duration": 10.285714285714285,
+    "loop": true,
+    "speed": 0.35,
+    "cycles": 3,
+    "steps": [
+     {
+      "time": 0,
+      "bone": "footR"
+     },
+     {
+      "time": 1.714285714285714,
+      "bone": "footL"
+     },
+     {
+      "time": 3.428571428571428,
+      "bone": "footR"
+     },
+     {
+      "time": 5.142857142857142,
+      "bone": "footL"
+     },
+     {
+      "time": 6.857142857142856,
+      "bone": "footR"
+     },
+     {
+      "time": 8.571428571428571,
+      "bone": "footL"
+     }
+    ]
+   }
+  ],
+  "glb": "patient.glb",
+  "triangles": 21446,
+  "vertices": 11191,
+  "bytes": 1694328,
+  "texture": 1024,
+  "height": 2.1902852058410645,
+  "bones": [
+   "hips",
+   "spine",
+   "chest",
+   "neck",
+   "head",
+   "shoulderL",
+   "upperArmL",
+   "forearmL",
+   "handL",
+   "shoulderR",
+   "upperArmR",
+   "forearmR",
+   "handR",
+   "thighL",
+   "shinL",
+   "footL",
+   "thighR",
+   "shinR",
+   "footR"
+  ]
+ },
+ "nurse": {
+  "entity": "nurse",
+  "clips": [
+   {
+    "name": "idle",
+    "state": "idle",
+    "duration": 8,
+    "loop": true,
+    "speed": 0,
+    "cycles": 0,
+    "steps": []
+   },
+   {
+    "name": "walk",
+    "state": "walk",
+    "duration": 2.3333333333333335,
+    "loop": true,
+    "speed": 0.9,
+    "cycles": 2,
+    "steps": [
+     {
+      "time": 0,
+      "bone": "footR"
+     },
+     {
+      "time": 0.5833333333333334,
+      "bone": "footL"
+     },
+     {
+      "time": 1.1666666666666667,
+      "bone": "footR"
+     },
+     {
+      "time": 1.75,
+      "bone": "footL"
+     }
+    ]
+   },
+   {
+    "name": "listen",
+    "state": "listen",
+    "duration": 6,
+    "loop": true,
+    "speed": 0,
+    "cycles": 0,
+    "steps": []
+   },
+   {
+    "name": "alert",
+    "state": "alert",
+    "duration": 0.6,
+    "loop": false,
+    "speed": 0,
+    "cycles": 0,
+    "steps": []
+   },
+   {
+    "name": "run",
+    "state": "run",
+    "duration": 1.1764705882352942,
+    "loop": true,
+    "speed": 3.4,
+    "cycles": 2,
+    "steps": [
+     {
+      "time": 0,
+      "bone": "footR"
+     },
+     {
+      "time": 0.29411764705882354,
+      "bone": "footL"
+     },
+     {
+      "time": 0.5882352941176471,
+      "bone": "footR"
+     },
+     {
+      "time": 0.8823529411764706,
+      "bone": "footL"
+     }
+    ]
+   },
+   {
+    "name": "search",
+    "state": "search",
+    "duration": 5.714285714285714,
+    "loop": true,
+    "speed": 0.7,
+    "cycles": 4,
+    "steps": [
+     {
+      "time": 0,
+      "bone": "footR"
+     },
+     {
+      "time": 0.7142857142857143,
+      "bone": "footL"
+     },
+     {
+      "time": 1.4285714285714286,
+      "bone": "footR"
+     },
+     {
+      "time": 2.142857142857143,
+      "bone": "footL"
+     },
+     {
+      "time": 2.857142857142857,
+      "bone": "footR"
+     },
+     {
+      "time": 3.5714285714285716,
+      "bone": "footL"
+     },
+     {
+      "time": 4.285714285714286,
+      "bone": "footR"
+     },
+     {
+      "time": 5,
+      "bone": "footL"
+     }
+    ]
+   }
+  ],
+  "glb": "nurse.glb",
+  "triangles": 23543,
+  "vertices": 12707,
+  "bytes": 1477248,
+  "texture": 1024,
+  "height": 1.9263858795166016,
+  "bones": [
+   "hips",
+   "spine",
+   "chest",
+   "neck",
+   "head",
+   "shoulderL",
+   "upperArmL",
+   "forearmL",
+   "handL",
+   "shoulderR",
+   "upperArmR",
+   "forearmR",
+   "handR",
+   "thighL",
+   "shinL",
+   "footL",
+   "thighR",
+   "shinR",
+   "footR"
+  ]
+ },
+ "crawler": {
+  "entity": "crawler",
+  "clips": [
+   {
+    "name": "idle",
+    "state": "idle",
+    "duration": 6,
+    "loop": true,
+    "speed": 0,
+    "cycles": 0,
+    "steps": []
+   },
+   {
+    "name": "walk",
+    "state": "walk",
+    "duration": 2.769230769230769,
+    "loop": true,
+    "speed": 0.65,
+    "cycles": 2,
+    "steps": [
+     {
+      "time": 0.34615384615384615,
+      "bone": "handL"
+     },
+     {
+      "time": 1.0384615384615383,
+      "bone": "handR"
+     },
+     {
+      "time": 1.7307692307692308,
+      "bone": "handL"
+     },
+     {
+      "time": 2.423076923076923,
+      "bone": "handR"
+     }
+    ]
+   },
+   {
+    "name": "alert",
+    "state": "alert",
+    "duration": 0.6,
+    "loop": false,
+    "speed": 0,
+    "cycles": 0,
+    "steps": []
+   },
+   {
+    "name": "run",
+    "state": "run",
+    "duration": 0.9375,
+    "loop": true,
+    "speed": 3.2,
+    "cycles": 2,
+    "steps": [
+     {
+      "time": 0.1171875,
+      "bone": "handL"
+     },
+     {
+      "time": 0.3515625,
+      "bone": "handR"
+     },
+     {
+      "time": 0.5859375,
+      "bone": "handL"
+     },
+     {
+      "time": 0.8203125,
+      "bone": "handR"
+     }
+    ]
+   },
+   {
+    "name": "search",
+    "state": "search",
+    "duration": 6.4,
+    "loop": true,
+    "speed": 0.5,
+    "cycles": 4,
+    "steps": [
+     {
+      "time": 0.4,
+      "bone": "handL"
+     },
+     {
+      "time": 1.2000000000000002,
+      "bone": "handR"
+     },
+     {
+      "time": 2,
+      "bone": "handL"
+     },
+     {
+      "time": 2.8000000000000003,
+      "bone": "handR"
+     },
+     {
+      "time": 3.6,
+      "bone": "handL"
+     },
+     {
+      "time": 4.4,
+      "bone": "handR"
+     },
+     {
+      "time": 5.2,
+      "bone": "handL"
+     },
+     {
+      "time": 6,
+      "bone": "handR"
+     }
+    ]
+   }
+  ],
+  "glb": "crawler.glb",
+  "triangles": 12579,
+  "vertices": 6507,
+  "bytes": 1146100,
+  "texture": 1024,
+  "height": 0.8548642992973328,
+  "bones": [
+   "hips",
+   "spine",
+   "chest",
+   "neck",
+   "head",
+   "shoulderL",
+   "upperArmL",
+   "forearmL",
+   "handL",
+   "shoulderR",
+   "upperArmR",
+   "forearmR",
+   "handR",
+   "thighL",
+   "shinL",
+   "footL",
+   "thighR",
+   "shinR",
+   "footR"
+  ]
+ },
+ "watcher": {
+  "entity": "watcher",
+  "clips": [
+   {
+    "name": "pose0",
+    "state": "stand",
+    "duration": 4,
+    "loop": true,
+    "speed": 0,
+    "cycles": 0,
+    "steps": []
+   },
+   {
+    "name": "pose1",
+    "state": "stand",
+    "duration": 4,
+    "loop": true,
+    "speed": 0,
+    "cycles": 0,
+    "steps": []
+   },
+   {
+    "name": "pose2",
+    "state": "stand",
+    "duration": 4,
+    "loop": true,
+    "speed": 0,
+    "cycles": 0,
+    "steps": []
+   },
+   {
+    "name": "pose3",
+    "state": "stand",
+    "duration": 4,
+    "loop": true,
+    "speed": 0,
+    "cycles": 0,
+    "steps": []
+   },
+   {
+    "name": "pose4",
+    "state": "stand",
+    "duration": 4,
+    "loop": true,
+    "speed": 0,
+    "cycles": 0,
+    "steps": []
+   },
+   {
+    "name": "walk",
+    "state": "walk",
+    "duration": 2.545454545454545,
+    "loop": true,
+    "speed": 0.55,
+    "cycles": 2,
+    "steps": []
+   }
+  ],
+  "glb": "watcher.glb",
+  "triangles": 17712,
+  "vertices": 9669,
+  "bytes": 1179564,
+  "texture": 1024,
+  "height": 2.3569021224975586,
+  "bones": [
+   "hips",
+   "spine",
+   "chest",
+   "neck",
+   "head",
+   "shoulderL",
+   "upperArmL",
+   "forearmL",
+   "handL",
+   "shoulderR",
+   "upperArmR",
+   "forearmR",
+   "handR",
+   "thighL",
+   "shinL",
+   "footL",
+   "thighR",
+   "shinR",
+   "footR"
+  ]
+ },
+ "reflection": {
+  "entity": "reflection",
+  "clips": [
+   {
+    "name": "idle",
+    "state": "idle",
+    "duration": 8,
+    "loop": true,
+    "speed": 0,
+    "cycles": 0,
+    "steps": []
+   },
+   {
+    "name": "notice",
+    "state": "alert",
+    "duration": 3,
+    "loop": false,
+    "speed": 0,
+    "cycles": 0,
+    "steps": []
+   }
+  ],
+  "glb": "reflection.glb",
+  "triangles": 13880,
+  "vertices": 7453,
+  "bytes": 910352,
+  "texture": 1024,
+  "height": 1.7051328420639038,
+  "bones": [
+   "hips",
+   "spine",
+   "chest",
+   "neck",
+   "head",
+   "shoulderL",
+   "upperArmL",
+   "forearmL",
+   "handL",
+   "shoulderR",
+   "upperArmR",
+   "forearmR",
+   "handR",
+   "thighL",
+   "shinL",
+   "footL",
+   "thighR",
+   "shinR",
+   "footR"
+  ]
+ }
+}

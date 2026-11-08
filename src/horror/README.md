@@ -4,6 +4,107 @@ This module is presentation only. Gameplay (NW-001B) stays authoritative over en
 movement, detection, chase, capture and navigation. Nothing in `src/horror/` or
 `src/atmosphere/` moves an entity, spawns one, teleports one, or decides an AI outcome.
 
+## NW-002C — Animated Blender entities
+
+The four bodied entities and the Reflection now ship as skinned, animated GLB models built in
+Blender (`src/horror/entities/assets/*.glb`). The procedural bodies remain only as a development
+fallback.
+
+### Runtime
+
+```
+horror.module.ts ── loadEntityModels() ──► ModelLibrary (one GLTF parse per entity, shared)
+                                             │ per gameplay node
+EntityPresenter(createVisual) ──► createModelVisual(type, model)  (SkeletonUtils clone + AnimationMixer)
+                                  └─ procedural createEntityVisual() if that model failed
+ReflectionModelPresenter (3D figure clipped to the mirror) ── or ReflectionPresenter (procedural)
+SilhouetteMirage ── Watcher model
+```
+
+* **Gameplay owns the transform.** The model is parented under the gameplay node and nothing
+  writes the node. Clips are in place: only the hips translate (bob, sway, crouch), with no root
+  motion. The model root stays at the origin; a unit test checks this.
+* **Floor contact.** The retarget clamps the lowest contact point of every frame to the floor.
+  Contact points are taken from the skinned mesh: the soles, or the hands, knees and toes for the
+  Crawler. Tests CPU-skin every clip at 8 times and require the lowest vertex to stay within
+  -4.5 cm and +5 cm.
+* **Footsteps.** Each gait clip carries its contact times in `manifest.json`. A footstep fires
+  when the playhead crosses one of them, and gait clips play at `speed / clip.speed`, clamped to
+  0.35–2.2. Footstep audio therefore stays in sync at any gameplay speed.
+* **Failure.** Each entity loads separately with a 20 s timeout. A failed, missing or incomplete
+  GLB is logged once (`console.warn`) and that entity keeps its procedural body. `?nwEntities=procedural`
+  forces the procedural bodies for every entity.
+* **Disposal.** Each instance owns its mixer and cloned materials, and frees them when its node
+  disappears. The shared geometry and textures are freed when the horror module is cleaned up.
+
+### State → clip mapping (`CLIP_FOR_STATE`, `fadeFor`)
+
+The behaviour-to-state resolver (`resolveVisualState`) is unchanged. Each visual state maps to a
+clip as follows:
+
+| Visual state | Patient | Nurse | Crawler | Watcher |
+| --- | --- | --- | --- | --- |
+| `idle` | `idle` (breathing, twitching) | `idle` | `idle` | `pose0`–`pose4` |
+| `walk` | `walk` (uneven limping stalk) | `walk` (measured, head turning) | `walk` (ground crawl) | `walk` (glide) |
+| `alert` | `alert` (snaps upright, once) | `alert` | `alert` (rears up) | current pose |
+| `run` | `run` (sprint) | `run` | `run` (skitter) | `walk` |
+| `search` | `search` (scanning) | `search` | `search` | current pose |
+| `observe` | `observe` (doorway lean) | `listen` | `idle` | current pose |
+| `lost` | `lost` | `search` | `search` | current pose |
+| `listen` | `alert` | `listen` (head cocked) | `alert` | current pose |
+
+Crossfades: into `alert` takes 0.07 s for the Patient and 0.1 s for the others. `alert` → `run`
+takes 0.18 s. The Patient's first 0.7 s of `run` plays up to 1.55× fast, as a lunge. Leaving `run`
+takes 0.7 s, entering `observe` 1.0 s, and the default is 0.45 s. Walk↔run keeps the gait phase,
+so the feet don't swap. The Watcher swaps poses with a 0 s fade (hard cut), and only after it has
+been unobserved for 5–14 s.
+
+### Reflection
+
+The Reflection is a real 3D figure. It stands inside the mirror world, 0.8 m past the glass on
+the viewer's sight line through the mirror centre. Its real counterpart would be standing just
+behind or beside the viewer. It faces the viewer and is mirror-flipped (`scale.x = -1`), so it
+shifts with parallax as the camera moves. A fragment-shader test discards every fragment not seen through the
+mirror rectangle. The depth buffer is cleared just before it draws, so the wall behind the glass
+does not hide it. This approach avoids needing a stencil buffer: r182 doesn't allocate one by
+default, and the engine options are not ours to change. The figure has no collider, plays
+`notice` and then `idle`, and fades out if stared at from up close or once line of sight to the
+mirror is lost.
+
+### Assets
+
+| Entity | GLB | Triangles | Bones | Clips |
+| --- | --- | --- | --- | --- |
+| Patient | 1.62 MB | 21,446 | 19 | idle, walk, alert, run, search, observe, lost |
+| Nurse | 1.41 MB | 23,543 | 19 | idle, walk, listen, alert, run, search |
+| Crawler | 1.09 MB | 12,579 | 19 | idle, walk, alert, run, search |
+| Watcher | 1.12 MB | 17,712 | 19 | pose0, pose1, pose2, pose3, pose4, walk |
+| Reflection | 0.87 MB | 13,880 | 19 | idle, notice |
+| **Total** | **6.11 MB** | 89,160 | | |
+
+Each GLB holds one skinned mesh and one material, with a 1024² baked colour atlas and a normal
+map. Every entity is one draw call. Budgets are enforced by tests: under 26k triangles and under
+2.6 MB per GLB.
+
+### Rebuilding the models (`src/horror/entities/pipeline/`)
+
+```
+python -m venv bvenv && bvenv/bin/pip install bpy        # Blender 5.x as a Python module
+cd src/horror/entities/pipeline/blender
+BLENDER_PY=/path/to/bvenv/bin/python ./build_all.sh      # sculpts → poses → rig/bake/export → assets
+```
+
+1. `patient.py`, `nurse.py`, `crawler.py`, `watcher.py` and `reflection.py` sculpt the
+   full-resolution figures. The heavy `.blend` files are not committed.
+2. `samplePoses.test.ts` samples the animation library at 30 fps into `poses.json`. It runs only
+   when `NW_POSE_OUT` is set.
+3. `rig_and_export.py` does the rest:
+   - decimates to budget and builds a 19-bone armature;
+   - assigns automatic weights;
+   - retargets the poses (in place, with the hips clamped to the floor);
+   - bakes the colour and normal maps;
+   - exports the GLB and its manifest.
+
 ## How it connects (no gameplay edits needed)
 
 NW-001B already publishes model-binding nodes through `createEntityPresentation()`:
