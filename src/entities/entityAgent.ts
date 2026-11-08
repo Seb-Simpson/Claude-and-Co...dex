@@ -18,6 +18,9 @@ export interface EntityAgentOptions {
   readonly player: PlayerProvider;
   readonly events: GameEvents;
   readonly playerEyeHeights?: { readonly standing: number; readonly crouching: number };
+  /** Optional world adapter: nearby doors use the same collision-safe interaction animation. */
+  readonly openNearbyDoor?: (position: Vec3, goal: Vec3) => boolean;
+  readonly getDoorApproach?: (position: Vec3, goal: Vec3) => Vec3 | null;
 }
 
 export interface EntityAgent {
@@ -53,7 +56,10 @@ export function createEntityAgent(options: EntityAgentOptions): EntityAgent {
   let cooldownUntil = 0;
   let captureDwell = 0;
   let captureCommitted = false;
-  let routeIndex = 0;
+  // Authored routes need not start beside the spawn. Join at the nearest point
+  // instead of requesting a hospital-wide crossing as the very first leg.
+  let routeIndex = options.route?.points.reduce((nearest, point, index, points) =>
+    distance(spawn.position, point) < distance(spawn.position, points[nearest]!) ? index : nearest, 0) ?? 0;
   let routeDirection = 1;
   let searchIndex = 0;
   let waypoints: readonly Vec3[] = [];
@@ -116,7 +122,19 @@ export function createEntityAgent(options: EntityAgentOptions): EntityAgent {
     if (distance(at, goal) < 0.22) return true;
     if (!allowed) return false;
     if (now >= replanAt || !pathGoal || distance(pathGoal, goal) > 0.35 || stuckSeconds > 0.6) {
-      const path = navigation.findPath({ from: at, to: goal, agent: profile.agent });
+      const openingDoor = options.openNearbyDoor?.(copy(at), copy(goal)) ?? false;
+      let path = navigation.findPath({ from: at, to: goal, agent: profile.agent });
+      const pathLength = path?.waypoints.reduce((total, point, index, points) =>
+        total + (index ? distance(points[index - 1]!, point) : distance(at, point)), 0) ?? Infinity;
+      // Prefer operating a reachable doorway to taking a hospital-wide detour
+      // around its closed leaf. Every approach still requires a real clear path.
+      if (!path || openingDoor || pathLength > distance(at, goal) * 1.8 + 2) {
+        const approach = options.getDoorApproach?.(copy(at), copy(goal));
+        if (approach) {
+          const approachPath = navigation.findPath({ from: at, to: approach, agent: profile.agent });
+          if (approachPath && (!path || openingDoor || distance(at, approach) + distance(approach, goal) < pathLength * 0.9)) path = approachPath;
+        }
+      }
       waypoints = path?.waypoints ?? [];
       waypointIndex = 0;
       pathGoal = copy(goal);
@@ -280,7 +298,7 @@ export function createEntityAgent(options: EntityAgentOptions): EntityAgent {
         const eye = { ...position(), y: position().y + profile.eyeHeight };
         const concealedEye = { ...witnessed.spot.playerPosition, y: witnessed.spot.playerPosition.y + 0.7 };
         canCapture = Boolean(approach && distance(position(), approach) < 0.4 &&
-          distance(position(), witnessed.spot.playerPosition) <= profile.captureRange + profile.agent.radius &&
+          distance(position(), witnessed.spot.playerPosition) <= profile.hidingInspectionRange &&
           physics.hasLineOfSight(eye, concealedEye, witnessed.spot.colliderIds));
         capturePosition = witnessed.spot.playerPosition;
       }

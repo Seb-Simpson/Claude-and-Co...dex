@@ -1,16 +1,11 @@
 import { expect, test } from '@playwright/test';
+import { bootHospital, enterWard, snapshot } from './application';
 
-test('boots real renderer and Rapier, unlocks audio, and resizes the canvas', async ({ page }, testInfo) => {
-  const errors: string[] = [];
-  page.on('pageerror', error => errors.push(error.message));
-  page.on('console', message => {
-    if (message.type() === 'error') errors.push(`${message.text()} (${message.location().url})`);
-  });
+test.describe.configure({ timeout: 90_000 });
 
-  await page.goto('/');
-  await expect(page.locator('#status')).toHaveText(
-    'Renderer and Rapier ready. Neutral test scene · no game modules installed.',
-  );
+test('boots the renderer, Rapier and registered world, unlocks audio, and resizes the canvas', async ({ page }, testInfo) => {
+  const errors = await bootHospital(page);
+  await expect(page.locator('#status')).toContainText('World: nw:hospital:ward-4-west');
   const canvas = page.locator('canvas');
   await expect(canvas).toBeVisible();
   const initialSize = await canvas.evaluate(element => {
@@ -23,13 +18,12 @@ test('boots real renderer and Rapier, unlocks audio, and resizes the canvas', as
   expect(initialSize.width).toBeGreaterThan(0);
   expect(initialSize.height).toBeGreaterThan(0);
   expect(initialSize.version).toContain('WebGL');
+  const before = (await snapshot(page)).frameCount;
+  await expect.poll(async () => (await snapshot(page)).frameCount).toBeGreaterThan(before + 2);
+  expect((await snapshot(page)).renderer.triangles).toBeGreaterThan(0);
+  await enterWard(page);
 
-  const audioButton = page.getByRole('button', { name: 'Enable audio', exact: true });
-  await expect(audioButton).toBeEnabled();
-  await audioButton.click();
-  await expect(page.getByRole('button', { name: 'Audio enabled', exact: true })).toBeDisabled();
-
-  await page.screenshot({ path: testInfo.outputPath('foundation-ready.png') });
+  await page.screenshot({ path: testInfo.outputPath('foundation-hospital-ready.png') });
   await page.setViewportSize({ width: 800, height: 600 });
   await expect.poll(async () => canvas.evaluate(element => {
     if (!(element instanceof HTMLCanvasElement)) throw new Error('Expected canvas element');
@@ -44,11 +38,9 @@ test('boots real renderer and Rapier, unlocks audio, and resizes the canvas', as
   expect(errors).toEqual([]);
 });
 
-test('reports WebGL context loss and disposes the renderer', async ({ page }, testInfo) => {
-  const pageErrors: string[] = [];
-  page.on('pageerror', error => pageErrors.push(error.message));
-  await page.goto('/');
-  await expect(page.locator('#status')).toContainText('Renderer and Rapier ready');
+test('reports WebGL context loss and disposes the registered modules and renderer', async ({ page }, testInfo) => {
+  const errors = await bootHospital(page);
+  await enterWard(page);
   await page.locator('canvas').evaluate(element => {
     if (!(element instanceof HTMLCanvasElement)) throw new Error('Expected canvas element');
     const extension = element.getContext('webgl2')?.getExtension('WEBGL_lose_context');
@@ -56,8 +48,9 @@ test('reports WebGL context loss and disposes the renderer', async ({ page }, te
     extension.loseContext();
   });
   await expect(page.getByRole('alert')).toContainText('WebGL context lost');
-  await expect(page.getByRole('button', { name: 'Enable audio', exact: true })).toBeDisabled();
   await expect(page.locator('canvas')).toHaveCount(0);
+  await expect(page.locator('[data-night-ward-hud]')).toHaveCount(0);
   await page.screenshot({ path: testInfo.outputPath('foundation-context-loss.png') });
-  expect(pageErrors).toEqual([]);
+  // The handled context-loss message is deliberately reported by the application.
+  expect(errors.filter(error => !error.includes('WebGL context lost'))).toEqual([]);
 });

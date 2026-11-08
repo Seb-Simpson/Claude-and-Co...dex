@@ -1,0 +1,695 @@
+{
+  "run": "Final unchanged-source Chromium suite",
+  "date": "2026-11-08T10:15:24.734Z",
+  "stats": {
+    "startTime": "2026-11-08T10:15:24.734Z",
+    "duration": 557367.3169999999,
+    "expected": 15,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "tests": [
+    {
+      "test": "boots the renderer, Rapier and registered world, unlocks audio, and resizes the canvas",
+      "status": "passed",
+      "durationMs": 34521
+    },
+    {
+      "test": "reports WebGL context loss and disposes the registered modules and renderer",
+      "status": "passed",
+      "durationMs": 11244
+    },
+    {
+      "test": "the game boots with the hospital world, atmosphere and horror modules",
+      "status": "passed",
+      "durationMs": 24573
+    },
+    {
+      "test": "dev preview renders every authored viewpoint with visible light",
+      "status": "passed",
+      "durationMs": 141438
+    },
+    {
+      "test": "WebGL context loss tears down the hospital modules cleanly",
+      "status": "passed",
+      "durationMs": 12058
+    },
+    {
+      "test": "actual pointer-lock controls move, sprint, crouch and collide with isolated walls",
+      "status": "passed",
+      "durationMs": 7628
+    },
+    {
+      "test": "E opens and closes a raycast door and enters/exits a hiding spot safely",
+      "status": "passed",
+      "durationMs": 10147
+    },
+    {
+      "test": "wake in room 104, walk into the real corridor, collide with a door, and open a route",
+      "status": "passed",
+      "durationMs": 43168,
+      "evidence": {
+        "combined-game-metrics": {
+          "renderer": {
+            "calls": 62,
+            "triangles": 30964,
+            "geometries": 319,
+            "textures": 39
+          },
+          "performance": {
+            "fixedMaxMs": 37.5,
+            "updateMaxMs": 36.89999999990687,
+            "frameDeltaMaxMs": 100
+          },
+          "frameCount": 63
+        }
+      }
+    },
+    {
+      "test": "all four real lockers and both invisible under-bed markers conceal and return the player safely",
+      "status": "passed",
+      "durationMs": 88429
+    },
+    {
+      "test": "an initially open hospital door closes at its authored hinge, blocks passage, and opens again",
+      "status": "passed",
+      "durationMs": 32737
+    },
+    {
+      "test": "real drawer and cabinet markers produce completed inspections through E",
+      "status": "passed",
+      "durationMs": 10071
+    },
+    {
+      "test": "capture transitions to restart and recreates a clean session repeatedly",
+      "status": "passed",
+      "durationMs": 33014,
+      "evidence": {
+        "session-1-resources": {
+          "sessionId": 2,
+          "colliderCount": 225,
+          "renderer": {
+            "calls": 185,
+            "triangles": 51104,
+            "geometries": 180,
+            "textures": 26
+          },
+          "performance": {
+            "fixedMaxMs": 0,
+            "updateMaxMs": 4.100000000093132,
+            "frameDeltaMaxMs": 100
+          }
+        },
+        "session-1-listeners": {
+          "baseline": 31,
+          "current": 31
+        },
+        "session-2-resources": {
+          "sessionId": 3,
+          "colliderCount": 225,
+          "renderer": {
+            "calls": 185,
+            "triangles": 51104,
+            "geometries": 180,
+            "textures": 26
+          },
+          "performance": {
+            "fixedMaxMs": 0,
+            "updateMaxMs": 4.2000000001862645,
+            "frameDeltaMaxMs": 100
+          }
+        },
+        "session-2-listeners": {
+          "baseline": 31,
+          "current": 31
+        },
+        "session-3-resources": {
+          "sessionId": 4,
+          "colliderCount": 225,
+          "renderer": {
+            "calls": 185,
+            "triangles": 51104,
+            "geometries": 180,
+            "textures": 26
+          },
+          "performance": {
+            "fixedMaxMs": 0,
+            "updateMaxMs": 6.699999999720603,
+            "frameDeltaMaxMs": 100
+          }
+        },
+        "session-3-listeners": {
+          "baseline": 31,
+          "current": 31
+        }
+      }
+    },
+    {
+      "test": "The Patient sees the player, pursues physically, loses an occluded trail and searches its last observation",
+      "status": "passed",
+      "durationMs": 30995,
+      "evidence": {
+        "real-chase-events": [
+          {
+            "type": "chase:started",
+            "payload": {
+              "chaseId": "nw:entity:patient:chase:1",
+              "entityId": "nw:entity:patient",
+              "playerId": "player",
+              "position": {
+                "x": 6,
+                "y": 0.0029999985098838862,
+                "z": 7.2
+              },
+              "timeSeconds": 0.46666666666666784
+            }
+          },
+          {
+            "type": "atmosphere:lighting",
+            "payload": {
+              "targetId": "nw:lights:corridor-main",
+              "effect": "flicker",
+              "durationSeconds": 1.6
+            }
+          },
+          {
+            "type": "atmosphere:sound",
+            "payload": {
+              "cueId": "nw:metal-creak",
+              "action": "play",
+              "position": {
+                "x": 6,
+                "y": 0.0029999985098838862,
+                "z": 7.2
+              },
+              "volume": 0.46,
+              "loop": false
+            }
+          },
+          {
+            "type": "entity:state",
+            "payload": {
+              "entityId": "nw:entity:patient",
+              "previous": "idle",
+              "current": "pursue"
+            }
+          },
+          {
+            "type": "chase:ended",
+            "payload": {
+              "chaseId": "nw:entity:patient:chase:1",
+              "entityId": "nw:entity:patient",
+              "playerId": "player",
+              "reason": "escaped",
+              "timeSeconds": 1.799999999999997
+            }
+          },
+          {
+            "type": "entity:state",
+            "payload": {
+              "entityId": "nw:entity:patient",
+              "previous": "pursue",
+              "current": "lost-target"
+            }
+          },
+          {
+            "type": "entity:state",
+            "payload": {
+              "entityId": "nw:entity:patient",
+              "previous": "lost-target",
+              "current": "search"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "test": "a physical Patient approach captures after a response window and offers restart",
+      "status": "passed",
+      "durationMs": 26108
+    },
+    {
+      "test": "the player genuinely escapes The Patient by sprinting around the hospital corner and keeps exploring",
+      "status": "passed",
+      "durationMs": 49282,
+      "evidence": {
+        "walked-escape-route": {
+          "route": [
+            {
+              "phase": 0,
+              "x": -1,
+              "y": 0.0029999985098838862,
+              "z": 7.2,
+              "frame": 24,
+              "patientState": "patrol",
+              "movement": "idle"
+            },
+            {
+              "phase": 0,
+              "x": -1.0666666666666667,
+              "y": 0.0029999985098838862,
+              "z": 7.2,
+              "frame": 25,
+              "patientState": "patrol",
+              "movement": "sprinting"
+            },
+            {
+              "phase": 0,
+              "x": -1.2444444444444445,
+              "y": 0.0029999985098838862,
+              "z": 7.2,
+              "frame": 26,
+              "patientState": "patrol",
+              "movement": "sprinting"
+            },
+            {
+              "phase": 0,
+              "x": -1.5333333333333332,
+              "y": 0.0029999985098838862,
+              "z": 7.2,
+              "frame": 27,
+              "patientState": "patrol",
+              "movement": "sprinting"
+            },
+            {
+              "phase": 0,
+              "x": -1.8911111111111114,
+              "y": 0.0029999985098838862,
+              "z": 7.2,
+              "frame": 28,
+              "patientState": "patrol",
+              "movement": "sprinting"
+            },
+            {
+              "phase": 0,
+              "x": -2.2494444444444452,
+              "y": 0.0029999985098838862,
+              "z": 7.2,
+              "frame": 29,
+              "patientState": "patrol",
+              "movement": "sprinting"
+            },
+            {
+              "phase": 0,
+              "x": -2.607777777777779,
+              "y": 0.0029999985098838862,
+              "z": 7.2,
+              "frame": 30,
+              "patientState": "investigate",
+              "movement": "sprinting"
+            },
+            {
+              "phase": 0,
+              "x": -2.966111111111113,
+              "y": 0.0029999985098838862,
+              "z": 7.2,
+              "frame": 31,
+              "patientState": "investigate",
+              "movement": "sprinting"
+            },
+            {
+              "phase": 0,
+              "x": -3.3244444444444468,
+              "y": 0.0029999985098838862,
+              "z": 7.2,
+              "frame": 32,
+              "patientState": "investigate",
+              "movement": "sprinting"
+            },
+            {
+              "phase": 0,
+              "x": -3.6827777777777806,
+              "y": 0.0029999985098838862,
+              "z": 7.2,
+              "frame": 33,
+              "patientState": "investigate",
+              "movement": "sprinting"
+            },
+            {
+              "phase": 0,
+              "x": -4.041111111111114,
+              "y": 0.0029999985098838862,
+              "z": 7.2,
+              "frame": 34,
+              "patientState": "investigate",
+              "movement": "sprinting"
+            },
+            {
+              "phase": 0,
+              "x": -4.399444444444446,
+              "y": 0.0029999985098838862,
+              "z": 7.2,
+              "frame": 35,
+              "patientState": "pursue",
+              "movement": "sprinting"
+            },
+            {
+              "phase": 0,
+              "x": -4.757777777777777,
+              "y": 0.0029999985098838862,
+              "z": 7.2,
+              "frame": 36,
+              "patientState": "pursue",
+              "movement": "sprinting"
+            },
+            {
+              "phase": 1,
+              "x": -5.049444444444444,
+              "y": 0.0029999985098838862,
+              "z": 7.133333333333334,
+              "frame": 37,
+              "patientState": "pursue",
+              "movement": "sprinting"
+            },
+            {
+              "phase": 1,
+              "x": -5.2299999999999995,
+              "y": 0.0029999985098838862,
+              "z": 6.955555555555556,
+              "frame": 38,
+              "patientState": "pursue",
+              "movement": "sprinting"
+            },
+            {
+              "phase": 1,
+              "x": -5.341599890755918,
+              "y": 0.0029999985098838862,
+              "z": 6.706009073294801,
+              "frame": 39,
+              "patientState": "pursue",
+              "movement": "sprinting"
+            },
+            {
+              "phase": 1,
+              "x": -5.400463916325684,
+              "y": 0.0029999985098838862,
+              "z": 6.366172437249835,
+              "frame": 40,
+              "patientState": "pursue",
+              "movement": "sprinting"
+            },
+            {
+              "phase": 1,
+              "x": -5.420530016329672,
+              "y": 0.0029999985098838862,
+              "z": 6.008401379996169,
+              "frame": 41,
+              "patientState": "pursue",
+              "movement": "sprinting"
+            },
+            {
+              "phase": 1,
+              "x": -5.42454323633047,
+              "y": 0.0029999985098838862,
+              "z": 5.936847168545436,
+              "frame": 42,
+              "patientState": "pursue",
+              "movement": "sprinting"
+            },
+            {
+              "phase": 1,
+              "x": -5.444609336334458,
+              "y": 0.0029999985098838862,
+              "z": 5.579076111291769,
+              "frame": 43,
+              "patientState": "pursue",
+              "movement": "sprinting"
+            },
+            {
+              "phase": 1,
+              "x": -5.464675436338446,
+              "y": 0.0029999985098838862,
+              "z": 5.221305054038103,
+              "frame": 44,
+              "patientState": "pursue",
+              "movement": "sprinting"
+            },
+            {
+              "phase": 1,
+              "x": -5.484741536342434,
+              "y": 0.0029999985098838862,
+              "z": 4.863533996784437,
+              "frame": 45,
+              "patientState": "pursue",
+              "movement": "sprinting"
+            },
+            {
+              "phase": 1,
+              "x": -5.504807636346422,
+              "y": 0.0029999985098838862,
+              "z": 4.50576293953077,
+              "frame": 46,
+              "patientState": "pursue",
+              "movement": "sprinting"
+            },
+            {
+              "phase": 1,
+              "x": -5.52487373635041,
+              "y": 0.0029999985098838862,
+              "z": 4.147991882277104,
+              "frame": 47,
+              "patientState": "pursue",
+              "movement": "sprinting"
+            },
+            {
+              "phase": 1,
+              "x": -5.5449398363543985,
+              "y": 0.0029999985098838862,
+              "z": 3.7902208250234364,
+              "frame": 48,
+              "patientState": "pursue",
+              "movement": "sprinting"
+            },
+            {
+              "phase": 2,
+              "x": -5.559587211462451,
+              "y": 0.0029999985098838862,
+              "z": 3.4321869827958866,
+              "frame": 49,
+              "patientState": "pursue",
+              "movement": "sprinting"
+            },
+            {
+              "phase": 2,
+              "x": -5.574234586570503,
+              "y": 0.0029999985098838862,
+              "z": 3.074153140568337,
+              "frame": 50,
+              "patientState": "pursue",
+              "movement": "sprinting"
+            },
+            {
+              "phase": 2,
+              "x": -5.588881961678555,
+              "y": 0.0029999985098838862,
+              "z": 2.716119298340787,
+              "frame": 51,
+              "patientState": "pursue",
+              "movement": "sprinting"
+            },
+            {
+              "phase": 2,
+              "x": -5.6035293367866075,
+              "y": 0.0029999985098838862,
+              "z": 2.3580854561132374,
+              "frame": 52,
+              "patientState": "pursue",
+              "movement": "sprinting"
+            },
+            {
+              "phase": 2,
+              "x": -5.61817671189466,
+              "y": 0.0029999985098838862,
+              "z": 2.0000516138856876,
+              "frame": 53,
+              "patientState": "pursue",
+              "movement": "sprinting"
+            },
+            {
+              "phase": 2,
+              "x": -5.632824087002712,
+              "y": 0.0029999985098838862,
+              "z": 1.642017771658138,
+              "frame": 54,
+              "patientState": "pursue",
+              "movement": "sprinting"
+            },
+            {
+              "phase": 2,
+              "x": -5.647471462110764,
+              "y": 0.0029999985098838862,
+              "z": 1.2839839294305881,
+              "frame": 55,
+              "patientState": "pursue",
+              "movement": "sprinting"
+            },
+            {
+              "phase": 2,
+              "x": -5.6621188372188165,
+              "y": 0.0029999985098838862,
+              "z": 0.9259500872030384,
+              "frame": 56,
+              "patientState": "lost-target",
+              "movement": "sprinting"
+            },
+            {
+              "phase": 2,
+              "x": -5.676766212326864,
+              "y": 0.0029999985098838862,
+              "z": 0.5679162449754886,
+              "frame": 57,
+              "patientState": "lost-target",
+              "movement": "sprinting"
+            },
+            {
+              "phase": 2,
+              "x": -5.6914135874349165,
+              "y": 0.0029999985098838862,
+              "z": 0.20988240274793918,
+              "frame": 58,
+              "patientState": "lost-target",
+              "movement": "sprinting"
+            }
+          ],
+          "events": [
+            {
+              "type": "door:state",
+              "payload": {
+                "doorId": "nw:door:maintenance-west",
+                "previous": "closed",
+                "current": "opening"
+              }
+            },
+            {
+              "type": "door:state",
+              "payload": {
+                "doorId": "nw:door:maintenance-west",
+                "previous": "opening",
+                "current": "open"
+              }
+            },
+            {
+              "type": "interaction:completed",
+              "payload": {
+                "playerId": "player",
+                "targetId": "nw:door:maintenance-west",
+                "action": "open",
+                "outcome": "completed",
+                "position": {
+                  "x": -5.7,
+                  "y": 0.0029999985098838862,
+                  "z": 4.8
+                }
+              }
+            },
+            {
+              "type": "entity:state",
+              "payload": {
+                "entityId": "nw:entity:patient",
+                "previous": "idle",
+                "current": "patrol"
+              }
+            },
+            {
+              "type": "entity:state",
+              "payload": {
+                "entityId": "nw:entity:patient",
+                "previous": "patrol",
+                "current": "investigate"
+              }
+            },
+            {
+              "type": "chase:started",
+              "payload": {
+                "chaseId": "nw:entity:patient:chase:1",
+                "entityId": "nw:entity:patient",
+                "playerId": "player",
+                "position": {
+                  "x": 5.991879406083114,
+                  "y": 0.0029999985098838862,
+                  "z": 7.126417923214507
+                },
+                "timeSeconds": 2.333333333333329
+              }
+            },
+            {
+              "type": "atmosphere:lighting",
+              "payload": {
+                "targetId": "nw:lights:corridor-main",
+                "effect": "flicker",
+                "durationSeconds": 1.6
+              }
+            },
+            {
+              "type": "atmosphere:sound",
+              "payload": {
+                "cueId": "nw:metal-creak",
+                "action": "play",
+                "position": {
+                  "x": 5.991879406083114,
+                  "y": 0.0029999985098838862,
+                  "z": 7.126417923214507
+                },
+                "volume": 0.46,
+                "loop": false
+              }
+            },
+            {
+              "type": "entity:state",
+              "payload": {
+                "entityId": "nw:entity:patient",
+                "previous": "investigate",
+                "current": "pursue"
+              }
+            },
+            {
+              "type": "chase:ended",
+              "payload": {
+                "chaseId": "nw:entity:patient:chase:1",
+                "entityId": "nw:entity:patient",
+                "playerId": "player",
+                "reason": "escaped",
+                "timeSeconds": 3.9833333333333236
+              }
+            },
+            {
+              "type": "entity:state",
+              "payload": {
+                "entityId": "nw:entity:patient",
+                "previous": "pursue",
+                "current": "lost-target"
+              }
+            },
+            {
+              "type": "entity:state",
+              "payload": {
+                "entityId": "nw:entity:patient",
+                "previous": "lost-target",
+                "current": "search"
+              }
+            }
+          ],
+          "performance": {
+            "fixedMaxMs": 74.90000000037253,
+            "updateMaxMs": 19.90000000037253,
+            "frameDeltaMaxMs": 100
+          },
+          "renderer": {
+            "calls": 162,
+            "triangles": 43002,
+            "geometries": 427,
+            "textures": 58
+          },
+          "frameCount": 74
+        }
+      }
+    }
+  ],
+  "scope": "Actual main hospital game, foundation coverage, all authored viewpoints and isolated original controls.",
+  "notes": [
+    "Software WebGL; hardware/cross-browser performance not established.",
+    "frameDeltaMaxMs is clamped engine time, not wall-clock FPS.",
+    "QA scenario positioning is opt-in; movement escape uses actual keys after setup."
+  ]
+}

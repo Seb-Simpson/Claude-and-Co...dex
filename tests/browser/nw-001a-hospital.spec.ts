@@ -1,4 +1,7 @@
 import { expect, test } from '@playwright/test';
+import { bootHospital, enterWard } from './application';
+
+test.describe.configure({ timeout: 90_000 });
 
 /**
  * NW-001A hospital environment checks against the real renderer (software WebGL in CI).
@@ -8,13 +11,9 @@ import { expect, test } from '@playwright/test';
 const WORLD_ID = 'nw:hospital:ward-4-west';
 
 test('the game boots with the hospital world, atmosphere and horror modules', async ({ page }, testInfo) => {
-  const errors: string[] = [];
-  page.on('pageerror', (error) => errors.push(error.message));
-  page.on('console', (message) => { if (message.type() === 'error') errors.push(message.text()); });
-  await page.goto('/');
+  const errors = await bootHospital(page);
   await expect(page.locator('#status')).toContainText(`World: ${WORLD_ID}`, { timeout: 30_000 });
-  await page.getByRole('button', { name: 'Enable audio', exact: true }).click();
-  await expect(page.getByRole('button', { name: 'Audio enabled', exact: true })).toBeDisabled();
+  await enterWard(page);
   await page.waitForTimeout(1500);
   const glError = await page.locator('canvas').evaluate((element) => {
     const gl = (element as HTMLCanvasElement).getContext('webgl2');
@@ -63,11 +62,8 @@ test('dev preview renders every authored viewpoint with visible light', async ({
 });
 
 test('WebGL context loss tears down the hospital modules cleanly', async ({ page }) => {
-  const pageErrors: string[] = [];
-  page.on('pageerror', (error) => pageErrors.push(error.message));
-  await page.goto('/');
-  await expect(page.locator('#status')).toContainText(`World: ${WORLD_ID}`, { timeout: 30_000 });
-  await page.getByRole('button', { name: 'Enable audio', exact: true }).click();
+  const pageErrors = await bootHospital(page);
+  await enterWard(page);
   await page.waitForTimeout(500);
   await page.locator('canvas').evaluate((element) => {
     (element as HTMLCanvasElement).getContext('webgl2')?.getExtension('WEBGL_lose_context')?.loseContext();
@@ -75,5 +71,5 @@ test('WebGL context loss tears down the hospital modules cleanly', async ({ page
   await expect(page.getByRole('alert')).toContainText('WebGL context lost');
   await expect(page.locator('canvas')).toHaveCount(0);
   await page.waitForTimeout(500);
-  expect(pageErrors).toEqual([]);
+  expect(pageErrors.filter(error => !error.includes('WebGL context lost'))).toEqual([]);
 });

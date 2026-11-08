@@ -1,84 +1,70 @@
 # NIGHT WARD
 
-A first-person 3D browser survival horror project. The player is completely
-defenceless. This branch implements **NW-000: shared technical foundation** only.
-It renders a neutral test scene and supplies the contracts and lifecycle used by
-independently developed world and gameplay modules.
+A first-person, completely defenceless browser horror game set in Ward 4 West.
+This branch integrates the hospital, player controls, hiding, atmosphere and a
+physical Patient encounter into the first playable build (NW-002A).
 
-## Run locally
+## Launch
 
-Use Node.js **22.12 or later** and npm.
+Use Node.js 22.12+ and a desktop browser with WebGL2.
 
 ```sh
 npm install
 npm run dev
 ```
 
-Open the local URL printed by Vite in a desktop browser with WebGL2 support.
-The **Enable audio** button creates/resumes the browser audio context after a
-user gesture. The foundation does not play a demo sound.
+Open the Vite URL and click **Enter ward**. This captures the mouse and unlocks
+browser audio. You start in room 104. WASD moves, Shift sprints, Ctrl/C crouches,
+E interacts and Escape releases the mouse. There are no weapons or attacks.
+
+Leave room 104 through its open door. The service connector leads to the
+maintenance passage; it rejoins the east corridor to form an escape loop. Listen
+for The Patient, break its sight around corners, and hide when it has not seen
+you enter. Four lockers and two under-bed spots are available. Capture fades the
+scene and presents **Restart**, which resets the ward without reloading the page.
+
+For a production build:
+
+```sh
+npm run build
+npm run preview
+```
+
+## Verification
 
 ```sh
 npm run typecheck
 npm test
 npm run build
-npm run preview
-```
-
-For browser smoke tests, install Chromium once, then run:
-
-```sh
 npx playwright install chromium
 npm run test:browser
 ```
 
-An existing Chromium installation can be selected instead:
+An installed Chromium can be selected with
+`PLAYWRIGHT_CHROMIUM_EXECUTABLE=/usr/bin/chromium`. The full browser suite owns
+port 4173 and serves Vite in development mode because it includes authored
+world previews and the isolated gameplay harness. The actual combined game can
+also be tested against production output:
 
 ```sh
-PLAYWRIGHT_CHROMIUM_EXECUTABLE=/usr/bin/chromium npm run test:browser
+PLAYWRIGHT_PREVIEW=1 PLAYWRIGHT_CHROMIUM_EXECUTABLE=/usr/bin/chromium npm run test:browser -- tests/browser/foundation.spec.ts tests/browser/nw002a-integration.spec.ts
 ```
 
-The Playwright suite starts its own Vite server on port 4173 and checks renderer/
-Rapier boot, gesture-based audio unlock, canvas resize and WebGL context-loss
-reporting/cleanup. These are foundation smoke tests, not gameplay tests.
+Normal play exposes no debug controls. Tests use `/?test=1` to opt into a small
+QA bridge for deterministic scenario setup, state snapshots and resource counts.
 
-`npm run build` also runs typecheck. `npm run preview` serves the production
-build. `package-lock.json` records the dependency resolution; CI/repeatable
-installs can use `npm ci`.
+## Integration notes
 
-## Shared documentation
+- [First playable integration and asset handoff](docs/NW-002A.md)
+- [Architecture](docs/ARCHITECTURE.md)
+- [Shared contracts](docs/CONTRACTS.md)
+- [Module integration](docs/INTEGRATION.md)
+- [Ownership](docs/AGENT-OWNERSHIP.md)
+- [Gameplay APIs](src/gameplay/README.md)
+- [Patient and model replacement APIs](src/entities/README.md)
 
-- [Architecture and engine lifecycle](docs/ARCHITECTURE.md)
-- [Contracts, units and metadata conventions](docs/CONTRACTS.md)
-- [Module registration and exact public APIs](docs/INTEGRATION.md)
-- [Agent ownership and parallel development](docs/AGENT-OWNERSHIP.md)
-
-Claude owns `src/world/`, `src/atmosphere/` and `src/horror/`. Codex owns
-`src/gameplay/`, `src/entities/` and `src/physics/`. Both agents add `*.module.ts`
-files under their own paths; neither needs to edit the shared entry point.
-
-The foundation does not implement a hospital, player controller, interactions,
-hiding, navigation, entities or chase sequences. Those remain NW-001A/NW-001B
-work. Start both branches from the same accepted foundation commit.
-
-## NW-000 verification
-
-Verified with Node 24 and Chromium: `npm install`, `npm run typecheck`,
-`npm test` (38 tests), and `npm run build` pass. The two Playwright smoke tests
-pass against both the development server and the production preview. They
-exercise real WebGL2 rendering and Rapier initialization, gesture audio unlock,
-canvas resizing, and visible context-loss handling with cleanup. The neutral
-scene screenshot was also visually inspected.
-
-To smoke-test the production output after building:
-
-```sh
-PLAYWRIGHT_PREVIEW=1 npm run test:browser
-```
-
-The browser checks use software WebGL in headless Chromium; they do not establish
-hardware performance or cross-browser compatibility. The Rapier compatibility
-bundle includes WASM and produces Vite's large-chunk warning (about 2.24 MB
-minified, 830 kB gzipped); it is loaded separately from the entry chunk. Future
-hospital/gameplay integration still needs its own collision, navigation, input,
-perception and chase verification.
+The Patient currently has a visible temporary model. The secondary entities
+remain profiles/framework, not finished encounters. Stairwell B is intentionally
+locked; navigation covers this hospital's single-floor loop. Browser automation
+uses software WebGL and does not establish hardware or cross-browser performance.
+No paid API or external runtime service is required.

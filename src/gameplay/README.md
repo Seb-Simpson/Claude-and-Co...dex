@@ -1,3 +1,9 @@
+> Historical NW-001B API handoff. The assembled NW-002A application now provides
+> capture/restart, an indexed physics broadphase, real hospital verification,
+> Patient model/effects and proximity door navigation. See [NW-002A](../../docs/NW-002A.md)
+> for current integration behavior and limits; the reload-only and unindexed-query
+> notes below apply to the original standalone NW-001B runtime.
+
 # NW-001B gameplay integration
 
 Shared foundation: `d0146399c89c172933ef32981551800ce35fa682`.
