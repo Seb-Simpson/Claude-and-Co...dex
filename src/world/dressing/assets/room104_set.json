@@ -1,6 +1,6 @@
 {
  "glb": "room104_set.glb",
- "bytes": 7214432,
+ "bytes": 6103100,
  "triangles": 56446,
  "meshes": {
   "props": 50962,
@@ -28,5 +28,6 @@
  "lightmap": "room104_lightmap.jpg",
  "lightmapSize": 2048,
  "lightmapBytes": 930138,
- "samples": 96
+ "samples": 96,
+ "gpuTextureMB": 129.3
 }

@@ -91,10 +91,14 @@ See `assets/room104_set.json`.
 
 | | |
 | --- | --- |
-| Triangles | about 57k for the whole room and corridor |
-| Materials and draw calls | 9 (one mesh per material) |
-| Download | about 7.4 MB GLB + 0.7 MB light map |
-| Textures | 2048² props atlas (colour, ORM, normal) and 2048² light map. The tiling sets are 512–1024². |
+| Triangles | 56,446 for the whole room and corridor (about +50k in view vs the procedural room) |
+| Materials and draw calls | 9 (one mesh per material). In-game draw calls do not rise: 52 vs 59 at the wake-up view, 155 vs 163 down the corridor. |
+| Download | 6.1 MB GLB + 0.9 MB light map |
+| GPU texture memory | about 129 MB uncompressed with mipmaps. The largest are the 2048² props colour atlas, decal atlas and light map (21 MB each). `optimize_glb.py` already drops the glow atlas, props ORM/normal and wheelchair maps to 512–1024. |
+
+**Recommended before scaling this to the whole ward:** KTX2/Basis texture compression (three's
+`KTX2Loader`). It would cut GPU texture memory by about 4–6×. It needs the Basis transcoder
+shipped as a static asset.
 
 ## Known limitations
 

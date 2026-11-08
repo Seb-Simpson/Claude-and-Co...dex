@@ -27,7 +27,8 @@ async function enterWard(page: Page, query = ''): Promise<string[]> {
 test('the playable game dresses every spawned entity in its animated Blender model', async ({ page }, testInfo) => {
   test.setTimeout(420_000);
   const glbs: string[] = [];
-  page.on('response', (response) => { if (/\.glb(\?|$)/.test(response.url())) glbs.push(`${response.status()} ${response.url().split('/').pop()}`); });
+  // Entity models only (the world also loads the Room 104 set GLB).
+  page.on('response', (response) => { if (/\/(patient|nurse|crawler|watcher|reflection)(-[\w-]+)?\.glb(\?|$)/.test(response.url())) glbs.push(`${response.status()} ${response.url().split('/').pop()}`); });
   const errors = await enterWard(page);
   expect(glbs.sort()).toEqual(['200 crawler.glb', '200 nurse.glb', '200 patient.glb', '200 reflection.glb', '200 watcher.glb']);
   expect(await probe(page, (d) => d.modelFailures)).toEqual({});
