@@ -53,6 +53,21 @@ PLAYWRIGHT_PREVIEW=1 PLAYWRIGHT_CHROMIUM_EXECUTABLE=/usr/bin/chromium npm run te
 Normal play exposes no debug controls. Tests use `/?test=1` to opt into a small
 QA bridge for deterministic scenario setup, state snapshots and resource counts.
 
+For a longer production-browser performance regression check:
+
+```sh
+npm run build
+PLAYWRIGHT_CHROMIUM_EXECUTABLE=/usr/bin/chromium npm run test:soak
+```
+
+The soak starts its own preview server on port 4181, requires at least five
+minutes of measured play and 120 simulation seconds, and writes timing, memory,
+audio and CPU-profile evidence under `.playwright/soak-latest/`. Its default
+320×180 software-rendered viewport measures long-run stability. Select a larger
+viewport with `-- --width=960 --height=540` to investigate rendering limits.
+For an accelerated CPU-only navigation profile, run
+`node tests/performance/navigation-profile.mjs`.
+
 ## Integration notes
 
 - [First playable integration and asset handoff](docs/NW-002A.md)
@@ -63,8 +78,10 @@ QA bridge for deterministic scenario setup, state snapshots and resource counts.
 - [Gameplay APIs](src/gameplay/README.md)
 - [Patient and model replacement APIs](src/entities/README.md)
 
-The Patient currently has a visible temporary model. The secondary entities
-remain profiles/framework, not finished encounters. Stairwell B is intentionally
+The Patient uses the merged NW-002C animated Blender model and NW-002B audio and
+presentation, with a fallback when models or the presentation module are absent.
+The models are committed; Blender is not required to play. Secondary entity gameplay
+remains profiles/framework, not finished encounters. Stairwell B is intentionally
 locked; navigation covers this hospital's single-floor loop. Browser automation
 uses software WebGL and does not establish hardware or cross-browser performance.
 No paid API or external runtime service is required.

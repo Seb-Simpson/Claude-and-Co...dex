@@ -2,6 +2,8 @@ import { PerspectiveCamera, Scene, SRGBColorSpace, WebGLRenderer } from 'three';
 import type { EngineServices, FrameContext } from '../contracts';
 import { createAudioService } from './audio';
 import { FrameClock } from './timing';
+import { FrameProfiler } from './performance';
+import type { EnginePerformanceSnapshot } from './performance';
 
 export interface EngineOptions {
   container: HTMLElement;
@@ -16,6 +18,8 @@ export interface EngineHooks {
 
 export interface Engine {
   readonly services: EngineServices;
+  /** Recent real frame intervals and CPU stage timings, when provided by the engine. */
+  getPerformanceSnapshot?(): EnginePerformanceSnapshot;
   start(hooks: EngineHooks): void;
   stop(): void;
   resize(): void;
@@ -55,6 +59,7 @@ export async function createEngine(options: EngineOptions): Promise<Engine> {
   const audio = createAudioService();
   const services: EngineServices = { renderer, scene, camera, physics, audio };
   const clock = new FrameClock();
+  const profiler = new FrameProfiler();
   let animationFrame: number | null = null;
   let running = false;
   let disposed = false;
@@ -86,14 +91,26 @@ export async function createEngine(options: EngineOptions): Promise<Engine> {
     animationFrame = null;
     if (!running || disposed || document.hidden) return;
     try {
+      const frameBegin = performance.now();
       const step = clock.tick(milliseconds);
+      let fixedMs = 0;
+      let physicsMs = 0;
       for (const fixedFrame of step.fixedSteps) {
+        const fixedBegin = performance.now();
         hooks.fixedUpdate?.(fixedFrame);
+        const physicsBegin = performance.now();
+        fixedMs += physicsBegin - fixedBegin;
         physics.timestep = fixedFrame.deltaSeconds;
         physics.step();
+        physicsMs += performance.now() - physicsBegin;
       }
+      const updateBegin = performance.now();
       hooks.update?.({ deltaSeconds: step.deltaSeconds, elapsedSeconds: step.elapsedSeconds });
+      const renderBegin = performance.now();
       renderer.render(scene, camera);
+      const frameEnd = performance.now();
+      profiler.record(milliseconds, frameEnd - frameBegin, fixedMs, physicsMs,
+        renderBegin - updateBegin, frameEnd - renderBegin, step.fixedSteps.length);
       schedule();
     } catch (error) {
       reportError(error);
@@ -105,12 +122,14 @@ export async function createEngine(options: EngineOptions): Promise<Engine> {
     if (animationFrame !== null) cancelAnimationFrame(animationFrame);
     animationFrame = null;
     clock.reset();
+    profiler.resetInterval();
   }
 
   function onVisibilityChange(): void {
     if (animationFrame !== null) cancelAnimationFrame(animationFrame);
     animationFrame = null;
     clock.reset();
+    profiler.resetInterval();
     schedule();
   }
 
@@ -142,12 +161,14 @@ export async function createEngine(options: EngineOptions): Promise<Engine> {
 
   return {
     services,
+    getPerformanceSnapshot: () => profiler.snapshot(),
     start(nextHooks) {
       if (disposed) throw new Error('Engine has been disposed');
       if (running) throw new Error('Engine is already running');
       hooks = nextHooks;
       running = true;
       clock.reset();
+      profiler.clear();
       schedule();
     },
     stop,

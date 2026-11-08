@@ -10,10 +10,22 @@ test.describe.configure({ timeout: 90_000 });
  */
 const WORLD_ID = 'nw:hospital:ward-4-west';
 
+/** The foundation shell offers "Enable audio"; with NW-001B installed the gesture is "Enter ward". */
+async function unlockAudio(page: import('@playwright/test').Page): Promise<void> {
+  const enter = page.getByRole('button', { name: 'Enter ward', exact: true });
+  const enable = page.getByRole('button', { name: 'Enable audio', exact: true });
+  await expect.poll(async () => await enter.isVisible() || await enable.isVisible(), { timeout: 30_000 }).toBe(true);
+  if (await enter.isVisible()) await enterWard(page);
+  else {
+    await enable.click();
+    await expect(page.getByRole('button', { name: 'Audio enabled', exact: true })).toBeDisabled();
+  }
+}
+
 test('the game boots with the hospital world, atmosphere and horror modules', async ({ page }, testInfo) => {
   const errors = await bootHospital(page);
   await expect(page.locator('#status')).toContainText(`World: ${WORLD_ID}`, { timeout: 30_000 });
-  await enterWard(page);
+  await unlockAudio(page);
   await page.waitForTimeout(1500);
   const glError = await page.locator('canvas').evaluate((element) => {
     const gl = (element as HTMLCanvasElement).getContext('webgl2');
@@ -63,7 +75,7 @@ test('dev preview renders every authored viewpoint with visible light', async ({
 
 test('WebGL context loss tears down the hospital modules cleanly', async ({ page }) => {
   const pageErrors = await bootHospital(page);
-  await enterWard(page);
+  await unlockAudio(page);
   await page.waitForTimeout(500);
   await page.locator('canvas').evaluate((element) => {
     (element as HTMLCanvasElement).getContext('webgl2')?.getExtension('WEBGL_lose_context')?.loseContext();

@@ -20,18 +20,20 @@ function fixture() {
   const physics = createPhysicsAdapter(world, hospital.world.colliders);
   resources.push(physics);
   const navigation = createNavigationProvider(physics, hospital.world.bounds, { cellSize: 0.25 });
-  return { hospital: hospital.world, physics, navigation, world };
+  const doorProgress = new Map(hospital.world.doors.map(door => [door.id, door.initialState === 'open' ? 1 : 0]));
+  return { hospital: hospital.world, physics, navigation, world, doorProgress };
 }
 function matrix(pose: Pose): Matrix4 {
   return new Matrix4().compose(new Vector3().copy(pose.position), new Quaternion().copy(pose.rotation), new Vector3(1, 1, 1));
 }
 function moveDoor(f: ReturnType<typeof fixture>, door: DoorMarker, open: boolean): void {
   const initial = door.initialState === 'open' ? door.openPose : door.closedPose;
-  const local = door.colliderIds.map(id => ({ id, matrix: matrix(initial).invert().multiply(matrix(f.physics.getColliderPose(id))) }));
+  const local = door.colliderIds.map(id => ({ id, matrix: matrix(initial).invert().multiply(matrix(f.hospital.colliders.find(collider => collider.id === id)!.pose)) }));
+  const start = f.doorProgress.get(door.id)!;
   // Use the same <=2 degree conservative angular samples as gameplay. No engine
   // step is needed for any query to observe the newly posed door.
   for (let index = 1; index <= 90; index += 1) {
-    const progress = open ? index / 90 : 1 - index / 90;
+    const progress = start + ((open ? 1 : 0) - start) * index / 90;
     const position = new Vector3().copy(door.closedPose.position).lerp(new Vector3().copy(door.openPose.position), progress);
     const rotation = new Quaternion().copy(door.closedPose.rotation).slerp(new Quaternion().copy(door.openPose.rotation), progress);
     const target = matrix({ position, rotation });
@@ -41,6 +43,7 @@ function moveDoor(f: ReturnType<typeof fixture>, door: DoorMarker, open: boolean
       return { id: entry.id, pose: { position: movedPosition, rotation: movedRotation } };
     })), `${door.id} angular sample ${index}`).toBe(true);
   }
+  f.doorProgress.set(door.id, open ? 1 : 0);
 }
 function walk(body: CharacterBody, target: Vec3): void {
   for (let tick = 0; tick < 2000; tick += 1) {
@@ -94,7 +97,11 @@ describe('actual Ward 4 collision and navigation integration', () => {
     const route = f.hospital.patrolRoutes.find(route => route.id === 'nw:route:ward-loop')!;
     const west = f.hospital.doors.find(door => door.id === 'nw:door:maintenance-west')!;
     const east = f.hospital.doors.find(door => door.id === 'nw:door:maintenance-east')!;
-    const query = { from: route.points[9]!, to: route.points[10]!, agent: patient };
+    // Close any initially-open passage leaves in this isolated fixture so the
+    // blocked case is independent of the authored starting poses.
+    moveDoor(f, west, false);
+    moveDoor(f, east, false);
+    const query = { from: { x: -5.7, y: 0, z: 7.2 }, to: { x: -5.7, y: 0, z: 4 }, agent: patient };
     expect(f.navigation.findPath(query)).toBeNull();
     // A repeated blocked query must reuse the result rather than repeat A*.
     const scan = vi.spyOn(f.physics, 'isSegmentFree');
@@ -115,9 +122,7 @@ describe('actual Ward 4 collision and navigation integration', () => {
     }
     body.dispose();
     expect(f.navigation.findPath(query)?.reachesGoal).toBe(true);
-    // Build a fresh inverse from the currently-open pose for the reverse sweep.
-    const opened = { ...west, initialState: 'open' as const };
-    moveDoor(f, opened, false);
+    moveDoor(f, west, false);
     const direct = f.physics.isSegmentFree(query.from, query.to, patient.radius, patient.height, [], false);
     expect(direct).toBe(false);
     // The east door remains open, so the longer hospital loop is still a valid escape.

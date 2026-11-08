@@ -20,7 +20,7 @@ export interface EntityAgentOptions {
   readonly playerEyeHeights?: { readonly standing: number; readonly crouching: number };
   /** Optional world adapter: nearby doors use the same collision-safe interaction animation. */
   readonly openNearbyDoor?: (position: Vec3, goal: Vec3) => boolean;
-  readonly getDoorApproach?: (position: Vec3, goal: Vec3) => Vec3 | null;
+  readonly getDoorApproach?: (position: Vec3, goal: Vec3, localOnly?: boolean) => Vec3 | null;
 }
 
 export interface EntityAgent {
@@ -122,17 +122,26 @@ export function createEntityAgent(options: EntityAgentOptions): EntityAgent {
     if (distance(at, goal) < 0.22) return true;
     if (!allowed) return false;
     if (now >= replanAt || !pathGoal || distance(pathGoal, goal) > 0.35 || stuckSeconds > 0.6) {
+      const localApproach = options.getDoorApproach?.(copy(at), copy(goal), true);
       const openingDoor = options.openNearbyDoor?.(copy(at), copy(goal)) ?? false;
-      let path = navigation.findPath({ from: at, to: goal, agent: profile.agent });
-      const pathLength = path?.waypoints.reduce((total, point, index, points) =>
-        total + (index ? distance(points[index - 1]!, point) : distance(at, point)), 0) ?? Infinity;
-      // Prefer operating a reachable doorway to taking a hospital-wide detour
-      // around its closed leaf. Every approach still requires a real clear path.
-      if (!path || openingDoor || pathLength > distance(at, goal) * 1.8 + 2) {
-        const approach = options.getDoorApproach?.(copy(at), copy(goal));
-        if (approach) {
-          const approachPath = navigation.findPath({ from: at, to: approach, agent: profile.agent });
-          if (approachPath && (!path || openingDoor || distance(at, approach) + distance(approach, goal) < pathLength * 0.9)) path = approachPath;
+      // A reachable nearby doorway takes priority over a potentially enormous
+      // detour around its moving leaf. While it opens, keep the last safe local
+      // approach and let collision continue to reserve the occupied space.
+      let path = localApproach
+        ? navigation.findPath({ from: at, to: localApproach, agent: profile.agent })
+        : openingDoor ? null : navigation.findPath({ from: at, to: goal, agent: profile.agent });
+      if (!localApproach && !openingDoor) {
+        const pathLength = path?.waypoints.reduce((total, point, index, points) =>
+          total + (index ? distance(points[index - 1]!, point) : distance(at, point)), 0) ?? Infinity;
+        // Farther doors still require a real route to their approach. Ordinary
+        // obstacle-aware navigation remains authoritative when no local portal
+        // offers safe progress.
+        if (!path || pathLength > distance(at, goal) * 1.8 + 2) {
+          const approach = options.getDoorApproach?.(copy(at), copy(goal));
+          if (approach) {
+            const approachPath = navigation.findPath({ from: at, to: approach, agent: profile.agent });
+            if (approachPath && (!path || distance(at, approach) + distance(approach, goal) < pathLength * 0.9)) path = approachPath;
+          }
         }
       }
       waypoints = path?.waypoints ?? [];

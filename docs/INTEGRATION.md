@@ -238,6 +238,9 @@ cannot establish those future gameplay properties.
 The registered world, atmosphere, horror and gameplay modules now run together.
 The application host recreates their registry/event bus on capture restart against
 one shared engine. Hospital gameplay enables The Patient with a 0.25m navigation
-grid, proximity door operation, temporary model and chase effects. See
+grid and safe proximity door operation. The merged NW-002B presenter attaches the
+Patient body automatically and owns chase audio/lighting; the integration adapter
+supplies contextual messages without duplicate effects. A temporary model remains
+available when the presentation module is absent. See
 [NW-002A.md](NW-002A.md) for exact application APIs, test setup, launch instructions
 and final-asset integration. No hospital implementation edits are required.
