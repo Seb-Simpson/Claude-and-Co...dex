@@ -12,15 +12,13 @@ export interface UiSound {
   /** Call from a user gesture: creates/resumes the context. */
   unlock(): void;
   play(cue: UiCue): void;
-  /** Low fluorescent hum under the title screen. */
-  hum(on: boolean): void;
+  /** The interface AudioContext once a gesture has created it (the title-screen ambience shares it). */
+  readonly context: AudioContext | null;
   dispose(): void;
 }
 
 export function createUiSound(): UiSound {
   let ctx: AudioContext | null = null;
-  let humNodes: { osc: OscillatorNode[]; gain: GainNode } | null = null;
-  let wantHum = false;
   let lastMove = 0;
   const out = (): AudioNode | null => (ctx ? audioOutput(ctx, 'sfx') : null);
 
@@ -60,43 +58,11 @@ export function createUiSound(): UiSound {
     src.onended = () => { src.disconnect(); filter.disconnect(); gain.disconnect(); };
   }
 
-  function startHum(): void {
-    if (!ctx || humNodes) return;
-    const gain = ctx.createGain();
-    gain.gain.value = 0;
-    gain.gain.setTargetAtTime(0.018, ctx.currentTime, 1.2);
-    const osc = [50, 100, 150.4].map((f, i) => {
-      const o = ctx!.createOscillator();
-      o.type = i === 0 ? 'sine' : 'sawtooth';
-      o.frequency.value = f;
-      const g = ctx!.createGain();
-      g.gain.value = i === 0 ? 0.7 : 0.08 / i;
-      o.connect(g).connect(gain);
-      o.start();
-      return o;
-    });
-    const filter = ctx.createBiquadFilter();
-    filter.type = 'lowpass';
-    filter.frequency.value = 900;
-    gain.connect(filter).connect(out()!);
-    humNodes = { osc, gain };
-  }
-
-  function stopHum(): void {
-    if (!ctx || !humNodes) return;
-    const { osc, gain } = humNodes;
-    humNodes = null;
-    gain.gain.setTargetAtTime(0, ctx.currentTime, 0.25);
-    for (const o of osc) o.stop(ctx.currentTime + 1.2);
-    setTimeout(() => gain.disconnect(), 1400);
-  }
-
   return {
     unlock() {
       try {
         if (!ctx) ctx = new AudioContext();
         if (ctx.state === 'suspended') void ctx.resume().catch(() => undefined);
-        if (wantHum) startHum();
       } catch { ctx = null; /* no Web Audio: stay silent */ }
     },
     play(cue) {
@@ -111,12 +77,8 @@ export function createUiSound(): UiSound {
       else if (cue === 'open') tone(98, 0.6, 'triangle', 0.07, 92);
       else tone(110, 0.18, 'square', 0.025, 104);
     },
-    hum(on) {
-      wantHum = on;
-      if (on) startHum(); else stopHum();
-    },
+    get context() { return ctx; },
     dispose() {
-      stopHum();
       void ctx?.close().catch(() => undefined);
       ctx = null;
     },

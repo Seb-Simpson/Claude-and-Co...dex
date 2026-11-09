@@ -1,4 +1,4 @@
-"""Menu and loading-screen imagery rendered from the game's own assets (Blender Cycles).
+"""Loading-screen imagery (the title screen has its own: render_menu.py) rendered from the game's own assets (Blender Cycles).
 
     <blender-python> render_media.py -- <room104_set.blend> <entity_glb_dir> <out_dir> [shot ...] [--quick]
 
@@ -125,25 +125,6 @@ SHOTS = {}
 def shot(fn):
     SHOTS[fn.__name__] = fn
     return fn
-
-
-@shot
-def menu_lit(scene):
-    corridor_lights(scene, True)
-    camera(scene, (-7.6, 1.5, 0.75), (-19.6, 1.25, -0.25), 30)
-
-
-@shot
-def menu_dark(scene):
-    corridor_lights(scene, False)
-    camera(scene, (-7.6, 1.5, 0.75), (-19.6, 1.25, -0.25), 30)
-
-
-@shot
-def menu_figure(scene):
-    corridor_lights(scene, True)
-    entity('watcher', (-18.9, 0, 0.35), (-7.6, 0, 0.75), 'pose2', 1)
-    camera(scene, (-7.6, 1.5, 0.75), (-19.6, 1.25, -0.25), 30)
 
 
 @shot

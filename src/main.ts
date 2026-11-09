@@ -24,6 +24,8 @@ frontend = createFrontend({
   moduleIds: modules.map((module) => module.id),
   // QA bridge: start a session straight away unless the test asks for the title screen (&menu=1).
   autoStart: testMode && params.get('menu') !== '1',
+  // QA bridge: a fixed seed makes the title screen's lighting events reproducible.
+  ...(testMode && params.has('menuSeed') ? { menuSeed: Number(params.get('menuSeed')) } : {}),
 });
 // Test positioning/capture helpers are never installed in a normal play session.
 if (testMode) {
