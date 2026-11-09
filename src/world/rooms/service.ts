@@ -2,7 +2,7 @@ import { Matrix4, Vector3 } from 'three';
 import { cagedBulb, emergencyLight } from '../architecture';
 import type { WorldBuilder } from '../core/builder';
 import { box, cylinder, cylinderBetween, torus } from '../core/geometry';
-import { CEILING, DOORS, ROOMS, T, X, Z } from '../layout';
+import { C1, CEILING, DOORS, ROOMS, T, X, Z } from '../layout';
 import { SIGN_DANGER, SIGN_PAPER, SIGN_ROOM, SIGN_WARNING, collide, put, sign } from '../props/common';
 import {
   cardboardBox, crashCart, electricalPanel, fireExtinguisher, floorDecal, gurney, mopBucket, noticeBoard, pipeRun, puddle,
@@ -16,7 +16,7 @@ export function buildServiceSpaces(b: WorldBuilder): void {
   corridorDressing(b);
   eastCorridor(b);
   liftCar(b);
-  stairwell(b);
+  if (b.layout === 'chapter1') chapter1Landing(b); else stairwell(b);
   maintenance(b);
 }
 
@@ -35,8 +35,8 @@ function corridorDressing(b: WorldBuilder): void {
   visitorChair(b, { x: -3.42, z: 1.05, yaw: Math.PI - 0.12 }, id);
   fireExtinguisher(b, { x: 11.1, z: Z.corridorS, yaw: Math.PI });
   sign(b, 'FIRE EXTINGUISHER', SIGN_DANGER, 0.3, 0.1, new Matrix4().makeRotationY(Math.PI).setPosition(11.1, 1.35, Z.corridorS - 0.012), { canvas: [384, 128] });
-  noticeBoard(b, new Matrix4().makeRotationY(Math.PI).setPosition(13.6, 1.5, Z.corridorS), 1.4, 0.9);
-  for (const [dx, side] of [[-15.55, 'n'], [-11.15, 'n'], [-6.75, 's'], [0.6, 'n'], [10.55, 's'], [-2.4, 's']] as const) {
+  noticeBoard(b, new Matrix4().makeRotationY(Math.PI).setPosition(b.layout === 'chapter1' ? 14.6 : 13.6, 1.5, Z.corridorS), 1.4, 0.9);
+  for (const [dx, side] of [[-15.55, 'n'], [-11.15, 'n'], [-6.75, 's'], [0.6, 'n'], [10.55, 's'], [b.layout === 'chapter1' ? -0.9 : -2.4, 's']] as const) {
     sanitizer(b, { x: dx, z: side === 'n' ? Z.corridorN : Z.corridorS, yaw: side === 'n' ? 0 : Math.PI });
   }
   // A ceiling tile came down here; water still finds its way through.
@@ -51,8 +51,8 @@ function corridorDressing(b: WorldBuilder): void {
   floorDecal(b, 'stainDrag', 9.4, -0.7, 2.6, 0.55, 0.05);
   floorDecal(b, 'stainWater', 12.5, -0.3, 1.4, 1.2, 0.8);
   crashCart(b, { x: 15.0, z: 1.05, yaw: Math.PI + 0.1 }, id);
-  // Smoke-door warnings.
-  for (const face of [-1, 1]) {
+  // Smoke-door warnings (Chapter 1 puts its own 'CLOSES ON ALARM' signs here).
+  for (const face of b.layout === 'chapter1' ? [] : [-1, 1]) {
     sign(b, 'FIRE DOOR — KEEP CLEAR', SIGN_WARNING, 0.5, 0.1, new Matrix4().makeRotationY(face < 0 ? -HALF_PI : HALF_PI).setPosition(DOORS.smoke + face * 0.092, 2.4, 0), { canvas: [512, 104] });
   }
   sign(b, 'WARD 4 WEST', { ...SIGN_ROOM, subtext: 'ROOMS 101 – 110' }, 0.9, 0.3, new Matrix4().makeRotationY(-HALF_PI).setPosition(X.eastCorridorE - 0.012, 2.05, 0), { canvas: [512, 170] });
@@ -113,7 +113,7 @@ function eastCorridor(b: WorldBuilder): void {
   inspectMarker(b, 'stairwell-notice', 'inspect', 'Read the notice', { x: DOORS.stair + 1.0, z: -10.95, yaw: 0 }, [0.5, 0.3, 0.06], 1.5, 1.8);
   b.emitter('stairwell', ROOMS.stairwell, 19.5, 3.0, -13.6);
   b.sightlines.push({ id: 'nw:sightline:stair-lobby', roomId: id, position: new Vector3(19.4, 0, -10.1), yaw: 0 });
-  wheelchair(b, { x: 18.75, z: -9.9, yaw: 0.9 }, id);
+  wheelchair(b, b.layout === 'chapter1' ? { x: 20.35, z: 1.8, yaw: 0.9 } : { x: 18.75, z: -9.9, yaw: 0.9 }, id);
   cardboardBox(b, { x: 20.4, z: -10.5, yaw: 0.2 }, id, [0.5, 0.45, 0.45]);
   cardboardBox(b, { x: 20.42, z: -10.48, yaw: -0.15, y: 0.45 }, null, [0.4, 0.3, 0.38], true);
 
@@ -244,4 +244,37 @@ function maintenance(b: WorldBuilder): void {
   b.block('chrome', -6.4, 0.45, 3.0, 0.5, 0.9, 0.5, 0.2, { tint: 0.6 });
   b.solid(-6.4, 0.45, 3.0, 0.5, 0.9, 0.5, { yaw: 0.2, roomId: ROOMS.connector, kind: 'prop' });
   for (let i = 0; i < 4; i++) b.block('fabricSeat', -6.4, 0.92 + i * 0.09, 3.0, 0.48, 0.06, 0.46, 0.2 + i * 0.05, { tint: [0.9, 0.7, 0.6] });
+}
+
+/**
+ * Chapter 1 (blockout): Stairwell B at ward level. The barrier opens onto a flat landing; the up
+ * flights are gone and a down flight falls away north to the lower infirmary. It is visible, with
+ * its rail, but a mesh gate across its head stops anyone entering it in this chapter.
+ */
+function chapter1Landing(b: WorldBuilder): void {
+  const id = ROOMS.stairwell;
+  const { z0 } = C1.landing;
+  const rise = 0.17;
+  const run = 0.27;
+  // Down flight: ten steps from the landing edge, descending north (visual; below the floor).
+  for (let i = 0; i < 10; i++) {
+    const top = -(i + 1) * rise;
+    const zf = z0 - i * run;
+    b.block('concrete', 19.5, top - 0.1, zf - run / 2, 2.6, 0.2, run, 0, { tint: 0.85 - i * 0.04 });
+    b.block('steel', 19.5, top + 0.004, zf - 0.02, 2.6, 0.008, 0.04, 0, { shade: 'flat', tint: 0.5 });
+  }
+  b.block('concrete', 19.5, -1.8, -14.9, 2.7, 0.1, 1.0, 0, { tint: 0.4 });
+  // Edge nosing, a rail down the west side, and the mesh gate across the head of the flight.
+  b.block('yellowPaint', 19.5, 0.005, z0 + 0.03, 2.7, 0.01, 0.06, 0, { shade: 'flat' });
+  const rail = cylinderBetween(new Vector3(18.3, 0.95, z0), new Vector3(18.3, 0.95 - 10 * rise, z0 - 10 * run), 0.022, 6);
+  b.add('steel', rail.geometry, rail.matrix, { tint: 0.7 });
+  for (const x of [X.eastCorridorW + 0.05, X.eastCorridorE - 0.05]) b.block('steel', x, 1.0, z0 - 0.05, 0.05, 2.0, 0.05, 0, { tint: 0.6 });
+  b.block('steel', 19.5, 2.0, z0 - 0.05, 2.7, 0.05, 0.05, 0, { tint: 0.6 });
+  b.block('steel', 19.5, 1.0, z0 - 0.05, 2.7, 0.04, 0.03, 0, { tint: 0.6 });
+  for (let x = X.eastCorridorW + 0.2; x < X.eastCorridorE - 0.1; x += 0.15) b.block('steel', x, 1.0, z0 - 0.05, 0.012, 2.0, 0.012, 0, { shade: 'flat', tint: 0.45 });
+  b.solid(19.5, 1.2, z0 + 0.0, X.eastCorridorE - X.eastCorridorW, 2.4, 0.1, { roomId: id, kind: 'stair-gate' });
+  sign(b, 'LOWER INFIRMARY — NO ACCESS', SIGN_DANGER, 0.6, 0.12, new Matrix4().setPosition(19.5, 1.5, z0 - 0.02), { canvas: [640, 128] });
+  sign(b, 'LEVEL 4', SIGN_ROOM, 0.4, 0.16, new Matrix4().makeRotationY(HALF_PI).setPosition(X.eastCorridorW + 0.012, 2.2, -12.0), { canvas: [384, 154] });
+  floorDecal(b, 'stainDark', 19.6, -11.6, 0.8, 0.6, 0.7);
+  void T;
 }

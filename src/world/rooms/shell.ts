@@ -5,11 +5,11 @@ import { box } from '../core/geometry';
 import { CEILING, DOORS, KEY_STAIRWELL, ROOMS, T, X, Z } from '../layout';
 import { SIGN_EXIT, sign } from '../props/common';
 
-const doorOpening = (center: number, width = 1.2): Opening => ({ from: center - width / 2, to: center + width / 2, bottom: 0, top: 2.1 });
-const windowOpening = (center: number, width: number, bottom = 0.85, top = 2.2): Opening => ({ from: center - width / 2, to: center + width / 2, bottom, top });
+export const doorOpening = (center: number, width = 1.2): Opening => ({ from: center - width / 2, to: center + width / 2, bottom: 0, top: 2.1 });
+export const windowOpening = (center: number, width: number, bottom = 0.85, top = 2.2): Opening => ({ from: center - width / 2, to: center + width / 2, bottom, top });
 
 /** Threshold plate covering the wall thickness under a doorway. */
-function threshold(b: WorldBuilder, axis: 'x' | 'z', at: number, center: number, width = 1.2): void {
+export function threshold(b: WorldBuilder, axis: 'x' | 'z', at: number, center: number, width = 1.2): void {
   const m = new Matrix4().makeTranslation(axis === 'x' ? center : at, 0.004, axis === 'x' ? at : center);
   b.add('steel', box(axis === 'x' ? width : T + 0.06, 0.008, axis === 'x' ? T + 0.06 : width), m, { shade: 'flat', tint: 0.7 });
 }
@@ -44,7 +44,7 @@ export function buildShell(b: WorldBuilder): void {
   });
   wall(b, {
     axis: 'x', at: Z.corridorS + T / 2, from: -20 - T, to: X.eastCorridorW, roomId: ROOMS.corridor,
-    openings: [doorOpening(DOORS.r102), doorOpening(DOORS.r104), doorOpening(DOORS.r106), { from: -6.8 + T / 2, to: -4.6 - T / 2, bottom: 0, top: 2.4 }, doorOpening(DOORS.r108), { from: 0.2, to: 5.6, bottom: 0, top: 2.4 }, doorOpening(DOORS.r110)],
+    openings: [doorOpening(DOORS.r102), doorOpening(DOORS.r104), doorOpening(DOORS.r106), { from: -6.8 + T / 2, to: -4.6 - T / 2, bottom: 0, top: 2.4 }, doorOpening(DOORS.r108), { from: 0.2, to: 5.6, bottom: 0, top: 2.4 }, doorOpening(DOORS.r110), doorOpening(DOORS.records), doorOpening(DOORS.electrical)],
     neg: corridorFinish, pos: roomFinish,
   });
   // North exterior with patient-room windows.
@@ -68,7 +68,7 @@ export function buildShell(b: WorldBuilder): void {
   }
   // Rear of the south rooms / maintenance passage north wall.
   wall(b, {
-    axis: 'x', at: Z.southBack + T / 2, from: -20 - T, to: X.eastCorridorW, openings: [doorOpening(DOORS.maintenanceWest)],
+    axis: 'x', at: Z.southBack + T / 2, from: -20 - T, to: X.eastCorridorW, openings: [doorOpening(DOORS.maintenanceWest), doorOpening(DOORS.electricalService)],
     neg: roomFinish, pos: { skin: 'concrete', skirting: false },
   });
   // Maintenance passage outer wall and west end (raw concrete).
@@ -161,7 +161,8 @@ export function buildShell(b: WorldBuilder): void {
   for (const [axis, at, center] of [
     ['x', north_, DOORS.r101], ['x', north_, DOORS.r103], ['x', north_, DOORS.r105], ['x', north_, DOORS.treatment], ['x', north_, DOORS.r107], ['x', north_, DOORS.storage],
     ['x', south_, DOORS.r102], ['x', south_, DOORS.r104], ['x', south_, DOORS.r106], ['x', south_, DOORS.r108], ['x', south_, DOORS.r110],
-    ['x', Z.southBack + T / 2, DOORS.maintenanceWest], ['z', X.east + T / 2, DOORS.maintenanceEast], ['x', -11 - T / 2, DOORS.stair], ['z', X.eastCorridorE + T / 2, -4.0],
+    ['x', Z.southBack + T / 2, DOORS.maintenanceWest], ['z', X.east + T / 2, DOORS.maintenanceEast],
+    ['x', south_, DOORS.records], ['x', south_, DOORS.electrical], ['x', Z.southBack + T / 2, DOORS.electricalService], ['x', -11 - T / 2, DOORS.stair], ['z', X.eastCorridorE + T / 2, -4.0],
   ] as const) threshold(b, axis, at, center);
 
   // ---- Corridor lighting ---------------------------------------------------------------------
@@ -174,7 +175,8 @@ export function buildShell(b: WorldBuilder): void {
     troffer(b, ROOMS.east, 19.5, z, CEILING.corridor, state, ['nw:lights:corridor-east'], { rotate: true });
   }
   troffer(b, ROOMS.connector, -5.7, 3.9, CEILING.corridor, 'flicker', ['nw:lights:connector'], { rotate: true, intensity: 3.5 });
-  emergencyLight(b, ROOMS.east, new Vector3(19.5, 2.56, -10.92), 0, { intensity: 1.6 });
+  // NW-004A: the light over the stair door fails and recovers: the distant doorway that flickers.
+  emergencyLight(b, ROOMS.east, new Vector3(19.5, 2.56, -10.92), 0, { intensity: 1.6, state: 'flicker' });
   emergencyLight(b, ROOMS.stairwell, new Vector3(18.3, 2.6, -13.5), Math.PI / 2, { intensity: 3 });
   emergencyLight(b, ROOMS.corridor, new Vector3(-19.9, 2.45, -1.1), Math.PI / 2, { color: 0xffa040, intensity: 1.3, state: 'flicker' });
   emergencyLight(b, ROOMS.maintenance, new Vector3(-6.7, 2.4, 7.25), Math.PI / 2, { color: 0xff5020, intensity: 1.6 });

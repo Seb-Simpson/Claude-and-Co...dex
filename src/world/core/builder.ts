@@ -152,7 +152,17 @@ export class WorldBuilder {
   /** What suppression dropped, for diagnostics and tests. */
   readonly suppressed: { material: MaterialKey; center: Vector3 }[] = [];
 
-  constructor(seed: number, options: { textures?: boolean; suppressVisuals?: readonly Box3[] } = {}) {
+  /**
+   * NW-004A: which floor plan the room builders produce. 'classic' is the shipped Ward 4 West;
+   * 'chapter1' is the Chapter 1 v2 blockout (preview with ?nwLayout=chapter1).
+   */
+  readonly layout: 'classic' | 'chapter1';
+  /** Chapter 1 world state for door positions (see createHospitalWorld's `chapter1Stage`). */
+  readonly stage: 'act1' | 'act3' | 'alarm' | 'review';
+
+  constructor(seed: number, options: { textures?: boolean; suppressVisuals?: readonly Box3[]; layout?: 'classic' | 'chapter1'; stage?: 'act1' | 'act3' | 'alarm' | 'review' } = {}) {
+    this.layout = options.layout ?? 'classic';
+    this.stage = options.stage ?? 'act1';
     this.suppress = options.suppressVisuals ?? [];
     this.textures = new TextureLibrary(seed, options.textures);
     this.materials = new MaterialLibrary(this.textures);

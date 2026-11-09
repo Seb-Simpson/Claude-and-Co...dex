@@ -1,0 +1,892 @@
+{
+ "status": "PROPOSAL v2 for approval; not built",
+ "rooms": [
+  {
+   "id": "nw:ward4:room-101",
+   "label": "101",
+   "zone": "patient",
+   "x": [
+    -20,
+    -15.6
+   ],
+   "z": [
+    -6.4,
+    -1.55
+   ],
+   "status": "kept",
+   "chapterKey": null
+  },
+  {
+   "id": "nw:ward4:room-103",
+   "label": "103",
+   "zone": "patient",
+   "x": [
+    -15.6,
+    -11.2
+   ],
+   "z": [
+    -6.4,
+    -1.55
+   ],
+   "status": "kept",
+   "chapterKey": null
+  },
+  {
+   "id": "nw:ward4:room-105",
+   "label": "105",
+   "zone": "patient",
+   "x": [
+    -11.2,
+    -6.8
+   ],
+   "z": [
+    -6.4,
+    -1.55
+   ],
+   "status": "kept",
+   "chapterKey": null
+  },
+  {
+   "id": "nw:ward4:room-102",
+   "label": "102",
+   "zone": "patient",
+   "x": [
+    -20,
+    -15.6
+   ],
+   "z": [
+    1.55,
+    6.4
+   ],
+   "status": "kept",
+   "chapterKey": null
+  },
+  {
+   "id": "nw:ward4:room-104",
+   "label": "104",
+   "zone": "patient",
+   "x": [
+    -15.6,
+    -11.2
+   ],
+   "z": [
+    1.55,
+    6.4
+   ],
+   "status": "kept",
+   "chapterKey": "room-104"
+  },
+  {
+   "id": "nw:ward4:room-106",
+   "label": "106",
+   "zone": "patient",
+   "x": [
+    -11.2,
+    -6.8
+   ],
+   "z": [
+    1.55,
+    6.4
+   ],
+   "status": "kept",
+   "chapterKey": null
+  },
+  {
+   "id": "nw:ward4:corridor-main",
+   "label": "Wing A corridor",
+   "zone": "circ",
+   "x": [
+    -20,
+    -0.2
+   ],
+   "z": [
+    -1.4,
+    1.4
+   ],
+   "status": "kept",
+   "chapterKey": "patient-wing-a"
+  },
+  {
+   "id": "nw:ward4:nurses-station",
+   "label": "Nurses' station",
+   "zone": "staff",
+   "x": [
+    -6.8,
+    0.2
+   ],
+   "z": [
+    -6.4,
+    -1.55
+   ],
+   "status": "kept",
+   "chapterKey": "nurses-station"
+  },
+  {
+   "id": "nw:ward4:staff-passage",
+   "label": "Staff passage",
+   "zone": "staff",
+   "x": [
+    -6.8,
+    18.0
+   ],
+   "z": [
+    -8.3,
+    -6.55
+   ],
+   "status": "new",
+   "chapterKey": null
+  },
+  {
+   "id": "nw:ward4:treatment",
+   "label": "Treatment",
+   "zone": "clinical",
+   "x": [
+    0.2,
+    6.6
+   ],
+   "z": [
+    -6.4,
+    -1.55
+   ],
+   "status": "kept",
+   "chapterKey": "treatment"
+  },
+  {
+   "id": "nw:ward4:room-107",
+   "label": "107 Observation gallery",
+   "zone": "observation",
+   "x": [
+    6.6,
+    11.0
+   ],
+   "z": [
+    -6.4,
+    -1.55
+   ],
+   "status": "repurposed",
+   "chapterKey": "gallery"
+  },
+  {
+   "id": "nw:ward4:observation-bay",
+   "label": "Observation bay (Patient)",
+   "zone": "observation",
+   "x": [
+    11.0,
+    18.0
+   ],
+   "z": [
+    -6.4,
+    -1.55
+   ],
+   "status": "repurposed",
+   "chapterKey": "patient-observation"
+  },
+  {
+   "id": "nw:ward4:ward-hall",
+   "label": "Ward hall (old day room)",
+   "zone": "hub",
+   "x": [
+    -0.2,
+    8.4
+   ],
+   "z": [
+    -1.4,
+    1.4
+   ],
+   "status": "repurposed",
+   "chapterKey": "atrium"
+  },
+  {
+   "id": "nw:ward4:ward-hall#south",
+   "label": "",
+   "zone": "hub",
+   "x": [
+    -0.2,
+    6.0
+   ],
+   "z": [
+    1.4,
+    6.4
+   ],
+   "status": "repurposed",
+   "chapterKey": null
+  },
+  {
+   "id": "nw:ward4:wing-b",
+   "label": "Wing B corridor",
+   "zone": "circ",
+   "x": [
+    8.4,
+    18.0
+   ],
+   "z": [
+    -1.4,
+    1.4
+   ],
+   "status": "new",
+   "chapterKey": "patient-wing-b"
+  },
+  {
+   "id": "nw:ward4:connector",
+   "label": "Conn.",
+   "zone": "circ",
+   "x": [
+    -6.8,
+    -4.6
+   ],
+   "z": [
+    1.4,
+    6.4
+   ],
+   "status": "kept",
+   "chapterKey": null
+  },
+  {
+   "id": "nw:ward4:records-112",
+   "label": "112 Records",
+   "zone": "staff",
+   "x": [
+    -4.6,
+    -0.2
+   ],
+   "z": [
+    1.55,
+    6.4
+   ],
+   "status": "moved",
+   "chapterKey": "records"
+  },
+  {
+   "id": "nw:ward4:room-110",
+   "label": "110",
+   "zone": "patient",
+   "x": [
+    6.0,
+    10.4
+   ],
+   "z": [
+    1.55,
+    6.4
+   ],
+   "status": "kept",
+   "chapterKey": null
+  },
+  {
+   "id": "nw:ward4:release-vestibule",
+   "label": "Release vestibule",
+   "zone": "observation",
+   "x": [
+    10.4,
+    14.2
+   ],
+   "z": [
+    1.55,
+    6.4
+   ],
+   "status": "new",
+   "chapterKey": "release-vestibule"
+  },
+  {
+   "id": "nw:ward4:electrical-114",
+   "label": "114 Electrical",
+   "zone": "service",
+   "x": [
+    14.2,
+    18.0
+   ],
+   "z": [
+    1.55,
+    6.4
+   ],
+   "status": "kept",
+   "chapterKey": "electrical"
+  },
+  {
+   "id": "nw:ward4:maintenance",
+   "label": "Maintenance passage",
+   "zone": "service",
+   "x": [
+    -6.8,
+    18.0
+   ],
+   "z": [
+    6.55,
+    7.95
+   ],
+   "status": "kept",
+   "chapterKey": "maintenance"
+  },
+  {
+   "id": "nw:ward4:maintenance#pump-bay",
+   "label": "Pump bay",
+   "zone": "service",
+   "x": [
+    3.6,
+    6.6
+   ],
+   "z": [
+    7.95,
+    9.4
+   ],
+   "status": "new",
+   "chapterKey": null
+  },
+  {
+   "id": "nw:ward4:corridor-east",
+   "label": "East corridor",
+   "zone": "circ",
+   "x": [
+    18.0,
+    20.85
+   ],
+   "z": [
+    -11.0,
+    7.95
+   ],
+   "status": "kept",
+   "chapterKey": null
+  },
+  {
+   "id": "nw:ward4:stairwell-b",
+   "label": "Stairwell B",
+   "zone": "vertical",
+   "x": [
+    18.15,
+    20.85
+   ],
+   "z": [
+    -15.4,
+    -11.0
+   ],
+   "status": "kept",
+   "chapterKey": "stairwell-b"
+  },
+  {
+   "id": "nw:ward4:lift-car",
+   "label": "Lift",
+   "zone": "vertical",
+   "x": [
+    21.0,
+    22.6
+   ],
+   "z": [
+    -4.85,
+    -3.15
+   ],
+   "status": "kept",
+   "chapterKey": null
+  }
+ ],
+ "doors": [
+  {
+   "id": "nw:door:room-104",
+   "x": -12.0,
+   "z": 1.4,
+   "kind": "door"
+  },
+  {
+   "id": "nw:door:room-101",
+   "x": -16.4,
+   "z": -1.4,
+   "kind": "door"
+  },
+  {
+   "id": "nw:door:room-103",
+   "x": -12.0,
+   "z": -1.4,
+   "kind": "door"
+  },
+  {
+   "id": "nw:door:room-105",
+   "x": -7.6,
+   "z": -1.4,
+   "kind": "door"
+  },
+  {
+   "id": "nw:door:room-102",
+   "x": -16.4,
+   "z": 1.4,
+   "kind": "door"
+  },
+  {
+   "id": "nw:door:room-106",
+   "x": -7.6,
+   "z": 1.4,
+   "kind": "door"
+  },
+  {
+   "id": "nw:door:station-staff",
+   "x": -3.0,
+   "z": -6.48,
+   "kind": "door"
+  },
+  {
+   "id": "nw:door:staff-west",
+   "x": -6.8,
+   "z": -7.4,
+   "kind": "door"
+  },
+  {
+   "id": "nw:door:staff-boundary",
+   "x": 0.2,
+   "z": -7.4,
+   "kind": "fire"
+  },
+  {
+   "id": "nw:door:treatment",
+   "x": 1.4,
+   "z": -1.48,
+   "kind": "door"
+  },
+  {
+   "id": "nw:door:treatment-staff",
+   "x": 4.6,
+   "z": -6.48,
+   "kind": "door"
+  },
+  {
+   "id": "nw:door:room-107",
+   "x": 7.45,
+   "z": -1.48,
+   "kind": "door"
+  },
+  {
+   "id": "nw:door:observation-bay",
+   "x": 18.0,
+   "z": -4.0,
+   "kind": "barrier"
+  },
+  {
+   "id": "nw:door:staff-east",
+   "x": 18.0,
+   "z": -7.4,
+   "kind": "door"
+  },
+  {
+   "id": "nw:door:hall-west",
+   "x": -0.2,
+   "z": 0.0,
+   "kind": "fire"
+  },
+  {
+   "id": "nw:door:smoke",
+   "x": 8.4,
+   "z": 0.0,
+   "kind": "fire"
+  },
+  {
+   "id": "nw:door:records-112",
+   "x": -2.4,
+   "z": 1.48,
+   "kind": "key"
+  },
+  {
+   "id": "nw:door:room-110",
+   "x": 6.95,
+   "z": 1.48,
+   "kind": "door"
+  },
+  {
+   "id": "nw:door:vestibule",
+   "x": 12.3,
+   "z": 1.48,
+   "kind": "door"
+  },
+  {
+   "id": "nw:door:vestibule-electrical",
+   "x": 14.2,
+   "z": 3.8,
+   "kind": "door"
+  },
+  {
+   "id": "nw:door:vestibule-service",
+   "x": 12.3,
+   "z": 6.48,
+   "kind": "door"
+  },
+  {
+   "id": "nw:door:electrical-114",
+   "x": 16.4,
+   "z": 1.48,
+   "kind": "door"
+  },
+  {
+   "id": "nw:door:electrical-service",
+   "x": 16.6,
+   "z": 6.48,
+   "kind": "door"
+  },
+  {
+   "id": "nw:door:maintenance-west",
+   "x": -5.7,
+   "z": 6.48,
+   "kind": "door"
+  },
+  {
+   "id": "nw:door:hall-service",
+   "x": 2.8,
+   "z": 6.48,
+   "kind": "door"
+  },
+  {
+   "id": "nw:door:maintenance-east",
+   "x": 18.08,
+   "z": 7.25,
+   "kind": "door"
+  },
+  {
+   "id": "nw:door:east-fire",
+   "x": 19.4,
+   "z": -1.9,
+   "kind": "fire"
+  },
+  {
+   "id": "nw:door:stairwell-b",
+   "x": 19.5,
+   "z": -11.0,
+   "kind": "barrier"
+  }
+ ],
+ "hiding": [
+  {
+   "id": "nw:hiding:room-105-bed-b",
+   "x": -7.85,
+   "z": -5.35,
+   "note": "existing"
+  },
+  {
+   "id": "nw:hiding:room-106-bed",
+   "x": -10.1,
+   "z": 5.15,
+   "note": "existing"
+  },
+  {
+   "id": "nw:hiding:nurses-staff",
+   "x": -6.4,
+   "z": -4.15,
+   "note": "existing"
+  },
+  {
+   "id": "nw:hiding:records-cupboard",
+   "x": -4.2,
+   "z": 2.3,
+   "note": "moved with Records"
+  },
+  {
+   "id": "nw:hiding:storage-a",
+   "x": 4.0,
+   "z": 8.9,
+   "note": "migrated to pump bay"
+  },
+  {
+   "id": "nw:hiding:storage-b",
+   "x": 4.65,
+   "z": 8.9,
+   "note": "migrated"
+  },
+  {
+   "id": "nw:hiding:storage-c",
+   "x": 5.3,
+   "z": 8.9,
+   "note": "migrated"
+  },
+  {
+   "id": "nw:hiding:vestibule-linen",
+   "x": 10.8,
+   "z": 5.7,
+   "note": "new"
+  },
+  {
+   "id": "nw:hiding:treatment-screen",
+   "x": 5.6,
+   "z": -2.4,
+   "note": "new"
+  }
+ ],
+ "nurseRound": [
+  [
+   -6.0,
+   -7.4
+  ],
+  [
+   -3.0,
+   -7.4
+  ],
+  [
+   -3.0,
+   -5.6
+  ],
+  [
+   -4.6,
+   -5.2
+  ],
+  [
+   -3.0,
+   -2.6
+  ],
+  [
+   -1.0,
+   -2.6
+  ],
+  [
+   -0.6,
+   -0.2
+  ],
+  [
+   1.4,
+   -0.6
+  ],
+  [
+   1.4,
+   -2.6
+  ],
+  [
+   3.0,
+   -3.0
+  ],
+  [
+   4.6,
+   -6.0
+  ],
+  [
+   4.6,
+   -7.4
+  ],
+  [
+   0.2,
+   -7.4
+  ],
+  [
+   -3.0,
+   -7.4
+  ],
+  [
+   -6.0,
+   -7.4
+  ]
+ ],
+ "chase": {
+  "A  The ward way (~41 m, every leg breaks sight)": [
+   [
+    12.3,
+    2.6
+   ],
+   [
+    12.3,
+    0.2
+   ],
+   [
+    8.4,
+    0.2
+   ],
+   [
+    4.0,
+    0.4
+   ],
+   [
+    1.4,
+    -0.8
+   ],
+   [
+    1.4,
+    -2.6
+   ],
+   [
+    3.0,
+    -5.4
+   ],
+   [
+    4.6,
+    -6.2
+   ],
+   [
+    4.6,
+    -7.4
+   ],
+   [
+    17.0,
+    -7.4
+   ],
+   [
+    19.5,
+    -7.4
+   ],
+   [
+    19.5,
+    -11.6
+   ]
+  ],
+  "B  The service way (~30 m, runs past his open cell)": [
+   [
+    12.3,
+    2.6
+   ],
+   [
+    12.3,
+    7.2
+   ],
+   [
+    18.08,
+    7.25
+   ],
+   [
+    19.5,
+    6.4
+   ],
+   [
+    19.5,
+    -1.9
+   ],
+   [
+    19.5,
+    -11.6
+   ]
+  ],
+  "C  Hold: linen cupboard, then B or A": [
+   [
+    12.3,
+    2.6
+   ],
+   [
+    11.2,
+    4.6
+   ],
+   [
+    10.8,
+    5.7
+   ]
+  ],
+  "Patient: cell > east corridor > toward the chime": [
+   [
+    14.5,
+    -4.0
+   ],
+   [
+    18.0,
+    -4.0
+   ],
+   [
+    19.4,
+    -3.2
+   ],
+   [
+    19.4,
+    0.0
+   ],
+   [
+    12.3,
+    0.0
+   ],
+   [
+    12.3,
+    1.4
+   ]
+  ]
+ },
+ "routes": {
+  "Act I (no threats): 104 > Wing A > station": [
+   [
+    -13.6,
+    4.6
+   ],
+   [
+    -12.0,
+    2.4
+   ],
+   [
+    -12.0,
+    0.0
+   ],
+   [
+    -4.0,
+    0.0
+   ],
+   [
+    -3.6,
+    -0.9
+   ]
+  ],
+  "Act III: station release > Records > (hall or service) > Electrical > vestibule": [
+   [
+    -3.6,
+    -0.9
+   ],
+   [
+    -2.4,
+    0.4
+   ],
+   [
+    -2.4,
+    3.4
+   ],
+   [
+    -2.4,
+    0.4
+   ],
+   [
+    4.0,
+    0.0
+   ],
+   [
+    8.4,
+    0.0
+   ],
+   [
+    16.4,
+    0.0
+   ],
+   [
+    16.4,
+    3.0
+   ],
+   [
+    16.6,
+    4.0
+   ],
+   [
+    14.2,
+    3.8
+   ],
+   [
+    12.0,
+    4.4
+   ]
+  ],
+  "Quiet service shortcut (Act III)": [
+   [
+    -2.4,
+    0.4
+   ],
+   [
+    -5.7,
+    0.0
+   ],
+   [
+    -5.7,
+    7.2
+   ],
+   [
+    16.6,
+    7.2
+   ],
+   [
+    16.6,
+    4.0
+   ]
+  ],
+  "Optional: observation gallery": [
+   [
+    6.0,
+    0.0
+   ],
+   [
+    7.45,
+    -1.0
+   ],
+   [
+    9.0,
+    -4.0
+   ]
+  ]
+ }
+}

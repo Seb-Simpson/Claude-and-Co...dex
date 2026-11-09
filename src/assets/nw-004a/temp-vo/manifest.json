@@ -1,0 +1,228 @@
+{
+ "status": "TEMPORARY placeholder voice: espeak-ng synthesis + processing. NOT a performance; replace with recorded human performances (see DIALOGUE.md casting).",
+ "source": "docs/nw-004/DIALOGUE.md (Codex PR #13)",
+ "cues": [
+  {
+   "cueId": "c1.voice.intercom.awakening",
+   "role": "intercom",
+   "file": "TEMP-intercom-awakening.ogg",
+   "temporary": true,
+   "durationSeconds": 8.67,
+   "subtitles": [
+    {
+     "start": 0.0,
+     "end": 2.46,
+     "text": "[TEMP] West Ward, night shift."
+    },
+    {
+     "start": 2.81,
+     "end": 5.39,
+     "text": "[TEMP] Please remain in your rooms."
+    },
+    {
+     "start": 5.74,
+     "end": 8.57,
+     "text": "[TEMP] The nurse will be with you shortly."
+    }
+   ]
+  },
+  {
+   "cueId": "c1.voice.protagonist.appointment",
+   "role": "protagonist",
+   "file": "TEMP-protagonist-appointment.ogg",
+   "temporary": true,
+   "durationSeconds": 2.6,
+   "subtitles": [
+    {
+     "start": 0.0,
+     "end": 2.59,
+     "text": "[TEMP] I came for an appointment."
+    }
+   ]
+  },
+  {
+   "cueId": "c1.voice.protagonist.call",
+   "role": "protagonist",
+   "file": "TEMP-protagonist-call.ogg",
+   "temporary": true,
+   "durationSeconds": 2.88,
+   "subtitles": [
+    {
+     "start": 0.0,
+     "end": 2.87,
+     "text": "[TEMP] Hello? Is anyone there?"
+    }
+   ]
+  },
+  {
+   "cueId": "c1.voice.intercom.review",
+   "role": "intercom",
+   "file": "TEMP-intercom-review.ogg",
+   "temporary": true,
+   "durationSeconds": 4.21,
+   "subtitles": [
+    {
+     "start": 0.0,
+     "end": 4.11,
+     "text": "[TEMP] Room one-zero-four. Night review requested."
+    }
+   ]
+  },
+  {
+   "cueId": "c1.voice.protagonist.ledger",
+   "role": "protagonist",
+   "file": "TEMP-protagonist-ledger.ogg",
+   "temporary": true,
+   "durationSeconds": 1.93,
+   "subtitles": [
+    {
+     "start": 0.0,
+     "end": 1.93,
+     "text": "[TEMP] That wasn’t there."
+    }
+   ]
+  },
+  {
+   "cueId": "c1.voice.protagonist.signature",
+   "role": "protagonist",
+   "file": "TEMP-protagonist-signature.ogg",
+   "temporary": true,
+   "durationSeconds": 1.99,
+   "subtitles": [
+    {
+     "start": 0.0,
+     "end": 1.99,
+     "text": "[TEMP] That’s my signature."
+    }
+   ]
+  },
+  {
+   "cueId": "c1.voice.archive.slate",
+   "role": "archive",
+   "file": "TEMP-archive-slate.ogg",
+   "temporary": true,
+   "durationSeconds": 7.12,
+   "subtitles": [
+    {
+     "start": 0.0,
+     "end": 2.98,
+     "text": "[TEMP] West Ward. Withdrawal record."
+    },
+    {
+     "start": 3.33,
+     "end": 7.12,
+     "text": "[TEMP] Seventeenth October, two thousand twelve."
+    }
+   ]
+  },
+  {
+   "cueId": "c1.voice.archive.withdrawal",
+   "role": "archive-protagonist",
+   "file": "TEMP-archive-withdrawal.ogg",
+   "temporary": true,
+   "durationSeconds": 8.4,
+   "subtitles": [
+    {
+     "start": 0.0,
+     "end": 3.58,
+     "text": "[TEMP] My patient number is one-zero-four."
+    },
+    {
+     "start": 3.93,
+     "end": 8.39,
+     "text": "[TEMP] I am withdrawing consent. I want to leave."
+    }
+   ]
+  },
+  {
+   "cueId": "c1.voice.archive.refusal",
+   "role": "archive-nurse",
+   "file": "TEMP-archive-refusal.ogg",
+   "temporary": true,
+   "durationSeconds": 3.74,
+   "subtitles": [
+    {
+     "start": 0.0,
+     "end": 3.73,
+     "text": "[TEMP] The consultant has not cleared your discharge."
+    }
+   ]
+  },
+  {
+   "cueId": "c1.voice.protagonist.memory",
+   "role": "protagonist",
+   "file": "TEMP-protagonist-memory.ogg",
+   "temporary": true,
+   "durationSeconds": 2.29,
+   "subtitles": [
+    {
+     "start": 0.0,
+     "end": 2.28,
+     "text": "[TEMP] I don’t remember this."
+    }
+   ]
+  },
+  {
+   "cueId": "c1.voice.intercom.armed",
+   "role": "intercom",
+   "file": "TEMP-intercom-armed.ogg",
+   "temporary": true,
+   "durationSeconds": 6.91,
+   "subtitles": [
+    {
+     "start": 0.0,
+     "end": 2.66,
+     "text": "[TEMP] West Ward control restored."
+    },
+    {
+     "start": 3.01,
+     "end": 6.81,
+     "text": "[TEMP] Emergency release awaiting local confirmation."
+    }
+   ]
+  },
+  {
+   "cueId": "c1.voice.intercom.release",
+   "role": "intercom",
+   "file": "TEMP-intercom-release.ogg",
+   "temporary": true,
+   "durationSeconds": 5.32,
+   "subtitles": [
+    {
+     "start": 0.0,
+     "end": 2.46,
+     "text": "[TEMP] Emergency transfer active."
+    },
+    {
+     "start": 2.81,
+     "end": 5.23,
+     "text": "[TEMP] Observation bays releasing."
+    }
+   ]
+  },
+  {
+   "cueId": "c1.voice.intercom.recognition",
+   "role": "intercom",
+   "file": "TEMP-intercom-recognition.ogg",
+   "temporary": true,
+   "durationSeconds": 8.71,
+   "subtitles": [
+    {
+     "start": 0.0,
+     "end": 2.19,
+     "text": "[TEMP] Patient one-zero-four."
+    },
+    {
+     "start": 2.54,
+     "end": 4.95,
+     "text": "[TEMP] Return admission confirmed."
+    },
+    {
+     "start": 5.3,
+     "end": 8.61,
+     "text": "[TEMP] Your discharge request is still pending."
+    }
+   ]
+  }
+ ]
+}

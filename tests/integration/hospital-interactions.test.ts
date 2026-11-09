@@ -61,8 +61,8 @@ describe('real hospital interactions and hiding', () => {
       const results: InteractionEvent[] = [];
       f.events.on('hiding:state', (event) => changes.push(event));
       f.events.on('interaction:completed', (event) => results.push(event));
-      expect(f.hospital.world.hidingLocations).toHaveLength(6);
-      expect(f.hospital.world.hidingLocations.filter((spot) => spot.type === 'locker')).toHaveLength(4);
+      expect(f.hospital.world.hidingLocations).toHaveLength(7); // NW-004A: + Records 112 archive cupboard
+      expect(f.hospital.world.hidingLocations.filter((spot) => spot.type === 'locker')).toHaveLength(5);
       for (const spot of f.hospital.world.hidingLocations) {
         const marker = f.hospital.world.interactables.find((candidate) => candidate.id === spot.interactableId)!;
         const firstExit = spot.exitCandidates[0]!;
@@ -103,8 +103,8 @@ describe('real hospital interactions and hiding', () => {
         expect(f.interactions.hiding.getOccupancy(spot.id).occupantId).toBeNull();
         if (lockerDoor) expect(Math.abs(lockerDoor.rotation.y)).toBeLessThan(0.00001);
       }
-      expect(results.filter((event) => event.outcome === 'completed')).toHaveLength(12);
-      expect(changes).toHaveLength(24);
+      expect(results.filter((event) => event.outcome === 'completed')).toHaveLength(14);
+      expect(changes).toHaveLength(28);
       expect(changes.every((event) => event.witnessedBy.join(',') === 'patient')).toBe(true);
     } finally { f.release(); }
   });
