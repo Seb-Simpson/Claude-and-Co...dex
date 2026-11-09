@@ -1,22 +1,29 @@
 {
  "glb": "room104_set.glb",
- "bytes": 6103100,
- "triangles": 56446,
+ "bytes": 8276516,
+ "triangles": 82706,
  "meshes": {
-  "props": 50962,
+  "props": 73078,
   "wheelchair.001": 4096,
+  "doorleaf": 2940,
+  "access_card": 602,
   "set_floor_vinyl": 4,
   "set_ceiling_tile": 4,
-  "set_wall_paint": 52,
-  "set_wainscot": 12,
-  "set_wood_rail": 1128,
-  "set_signage": 158,
+  "set_wall_paint": 108,
+  "set_wainscot": 20,
+  "set_wood_rail": 1504,
+  "set_signage": 314,
+  "set_opening_labels": 6,
   "set_decals": 30
  },
  "materials": [
   "ceiling_tile",
   "decals",
+  "door_glass",
+  "door_veneer",
+  "doorleaf_atlas",
   "floor_vinyl",
+  "opening_labels",
   "props_atlas",
   "signage",
   "wainscot",
@@ -24,10 +31,13 @@
   "wheelchair_atlas",
   "wood_rail"
  ],
+ "nodes": {
+  "doorleaf": "door leaf, door-group frame (hinge at origin, leaf along +x)",
+  "access_card": "pickup, world position"
+ },
  "atlas": 2048,
  "lightmap": "room104_lightmap.jpg",
  "lightmapSize": 2048,
- "lightmapBytes": 930138,
- "samples": 96,
- "gpuTextureMB": 129.3
+ "lightmapBytes": 955301,
+ "samples": 96
 }
