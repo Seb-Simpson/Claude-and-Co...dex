@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>NIGHT WARD — isolated Chapter One systems harness</title>
+    <link rel="icon" href="data:," />
+    <style>
+      * { box-sizing: border-box; }
+      html, body { margin: 0; width: 100%; height: 100%; background: #111b22; color: #edf2ee; font: 14px/1.45 system-ui, sans-serif; }
+      #stage { position: fixed; inset: 0; }
+      #stage canvas { display: block; width: 100%; height: 100%; }
+      header { position: fixed; top: 16px; left: 20px; max-width: 620px; padding: 12px 16px; background: #10191eef; border-left: 3px solid #b3d2c6; }
+      h1 { margin: 0 0 4px; font-size: 17px; }
+      p { margin: 5px 0; }
+      .preview { color: #ffd28e; }
+      nav { position: fixed; right: 18px; top: 18px; width: 230px; display: grid; gap: 6px; }
+      button { padding: 8px; color: #edf2ee; background: #263c46; border: 1px solid #77938f; cursor: pointer; }
+      button:disabled { opacity: .5; cursor: wait; }
+      #subtitle { position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%); width: min(740px, 85vw); text-align: center; padding: 12px 20px; background: #071015ef; }
+      #subtitle:empty { display: none; }
+      #error { position: fixed; inset: auto 20px 120px; padding: 16px; color: #ffb0a3; background: #230b08; }
+    </style>
+  </head>
+  <body>
+    <main id="stage" aria-label="Isolated WebGL systems test stage"></main>
+    <header>
+      <h1>NIGHT WARD · isolated systems test harness</h1>
+      <p>Temporary test geometry. This is not the hospital or a Chapter One playthrough.</p>
+      <p class="preview">PREVIEW — NO RECORDED VOICES. Subtitles demonstrate transport only.</p>
+      <p>Audio-clock QA may generate a quiet diagnostic sine tone; it is not a chapter voice.</p>
+      <p id="status" role="status">Starting the real renderer, physics and gameplay module…</p>
+      <p>Click the scene for pointer lock; WASD / Shift / mouse. Escape releases the pointer.</p>
+    </header>
+    <nav aria-label="Systems harness controls">
+      <button id="audio" disabled>Unlock audio (diagnostic only)</button>
+      <button id="play" disabled>Play test camera path</button>
+      <button id="pause" disabled>Pause / resume path</button>
+      <button id="skip" disabled>Skip path</button>
+      <button id="cancel" disabled>Interrupt path</button>
+      <button id="restart" disabled>Restart test session</button>
+    </nav>
+    <div id="subtitle" aria-live="polite"></div>
+    <p id="error" role="alert" hidden></p>
+    <script type="module" src="./chapter-runtime.ts"></script>
+  </body>
+</html>

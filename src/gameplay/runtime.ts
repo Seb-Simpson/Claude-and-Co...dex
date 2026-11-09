@@ -5,7 +5,7 @@ import { createEntitySystem, createEntityPresentation, createDoorNavigationAdapt
 import type { EntitySystem, EntityProfile, EntityPresentation } from '../entities';
 import { createBrowserInput } from './input';
 import { createPlayerController, DEFAULT_PLAYER_CONFIG } from './player';
-import type { PlayerConfig, PlayerController, PlayerInput } from './player';
+import type { PlayerCameraControlLease, PlayerConfig, PlayerController, PlayerInput } from './player';
 import { createInteractionSystem } from './interactions';
 import type { InteractionSystem } from './interactions';
 import { createGameplayHud } from './hud';
@@ -13,6 +13,7 @@ import type { GameplayHud } from './hud';
 
 export interface PlayerInputSource {
   readonly locked?: boolean;
+  setSuppressed?(value: boolean): void;
   read(): PlayerInput;
   dispose(): void;
 }
@@ -36,6 +37,8 @@ export interface GameplayRuntime extends ModuleInstance {
   readonly interactions: InteractionSystem;
   readonly entities: EntitySystem;
   readonly presentation: EntityPresentation;
+  /** Real camera/input lease for a host-driven cinematic. Actor safety remains director-owned. */
+  acquireCinematicControl(): PlayerCameraControlLease | null;
   fixedUpdate(frame: FrameContext): void;
   update(frame: FrameContext): void;
   notify(message: string): void;
@@ -118,7 +121,39 @@ export function createGameplayRuntime(context: ModuleContext, options: GameplayO
       onLook: (dx, dy) => player.look(dx, dy),
       onInteract: () => { pendingInteraction = true; },
     }));
+    let awaitNeutralInput = false;
+    let activeControl: PlayerCameraControlLease | null = null;
+    function acquireCinematicControl(): PlayerCameraControlLease | null {
+      if (disposed) return null;
+      const lease = player.acquireCameraControl();
+      if (!lease) return null;
+      pendingInteraction = false;
+      try { input?.setSuppressed?.(true); }
+      catch (error) {
+        lease.release();
+        try { input?.setSuppressed?.(false); }
+        catch (cleanupError) { throw new AggregateError([error, cleanupError], 'Cinematic input suppression failed'); }
+        throw error;
+      }
+      let released = false;
+      const release = (): void => {
+        if (released) return;
+        released = true;
+        activeControl = null;
+        lease.signal.removeEventListener('abort', release);
+        pendingInteraction = false;
+        awaitNeutralInput = true;
+        try { lease.release(); }
+        finally { input?.setSuppressed?.(false); }
+      };
+      lease.signal.addEventListener('abort', release, { once: true });
+      activeControl = { signal: lease.signal,
+        handoff: pose => physics.hasSupport(player.getSnapshot().position, player.body.radius, 0.2) && lease.handoff(pose),
+        release };
+      return activeControl;
+    }
     if (input) cleanup.push(() => input.dispose());
+    cleanup.push(() => activeControl?.release());
     if (options.showHud !== false && canvas?.ownerDocument) {
       const onGesture = (): void => {
         void context.engine.audio.resume().catch(() => hud?.notify('Audio could not start. Check browser permissions.'));
@@ -129,10 +164,13 @@ export function createGameplayRuntime(context: ModuleContext, options: GameplayO
       cleanup.push(() => hud!.dispose());
     }
     const runtime: GameplayRuntime = {
-      player, physics, interactions, entities, presentation,
+      player, physics, interactions, entities, presentation, acquireCinematicControl,
       fixedUpdate(frame) {
         if (disposed) return;
-        player.fixedUpdate(frame, input?.read() ?? idleInput);
+        const requested = input?.read() ?? idleInput;
+        if (awaitNeutralInput && requested.forward === 0 && requested.right === 0 && !requested.crouch && !requested.sprint) awaitNeutralInput = false;
+        player.fixedUpdate(frame, player.controlsLocked || awaitNeutralInput ? idleInput : requested);
+        if (player.controlsLocked) pendingInteraction = false;
         if (pendingInteraction) {
           pendingInteraction = false;
           interactions.interact(frame.elapsedSeconds);
@@ -147,7 +185,7 @@ export function createGameplayRuntime(context: ModuleContext, options: GameplayO
         const snapshot = player.getSnapshot();
         hud?.update({
           locked: input?.locked ?? false, captured: snapshot.captured,
-          hidden: snapshot.hiding.state !== 'outside', prompt: interactions.getPrompt(),
+          hidden: snapshot.hiding.state !== 'outside', prompt: player.controlsLocked ? null : interactions.getPrompt(),
         });
       },
       notify(message) { hud?.notify(message); },
