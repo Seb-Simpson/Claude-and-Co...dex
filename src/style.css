@@ -1,11 +1,5 @@
-:root { font-family: system-ui, sans-serif; color: #e4e9ec; background: #141a20; color-scheme: dark; }
+:root { font-family: 'Barlow Condensed', system-ui, sans-serif; color: #dfe3d8; background: #040607; color-scheme: dark; }
 * { box-sizing: border-box; }
-html, body, #app { margin: 0; width: 100%; height: 100%; overflow: hidden; }
+html, body, #app { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #040607; }
 canvas { display: block; width: 100%; height: 100%; }
-#overlay { position: absolute; z-index: 1; top: 1.5rem; left: 1.5rem; max-width: min(32rem, calc(100% - 3rem)); padding: 1.25rem 1.5rem; background: #11181ee8; border: 1px solid #5f747f; border-radius: .35rem; }
-.eyebrow { letter-spacing: .14em; font-size: .72rem; color: #9eb6c4; }
-h1 { font-size: 1.35rem; font-weight: 500; }
-p { line-height: 1.5; }
-button { font: inherit; padding: .55rem .85rem; border: 1px solid #7d949f; border-radius: .2rem; background: #263740; color: inherit; cursor: pointer; }
-button:focus-visible { outline: 2px solid #e4e9ec; outline-offset: 3px; }
-button:disabled { opacity: .55; cursor: default; }
+button { font: inherit; }

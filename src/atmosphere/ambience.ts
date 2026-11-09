@@ -1,5 +1,6 @@
 import type { Vector3 } from 'three';
 import type { SoundEmitter } from '../world/extras';
+import { audioOutput } from '../audio/mixer';
 
 /**
  * Procedural, restrained hospital soundscape built only from Web Audio nodes (no assets, no
@@ -80,7 +81,7 @@ export class Ambience {
       const comp = ctx.createDynamicsCompressor();
       comp.threshold.value = -18;
       comp.ratio.value = 3;
-      master.connect(comp).connect(ctx.destination);
+      master.connect(comp).connect(audioOutput(ctx, 'sfx'));
       this.master = master;
       this.noise = this.makeNoise(ctx, 4, 'brown');
       // Room tone: air handling rumble plus faint mains hum.
