@@ -102,8 +102,8 @@
     "captured": true,
     "endTime": 7.6,
     "playerEnd": {
-      "x": 19.6,
-      "z": -2.2
+      "x": 19.8,
+      "z": 2.1
     },
     "hidden": "outside",
     "firstPursuit": 5.9,
@@ -278,7 +278,7 @@
     "closedAt": 1.9,
     "gateOpenedAt": 1.9,
     "patientAtClose": {
-      "x": 19.5,
+      "x": 19.6,
       "z": -9.1
     },
     "reopenedByPatient": true,
@@ -310,7 +310,7 @@
     "gateOpenedAt": 1.9,
     "patientAtClose": {
       "x": 19.5,
-      "z": -6.3
+      "z": -6.2
     },
     "reopenedByPatient": true,
     "captured": true,
@@ -326,10 +326,10 @@
     "timeline": [
       "0.1s idle at (19.5, -0.3), player (19.5, -10.3), 10.0 m, last known by vision",
       "0.5s pursue at (19.5, -0.5), player (19.6, -10.6), 10.1 m, last known by vision",
-      "3.1s lost-target at (19.5, -10.1), player (20.2, -12.3), 2.2 m, last known by vision",
-      "3.7s search at (19.5, -10.1), player (20.2, -12.3), 2.2 m, last known by vision",
-      "5.1s pursue at (19.8, -11.1), player (20.2, -12.3), 1.2 m, last known by vision",
-      "6.9s idle at (20.0, -11.7), player (20.2, -12.3), 0.6 m, last known by vision"
+      "3.2s lost-target at (19.5, -10.1), player (20.2, -12.3), 2.2 m, last known by vision",
+      "3.8s search at (19.5, -10.1), player (20.2, -12.3), 2.2 m, last known by vision",
+      "5.2s pursue at (19.9, -11.4), player (20.2, -12.3), 0.9 m, last known by vision",
+      "7.0s idle at (20.0, -11.7), player (20.2, -12.3), 0.6 m, last known by vision"
     ],
     "doors": [
       "0.0s east-fire-west opening",
