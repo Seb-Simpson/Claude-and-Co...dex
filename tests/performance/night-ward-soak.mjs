@@ -4,6 +4,7 @@ import { spawn } from 'node:child_process';
 import { mkdir, readFile, writeFile, access } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { resolve, join } from 'node:path';
+import { gunzipSync } from 'node:zlib';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const options = Object.fromEntries(process.argv.slice(2).map(arg => {
@@ -97,7 +98,9 @@ function validateSoak(data) {
     postGcEarlyAudioNodes: early.nativeAudio.nodes, postGcLateAudioNodes: late.nativeAudio.nodes };
 }
 if (typeof options.analyze === 'string') {
-  const source = resolve(root, options.analyze); const data = JSON.parse(await readFile(source, 'utf8'));
+  const source = resolve(root, options.analyze);
+  const bytes = await readFile(source);
+  const data = JSON.parse((source.endsWith('.gz') ? gunzipSync(bytes) : bytes).toString('utf8'));
   const validation = validateSoak(data);
   const analysis = { source, assertionReplay: true, originalRunFailures: data.failures ?? [], runtimeRerun: false, ...validation };
   await save('corrected-assertions.json', analysis); console.log(JSON.stringify(analysis, null, 2));

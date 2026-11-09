@@ -1,10 +1,10 @@
 {
-  "run": "Final unchanged-source Chromium suite",
-  "date": "2026-11-08T10:15:24.734Z",
+  "run": "Final current-main Chromium suite with Blender entities and the Room 104 visual set",
+  "date": "2026-11-08T20:14:43.310Z",
   "stats": {
-    "startTime": "2026-11-08T10:15:24.734Z",
-    "duration": 557367.3169999999,
-    "expected": 15,
+    "startTime": "2026-11-08T20:14:43.310Z",
+    "duration": 1524723.431,
+    "expected": 23,
     "skipped": 0,
     "unexpected": 0,
     "flaky": 0
@@ -13,54 +13,140 @@
     {
       "test": "boots the renderer, Rapier and registered world, unlocks audio, and resizes the canvas",
       "status": "passed",
-      "durationMs": 34521
+      "durationMs": 73685
     },
     {
       "test": "reports WebGL context loss and disposes the registered modules and renderer",
       "status": "passed",
-      "durationMs": 11244
+      "durationMs": 22830
     },
     {
       "test": "the game boots with the hospital world, atmosphere and horror modules",
       "status": "passed",
-      "durationMs": 24573
+      "durationMs": 42534
     },
     {
       "test": "dev preview renders every authored viewpoint with visible light",
       "status": "passed",
-      "durationMs": 141438
+      "durationMs": 209344
     },
     {
       "test": "WebGL context loss tears down the hospital modules cleanly",
       "status": "passed",
-      "durationMs": 12058
+      "durationMs": 22991
+    },
+    {
+      "test": "renders all four bodied entities and survives every cinematic beat",
+      "status": "passed",
+      "durationMs": 64187
+    },
+    {
+      "test": "loads every GLB, animates it in hospital light and keeps feet on the floor",
+      "status": "passed",
+      "durationMs": 130696
+    },
+    {
+      "test": "falls back to the procedural bodies when a model fails to load",
+      "status": "passed",
+      "durationMs": 19297
+    },
+    {
+      "test": "?nwEntities=procedural keeps the development figures",
+      "status": "passed",
+      "durationMs": 13911
+    },
+    {
+      "test": "the playable game loads all five assets and dresses the active Patient in its Blender model",
+      "status": "passed",
+      "durationMs": 124519
+    },
+    {
+      "test": "?nwEntities=procedural keeps the development bodies in the playable game",
+      "status": "passed",
+      "durationMs": 19128
     },
     {
       "test": "actual pointer-lock controls move, sprint, crouch and collide with isolated walls",
       "status": "passed",
-      "durationMs": 7628
+      "durationMs": 8872
     },
     {
       "test": "E opens and closes a raycast door and enters/exits a hiding spot safely",
       "status": "passed",
-      "durationMs": 10147
+      "durationMs": 9804
     },
     {
       "test": "wake in room 104, walk into the real corridor, collide with a door, and open a route",
       "status": "passed",
-      "durationMs": 43168,
+      "durationMs": 72164,
       "evidence": {
         "combined-game-metrics": {
           "renderer": {
-            "calls": 62,
-            "triangles": 30964,
-            "geometries": 319,
-            "textures": 39
+            "calls": 66,
+            "triangles": 104070,
+            "geometries": 313,
+            "textures": 65
           },
           "performance": {
-            "fixedMaxMs": 37.5,
-            "updateMaxMs": 36.89999999990687,
-            "frameDeltaMaxMs": 100
+            "fixedMaxMs": 36.70000000298023,
+            "updateMaxMs": 63.100000001490116,
+            "frameDeltaMaxMs": 100,
+            "simulatedSeconds": 4.116666666666654,
+            "engine": {
+              "sampleCount": 63,
+              "capacity": 240,
+              "totalFrames": 63,
+              "totalSubsteps": 291,
+              "frameIntervalMs": {
+                "last": 66.60000000000582,
+                "mean": 1051.8387096774193,
+                "p50": 900,
+                "p95": 1999.9000000000015,
+                "max": 2833.2000000000007
+              },
+              "frameCpuMs": {
+                "last": 8.399999998509884,
+                "mean": 47.69206349161409,
+                "p50": 16.5,
+                "p95": 56.69999999552965,
+                "max": 1643.1000000014901
+              },
+              "fixedMs": {
+                "last": 1.4999999925494194,
+                "mean": 3.8396825390675713,
+                "p50": 1.7999999970197678,
+                "p95": 10.899999998509884,
+                "max": 38.20000000298023
+              },
+              "physicsMs": {
+                "last": 0.4000000059604645,
+                "mean": 0.5285714286423865,
+                "p50": 0.30000000447034836,
+                "p95": 1.2000000029802322,
+                "max": 9.599999994039536
+              },
+              "updateMs": {
+                "last": 3.899999998509884,
+                "mean": 10.604761904549031,
+                "p50": 7.199999995529652,
+                "p95": 40.099999994039536,
+                "max": 63.20000000298023
+              },
+              "renderMs": {
+                "last": 2.5,
+                "mean": 32.68730158760907,
+                "p50": 4.799999997019768,
+                "p95": 35.19999999552965,
+                "max": 1627.1000000014901
+              },
+              "substeps": {
+                "last": 4,
+                "mean": 4.619047619047619,
+                "p50": 5,
+                "p95": 5,
+                "max": 5
+              }
+            }
           },
           "frameCount": 63
         }
@@ -69,36 +155,92 @@
     {
       "test": "all four real lockers and both invisible under-bed markers conceal and return the player safely",
       "status": "passed",
-      "durationMs": 88429
+      "durationMs": 127021
     },
     {
       "test": "an initially open hospital door closes at its authored hinge, blocks passage, and opens again",
       "status": "passed",
-      "durationMs": 32737
+      "durationMs": 77695
     },
     {
       "test": "real drawer and cabinet markers produce completed inspections through E",
       "status": "passed",
-      "durationMs": 10071
+      "durationMs": 16650
     },
     {
       "test": "capture transitions to restart and recreates a clean session repeatedly",
       "status": "passed",
-      "durationMs": 33014,
+      "durationMs": 60629,
       "evidence": {
         "session-1-resources": {
           "sessionId": 2,
           "colliderCount": 225,
           "renderer": {
-            "calls": 185,
-            "triangles": 51104,
-            "geometries": 180,
-            "textures": 26
+            "calls": 183,
+            "triangles": 125714,
+            "geometries": 1,
+            "textures": 1
           },
           "performance": {
             "fixedMaxMs": 0,
-            "updateMaxMs": 4.100000000093132,
-            "frameDeltaMaxMs": 100
+            "updateMaxMs": 0,
+            "frameDeltaMaxMs": 0,
+            "simulatedSeconds": 0,
+            "engine": {
+              "sampleCount": 0,
+              "capacity": 240,
+              "totalFrames": 0,
+              "totalSubsteps": 0,
+              "frameIntervalMs": {
+                "last": 0,
+                "mean": 0,
+                "p50": 0,
+                "p95": 0,
+                "max": 0
+              },
+              "frameCpuMs": {
+                "last": 0,
+                "mean": 0,
+                "p50": 0,
+                "p95": 0,
+                "max": 0
+              },
+              "fixedMs": {
+                "last": 0,
+                "mean": 0,
+                "p50": 0,
+                "p95": 0,
+                "max": 0
+              },
+              "physicsMs": {
+                "last": 0,
+                "mean": 0,
+                "p50": 0,
+                "p95": 0,
+                "max": 0
+              },
+              "updateMs": {
+                "last": 0,
+                "mean": 0,
+                "p50": 0,
+                "p95": 0,
+                "max": 0
+              },
+              "renderMs": {
+                "last": 0,
+                "mean": 0,
+                "p50": 0,
+                "p95": 0,
+                "max": 0
+              },
+              "substeps": {
+                "last": 0,
+                "mean": 0,
+                "p50": 0,
+                "p95": 0,
+                "max": 0
+              }
+            }
           }
         },
         "session-1-listeners": {
@@ -109,15 +251,71 @@
           "sessionId": 3,
           "colliderCount": 225,
           "renderer": {
-            "calls": 185,
-            "triangles": 51104,
-            "geometries": 180,
-            "textures": 26
+            "calls": 183,
+            "triangles": 125714,
+            "geometries": 1,
+            "textures": 1
           },
           "performance": {
             "fixedMaxMs": 0,
-            "updateMaxMs": 4.2000000001862645,
-            "frameDeltaMaxMs": 100
+            "updateMaxMs": 0,
+            "frameDeltaMaxMs": 0,
+            "simulatedSeconds": 0,
+            "engine": {
+              "sampleCount": 0,
+              "capacity": 240,
+              "totalFrames": 0,
+              "totalSubsteps": 0,
+              "frameIntervalMs": {
+                "last": 0,
+                "mean": 0,
+                "p50": 0,
+                "p95": 0,
+                "max": 0
+              },
+              "frameCpuMs": {
+                "last": 0,
+                "mean": 0,
+                "p50": 0,
+                "p95": 0,
+                "max": 0
+              },
+              "fixedMs": {
+                "last": 0,
+                "mean": 0,
+                "p50": 0,
+                "p95": 0,
+                "max": 0
+              },
+              "physicsMs": {
+                "last": 0,
+                "mean": 0,
+                "p50": 0,
+                "p95": 0,
+                "max": 0
+              },
+              "updateMs": {
+                "last": 0,
+                "mean": 0,
+                "p50": 0,
+                "p95": 0,
+                "max": 0
+              },
+              "renderMs": {
+                "last": 0,
+                "mean": 0,
+                "p50": 0,
+                "p95": 0,
+                "max": 0
+              },
+              "substeps": {
+                "last": 0,
+                "mean": 0,
+                "p50": 0,
+                "p95": 0,
+                "max": 0
+              }
+            }
           }
         },
         "session-2-listeners": {
@@ -128,15 +326,71 @@
           "sessionId": 4,
           "colliderCount": 225,
           "renderer": {
-            "calls": 185,
-            "triangles": 51104,
-            "geometries": 180,
-            "textures": 26
+            "calls": 183,
+            "triangles": 125714,
+            "geometries": 176,
+            "textures": 54
           },
           "performance": {
             "fixedMaxMs": 0,
-            "updateMaxMs": 6.699999999720603,
-            "frameDeltaMaxMs": 100
+            "updateMaxMs": 27.700000002980232,
+            "frameDeltaMaxMs": 100,
+            "simulatedSeconds": 0,
+            "engine": {
+              "sampleCount": 3,
+              "capacity": 240,
+              "totalFrames": 3,
+              "totalSubsteps": 6,
+              "frameIntervalMs": {
+                "last": 16.69999999999709,
+                "mean": 766.6359999999986,
+                "p50": 16.69999999999709,
+                "p95": 1516.5720000000001,
+                "max": 1516.5720000000001
+              },
+              "frameCpuMs": {
+                "last": 3.899999998509884,
+                "mean": 510.56666666766006,
+                "p50": 5.5,
+                "p95": 1522.3000000044703,
+                "max": 1522.3000000044703
+              },
+              "fixedMs": {
+                "last": 0,
+                "mean": 0,
+                "p50": 0,
+                "p95": 0,
+                "max": 0
+              },
+              "physicsMs": {
+                "last": 0.10000000149011612,
+                "mean": 0.43333333482344943,
+                "p50": 0.10000000149011612,
+                "p95": 1.2000000029802322,
+                "max": 1.2000000029802322
+              },
+              "updateMs": {
+                "last": 1.2000000029802322,
+                "mean": 9.90000000099341,
+                "p50": 1.2000000029802322,
+                "p95": 27.700000002980232,
+                "max": 27.700000002980232
+              },
+              "renderMs": {
+                "last": 2.5999999940395355,
+                "mean": 500.2333333318432,
+                "p50": 3.5,
+                "p95": 1494.6000000014901,
+                "max": 1494.6000000014901
+              },
+              "substeps": {
+                "last": 1,
+                "mean": 2,
+                "p50": 1,
+                "p95": 5,
+                "max": 5
+              }
+            }
           }
         },
         "session-3-listeners": {
@@ -148,7 +402,7 @@
     {
       "test": "The Patient sees the player, pursues physically, loses an occluded trail and searches its last observation",
       "status": "passed",
-      "durationMs": 30995,
+      "durationMs": 62916,
       "evidence": {
         "real-chase-events": [
           {
@@ -162,29 +416,104 @@
                 "y": 0.0029999985098838862,
                 "z": 7.2
               },
-              "timeSeconds": 0.46666666666666784
-            }
-          },
-          {
-            "type": "atmosphere:lighting",
-            "payload": {
-              "targetId": "nw:lights:corridor-main",
-              "effect": "flicker",
-              "durationSeconds": 1.6
+              "timeSeconds": 0.4666666666666679
             }
           },
           {
             "type": "atmosphere:sound",
             "payload": {
-              "cueId": "nw:metal-creak",
+              "cueId": "nw:chase-stinger",
               "action": "play",
-              "position": {
-                "x": 6,
-                "y": 0.0029999985098838862,
-                "z": 7.2
-              },
-              "volume": 0.46,
+              "volume": 0.85,
               "loop": false
+            }
+          },
+          {
+            "type": "atmosphere:lighting",
+            "payload": {
+              "targetId": "nw:light:fluorescent:07",
+              "effect": "flicker",
+              "durationSeconds": 1.3
+            }
+          },
+          {
+            "type": "atmosphere:lighting",
+            "payload": {
+              "targetId": "nw:light:fluorescent:08",
+              "effect": "flicker",
+              "durationSeconds": 1.3
+            }
+          },
+          {
+            "type": "atmosphere:lighting",
+            "payload": {
+              "targetId": "nw:light:fluorescent:09",
+              "effect": "flicker",
+              "durationSeconds": 1.3
+            }
+          },
+          {
+            "type": "atmosphere:lighting",
+            "payload": {
+              "targetId": "nw:light:fluorescent:24",
+              "effect": "flicker",
+              "durationSeconds": 1.3
+            }
+          },
+          {
+            "type": "atmosphere:lighting",
+            "payload": {
+              "targetId": "nw:light:monitor:02",
+              "effect": "flicker",
+              "durationSeconds": 1.3
+            }
+          },
+          {
+            "type": "atmosphere:lighting",
+            "payload": {
+              "targetId": "nw:light:lamp:02",
+              "effect": "flicker",
+              "durationSeconds": 1.3
+            }
+          },
+          {
+            "type": "atmosphere:lighting",
+            "payload": {
+              "targetId": "nw:light:fluorescent:30",
+              "effect": "flicker",
+              "durationSeconds": 1.3
+            }
+          },
+          {
+            "type": "atmosphere:lighting",
+            "payload": {
+              "targetId": "nw:light:vending:01",
+              "effect": "flicker",
+              "durationSeconds": 1.3
+            }
+          },
+          {
+            "type": "atmosphere:lighting",
+            "payload": {
+              "targetId": "nw:light:caged:02",
+              "effect": "flicker",
+              "durationSeconds": 1.3
+            }
+          },
+          {
+            "type": "atmosphere:lighting",
+            "payload": {
+              "targetId": "nw:light:caged:03",
+              "effect": "flicker",
+              "durationSeconds": 1.3
+            }
+          },
+          {
+            "type": "atmosphere:lighting",
+            "payload": {
+              "targetId": "nw:light:caged:04",
+              "effect": "flicker",
+              "durationSeconds": 1.3
             }
           },
           {
@@ -202,7 +531,16 @@
               "entityId": "nw:entity:patient",
               "playerId": "player",
               "reason": "escaped",
-              "timeSeconds": 1.799999999999997
+              "timeSeconds": 1.8166666666666635
+            }
+          },
+          {
+            "type": "atmosphere:sound",
+            "payload": {
+              "cueId": "nw:mix:silence",
+              "action": "play",
+              "volume": 0,
+              "loop": false
             }
           },
           {
@@ -227,12 +565,12 @@
     {
       "test": "a physical Patient approach captures after a response window and offers restart",
       "status": "passed",
-      "durationMs": 26108
+      "durationMs": 49993
     },
     {
       "test": "the player genuinely escapes The Patient by sprinting around the hospital corner and keeps exploring",
       "status": "passed",
-      "durationMs": 49282,
+      "durationMs": 77499,
       "evidence": {
         "walked-escape-route": {
           "route": [
@@ -241,7 +579,7 @@
               "x": -1,
               "y": 0.0029999985098838862,
               "z": 7.2,
-              "frame": 24,
+              "frame": 26,
               "patientState": "patrol",
               "movement": "idle"
             },
@@ -250,31 +588,13 @@
               "x": -1.0666666666666667,
               "y": 0.0029999985098838862,
               "z": 7.2,
-              "frame": 25,
-              "patientState": "patrol",
-              "movement": "sprinting"
-            },
-            {
-              "phase": 0,
-              "x": -1.2444444444444445,
-              "y": 0.0029999985098838862,
-              "z": 7.2,
-              "frame": 26,
-              "patientState": "patrol",
-              "movement": "sprinting"
-            },
-            {
-              "phase": 0,
-              "x": -1.5333333333333332,
-              "y": 0.0029999985098838862,
-              "z": 7.2,
               "frame": 27,
               "patientState": "patrol",
               "movement": "sprinting"
             },
             {
               "phase": 0,
-              "x": -1.8911111111111114,
+              "x": -1.0933333333333333,
               "y": 0.0029999985098838862,
               "z": 7.2,
               "frame": 28,
@@ -283,7 +603,7 @@
             },
             {
               "phase": 0,
-              "x": -2.2494444444444452,
+              "x": -1.2933333333333334,
               "y": 0.0029999985098838862,
               "z": 7.2,
               "frame": 29,
@@ -292,25 +612,25 @@
             },
             {
               "phase": 0,
-              "x": -2.607777777777779,
+              "x": -1.6044444444444443,
               "y": 0.0029999985098838862,
               "z": 7.2,
               "frame": 30,
-              "patientState": "investigate",
+              "patientState": "patrol",
               "movement": "sprinting"
             },
             {
               "phase": 0,
-              "x": -2.966111111111113,
+              "x": -1.9627777777777782,
               "y": 0.0029999985098838862,
               "z": 7.2,
               "frame": 31,
-              "patientState": "investigate",
+              "patientState": "patrol",
               "movement": "sprinting"
             },
             {
               "phase": 0,
-              "x": -3.3244444444444468,
+              "x": -2.321111111111112,
               "y": 0.0029999985098838862,
               "z": 7.2,
               "frame": 32,
@@ -319,7 +639,7 @@
             },
             {
               "phase": 0,
-              "x": -3.6827777777777806,
+              "x": -2.679444444444446,
               "y": 0.0029999985098838862,
               "z": 7.2,
               "frame": 33,
@@ -328,7 +648,7 @@
             },
             {
               "phase": 0,
-              "x": -4.041111111111114,
+              "x": -3.0377777777777797,
               "y": 0.0029999985098838862,
               "z": 7.2,
               "frame": 34,
@@ -337,217 +657,244 @@
             },
             {
               "phase": 0,
-              "x": -4.399444444444446,
+              "x": -3.3961111111111135,
               "y": 0.0029999985098838862,
               "z": 7.2,
               "frame": 35,
-              "patientState": "pursue",
+              "patientState": "investigate",
               "movement": "sprinting"
             },
             {
               "phase": 0,
-              "x": -4.757777777777777,
+              "x": -3.7544444444444474,
               "y": 0.0029999985098838862,
               "z": 7.2,
               "frame": 36,
-              "patientState": "pursue",
+              "patientState": "investigate",
               "movement": "sprinting"
             },
             {
-              "phase": 1,
-              "x": -5.049444444444444,
+              "phase": 0,
+              "x": -4.11277777777778,
               "y": 0.0029999985098838862,
-              "z": 7.133333333333334,
+              "z": 7.2,
               "frame": 37,
-              "patientState": "pursue",
+              "patientState": "investigate",
               "movement": "sprinting"
             },
             {
-              "phase": 1,
-              "x": -5.2299999999999995,
+              "phase": 0,
+              "x": -4.471111111111112,
               "y": 0.0029999985098838862,
-              "z": 6.955555555555556,
+              "z": 7.2,
               "frame": 38,
               "patientState": "pursue",
               "movement": "sprinting"
             },
             {
-              "phase": 1,
-              "x": -5.341599890755918,
+              "phase": 0,
+              "x": -4.8294444444444435,
               "y": 0.0029999985098838862,
-              "z": 6.706009073294801,
+              "z": 7.2,
               "frame": 39,
               "patientState": "pursue",
               "movement": "sprinting"
             },
             {
               "phase": 1,
-              "x": -5.400463916325684,
+              "x": -5.1211111111111105,
               "y": 0.0029999985098838862,
-              "z": 6.366172437249835,
+              "z": 7.133333333333334,
               "frame": 40,
               "patientState": "pursue",
               "movement": "sprinting"
             },
             {
               "phase": 1,
-              "x": -5.420530016329672,
+              "x": -5.301666666666666,
               "y": 0.0029999985098838862,
-              "z": 6.008401379996169,
+              "z": 6.955555555555556,
               "frame": 41,
               "patientState": "pursue",
               "movement": "sprinting"
             },
             {
               "phase": 1,
-              "x": -5.42454323633047,
+              "x": -5.371561999345067,
               "y": 0.0029999985098838862,
-              "z": 5.936847168545436,
+              "z": 6.666666666666667,
               "frame": 42,
               "patientState": "pursue",
               "movement": "sprinting"
             },
             {
               "phase": 1,
-              "x": -5.444609336334458,
+              "x": -5.401394205856637,
               "y": 0.0029999985098838862,
-              "z": 5.579076111291769,
+              "z": 6.310983037544799,
               "frame": 43,
               "patientState": "pursue",
               "movement": "sprinting"
             },
             {
               "phase": 1,
-              "x": -5.464675436338446,
+              "x": -5.421756026801005,
               "y": 0.0029999985098838862,
-              "z": 5.221305054038103,
+              "z": 5.953228688828242,
               "frame": 44,
               "patientState": "pursue",
               "movement": "sprinting"
             },
             {
               "phase": 1,
-              "x": -5.484741536342434,
+              "x": -5.442117847745373,
               "y": 0.0029999985098838862,
-              "z": 4.863533996784437,
+              "z": 5.595474340111685,
               "frame": 45,
               "patientState": "pursue",
               "movement": "sprinting"
             },
             {
               "phase": 1,
-              "x": -5.504807636346422,
+              "x": -5.462479668689741,
               "y": 0.0029999985098838862,
-              "z": 4.50576293953077,
+              "z": 5.237719991395128,
               "frame": 46,
               "patientState": "pursue",
               "movement": "sprinting"
             },
             {
               "phase": 1,
-              "x": -5.52487373635041,
+              "x": -5.4828414896341044,
               "y": 0.0029999985098838862,
-              "z": 4.147991882277104,
+              "z": 4.879965642678571,
               "frame": 47,
               "patientState": "pursue",
               "movement": "sprinting"
             },
             {
               "phase": 1,
-              "x": -5.5449398363543985,
+              "x": -5.503203310578472,
               "y": 0.0029999985098838862,
-              "z": 3.7902208250234364,
+              "z": 4.522211293962014,
               "frame": 48,
               "patientState": "pursue",
               "movement": "sprinting"
             },
             {
-              "phase": 2,
-              "x": -5.559587211462451,
+              "phase": 1,
+              "x": -5.523565131522836,
               "y": 0.0029999985098838862,
-              "z": 3.4321869827958866,
+              "z": 4.164456945245457,
               "frame": 49,
               "patientState": "pursue",
               "movement": "sprinting"
             },
             {
-              "phase": 2,
-              "x": -5.574234586570503,
+              "phase": 1,
+              "x": -5.543926952467204,
               "y": 0.0029999985098838862,
-              "z": 3.074153140568337,
+              "z": 3.8067025965289005,
               "frame": 50,
               "patientState": "pursue",
               "movement": "sprinting"
             },
             {
               "phase": 2,
-              "x": -5.588881961678555,
+              "x": -5.558606121179556,
               "y": 0.0029999985098838862,
-              "z": 2.716119298340787,
+              "z": 3.448670056410418,
               "frame": 51,
               "patientState": "pursue",
               "movement": "sprinting"
             },
             {
               "phase": 2,
-              "x": -5.6035293367866075,
+              "x": -5.573285289891909,
               "y": 0.0029999985098838862,
-              "z": 2.3580854561132374,
+              "z": 3.0906375162919355,
               "frame": 52,
               "patientState": "pursue",
               "movement": "sprinting"
             },
             {
               "phase": 2,
-              "x": -5.61817671189466,
+              "x": -5.587964458604262,
               "y": 0.0029999985098838862,
-              "z": 2.0000516138856876,
+              "z": 2.732604976173453,
               "frame": 53,
               "patientState": "pursue",
               "movement": "sprinting"
             },
             {
               "phase": 2,
-              "x": -5.632824087002712,
+              "x": -5.602643627316614,
               "y": 0.0029999985098838862,
-              "z": 1.642017771658138,
+              "z": 2.3745724360549705,
               "frame": 54,
               "patientState": "pursue",
               "movement": "sprinting"
             },
             {
               "phase": 2,
-              "x": -5.647471462110764,
+              "x": -5.617322796028967,
               "y": 0.0029999985098838862,
-              "z": 1.2839839294305881,
+              "z": 2.016539895936488,
               "frame": 55,
               "patientState": "pursue",
               "movement": "sprinting"
             },
             {
               "phase": 2,
-              "x": -5.6621188372188165,
+              "x": -5.6320019647413195,
               "y": 0.0029999985098838862,
-              "z": 0.9259500872030384,
+              "z": 1.6585073558180066,
               "frame": 56,
-              "patientState": "lost-target",
+              "patientState": "pursue",
               "movement": "sprinting"
             },
             {
               "phase": 2,
-              "x": -5.676766212326864,
+              "x": -5.646681133453672,
               "y": 0.0029999985098838862,
-              "z": 0.5679162449754886,
+              "z": 1.3004748156995252,
               "frame": 57,
+              "patientState": "pursue",
+              "movement": "sprinting"
+            },
+            {
+              "phase": 2,
+              "x": -5.661360302166025,
+              "y": 0.0029999985098838862,
+              "z": 0.9424422755810438,
+              "frame": 58,
               "patientState": "lost-target",
               "movement": "sprinting"
             },
             {
               "phase": 2,
-              "x": -5.6914135874349165,
+              "x": -5.670167803393436,
               "y": 0.0029999985098838862,
-              "z": 0.20988240274793918,
-              "frame": 58,
+              "z": 0.7276227515099549,
+              "frame": 59,
+              "patientState": "lost-target",
+              "movement": "sprinting"
+            },
+            {
+              "phase": 2,
+              "x": -5.684846972105789,
+              "y": 0.0029999985098838862,
+              "z": 0.3695902113914735,
+              "frame": 60,
+              "patientState": "lost-target",
+              "movement": "sprinting"
+            },
+            {
+              "phase": 2,
+              "x": -5.699526140818146,
+              "y": 0.0029999985098838862,
+              "z": 0.011557671272992148,
+              "frame": 61,
               "patientState": "lost-target",
               "movement": "sprinting"
             }
@@ -559,6 +906,14 @@
                 "doorId": "nw:door:maintenance-west",
                 "previous": "closed",
                 "current": "opening"
+              }
+            },
+            {
+              "type": "entity:state",
+              "payload": {
+                "entityId": "nw:entity:patient",
+                "previous": "idle",
+                "current": "patrol"
               }
             },
             {
@@ -587,14 +942,6 @@
               "type": "entity:state",
               "payload": {
                 "entityId": "nw:entity:patient",
-                "previous": "idle",
-                "current": "patrol"
-              }
-            },
-            {
-              "type": "entity:state",
-              "payload": {
-                "entityId": "nw:entity:patient",
                 "previous": "patrol",
                 "current": "investigate"
               }
@@ -606,33 +953,108 @@
                 "entityId": "nw:entity:patient",
                 "playerId": "player",
                 "position": {
-                  "x": 5.991879406083114,
+                  "x": 6.045123104242453,
                   "y": 0.0029999985098838862,
-                  "z": 7.126417923214507
+                  "z": 7.120718632253806
                 },
-                "timeSeconds": 2.333333333333329
-              }
-            },
-            {
-              "type": "atmosphere:lighting",
-              "payload": {
-                "targetId": "nw:lights:corridor-main",
-                "effect": "flicker",
-                "durationSeconds": 1.6
+                "timeSeconds": 2.399999999999995
               }
             },
             {
               "type": "atmosphere:sound",
               "payload": {
-                "cueId": "nw:metal-creak",
+                "cueId": "nw:chase-stinger",
                 "action": "play",
-                "position": {
-                  "x": 5.991879406083114,
-                  "y": 0.0029999985098838862,
-                  "z": 7.126417923214507
-                },
-                "volume": 0.46,
+                "volume": 0.85,
                 "loop": false
+              }
+            },
+            {
+              "type": "atmosphere:lighting",
+              "payload": {
+                "targetId": "nw:light:fluorescent:07",
+                "effect": "flicker",
+                "durationSeconds": 1.3
+              }
+            },
+            {
+              "type": "atmosphere:lighting",
+              "payload": {
+                "targetId": "nw:light:fluorescent:08",
+                "effect": "flicker",
+                "durationSeconds": 1.3
+              }
+            },
+            {
+              "type": "atmosphere:lighting",
+              "payload": {
+                "targetId": "nw:light:fluorescent:09",
+                "effect": "flicker",
+                "durationSeconds": 1.3
+              }
+            },
+            {
+              "type": "atmosphere:lighting",
+              "payload": {
+                "targetId": "nw:light:fluorescent:24",
+                "effect": "flicker",
+                "durationSeconds": 1.3
+              }
+            },
+            {
+              "type": "atmosphere:lighting",
+              "payload": {
+                "targetId": "nw:light:monitor:02",
+                "effect": "flicker",
+                "durationSeconds": 1.3
+              }
+            },
+            {
+              "type": "atmosphere:lighting",
+              "payload": {
+                "targetId": "nw:light:lamp:02",
+                "effect": "flicker",
+                "durationSeconds": 1.3
+              }
+            },
+            {
+              "type": "atmosphere:lighting",
+              "payload": {
+                "targetId": "nw:light:fluorescent:30",
+                "effect": "flicker",
+                "durationSeconds": 1.3
+              }
+            },
+            {
+              "type": "atmosphere:lighting",
+              "payload": {
+                "targetId": "nw:light:vending:01",
+                "effect": "flicker",
+                "durationSeconds": 1.3
+              }
+            },
+            {
+              "type": "atmosphere:lighting",
+              "payload": {
+                "targetId": "nw:light:caged:02",
+                "effect": "flicker",
+                "durationSeconds": 1.3
+              }
+            },
+            {
+              "type": "atmosphere:lighting",
+              "payload": {
+                "targetId": "nw:light:caged:03",
+                "effect": "flicker",
+                "durationSeconds": 1.3
+              }
+            },
+            {
+              "type": "atmosphere:lighting",
+              "payload": {
+                "targetId": "nw:light:caged:04",
+                "effect": "flicker",
+                "durationSeconds": 1.3
               }
             },
             {
@@ -650,7 +1072,16 @@
                 "entityId": "nw:entity:patient",
                 "playerId": "player",
                 "reason": "escaped",
-                "timeSeconds": 3.9833333333333236
+                "timeSeconds": 4.049999999999989
+              }
+            },
+            {
+              "type": "atmosphere:sound",
+              "payload": {
+                "cueId": "nw:mix:silence",
+                "action": "play",
+                "volume": 0,
+                "loop": false
               }
             },
             {
@@ -671,25 +1102,93 @@
             }
           ],
           "performance": {
-            "fixedMaxMs": 74.90000000037253,
-            "updateMaxMs": 19.90000000037253,
-            "frameDeltaMaxMs": 100
+            "fixedMaxMs": 66.20000000298023,
+            "updateMaxMs": 64.10000000149012,
+            "frameDeltaMaxMs": 100,
+            "simulatedSeconds": 5.399999999999984,
+            "engine": {
+              "sampleCount": 76,
+              "capacity": 240,
+              "totalFrames": 76,
+              "totalSubsteps": 348,
+              "frameIntervalMs": {
+                "last": 1383.300000000003,
+                "mean": 896.1866666666666,
+                "p50": 883.4000000000015,
+                "p95": 2383.2,
+                "max": 2883.300000000003
+              },
+              "frameCpuMs": {
+                "last": 9.600000001490116,
+                "mean": 35.24605263112799,
+                "p50": 11.899999998509884,
+                "p95": 74.90000000596046,
+                "max": 1286.2999999970198
+              },
+              "fixedMs": {
+                "last": 1.2000000104308128,
+                "mean": 3.623684210800811,
+                "p50": 1.6999999955296516,
+                "p95": 6.999999992549419,
+                "max": 68.60000000149012
+              },
+              "physicsMs": {
+                "last": 0.19999999552965164,
+                "mean": 1.228947368107344,
+                "p50": 0.3999999985098839,
+                "p95": 2.5000000074505806,
+                "max": 52.399999998509884
+              },
+              "updateMs": {
+                "last": 5.899999998509884,
+                "mean": 7.515789473821458,
+                "p50": 3.5,
+                "p95": 37.30000000447035,
+                "max": 64.10000000149012
+              },
+              "renderMs": {
+                "last": 2.2999999970197678,
+                "mean": 22.853947368107345,
+                "p50": 4.299999997019768,
+                "p95": 34.399999998509884,
+                "max": 1268.2999999970198
+              },
+              "substeps": {
+                "last": 5,
+                "mean": 4.578947368421052,
+                "p50": 5,
+                "p95": 5,
+                "max": 5
+              }
+            }
           },
           "renderer": {
-            "calls": 162,
-            "triangles": 43002,
-            "geometries": 427,
-            "textures": 58
+            "calls": 159,
+            "triangles": 118828,
+            "geometries": 421,
+            "textures": 86
           },
-          "frameCount": 74
+          "frameCount": 76
         }
       }
+    },
+    {
+      "test": "the playable game shows the Blender Room 104 and west corridor, with gameplay intact",
+      "status": "passed",
+      "durationMs": 147663
+    },
+    {
+      "test": "?nwSet=procedural shows the old room for comparison and keeps identical gameplay",
+      "status": "passed",
+      "durationMs": 68161
     }
   ],
   "scope": "Actual main hospital game, foundation coverage, all authored viewpoints and isolated original controls.",
   "notes": [
     "Software WebGL; hardware/cross-browser performance not established.",
     "frameDeltaMaxMs is clamped engine time, not wall-clock FPS.",
-    "QA scenario positioning is opt-in; movement escape uses actual keys after setup."
-  ]
+    "QA scenario positioning is opt-in; movement escape uses actual keys after setup.",
+    "GPU leak claims use the strengthened visible-model followup, which guarantees uploads after each new ready state."
+  ],
+  "followupVerification": "visible-model-results.json"
 }

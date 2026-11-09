@@ -23,6 +23,10 @@ for The Patient, break its sight around corners, and hide when it has not seen
 you enter. Four lockers and two under-bed spots are available. Capture fades the
 scene and presents **Restart**, which resets the ward without reloading the page.
 
+For lighter graphics, open `/?nwSet=procedural` to use the original Room 104 and
+west corridor visuals. Collision, interactions, hiding and enemy behaviour stay
+the same. Both visual modes are covered by browser tests.
+
 For a production build:
 
 ```sh
