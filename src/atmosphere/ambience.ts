@@ -11,14 +11,12 @@ export type CueId =
   | 'nw:pipe-knock' | 'nw:distant-door' | 'nw:drip' | 'nw:trolley' | 'nw:lift-chime' | 'nw:lift-doors' | 'nw:metal-creak'
   | 'nw:settle' | 'nw:light-pop' | 'nw:static' | 'nw:curtain' | 'nw:vent-breath' | 'nw:monitor-beep' | 'nw:flatline'
   | 'nw:wheel-creak' | 'nw:brownout'
-  | 'nw:chase-stinger' | 'nw:heartbeat' | 'nw:reveal' | 'nw:power-down' | 'nw:power-up' | 'nw:presence-out' | 'nw:distant-steps'
-  | 'nw:intercom';
+  | 'nw:chase-stinger' | 'nw:heartbeat' | 'nw:reveal' | 'nw:power-down' | 'nw:power-up' | 'nw:presence-out' | 'nw:distant-steps';
 
 export const CUE_IDS: readonly CueId[] = [
   'nw:pipe-knock', 'nw:distant-door', 'nw:drip', 'nw:trolley', 'nw:lift-chime', 'nw:lift-doors', 'nw:metal-creak', 'nw:settle',
   'nw:light-pop', 'nw:static', 'nw:curtain', 'nw:vent-breath', 'nw:monitor-beep', 'nw:flatline', 'nw:wheel-creak', 'nw:brownout',
   'nw:chase-stinger', 'nw:heartbeat', 'nw:reveal', 'nw:power-down', 'nw:power-up', 'nw:presence-out', 'nw:distant-steps',
-  'nw:intercom',
 ];
 
 export interface PlayOptions {
@@ -38,8 +36,6 @@ const EMITTER_CUES: Record<SoundEmitter['kind'], readonly CueId[]> = {
   distant: ['nw:settle', 'nw:distant-door', 'nw:distant-steps'],
   trolley: ['nw:trolley', 'nw:wheel-creak'],
   door: ['nw:distant-door', 'nw:distant-steps'],
-  // NW-004A: ceiling PA speakers that key up on their own and hiss with something under the static.
-  intercom: ['nw:intercom', 'nw:intercom', 'nw:static'],
 };
 
 export class Ambience {
@@ -367,50 +363,6 @@ export class Ambience {
         src.connect(filt('bandpass', 3200, 0.6)).connect(g).connect(out);
         src.start(t); src.stop(t + dur + 0.1);
         stops.push(() => src.stop());
-        end = t + dur + 0.1;
-        break;
-      }
-      case 'nw:intercom': {
-        // The PA keys up: a click, gated band-limited static, and under it a formant "voice"
-        // (a slow, sagging sawtooth through two vowel filters) too faint to make out. Then it cuts.
-        const dur = options.duration ?? 2 + this.random() * 1.6;
-        const src = this.noiseSource(ctx, true);
-        const g = ctx.createGain();
-        g.gain.setValueAtTime(0.0001, t);
-        for (let k = 0; k < 9; k++) {
-          const at = t + 0.06 + (k / 9) * (dur - 0.2);
-          g.gain.setValueAtTime(vol * (0.05 + 0.09 * this.random()), at);
-          g.gain.setTargetAtTime(vol * 0.02, at + 0.05, 0.04);
-        }
-        g.gain.setValueAtTime(0.0001, t + dur);
-        src.connect(filt('bandpass', 1900, 1.8)).connect(g).connect(out);
-        src.start(t); src.stop(t + dur + 0.05);
-        const voice = ctx.createOscillator();
-        voice.type = 'sawtooth';
-        voice.frequency.setValueAtTime(118, t);
-        voice.frequency.linearRampToValueAtTime(92, t + dur);
-        const vg = ctx.createGain();
-        vg.gain.setValueAtTime(0.0001, t);
-        vg.gain.linearRampToValueAtTime(vol * 0.03, t + 0.3);
-        vg.gain.setValueAtTime(vol * 0.03, t + dur - 0.25);
-        vg.gain.linearRampToValueAtTime(0.0001, t + dur);
-        const f1 = filt('bandpass', 650, 6);
-        const f2 = filt('bandpass', 1150, 7);
-        voice.connect(f1).connect(vg);
-        voice.connect(f2).connect(vg);
-        vg.connect(out);
-        voice.start(t); voice.stop(t + dur + 0.05);
-        const click = ctx.createOscillator();
-        click.type = 'square';
-        click.frequency.value = 2400;
-        const cg = ctx.createGain();
-        cg.gain.setValueAtTime(vol * 0.05, t);
-        cg.gain.exponentialRampToValueAtTime(0.0001, t + 0.03);
-        cg.gain.setValueAtTime(vol * 0.05, t + dur);
-        cg.gain.exponentialRampToValueAtTime(0.0001, t + dur + 0.03);
-        click.connect(cg).connect(out);
-        click.start(t); click.stop(t + dur + 0.05);
-        stops.push(() => { src.stop(); voice.stop(); click.stop(); });
         end = t + dur + 0.1;
         break;
       }

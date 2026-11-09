@@ -2,7 +2,6 @@ import { Color, HemisphereLight, type InstancedMesh, PointLight, type Scene, Vec
 import type { LightingEvent } from '../contracts';
 import type { HospitalExtras, LightFixture } from '../world/extras';
 import { applyOverride, fixtureBrightness, hash01, type LightOverride, seedFromId } from './flicker';
-import type { ProfileState } from './profiles';
 
 export interface LightRigOptions {
   /** Number of real PointLights reassigned to the nearest fixtures every frame. Constant to avoid shader recompiles. */
@@ -56,9 +55,6 @@ export class LightRig {
   private chaseIntensity = 0;
   private readonly listeners = new Set<(event: RigEvent) => void>();
   private disposed = false;
-  /** NW-004A: the active lighting profile (null = the original NW-001A look). */
-  private profile: ProfileState | null = null;
-  private readonly tintColor = new Color();
 
   constructor(private readonly scene: Scene, extras: HospitalExtras, options: LightRigOptions = {}) {
     this.random = options.random ?? Math.random;
@@ -110,9 +106,6 @@ export class LightRig {
     return targets.length;
   }
 
-  /** NW-004A: apply a (blended) lighting profile every frame; null restores the original look. */
-  setProfile(profile: ProfileState | null): void { this.profile = profile; }
-
   /** Raise disturbance pressure while a chase is active (0 = calm, 1 = chase). */
   setChaseIntensity(value: number): void {
     this.chaseIntensity = Math.max(0, Math.min(1, value));
@@ -140,7 +133,6 @@ export class LightRig {
       if (override && elapsed >= override.end) this.overrides.delete(r.fixture.id);
       else b = applyOverride(b, override, elapsed);
       if (r.fixture.kind === 'emergency') b *= emergencyBoost * (this.chaseIntensity > 0 ? chasePulse : 1);
-      if (this.profile) b = this.profiled(r, b, elapsed);
       r.brightness = b;
       this.paint(r, b);
       if (r.fixture.kind === 'fluorescent' && r.fixture.state !== 'dead') {
@@ -156,30 +148,10 @@ export class LightRig {
     const target = totalWeight > 0.01 ? 1 - litWeight / totalWeight : 0;
     this.darknessLevel += (target - this.darknessLevel) * Math.min(1, deltaSeconds * 2.5);
     this.fill.position.copy(camera);
-    this.fill.intensity = (0.22 + this.darknessLevel * 0.18) * (this.profile?.fill ?? 1);
+    this.fill.intensity = 0.22 + this.darknessLevel * 0.18;
     for (const mesh of this.dirtyMeshes) if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
     this.dirtyMeshes.clear();
     this.assignPool(camera);
-  }
-
-  /** Profile shaping of one fixture's brightness (NW-004A). */
-  private profiled(r: FixtureRuntime, b: number, t: number): number {
-    const p = this.profile!;
-    const kind = r.fixture.kind;
-    if (kind === 'fluorescent' || kind === 'strip' || kind === 'caged') {
-      b *= p.fluorescent;
-      if (p.instability > 0) {
-        // Stepped electrical dips, six steps a second; each dip lasts at least one step.
-        const step = Math.floor(t * 6);
-        if (hash01(r.seed, step) < p.instability * 0.25) b *= 0.3 + 0.4 * hash01(r.seed + 7, step);
-      }
-      if (p.breath > 0) b *= 1 - p.breath * 0.6 * (0.5 + 0.5 * Math.sin(t * 1.1 - r.fixture.position.x * 0.18 - r.fixture.position.z * 0.1));
-    } else if (kind === 'emergency') {
-      b *= p.emergency * (1 - p.emergencyPulse * 0.45 * (0.5 + 0.5 * Math.sin(t * 4.2)));
-    } else if (kind === 'exit') {
-      b *= p.exit;
-    }
-    return b;
   }
 
   /** 0 when the mains lighting near the camera is working, 1 when it has all failed. */
@@ -224,10 +196,6 @@ export class LightRig {
       light.position.copy(r.fixture.position);
       light.color.setHex(r.fixture.color);
       light.distance = r.fixture.distance;
-      if (this.profile) {
-        if (this.profile.tintAmount > 0 && r.fixture.kind !== 'exit') light.color.lerp(this.tintColor.copy(this.profile.tint), this.profile.tintAmount);
-        light.distance = r.fixture.distance * this.profile.reach;
-      }
       light.intensity = r.fixture.intensity * r.brightness * edgeFade;
     }
   }
@@ -237,7 +205,7 @@ export class LightRig {
     if (this.time < this.nextDisturbance) return;
     const [min, max] = this.interval;
     const pressure = 1 - this.chaseIntensity * 0.6;
-    this.nextDisturbance = this.time + ((min + this.random() * (max - min)) * pressure) / Math.max(0.1, this.profile?.disturbance ?? 1);
+    this.nextDisturbance = this.time + (min + this.random() * (max - min)) * pressure;
     const nearby = this.runtimes
       .filter((r) => r.fixture.kind === 'fluorescent' && r.fixture.state !== 'dead' && r.poppedUntil <= this.time)
       .map((r) => ({ r, d: r.fixture.position.distanceTo(camera) }))
