@@ -39,7 +39,7 @@ scene = bpy.context.scene
 scene.render.engine = 'CYCLES'
 scene.cycles.device = 'CPU'
 
-TILED = {'floor_vinyl', 'wall_paint', 'wainscot', 'ceiling_tile', 'wood_rail', 'signage', 'decals', 'door_veneer', 'opening_labels', 'door_glass'}
+TILED = {'floor_vinyl', 'wall_paint', 'wainscot', 'ceiling_tile', 'wood_rail', 'signage', 'decals', 'door_veneer', 'opening_labels', 'door_glass', 'corridor_labels'}
 col = lambda n: bpy.data.collections[n]  # noqa: E731
 
 

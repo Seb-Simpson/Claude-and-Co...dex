@@ -30,7 +30,8 @@ describe('Room 104 set asset', () => {
   it('stays within the download and triangle budget for ordinary laptops', () => {
     expect(statSync(setPath).size).toBeLessThan(9 * 1024 * 1024);
     expect(statSync(fileURLToPath(ROOM104_LIGHTMAP_URL)).size).toBeLessThan(1.5 * 1024 * 1024);
-    expect(set.stats.triangles).toBeLessThan(90000);
+    // NW-005A: the corridor to the station, door kit and corridor props (~94k; was 56k for 104 + west corridor).
+    expect(set.stats.triangles).toBeLessThan(110000);
     // One mesh per material: few draw calls for the whole room and corridor (NW-005A adds the
     // veneer, labels, door-leaf atlas and glass, the access card and the door leaf itself).
     expect(set.stats.meshes).toBeLessThanOrEqual(16);

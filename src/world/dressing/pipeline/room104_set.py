@@ -65,6 +65,7 @@ M_RAIL = nw.image_material('wood_rail', tex('wood_rail_albedo.jpg'), tex('wood_r
 M_SIGN = nw.image_material('signage', tex('signage.jpg'), rough_value=0.35)
 M_VENEER = nw.image_material('door_veneer', tex('door_veneer_albedo.jpg'), tex('door_veneer_normal.jpg'), tex('door_veneer_orm.jpg'))
 M_LABELS = op.labels_material(tex)
+M_CLABELS = nw.image_material('corridor_labels', tex('corridor_labels.jpg'), rough_value=0.5)
 M_DECAL = nw.image_material('decals', tex('decals.png'), rough_value=0.8, alpha_blend=True, emissive=tex('decals_glow.jpg'), emissive_strength=1.0)
 
 P = {
@@ -97,6 +98,14 @@ P = {
     'frame': nw.pbr('frame_gloss', (0.74, 0.74, 0.69), rough=0.3, grime=0.45, grime_scale=4.0, bump=0.03, wear_color=(0.42, 0.33, 0.24), wear=0.12, streaks=0.1),
     'bead': nw.pbr('bead_paint', (0.62, 0.6, 0.55), rough=0.35, grime=0.4, bump=0.03),
     'lipping': nw.pbr('lipping_beech', (0.5, 0.36, 0.22), rough=0.4, grime=0.35, bump=0.03, wear_color=(0.3, 0.22, 0.14), wear=0.15),
+    'fascia': nw.pbr('fascia_hpl', (0.16, 0.3, 0.3), rough=0.42, grime=0.4, grime_scale=4.0, bump=0.03, wear_color=(0.32, 0.38, 0.36), wear=0.1, streaks=0.12),
+    'corian': nw.pbr('solid_surface', (0.8, 0.78, 0.72), rough=0.32, grime=0.35, bump=0.02, speck=0.1, wear_color=(0.6, 0.56, 0.5), wear=0.08),
+    'seat_vinyl': nw.pbr('seat_vinyl', (0.12, 0.3, 0.36), rough=0.42, grime=0.35, bump=0.12, bump_scale=50.0, wear_color=(0.25, 0.3, 0.3), wear=0.12),
+    'void_foam': nw.pbr('foam', (0.7, 0.62, 0.4), rough=0.95, grime=0.4, bump=0.4),
+    'grey_abs': nw.pbr('grey_abs', (0.35, 0.36, 0.37), rough=0.45, grime=0.25),
+    'safety_yellow': nw.pbr('safety_yellow', (0.8, 0.62, 0.05), rough=0.45, grime=0.35, wear_color=(0.4, 0.35, 0.2), wear=0.1),
+    'apron_white': nw.pbr('apron_film', (0.88, 0.9, 0.9), rough=0.3, grime=0.2, bump=0.1),
+    'nitrile': nw.pbr('nitrile_blue', (0.12, 0.26, 0.62), rough=0.55, grime=0.2, bump=0.1),
     'curtain': nw.pbr('curtain_print', (0.42, 0.55, 0.62), rough=0.92, grime=0.35, grime_scale=3.0, weave=1.0, bump=0.3, streaks=0.15),
 }
 
@@ -571,10 +580,6 @@ def corridor_shell():
                 if a0 + 0.01 < jx < a1 - 0.01:
                     objs.append(nw.box(f'cor_guard_{tag}{i}_{jx:.1f}', SHELL, (0.04, 1.4, 0.04), (jx + (0.02 if jx == r0 else -0.02), 0.8, zf + facing * 0.02), mat=P['steel'], bevel=0.006))
         # Room-number plaques stay procedural: they are crisp canvas-text signs (separate meshes).
-    # Hand-sanitiser dispensers on the north wall (where the procedural ones were).
-    for x in (-15.55, -11.15):
-        objs.append(nw.box(f'cor_sanitiser_{x}', SHELL, (0.12, 0.24, 0.09), (x, 1.25, Z_CN + 0.045), mat=P['white'], bevel=0.015, segments=2))
-        objs.append(nw.box(f'cor_sanitiser_win_{x}', SHELL, (0.06, 0.08, 0.004), (x, 1.3, Z_CN + 0.092), mat=P['plastic_clear'], bevel=0.0))
     # The notice taped near Room 104's door.
     notice = nw.plane('cor_notice', SHELL, 0.3, 0.15, (-13.35, 1.6, Z_CS - 0.006), normal='-z', mat=M_SIGN)
     sign_uv(notice, 7)
@@ -704,6 +709,13 @@ def build():
     props += op.intercom(Prop, M_LABELS, PROPS)
     props += op.bed_curtain(Prop, P, PROPS)
     props += op.corridor_fixtures(Prop, P, M_LABELS, M_SIGN, PROPS, clock_dial)
+    # NW-005A second pass: corridor props at the room's standard.
+    props += op.counter_front(Prop, P, M_CLABELS, PROPS)
+    props += [op.visitor_chair(Prop, -4.05, 1.05, math.pi, 'chair_a', torn=True), op.visitor_chair(Prop, -3.42, 1.05, math.pi - 0.12, 'chair_b')]
+    props += [op.sanitiser(Prop, x, side, f'sanitiser_{side}{i}') for i, (x, side) in enumerate(((-15.55, 'n'), (-11.15, 'n'), (-6.75, 's'), (-2.4, 's')))]
+    props += op.wet_floor_sign(Prop, M_CLABELS, PROPS)
+    props += op.wall_details(Prop, P, M_CLABELS, PROPS)
+    props += op.floor_clutter(Prop, P, PROPS)
     op.access_card(M_LABELS, PICKUPS)
     hw, ven = op.door_leaf(Prop, P, M_VENEER, DOORLEAF)
     op.door_glass(DOORLEAF)

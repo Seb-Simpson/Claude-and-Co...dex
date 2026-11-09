@@ -51,6 +51,17 @@ export const PROTOTYPE_REGIONS = {
   /** Corridor floor-level paint and decals (guide line, puddle) that would sit under the new floor skin. */
   corridorFloorDecals: box([-20.2, -0.02, -1.41], [SET_EAST_X, 0.006, 1.41]),
   ...doorFrames,
+  /**
+   * NW-005A corridor props the set remodels on their existing colliders (the colliders stay):
+   * the station counter's front fascia and transaction ledge (the worktop, pedestals and
+   * everything on the desk stay), the two visitors' chairs, the south sanitisers and the
+   * wet-floor sign.
+   */
+  stationCounterFront: box([-6.36, -0.02, -1.87], [-1.24, 1.165, -1.44]),
+  visitorChairs: box([-4.45, -0.02, 0.66], [-2.95, 1.02, 1.36]),
+  sanitiserSouthA: box([-6.85, 1.1, 1.25], [-6.65, 1.5, 1.405]),
+  sanitiserSouthB: box([-2.5, 1.1, 1.25], [-2.3, 1.5, 1.405]),
+  wetFloorSign: box([-9.25, -0.02, 0.1], [-8.45, 0.7, 0.9]),
 } as const;
 
 export const PROTOTYPE_SUPPRESSION: readonly Box3[] = Object.values(PROTOTYPE_REGIONS);

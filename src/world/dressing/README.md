@@ -108,9 +108,9 @@ shipped as a static asset.
   specular-only surface (there is no environment map).
 * **Bedding.** The cloth simulation lands most of the bedding in a heap beside the bed. That
   reads as "dragged off", but the sheet is not tucked on the mattress.
-* **Still procedural.** The TV and monitor screens, the light panels, the corridor props
-  (wet-floor sign, west window and blinds, visitors' chairs, sanitisers), the room-number plaques,
-  the nurses' station interior and counter, and the troffer at x −0.2, which straddles the set's
+* **Still procedural.** The TV and monitor screens, the light panels, the west window and blinds,
+  the room-number plaques and the hanging station sign (crisp canvas text), the nurses' station
+  interior (worktop, desk items, back wall), and the troffer at x −0.2, which straddles the set's
   end.
 
 ## NW-005A additions (the opening)
@@ -140,6 +140,25 @@ content lives in `pipeline/opening.py` and is called from `room104_set.py`:
   - the bed's privacy curtain on its ceiling track.
 * **Corridor fixtures.** Smoke detectors, PA speakers, the station's STAFF ONLY sign and the
   corridor clock (03:17).
+* **Corridor props, remodelled on their existing colliders.** The procedural visuals are
+  suppressed by boxes in `regions.ts`; the colliders are kept.
+  - The station counter's front: teal HPL panels with aluminium joints, a recessed plinth, a beech
+    bump rail and a solid-surface ledge carrying a bell, a pen on its chain, a visitors' book and a
+    "PLEASE WAIT HERE" tent card.
+  - The two visitors' chairs: beech arms, wipe-clean vinyl, one seat torn.
+  - Four sanitiser dispensers.
+  - The yellow A-frame "CAUTION WET FLOOR" sign.
+* **Corridor density without collision.** These are wall-mounted, overhead or flat on the floor,
+  so no colliders are added; Codex's `doorway-seams` test pins the count.
+  - patient-information whiteboards by the doors;
+  - glove-and-apron PPE stations by 104 and 106;
+  - a fire alarm call point and fire action notice;
+  - the ward notice board (night rota, "Re: 104 — do not discuss with relatives");
+  - a hand-hygiene poster and the visiting-hours sign;
+  - a CCTV dome over the station approach;
+  - loose papers, a nitrile glove, a medicine cup and a pen on the floor.
+
+  The print is in `textures.py → corridor_labels.jpg`.
 * **Textures.** `textures.py` adds `door_veneer` (a grain set) and `opening_labels.jpg`, which
   holds the ID card, the reader face, the intercom badge and the station sign.
 * **Light.** The bake adds the corridor troffers at x −3.8 and −0.2, the station troffer and the

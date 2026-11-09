@@ -270,3 +270,187 @@ def corridor_fixtures(Prop, P, labels, sign_mat, col, clock_dial):
     out.append(p.finish())
     out.append(clock_dial('cor_clock_dial', -3.2, 2.2, Z_CS - 0.057, facing=-1))
     return out
+
+
+# ---------------------------------------------------------------------------------------------
+# Corridor props at Room 104's standard (NW-005A, second pass). Remodelled on the procedural
+# props' existing colliders (regions.ts suppresses only their visuals), plus wall-mounted, overhead
+# and floor-flat detail that needs no collision. No collider is added or moved.
+
+def cell_rect(i):
+    """corridor_labels.jpg cell i (512 x 256 cells, two columns, row-major from the top)."""
+    col, row = i % 2, i // 2
+    u0 = col * 0.5
+    v1 = 1.0 - row * 0.25
+    return (u0, v1 - 0.25, u0 + 0.5, v1)
+
+
+def rect_quad(name, col, mat, w, h, center, normal, rect):
+    u0, v0, u1, v1 = rect
+    ob = nw.plane(name, col, w, h, center, normal=normal, mat=mat)
+    uv = ob.data.uv_layers.get('UVMap') or ob.data.uv_layers.new(name='UVMap')
+    for d in uv.data:
+        d.uv = (u0 + d.uv.x * (u1 - u0), v0 + d.uv.y * (v1 - v0))
+    return ob
+
+
+def wall_quad(name, col, mat, w, h, x, y, side, rect, proud=0.006):
+    """A print on the corridor face: side 'n' (north wall, faces +z) or 's' (south wall, faces -z)."""
+    z = Z_CN + proud if side == 'n' else Z_CS - proud
+    return rect_quad(name, col, mat, w, h, (x, y, z), '+z' if side == 'n' else '-z', rect)
+
+
+def counter_front(Prop, P, cl, col):
+    """The station's front: teal HPL fascia panels with aluminium joints, a recessed plinth, a beech
+    bump rail and a solid-surface transaction ledge, with the night's leftovers on it."""
+    x0, x1 = -6.3, -1.3
+    L = x1 - x0
+    cx = (x0 + x1) / 2
+    out = []
+    p = Prop('counter_front', cx, -1.6, 0.0, col=col)
+    p.box('vinyl_black', (L, 0.1, 0.04), (0, 0.05, -0.06), bevel=0.004)
+    n = 4
+    for k in range(n):
+        px = -L / 2 + (k + 0.5) * L / n
+        p.box('fascia', (L / n - 0.012, 0.98, 0.03), (px, 0.6, -0.005), bevel=0.004)
+        if k:
+            p.box('steel', (0.014, 0.98, 0.008), (-L / 2 + k * L / n, 0.6, 0.012), bevel=0.002)
+    p.box('lipping', (L, 0.06, 0.03), (0, 0.97, 0.02), bevel=0.01, segments=3)
+    p.box('corian', (L + 0.06, 0.035, 0.36), (0, 1.1225, -0.07), bevel=0.012, segments=3)
+    p.box('steel', (L, 0.02, 0.012), (0, 1.095, 0.1), bevel=0.003)
+    # Night leftovers on the ledge: bell, pen on its chain, a box of gloves.
+    p.cyl('chrome', 0.045, 0.04, (1.2, 1.16, -0.05), verts=24, r2=0.012)
+    p.cyl('rubber', 0.05, 0.012, (1.2, 1.146, -0.05), verts=24)
+    p.box('rubber', (0.14, 0.008, 0.01), (-0.6, 1.145, -0.02), yaw=0.4, bevel=0.002)
+    p.tube('chrome', [(-0.53, 1.145, -0.0), (-0.45, 1.141, 0.03), (-0.38, 1.142, 0.05)], 0.002, res=4)
+    ob = p.finish()
+    out.append(ob)
+    # Visitor book (closed) and a tent card.
+    book = nw.box('counter_book', col, (0.3, 0.03, 0.22), (cx - 0.9, 1.155, -1.66), mat=P['vinyl_black'], bevel=0.004)
+    out.append(book)
+    u0, v0, u1, v1 = cell_rect(7)
+    out.append(rect_quad('counter_book_cover', col, cl, 0.28, 0.2, (cx - 0.9, 1.1705, -1.66), 'y', (u0, v0, u0 + 0.25, v1)))
+    for s in (-1, 1):
+        q = rect_quad(f'counter_tent_{s}', col, cl, 0.2, 0.1, (0, 0, 0), '+z', (u0 + 0.25, v0, u1, v1))
+        bpy.context.view_layer.update()
+        q.matrix_world = Matrix.Translation(g(cx + 0.35, 1.19, -1.6 + s * 0.022)) @ Matrix.Rotation(math.pi / 2 + s * 0.42, 4, 'X') @ Matrix.Rotation(0 if s < 0 else math.pi, 4, 'Z')
+        nw.select_only([q])
+        bpy.ops.object.transform_apply(location=True, rotation=True, scale=True)
+        out.append(q)
+    return out
+
+
+def visitor_chair(Prop, x, z, yaw, name, torn=False):
+    """Wipe-clean beech-armed visitor chair (front local +z), on the procedural chair's collider."""
+    p = Prop(name, x, z, yaw)
+    p.box('seat_vinyl', (0.48, 0.08, 0.46), (0, 0.46, 0.01), bevel=0.03, segments=4)
+    p.box('seat_vinyl', (0.48, 0.4, 0.07), (0, 0.79, -0.215), rot=(-0.12, 0, 0), bevel=0.03, segments=4)
+    if torn:
+        p.box('void_foam', (0.14, 0.006, 0.08), (0.08, 0.502, 0.08), yaw=0.4, bevel=0.002)
+    for side in (-1, 1):
+        sx = side * 0.27
+        p.box('lipping', (0.05, 0.035, 0.5), (sx, 0.66, 0.0), bevel=0.012)
+        p.box('lipping', (0.04, 0.62, 0.04), (sx, 0.32, 0.2), bevel=0.008)
+        p.box('lipping', (0.04, 0.95, 0.04), (sx, 0.47, -0.22), rot=(-0.08, 0, 0), bevel=0.008)
+        p.box('lipping', (0.03, 0.03, 0.42), (sx, 0.14, -0.01), bevel=0.006)
+        for gz in (0.2, -0.24):
+            p.cyl('rubber', 0.018, 0.01, (sx, 0.005, gz), verts=10)
+    p.box('lipping', (0.5, 0.03, 0.03), (0, 0.14, 0.2), bevel=0.006)
+    p.box('steel', (0.44, 0.03, 0.4), (0, 0.405, 0.01), bevel=0.004)
+    return p.finish()
+
+
+def sanitiser(Prop, x, side, name):
+    zw = Z_CN if side == 'n' else Z_CS
+    p = Prop(name, x, zw, 0.0 if side == 'n' else math.pi)
+    p.box('steel', (0.1, 0.06, 0.01), (0, 1.36, 0.005), bevel=0.002)
+    p.box('white', (0.12, 0.26, 0.095), (0, 1.29, 0.055), bevel=0.018, segments=3)
+    p.box('plastic_clear', (0.07, 0.09, 0.004), (0, 1.33, 0.103), bevel=0.002)
+    p.box('grey_abs', (0.1, 0.05, 0.03), (0, 1.17, 0.085), rot=(0.3, 0, 0), bevel=0.008)
+    p.box('grey_abs', (0.02, 0.012, 0.02), (0, 1.15, 0.07), bevel=0.003)
+    return p.finish()
+
+
+def wet_floor_sign(Prop, cl, col):
+    """Yellow A-frame (the procedural sign's spot and angle; it has never had a collider)."""
+    x, z, yaw = -8.85, 0.5, 0.6
+    p = Prop('wet_floor', x, z, yaw, col=col)
+    for s in (-1, 1):
+        p.box('safety_yellow', (0.3, 0.64, 0.012), (0, 0.32, s * 0.09), rot=(s * 0.28, 0, 0), bevel=0.01, segments=3)
+    p.box('safety_yellow', (0.1, 0.03, 0.05), (0, 0.66, 0), bevel=0.01)
+    ob = p.finish()
+    out = [ob]
+    rect = cell_rect(0)
+    for s in (-1, 1):
+        # Plane at the origin facing +/-z, then: offset off the panel face, tilt with the panel
+        # about its centre (same rotation as the box above), move to the panel centre, yaw, place.
+        q = rect_quad(f'wet_floor_print_{s}', col, cl, 0.27, 0.135, (0, 0, 0), '+z' if s > 0 else '-z', rect)
+        bpy.context.view_layer.update()
+        base = q.matrix_world.copy()
+        q.matrix_world = (Matrix.Translation(g(x, 0, z)) @ Matrix.Rotation(yaw, 4, 'Z') @ Matrix.Translation(g(0, 0.32, s * 0.09))
+                          @ Matrix.Rotation(s * 0.28, 4, 'X') @ Matrix.Translation(g(0, 0.13, s * 0.0075)) @ base)
+        nw.select_only([q])
+        bpy.ops.object.transform_apply(location=True, rotation=True, scale=True)
+        out.append(q)
+    return out
+
+
+def wall_details(Prop, P, cl, col):
+    out = []
+    # Patient information whiteboards beside each patient door (east side, above the sanitisers).
+    for label, x, side in (('101', -15.45, 'n'), ('103', -11.05, 'n'), ('102', -15.45, 's'), ('104', -11.05, 's'), ('106', -6.85, 's')):
+        zw = Z_CN if side == 'n' else Z_CS
+        f = 1 if side == 'n' else -1
+        out.append(nw.box(f'status_frame_{label}', col, (0.32, 0.17, 0.012), (x, 1.74, zw + f * 0.006), mat=P['steel'], bevel=0.003))
+        out.append(wall_quad(f'status_{label}', col, cl, 0.3, 0.15, x, 1.74, side, cell_rect(1), proud=0.0125))
+    # PPE station (three glove boxes and an apron roll) by 104 and by 106.
+    for name, x in (('ppe_104', -10.75), ('ppe_106', -8.95)):
+        p = Prop(name, x, Z_CS, math.pi, col=col)
+        p.box('white', (0.42, 0.3, 0.012), (0, 1.25, 0.006), bevel=0.004)
+        for k in range(3):
+            p.box('white', (0.125, 0.24, 0.085), (-0.135 + k * 0.135, 1.25, 0.055), bevel=0.004)
+        p.box('apron_white', (0.2, 0.07, 0.07), (0, 1.46, 0.045), bevel=0.02)
+        out.append(p.finish())
+        u0, v0, u1, v1 = cell_rect(6)
+        for k in range(3):
+            out.append(rect_quad(f'{name}_box{k}', col, cl, 0.12, 0.2, (x + (0.135 - k * 0.135), 1.25, Z_CS - 0.0985), '-z', (u0 + k * 0.166, v0, u0 + (k + 1) * 0.166, v1)))
+    # Fire alarm call point with the fire action notice above it.
+    p = Prop('call_point', -14.2, Z_CN, 0.0, col=col)
+    p.box('red', (0.09, 0.09, 0.05), (0, 1.4, 0.025), bevel=0.006)
+    p.box('plastic_clear', (0.06, 0.06, 0.004), (0, 1.4, 0.052), bevel=0.001)
+    out.append(p.finish())
+    out.append(nw.box('fire_action_back', col, (0.32, 0.17, 0.004), (-14.2, 1.74, Z_CN + 0.003), mat=P['white'], bevel=0.001))
+    out.append(wall_quad('fire_action', col, cl, 0.3, 0.15, -14.2, 1.74, 'n', cell_rect(2), proud=0.007))
+    # Ward notice board between 104 and 106: cork in a beech frame, papers pinned on.
+    x, y = -9.85, 1.58
+    out.append(nw.box('notice_frame', col, (1.04, 0.7, 0.02), (x, y, Z_CS - 0.01), mat=P['lipping'], bevel=0.006))
+    out.append(wall_quad('notice_papers', col, cl, 0.98, 0.64, x, y, 's', cell_rect(4), proud=0.0205))
+    # Hand hygiene poster, visiting hours.
+    out.append(wall_quad('hand_hygiene', col, cl, 0.42, 0.21, -10.5, 1.55, 'n', cell_rect(3)))
+    out.append(wall_quad('visiting_hours', col, cl, 0.4, 0.2, -3.75, 1.75, 's', cell_rect(5)))
+    # CCTV dome over the station approach.
+    p = Prop('cctv', -6.2, -0.9, 0.0, col=col)
+    p.cyl('white', 0.075, 0.03, (0, CEIL_COR - 0.015, 0), verts=24)
+    p.cyl('glass', 0.06, 0.05, (0, CEIL_COR - 0.055, 0), verts=24, r2=0.035)
+    out.append(p.finish())
+    return out
+
+
+def floor_clutter(Prop, P, col):
+    """Flat things on the floor (nothing that needs collision): papers by the chairs, a blue
+    nitrile glove outside 104, a medicine cup, a pen."""
+    out = []
+    for i, (x, z, a) in enumerate(((-3.3, 0.35, 0.4), (-2.6, 0.75, -0.7), (-3.9, -0.3, 1.2), (-2.2, -0.2, 0.15), (-4.6, 0.5, -0.4), (-11.4, 0.8, 0.9))):
+        out.append(nw.box(f'paper_{i}', col, (0.21, 0.0012, 0.297), (x, 0.0042 + i * 0.0003, z), yaw=a, mat=P['paper'], bevel=0.0))
+    p = Prop('glove', -11.5, 0.45, 0.8, col=col)
+    p.box('nitrile', (0.09, 0.012, 0.11), (0, 0.009, 0), bevel=0.005)
+    for k in range(4):
+        p.box('nitrile', (0.016, 0.01, 0.07), (-0.033 + k * 0.022, 0.008, 0.085), yaw=(k - 1.5) * 0.12, bevel=0.004)
+    out.append(p.finish())
+    p = Prop('med_cup', -7.9, -0.6, 0.0, col=col)
+    p.cyl('plastic_clear', 0.022, 0.045, (0, 0.024, 0), axis='z', verts=12, r2=0.017)
+    out.append(p.finish())
+    p = Prop('pen', -4.4, -0.45, 1.1, col=col)
+    p.cyl('white', 0.0045, 0.14, (0, 0.0075, 0), axis='x', verts=8)
+    out.append(p.finish())
+    return out

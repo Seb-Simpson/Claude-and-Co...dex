@@ -482,6 +482,104 @@ def opening_labels(out):
     Image.fromarray((np.clip(arr, 0, 1) * 255).astype(np.uint8)).save(os.path.join(out, 'opening_labels.jpg'), quality=92)
 
 
+def corridor_labels(out):
+    """1024 x 1024 sheet of corridor print, eight 512 x 256 cells (row-major, top to bottom; see
+    CORRIDOR_CELLS): 0 'CAUTION WET FLOOR', 1 patient status whiteboard, 2 fire action notice,
+    3 hand hygiene poster, 4 notice-board papers, 5 visiting hours, 6 glove box print, 7 desk items."""
+    n = 1024
+    img = Image.new('RGB', (n, n), (40, 40, 40))
+    d = ImageDraw.Draw(img)
+
+    def cell(i):
+        return (i % 2) * 512, (i // 2) * 256
+    # 0: caution sign (yellow), pictogram of a slipping figure.
+    x, y = cell(0)
+    d.rectangle([x, y, x + 512, y + 256], fill=(236, 196, 30))
+    d.polygon([(x + 70, y + 40), (x + 150, y + 180), (x + 20, y + 180)], outline=(20, 20, 20), width=8)
+    d.ellipse([x + 78, y + 92, x + 92, y + 106], fill=(20, 20, 20))
+    d.line([(x + 85, y + 106), (x + 92, y + 140)], fill=(20, 20, 20), width=6)
+    d.line([(x + 92, y + 140), (x + 110, y + 160)], fill=(20, 20, 20), width=5)
+    d.line([(x + 92, y + 140), (x + 70, y + 158)], fill=(20, 20, 20), width=5)
+    d.text((x + 330, y + 70), 'CAUTION', font=_font(64), fill=(20, 20, 20), anchor='mm')
+    d.text((x + 330, y + 140), 'WET FLOOR', font=_font(52), fill=(20, 20, 20), anchor='mm')
+    d.text((x + 330, y + 205), 'ATTENTION  -  SUELO MOJADO', font=_font(18, False), fill=(40, 40, 30), anchor='mm')
+    # 1: patient status whiteboard (magnetic, marker scrawl, smudged).
+    x, y = cell(1)
+    d.rectangle([x, y, x + 512, y + 256], fill=(232, 234, 230))
+    d.rectangle([x + 8, y + 8, x + 504, y + 44], fill=(22, 58, 112))
+    d.text((x + 256, y + 26), 'PATIENT INFORMATION', font=_font(22), fill=(240, 240, 240), anchor='mm')
+    rows = [('Named nurse:', 'E. Shaw'), ('Consultant:', 'Dr  M. Hale'), ('Diet:', 'NIL BY MOUTH'), ('Obs:', '1 hrly')]
+    for k, (a, b) in enumerate(rows):
+        yy = y + 70 + k * 44
+        d.text((x + 24, yy), a, font=_font(20, False), fill=(60, 60, 60), anchor='lm')
+        d.text((x + 210, yy), b, font=_font(28, False), fill=(30, 40, 120) if k != 2 else (170, 20, 20), anchor='lm')
+        d.line([(x + 20, yy + 20), (x + 490, yy + 20)], fill=(200, 202, 198), width=2)
+    d.ellipse([x + 430, y + 200, x + 470, y + 240], fill=(200, 30, 30))  # magnet
+    # 2: fire action notice.
+    x, y = cell(2)
+    d.rectangle([x, y, x + 512, y + 256], fill=(240, 240, 236))
+    d.rectangle([x, y, x + 512, y + 48], fill=(200, 24, 24))
+    d.text((x + 256, y + 24), 'FIRE ACTION', font=_font(32), fill=(255, 255, 255), anchor='mm')
+    for k, t in enumerate(['Raise the alarm at the nearest call point', 'Do not use the lifts', 'Staff will direct patients', 'Assembly point: Car Park C']):
+        d.rectangle([x + 18, y + 64 + k * 46, x + 46, y + 92 + k * 46], fill=(22, 58, 112))
+        d.text((x + 58, y + 78 + k * 46), t, font=_font(20, False), fill=(30, 30, 30), anchor='lm')
+    # 3: hand hygiene poster.
+    x, y = cell(3)
+    d.rectangle([x, y, x + 512, y + 256], fill=(226, 238, 242))
+    d.text((x + 256, y + 34), 'CLEAN YOUR HANDS', font=_font(38), fill=(0, 94, 160), anchor='mm')
+    for k in range(6):
+        cx = x + 50 + k * 82
+        d.ellipse([cx - 30, y + 80, cx + 30, y + 140], outline=(0, 94, 160), width=5)
+        d.text((cx, y + 110), str(k + 1), font=_font(26), fill=(0, 94, 160), anchor='mm')
+    d.text((x + 256, y + 190), 'Before and after every patient contact', font=_font(20, False), fill=(40, 60, 70), anchor='mm')
+    d.text((x + 256, y + 226), 'WARD 4 WEST  -  INFECTION PREVENTION', font=_font(16, False), fill=(90, 100, 110), anchor='mm')
+    # 4: notice-board papers: rota, memo, torn flyer (collage, each slightly rotated).
+    x, y = cell(4)
+    d.rectangle([x, y, x + 512, y + 256], fill=(150, 104, 62))
+    papers = [
+        (x + 20, y + 16, 170, 220, (238, 236, 226), 'NIGHT ROTA', ['Mon  E.S / J.K', 'Tue  E.S / P.O', 'Wed  E.S / -', 'Thu  E.S / -', 'Fri  E.S / -']),
+        (x + 200, y + 30, 150, 120, (250, 240, 170), 'REMINDER', ['Doors closed', 'after 22:00', 'NO EXCEPTIONS']),
+        (x + 360, y + 20, 136, 200, (236, 238, 240), 'MEMO', ['Re: 104', 'Do not discuss', 'with relatives', '- Mgmt']),
+        (x + 210, y + 160, 140, 86, (220, 236, 222), 'STAFF SOCIAL', ['cancelled']),
+    ]
+    for (px, py, w, h, col, title, lines) in papers:
+        d.rectangle([px, py, px + w, py + h], fill=col, outline=(120, 110, 90))
+        d.text((px + w / 2, py + 18), title, font=_font(18), fill=(40, 40, 40), anchor='mm')
+        for k, t in enumerate(lines):
+            d.text((px + 10, py + 44 + k * 24), t, font=_font(15, False), fill=(50, 50, 60), anchor='lm')
+        d.ellipse([px + w / 2 - 6, py + 2, px + w / 2 + 6, py + 14], fill=(200, 30, 30))
+    # 5: visiting hours.
+    x, y = cell(5)
+    d.rectangle([x, y, x + 512, y + 256], fill=(236, 234, 226))
+    d.rectangle([x, y, x + 512, y + 56], fill=(22, 58, 112))
+    d.text((x + 256, y + 28), 'VISITING HOURS', font=_font(34), fill=(255, 255, 255), anchor='mm')
+    d.text((x + 256, y + 110), '14:00 - 16:00', font=_font(46), fill=(30, 30, 30), anchor='mm')
+    d.text((x + 256, y + 165), '18:00 - 20:00', font=_font(46), fill=(30, 30, 30), anchor='mm')
+    d.text((x + 256, y + 222), 'Visitors are not permitted after 20:00', font=_font(18, False), fill=(150, 30, 30), anchor='mm')
+    # 6: glove box print (three sizes side by side, each 170 px wide).
+    x, y = cell(6)
+    for k, (size, col) in enumerate((('S', (120, 70, 160)), ('M', (40, 110, 190)), ('L', (30, 150, 120)))):
+        bx = x + k * 170
+        d.rectangle([bx + 2, y, bx + 168, y + 256], fill=(236, 236, 236))
+        d.rectangle([bx + 2, y + 160, bx + 168, y + 256], fill=col)
+        d.ellipse([bx + 40, y + 40, bx + 130, y + 110], fill=(70, 70, 70))  # dispenser hole
+        d.text((bx + 85, y + 208), size, font=_font(60), fill=(255, 255, 255), anchor='mm')
+        d.text((bx + 85, y + 140), 'NITRILE', font=_font(18), fill=(60, 60, 60), anchor='mm')
+    # 7: desk items: visitor book cover (left), 'PLEASE WAIT HERE' card (right).
+    x, y = cell(7)
+    d.rectangle([x, y, x + 256, y + 256], fill=(70, 22, 26))
+    d.text((x + 128, y + 110), 'VISITORS', font=_font(30), fill=(210, 190, 140), anchor='mm')
+    d.text((x + 128, y + 150), 'WARD 4 WEST', font=_font(18), fill=(210, 190, 140), anchor='mm')
+    d.rectangle([x + 256, y, x + 512, y + 256], fill=(240, 238, 230))
+    d.text((x + 384, y + 90), 'PLEASE', font=_font(40), fill=(30, 30, 30), anchor='mm')
+    d.text((x + 384, y + 140), 'WAIT HERE', font=_font(40), fill=(30, 30, 30), anchor='mm')
+    d.text((x + 384, y + 200), 'Ring for assistance', font=_font(20, False), fill=(90, 90, 90), anchor='mm')
+    arr = np.asarray(img).astype(np.float64) / 255.0
+    grime = np.asarray(Image.fromarray((fbm(512, 2.2, 2, seed=306) * 255).astype(np.uint8)).resize((n, n))) / 255.0
+    arr *= (0.88 + 0.12 * grime[..., None])
+    Image.fromarray((np.clip(arr, 0, 1) * 255).astype(np.uint8)).save(os.path.join(out, 'corridor_labels.jpg'), quality=90)
+
+
 # (u0, v0, u1, v1) of each label cell, v measured from the bottom (Blender/glTF UV convention).
 OPENING_CELLS = {'card': (0.0, 0.5, 0.5, 1.0), 'reader': (0.5, 0.5, 1.0, 1.0), 'intercom': (0.0, 0.0, 0.5, 0.5), 'staff': (0.5, 0.0, 1.0, 0.5)}
 
@@ -489,6 +587,6 @@ OPENING_CELLS = {'card': (0.0, 0.5, 0.5, 1.0), 'reader': (0.5, 0.5, 1.0, 1.0), '
 if __name__ == '__main__':
     out = sys.argv[1] if len(sys.argv) > 1 else 'textures'
     os.makedirs(out, exist_ok=True)
-    for fn in (floor_vinyl, wall_paint, wainscot, ceiling_tile, wood_rail, water_stain, rust_drip, scratches, handprints, rot_veins, floor_wear, peeling, signage, decal_atlas, door_veneer, opening_labels):
+    for fn in (floor_vinyl, wall_paint, wainscot, ceiling_tile, wood_rail, water_stain, rust_drip, scratches, handprints, rot_veins, floor_wear, peeling, signage, decal_atlas, door_veneer, opening_labels, corridor_labels):
         fn(out)
         print('NW_TEX', fn.__name__)
