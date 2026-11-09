@@ -9,6 +9,10 @@ import { buildChapter1Details, HAZE_VOLUMES } from './rooms/chapter1';
 import { buildRecordsAndElectrical } from './rooms/records';
 import { buildServiceSpaces } from './rooms/service';
 import { buildShell } from './rooms/shell';
+import { buildChapter1Shell } from './rooms/chapter1Shell';
+import {
+  addChapter1Triggers, buildChapter1Rooms, CHAPTER1_ANCHORS, declareChapter1Actors, declareChapter1Rooms, retagChapter1Rooms,
+} from './rooms/chapter1Layout';
 import { STAGING_ANCHORS } from './staging';
 
 export interface CreateHospitalWorldOptions {
@@ -24,6 +28,18 @@ export interface CreateHospitalWorldOptions {
    * Colliders, doors, interactables, navigation, lights and anomalies are unchanged.
    */
   readonly suppressVisuals?: readonly Box3[];
+  /**
+   * NW-004A: 'classic' (default) is the shipped Ward 4 West. 'chapter1' is the Chapter 1 layout v2
+   * gameplay blockout (preview with `?nwLayout=chapter1`). Codex has not adopted it; nothing
+   * changes for the classic world.
+   */
+  readonly layout?: 'classic' | 'chapter1';
+  /**
+   * Chapter 1 only: door positions for a story stage, until coordinator door transactions exist.
+   * 'act1' (default) Records locked; 'act3' Records released; 'alarm' after CONFIRM RELEASE: fire
+   * doors shut (closed, not locked), stair barrier and observation-bay door open.
+   */
+  readonly chapter1Stage?: 'act1' | 'act3' | 'alarm';
 }
 
 export interface HospitalWorldBuild {
@@ -44,16 +60,26 @@ export function createHospitalWorld(options: CreateHospitalWorldOptions = {}): H
   const builder = new WorldBuilder(options.seed ?? 0x4e57, {
     ...(options.textures === undefined ? {} : { textures: options.textures }),
     ...(options.suppressVisuals ? { suppressVisuals: options.suppressVisuals } : {}),
+    layout: options.layout ?? 'classic',
+    stage: options.chapter1Stage ?? 'act1',
   });
+  const chapter1 = builder.layout === 'chapter1';
   try {
-    declareRooms(builder);
-    buildShell(builder);
+    if (chapter1) declareChapter1Rooms(builder); else declareRooms(builder);
+    if (chapter1) buildChapter1Shell(builder); else buildShell(builder);
     buildPatientRooms(builder);
     buildClinicalRooms(builder);
     buildServiceSpaces(builder);
     buildRecordsAndElectrical(builder);
+    if (chapter1) buildChapter1Rooms(builder);
     buildChapter1Details(builder);
-    declareActors(builder);
+    if (chapter1) {
+      declareChapter1Actors(builder);
+      addChapter1Triggers(builder);
+      retagChapter1Rooms(builder);
+    } else {
+      declareActors(builder);
+    }
     builder.finalize();
   } catch (error) {
     builder.dispose();
@@ -63,7 +89,7 @@ export function createHospitalWorld(options: CreateHospitalWorldOptions = {}): H
   const world: HospitalWorld = {
     id: HOSPITAL_WORLD_ID,
     root: builder.root,
-    bounds: { min: { x: -20.4, y: -0.3, z: -15.7 }, max: { x: 22.8, y: 6.1, z: 8.3 } },
+    bounds: { min: { x: -20.4, y: -0.3, z: -15.7 }, max: { x: 22.8, y: 6.1, z: chapter1 ? 9.7 : 8.3 } },
     rooms: builder.rooms,
     colliders: builder.colliders,
     interactables: builder.interactables,
@@ -82,7 +108,7 @@ export function createHospitalWorld(options: CreateHospitalWorldOptions = {}): H
     sharedMaterials: [],
     reflectiveSurfaces: builder.reflectiveSurfaces,
     sightlines: builder.sightlines,
-    staging: STAGING_ANCHORS,
+    staging: chapter1 ? CHAPTER1_ANCHORS : STAGING_ANCHORS,
     haze: HAZE_VOLUMES,
   };
   attachExtras(builder.root, extras);

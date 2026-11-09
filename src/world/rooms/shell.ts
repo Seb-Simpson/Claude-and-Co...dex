@@ -5,11 +5,11 @@ import { box } from '../core/geometry';
 import { CEILING, DOORS, KEY_STAIRWELL, ROOMS, T, X, Z } from '../layout';
 import { SIGN_EXIT, sign } from '../props/common';
 
-const doorOpening = (center: number, width = 1.2): Opening => ({ from: center - width / 2, to: center + width / 2, bottom: 0, top: 2.1 });
-const windowOpening = (center: number, width: number, bottom = 0.85, top = 2.2): Opening => ({ from: center - width / 2, to: center + width / 2, bottom, top });
+export const doorOpening = (center: number, width = 1.2): Opening => ({ from: center - width / 2, to: center + width / 2, bottom: 0, top: 2.1 });
+export const windowOpening = (center: number, width: number, bottom = 0.85, top = 2.2): Opening => ({ from: center - width / 2, to: center + width / 2, bottom, top });
 
 /** Threshold plate covering the wall thickness under a doorway. */
-function threshold(b: WorldBuilder, axis: 'x' | 'z', at: number, center: number, width = 1.2): void {
+export function threshold(b: WorldBuilder, axis: 'x' | 'z', at: number, center: number, width = 1.2): void {
   const m = new Matrix4().makeTranslation(axis === 'x' ? center : at, 0.004, axis === 'x' ? at : center);
   b.add('steel', box(axis === 'x' ? width : T + 0.06, 0.008, axis === 'x' ? T + 0.06 : width), m, { shade: 'flat', tint: 0.7 });
 }

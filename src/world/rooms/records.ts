@@ -2,7 +2,7 @@ import { Matrix4, Vector3 } from 'three';
 import { cagedBulb, ceilingRect, door, emergencyLight, floorRect, troffer, wall } from '../architecture';
 import type { WorldBuilder } from '../core/builder';
 import { box } from '../core/geometry';
-import { CEILING, DOORS, KEY_ELECTRICAL, ROOMS, T, X, Z } from '../layout';
+import { C1, CEILING, DOORS, KEY_ELECTRICAL, ROOMS, T, X, Z } from '../layout';
 import { SIGN_DANGER, SIGN_PAPER, SIGN_ROOM, SIGN_WARNING, collide, put, sign } from '../props/common';
 import {
   binders, cardboardBox, computerMonitor, electricalPanel, floorDecal, officeChair, phone, pipeRun, scatteredPapers, shelvingUnit,
@@ -22,29 +22,46 @@ export const ELECTRICAL_X = [14.2, 18] as const;
  * it changes no navigation, until Codex decides whether Chapter 1 uses it.
  */
 export function buildRecordsAndElectrical(b: WorldBuilder): void {
-  const [rx0, rx1] = RECORDS_X;
+  // Chapter 1 layout v2: Records moves into the old Room 108 footprint (x -4.6..-0.2, door -2.4);
+  // the old Records footprint becomes the release vestibule (built in chapter1Layout.ts).
+  const chapter1 = b.layout === 'chapter1';
+  const [rx0, rx1] = chapter1 ? C1.recordsX : RECORDS_X;
+  const recordsDoor = chapter1 ? C1.recordsDoor : DOORS.records;
   const [ex0, ex1] = ELECTRICAL_X;
   const roomFinish = { skirting: true } as const;
   floorRect(b, ROOMS.records, rx0 + T / 2, rx1 - T / 2, Z.southFace, Z.southBack);
   floorRect(b, ROOMS.electrical, ex0 + T / 2, ex1, Z.southFace, Z.southBack, 'floorConcrete', { aoStrength: 0.55 });
-  wall(b, { axis: 'z', at: rx1, from: Z.southFace, to: Z.southBack, neg: roomFinish, pos: { skin: 'concrete', skirting: false } });
-  ceilingRect(b, rx0 + T / 2, rx1 - T / 2, Z.southFace, Z.southBack, CEILING.room, 'ceilingStained', [{ x: 13.4, z: 5.4, hanging: true }]);
+  wall(b, {
+    axis: 'z', at: ex0, from: Z.southFace, to: Z.southBack, neg: roomFinish, pos: { skin: 'concrete', skirting: false },
+    ...(chapter1 ? { openings: [{ from: C1.vestibuleElectricalZ - 0.6, to: C1.vestibuleElectricalZ + 0.6, bottom: 0, top: 2.1 }] } : {}),
+  });
+  ceilingRect(b, rx0 + T / 2, rx1 - T / 2, Z.southFace, Z.southBack, CEILING.room, 'ceilingStained', [{ x: rx0 + 3.0, z: 5.4, hanging: true }]);
   ceilingRect(b, ex0 + T / 2, ex1, Z.southFace, Z.southBack, CEILING.room, 'concrete');
 
   const south = Z.corridorS + T / 2;
-  door(b, { name: 'records-112', roomId: ROOMS.records, axis: 'x', at: south, center: DOORS.records, hinge: 'max', swing: 'pos', initial: 'closed', vision: 'wide', prompt: 'Open Medical Records' });
-  door(b, { name: 'electrical-114', roomId: ROOMS.electrical, axis: 'x', at: south, center: DOORS.electrical, hinge: 'min', swing: 'pos', initial: 'closed', vision: 'none', leafTint: 0.7, prompt: 'Open electrical room' });
+  const recordsInitial = chapter1 ? (b.stage === 'act1' ? 'locked' : 'closed') : 'closed';
   door(b, {
+    name: 'records-112', roomId: ROOMS.records, axis: 'x', at: south, center: recordsDoor, hinge: 'max', swing: 'pos', initial: recordsInitial, vision: 'wide',
+    prompt: recordsInitial === 'locked' ? 'Locked — released from the station' : 'Open Medical Records',
+  });
+  door(b, { name: 'electrical-114', roomId: ROOMS.electrical, axis: 'x', at: south, center: DOORS.electrical, hinge: 'min', swing: 'pos', initial: 'closed', vision: 'none', leafTint: 0.7, prompt: 'Open electrical room' });
+  door(b, chapter1 ? {
+    // Chapter 1: the provisional service key is withdrawn; the door is an ordinary closed door.
+    name: 'electrical-service', roomId: ROOMS.electrical, axis: 'x', at: Z.southBack + T / 2, center: DOORS.electricalService, hinge: 'max', swing: 'neg',
+    initial: 'closed', vision: 'none', leafTint: 0.55, prompt: 'Open service door',
+  } : {
     name: 'electrical-service', roomId: ROOMS.electrical, axis: 'x', at: Z.southBack + T / 2, center: DOORS.electricalService, hinge: 'max', swing: 'neg',
     initial: 'locked', vision: 'none', leafTint: 0.55, requirements: [KEY_ELECTRICAL], prompt: 'Locked — Electrical service door',
   });
-  b.connect(ROOMS.corridor, ROOMS.records);
-  b.connect(ROOMS.corridor, ROOMS.electrical);
-  b.connect(ROOMS.electrical, ROOMS.maintenance);
+  if (!chapter1) {
+    b.connect(ROOMS.corridor, ROOMS.records);
+    b.connect(ROOMS.corridor, ROOMS.electrical);
+    b.connect(ROOMS.electrical, ROOMS.maintenance);
+  }
 
-  records(b);
+  records(b, rx0, rx1, recordsDoor);
   electrical(b);
-  wayfinding(b);
+  if (!chapter1) wayfinding(b);
 }
 
 /** Hanging double-sided corridor signs: quiet wayfinding toward Records, Electrical and Stairs B. */
@@ -64,14 +81,15 @@ function wayfinding(b: WorldBuilder): void {
   }
 }
 
-function records(b: WorldBuilder): void {
+function records(b: WorldBuilder, x0: number, x1: number, doorX: number): void {
   const id = ROOMS.records;
-  const [x0, x1] = RECORDS_X;
+  /** Offset from the classic position (x0 10.4): the room keeps its west-wall arrangement. */
+  const dx = x0 - RECORDS_X[0];
   // Interior: x 10.475..14.125, z 1.625..6.4. The door (x 11.35..12.55) opens onto a clear front
   // zone; two double-sided archive racks run east-west behind it with a 0.9 m aisle between them
   // and a 1.5 m back aisle; a 1.3 m strip along the west wall holds the cupboard and the desk.
   for (const [i, z] of [3.2, 4.6].entries()) {
-    shelvingUnit(b, { x: 12.85, z, yaw: 0 }, id, { width: 2.2, depth: 0.5, height: 2.1, fill: i === 1 ? 0.5 : 0.85 });
+    shelvingUnit(b, { x: 12.85 + dx, z, yaw: 0 }, id, { width: 2.2, depth: 0.5, height: 2.1, fill: i === 1 ? 0.5 : 0.85 });
   }
   // Two filing cabinets by the door, one drawer pulled out and empty.
   for (const [i, z] of [1.95, 2.5].entries()) {
@@ -93,23 +111,23 @@ function records(b: WorldBuilder): void {
   put(b, desk, 'paper', box(0.42, 0.012, 0.3), 0.0, 0.765, 0.08, 0.25);
   inspectMarker(b, 'records-patient-file', 'inspect', 'Read the patient file', { x: desk.x + 0.08, z: desk.z, yaw: desk.yaw }, [0.5, 0.12, 0.4], 0.78, 1.7);
   // A records trolley abandoned in the back aisle, files spilled from it.
-  const trolley = { x: 13.25, z: 5.7, yaw: 0.3 };
+  const trolley = { x: 13.25 + dx, z: 5.7, yaw: 0.3 };
   put(b, trolley, 'steel', box(0.9, 0.04, 0.5), 0, 0.8, 0, 0, 0, 0, { tint: 0.65 });
   put(b, trolley, 'steel', box(0.9, 0.04, 0.5), 0, 0.3, 0, 0, 0, 0, { tint: 0.6 });
   collide(b, trolley, id, 0, 0.45, 0, 0.9, 0.9, 0.5);
-  scatteredPapers(b, 12.4, 5.55, 0.6, 14);
-  scatteredPapers(b, 11.7, 3.9, 0.4, 5);
-  cardboardBox(b, { x: 13.85, z: 6.1, yaw: 0.2 }, id, [0.4, 0.3, 0.34], true);
-  floorDecal(b, 'stainWater', 13.2, 5.9, 1.2, 0.9, 0.4);
+  scatteredPapers(b, 12.4 + dx, 5.55, 0.6, 14);
+  scatteredPapers(b, 11.7 + dx, 3.9, 0.4, 5);
+  cardboardBox(b, { x: 13.85 + dx, z: 6.1, yaw: 0.2 }, id, [0.4, 0.3, 0.34], true);
+  floorDecal(b, 'stainWater', 13.2 + dx, 5.9, 1.2, 0.9, 0.4);
   // Hiding: the tall archive cupboard just inside the door, facing into the room.
   addLockerHiding(b, 'records-cupboard', { x: x0 + 0.36, z: 2.25, yaw: HALF_PI }, id);
   // Signage and lighting.
-  sign(b, '112', { ...SIGN_ROOM, subtext: 'MEDICAL RECORDS' }, 0.3, 0.2, new Matrix4().makeRotationY(Math.PI).setPosition(DOORS.records - 0.95, 1.6, Z.corridorS - 0.012), { canvas: [256, 170] });
-  sign(b, 'STAFF ONLY — CONFIDENTIAL', SIGN_WARNING, 0.42, 0.08, new Matrix4().makeRotationY(Math.PI).setPosition(DOORS.records, 2.25, Z.corridorS - 0.012), { canvas: [512, 98] });
+  sign(b, '112', { ...SIGN_ROOM, subtext: 'MEDICAL RECORDS' }, 0.3, 0.2, new Matrix4().makeRotationY(Math.PI).setPosition(doorX - 0.95, 1.6, Z.corridorS - 0.012), { canvas: [256, 170] });
+  sign(b, 'STAFF ONLY — CONFIDENTIAL', SIGN_WARNING, 0.42, 0.08, new Matrix4().makeRotationY(Math.PI).setPosition(doorX, 2.25, Z.corridorS - 0.012), { canvas: [512, 98] });
   sign(b, 'RETURN ALL FILES BEFORE 22:00', SIGN_PAPER, 0.4, 0.16, new Matrix4().makeRotationY(HALF_PI).setPosition(x0 + 0.09, 1.45, 3.6), { canvas: [512, 204] });
-  troffer(b, id, 12.3, 2.4, CEILING.room, 'dying', ['nw:lights:records'], { intensity: 3.2 });
-  troffer(b, id, 12.3, 5.4, CEILING.room, 'dead', ['nw:lights:records']);
-  b.emitter('vent', id, 12.3, 2.7, 4.0);
+  troffer(b, id, 12.3 + dx, 2.4, CEILING.room, 'dying', ['nw:lights:records'], { intensity: 3.2 });
+  troffer(b, id, 12.3 + dx, 5.4, CEILING.room, 'dead', ['nw:lights:records']);
+  b.emitter('vent', id, 12.3 + dx, 2.7, 4.0);
 }
 
 function electrical(b: WorldBuilder): void {

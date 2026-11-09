@@ -34,11 +34,12 @@ export function buildPatientRooms(b: WorldBuilder): void {
   room101(b);
   room103(b);
   room105(b);
-  room107(b);
+  if (b.layout === 'chapter1') gallery107(b); else room107(b);
   room102(b);
   room104(b);
   room106(b);
-  room108(b);
+  // Chapter 1: Records 112 takes the Room 108 footprint.
+  if (b.layout !== 'chapter1') room108(b);
   room110(b);
 }
 
@@ -127,6 +128,26 @@ function room107(b: WorldBuilder): void {
   floorDecal(b, 'stainDark', 9.3, -3.9, 0.9, 0.7, 1.2);
   scatteredPapers(b, 8.2, -3.0, 1.2, 9);
   paperNote(b, 'IT LEARNS THE ROUNDS', 7.6, 1.5, Z.northBack + 0.012, 0, 0.1);
+}
+
+/**
+ * Chapter 1 (blockout): 107 becomes the observation gallery. A dark viewing room; its east wall
+ * carries the one-way glass into the observation bay, where the Patient stands dormant.
+ */
+function gallery107(b: WorldBuilder): void {
+  const id = ROOMS.r107;
+  roomPlaque(b, '107', DOORS.r107, 'north', 0.95, 'OBSERVATION');
+  paperNote(b, 'KEEP LOCKED', DOORS.r107 + 0.95, 1.95, Z.corridorN + 0.014, 0, -0.08);
+  troffer(b, id, 8.2, -3.8, CEILING.room, 'dead', [], { intensity: 2.5 });
+  // A viewing bench facing the glass, a chair turned toward it, the observation log on a shelf.
+  b.block('laminate', 10.55, 0.86, -4.0, 0.5, 0.04, 3.0);
+  b.block('beigePlastic', 10.55, 0.43, -4.0, 0.46, 0.82, 2.9, 0, { tint: 0.7 });
+  b.solid(10.55, 0.44, -4.0, 0.5, 0.88, 3.0, { roomId: id, kind: 'prop' });
+  visitorChair(b, { x: 9.7, z: -3.4, yaw: FACE.east + 0.3 }, id);
+  visitorChair(b, { x: 8.4, z: -2.3, yaw: 2.4 }, id, { tipped: true });
+  sinkUnit(b, { x: 6.675, z: -4.5, yaw: FACE.east }, id, { mirror: 'cracked' });
+  scatteredPapers(b, 8.6, -3.6, 1.0, 7);
+  paperNote(b, 'DO NOT TAP THE GLASS', 7.6, 1.5, Z.northBack + 0.012, 0, 0.1);
 }
 
 /** 102 — Paediatric overflow. A cot, a night-lamp still on, a drawing nobody took down. */

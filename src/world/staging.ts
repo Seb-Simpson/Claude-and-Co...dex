@@ -13,7 +13,9 @@ import { ROOMS } from './layout';
  * checks that every anchor sits inside its room, every entity mark has floor and room to stand,
  * and every camera has a clear line of sight to its target.
  */
-export type StagingScene = 'awakening' | 'nurse-reveal' | 'record-discovery' | 'patient-introduction' | 'stairwell-ending';
+export type StagingScene = 'awakening' | 'nurse-reveal' | 'record-discovery' | 'patient-introduction' | 'stairwell-ending'
+  /** Chapter 1 layout v2 binding anchors (`nw:c1:<CHAPTER_ANCHORS key>`), see rooms/chapter1Layout.ts. */
+  | 'chapter1';
 
 export interface StagingAnchor {
   readonly id: ObjectId;
