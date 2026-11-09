@@ -2,6 +2,8 @@ import type { PlayerInput } from './player';
 
 export interface BrowserInput {
   readonly locked: boolean;
+  /** Clears held/toggled keys and ignores gameplay input while a camera lease owns control. */
+  setSuppressed(value: boolean): void;
   read(): PlayerInput;
   dispose(): void;
 }
@@ -20,13 +22,14 @@ export function createBrowserInput(options: BrowserInputOptions): BrowserInput {
   const pressed = new Set<string>();
   let crouchToggled = false;
   let disposed = false;
+  let suppressed = false;
   const keys = new Set(['KeyW', 'KeyA', 'KeyS', 'KeyD', 'ShiftLeft', 'ShiftRight', 'ControlLeft', 'ControlRight', 'KeyC', 'KeyE']);
   function locked(): boolean { return !disposed && !document.hidden && document.pointerLockElement === element; }
   function clear(): void { pressed.clear(); crouchToggled = false; }
   function onPointerLockChange(): void { if (!locked()) clear(); }
   function onVisibilityChange(): void { if (document.hidden) clear(); }
   function onMouseMove(event: MouseEvent): void {
-    if (locked()) options.onLook(event.movementX, event.movementY);
+    if (locked() && !suppressed) options.onLook(event.movementX, event.movementY);
   }
   function onKeyDown(event: KeyboardEvent): void {
     if (locked() && event.code === 'Escape') {
@@ -36,6 +39,7 @@ export function createBrowserInput(options: BrowserInputOptions): BrowserInput {
     }
     if (!locked() || !keys.has(event.code)) return;
     event.preventDefault();
+    if (suppressed) return;
     if (event.repeat || pressed.has(event.code)) return;
     pressed.add(event.code);
     if (event.code === 'KeyC') crouchToggled = !crouchToggled;
@@ -63,8 +67,9 @@ export function createBrowserInput(options: BrowserInputOptions): BrowserInput {
   window.addEventListener('blur', clear);
   return {
     get locked() { return locked(); },
+    setSuppressed(value) { suppressed = value; clear(); },
     read() {
-      if (!locked()) return { forward: 0, right: 0, sprint: false, crouch: false };
+      if (!locked() || suppressed) return { forward: 0, right: 0, sprint: false, crouch: false };
       return {
         forward: Number(pressed.has('KeyW')) - Number(pressed.has('KeyS')),
         right: Number(pressed.has('KeyD')) - Number(pressed.has('KeyA')),

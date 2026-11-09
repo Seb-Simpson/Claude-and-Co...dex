@@ -16,3 +16,5 @@ export { createPatientProxy } from './patientProxy';
 export type { PatientProxy } from './patientProxy';
 export { createDoorNavigationAdapter } from './doorNavigation';
 export type { DoorNavigationAdapter, DoorNavigationOptions } from './doorNavigation';
+export { createNurseEncounter } from './nurseEncounter';
+export type { NurseEncounter, NurseEncounterOptions, NurseEncounterPhase, NurseDoorPolicy, NurseAudioCue, NurseAudioCueKind } from './nurseEncounter';

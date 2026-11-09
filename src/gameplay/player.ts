@@ -53,6 +53,9 @@ export const DEFAULT_PLAYER_CONFIG: Readonly<PlayerConfig> = Object.freeze({
 
 export interface PlayerController extends PlayerProvider {
   readonly body: CharacterBody;
+  readonly controlsLocked: boolean;
+  /** Exclusive cinematic camera ownership; collision remains active at the existing feet pose. */
+  acquireCameraControl(): PlayerCameraControlLease | null;
   fixedUpdate(frame: FrameContext, input: PlayerInput): void;
   update(frame: FrameContext): void;
   look(deltaX: number, deltaY: number): void;
@@ -65,6 +68,14 @@ export interface PlayerController extends PlayerProvider {
   setCaptured(captured: boolean): void;
   setHiding(state: HidingState, spotId: string | null, cameraPose?: Pose): void;
   dispose(): void;
+}
+
+export interface PlayerCameraControlLease {
+  /** Capture, hiding or disposal invalidates the lease and its presentation owner. */
+  readonly signal: AbortSignal;
+  /** Accept only an unoccupied controller eye pose at the existing body; the host validates floor support. */
+  handoff(pose: Pose): boolean;
+  release(): void;
 }
 
 export interface PlayerControllerOptions {
@@ -112,6 +123,7 @@ export function createPlayerController(options: PlayerControllerOptions): Player
   let distanceSinceFootstep = 0;
   let movement: PlayerSnapshot['movement'] = 'idle';
   let disposed = false;
+  let control: AbortController | null = null;
   let eyeHeight = body.height < config.standingHeight - 0.01 ? config.crouchingEyeHeight : config.standingEyeHeight;
   const normalRotation = new Quaternion();
   const targetRotation = new Quaternion();
@@ -127,14 +139,57 @@ export function createPlayerController(options: PlayerControllerOptions): Player
   }
 
   function setViewRotation(rotation: ViewRotation): void {
-    if (disposed || !Number.isFinite(rotation.yaw) || !Number.isFinite(rotation.pitch)) return;
+    if (disposed || control || !Number.isFinite(rotation.yaw) || !Number.isFinite(rotation.pitch)) return;
     yaw = rotation.yaw;
     pitch = Math.max(-config.pitchLimit, Math.min(config.pitchLimit, rotation.pitch));
     if (hidingState === 'outside') camera.quaternion.setFromEuler(euler.set(pitch, yaw, 0, 'YXZ'));
   }
 
+  function invalidateControl(): void {
+    const previous = control;
+    control = null;
+    previous?.abort();
+  }
+
   return {
     body,
+    get controlsLocked() { return control !== null; },
+    acquireCameraControl() {
+      if (disposed || control || captured || hidingState !== 'outside') return null;
+      const lease = new AbortController();
+      control = lease;
+      resetVelocity();
+      movement = 'idle';
+      return {
+        signal: lease.signal,
+        handoff(pose) {
+          if (control !== lease || disposed || captured || hidingState !== 'outside' || !pose?.position || !pose.rotation) return false;
+          const p = pose.position;
+          const q = pose.rotation;
+          if (![p.x, p.y, p.z, q.x, q.y, q.z, q.w].every(Number.isFinite) ||
+              Math.abs(Math.hypot(q.x, q.y, q.z, q.w) - 1) > 0.001) return false;
+          const feet = body.getPosition();
+          if (Math.hypot(p.x - feet.x, p.z - feet.z) > 0.02 ||
+              Math.abs(p.y - feet.y - eyeHeight) > 0.02 || !body.canOccupy(feet)) return false;
+          targetRotation.set(q.x, q.y, q.z, q.w);
+          euler.setFromQuaternion(targetRotation, 'YXZ');
+          if (Math.abs(euler.z) > 0.001 || Math.abs(euler.x) > config.pitchLimit) return false;
+          yaw = euler.y;
+          pitch = euler.x;
+          // Set the exact controller pose so its next update cannot snap out of the path.
+          camera.position.set(feet.x, feet.y + eyeHeight, feet.z);
+          camera.quaternion.setFromEuler(euler.set(pitch, yaw, 0, 'YXZ'));
+          camera.updateMatrixWorld();
+          return true;
+        },
+        release() {
+          if (control !== lease) return;
+          invalidateControl();
+          resetVelocity();
+          movement = 'idle';
+        },
+      };
+    },
     getSnapshot() {
       const crouching = body.height < config.standingHeight - 0.01;
       return {
@@ -147,9 +202,9 @@ export function createPlayerController(options: PlayerControllerOptions): Player
       if (disposed) return;
       const dt = frame.deltaSeconds;
       if (!Number.isFinite(dt) || dt <= 0 || dt > 0.1) return;
-      if (captured || hidingState !== 'outside') {
+      if (captured || hidingState !== 'outside' || control) {
         resetVelocity();
-        movement = captured ? 'captured' : 'hidden';
+        movement = captured ? 'captured' : hidingState !== 'outside' ? 'hidden' : 'idle';
         return;
       }
       const requestedHeight = input.crouch ? config.crouchingHeight : config.standingHeight;
@@ -191,7 +246,7 @@ export function createPlayerController(options: PlayerControllerOptions): Player
       }
     },
     update(frame) {
-      if (disposed) return;
+      if (disposed || control) return;
       const dt = Math.max(0, Math.min(0.1, frame.deltaSeconds));
       const desiredEyeHeight = body.height < config.standingHeight - 0.01 ? config.crouchingEyeHeight : config.standingEyeHeight;
       eyeHeight += (desiredEyeHeight - eyeHeight) * (1 - Math.exp(-config.cameraHeightSharpness * dt));
@@ -230,7 +285,7 @@ export function createPlayerController(options: PlayerControllerOptions): Player
       camera.updateMatrixWorld();
     },
     look(deltaX, deltaY) {
-      if (disposed || captured || hidingState !== 'outside' || !Number.isFinite(deltaX) || !Number.isFinite(deltaY)) return;
+      if (disposed || control || captured || hidingState !== 'outside' || !Number.isFinite(deltaX) || !Number.isFinite(deltaY)) return;
       setViewRotation({ yaw: yaw - deltaX * lookX, pitch: pitch - deltaY * lookY });
     },
     setLookSensitivity(horizontal, vertical = horizontal) {
@@ -239,11 +294,13 @@ export function createPlayerController(options: PlayerControllerOptions): Player
     setViewRotation,
     setCaptured(value) {
       captured = value;
+      if (value) invalidateControl();
       resetVelocity();
       if (value) movement = 'captured';
       else movement = hidingState === 'outside' ? 'idle' : 'hidden';
     },
     setHiding(state, spotId, cameraPose) {
+      if (state !== 'outside') invalidateControl();
       hidingState = state;
       hidingSpotId = state === 'outside' ? null : spotId;
       if (cameraPose) hidingPose = cameraPose;
@@ -254,6 +311,7 @@ export function createPlayerController(options: PlayerControllerOptions): Player
     dispose() {
       if (disposed) return;
       disposed = true;
+      invalidateControl();
       resetVelocity();
       body.dispose();
     },

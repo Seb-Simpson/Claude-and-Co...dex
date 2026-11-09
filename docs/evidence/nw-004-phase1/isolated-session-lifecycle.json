@@ -1,0 +1,583 @@
+{
+  "baseline": {
+    "ready": true,
+    "disposed": false,
+    "generation": 1,
+    "frameCount": 9,
+    "canvasCount": 1,
+    "worldCount": 1,
+    "colliderCount": 3,
+    "bodyCount": 0,
+    "moduleSetups": 2,
+    "moduleDisposals": 0,
+    "locked": false,
+    "controlsLocked": false,
+    "position": {
+      "x": 0,
+      "y": 0.0029999985098838862,
+      "z": 3
+    },
+    "rotation": {
+      "yaw": 0,
+      "pitch": 0
+    },
+    "camera": {
+      "x": 0,
+      "y": 1.6529999985098838,
+      "z": 3
+    },
+    "phase": "idle",
+    "elapsedSeconds": 0,
+    "noiseCount": 0,
+    "noiseDuringControl": 0,
+    "previewCount": 0,
+    "audioState": "running",
+    "draws": 4,
+    "triangles": 48,
+    "pixelRatio": 0.75,
+    "outcomes": [],
+    "gpuResources": {
+      "geometries": 1,
+      "textures": 1,
+      "programs": 1
+    },
+    "performance": {
+      "sampleCount": 9,
+      "capacity": 240,
+      "totalFrames": 9,
+      "totalSubsteps": 33,
+      "frameIntervalMs": {
+        "last": 116.60000000000014,
+        "mean": 81.23750000000001,
+        "p50": 83.29999999999995,
+        "p95": 116.60000000000014,
+        "max": 116.60000000000014
+      },
+      "frameCpuMs": {
+        "last": 5.199999999254942,
+        "mean": 8.24444444436166,
+        "p50": 7.099999997764826,
+        "p95": 19.899999998509884,
+        "max": 19.899999998509884
+      },
+      "fixedMs": {
+        "last": 3.5,
+        "mean": 4.322222221228811,
+        "p50": 4.5,
+        "p95": 8.399999998509884,
+        "max": 8.399999998509884
+      },
+      "physicsMs": {
+        "last": 0,
+        "mean": 1.1111111119389534,
+        "p50": 0.10000000149011612,
+        "p95": 9.100000001490116,
+        "max": 9.100000001490116
+      },
+      "updateMs": {
+        "last": 1.300000000745058,
+        "mean": 0.23333333391282293,
+        "p50": 0.10000000149011612,
+        "p95": 1.300000000745058,
+        "max": 1.300000000745058
+      },
+      "renderMs": {
+        "last": 0.3999999985098839,
+        "mean": 2.544444443864955,
+        "p50": 0.5,
+        "p95": 19.599999997764826,
+        "max": 19.599999997764826
+      },
+      "substeps": {
+        "last": 5,
+        "mean": 3.6666666666666665,
+        "p50": 5,
+        "p95": 5,
+        "max": 5
+      }
+    }
+  },
+  "restarts": [
+    {
+      "ready": true,
+      "disposed": false,
+      "generation": 2,
+      "frameCount": 40,
+      "canvasCount": 1,
+      "worldCount": 1,
+      "colliderCount": 3,
+      "bodyCount": 0,
+      "moduleSetups": 4,
+      "moduleDisposals": 2,
+      "locked": false,
+      "controlsLocked": false,
+      "position": {
+        "x": 0,
+        "y": 0.0029999985098838862,
+        "z": 3
+      },
+      "rotation": {
+        "yaw": 0,
+        "pitch": 0
+      },
+      "camera": {
+        "x": 0,
+        "y": 1.6529999985098838,
+        "z": 3
+      },
+      "phase": "idle",
+      "elapsedSeconds": 0,
+      "noiseCount": 0,
+      "noiseDuringControl": 0,
+      "previewCount": 3,
+      "audioState": "running",
+      "draws": 4,
+      "triangles": 48,
+      "pixelRatio": 0.75,
+      "outcomes": [
+        {
+          "id": "test:systems:1:0",
+          "outcome": "completed"
+        },
+        {
+          "id": "test:systems:1:1",
+          "outcome": "interrupted",
+          "reason": "Test interruption"
+        },
+        {
+          "id": "test:systems:1:2",
+          "outcome": "interrupted",
+          "reason": "Cinematic player disposed"
+        }
+      ],
+      "gpuResources": {
+        "geometries": 1,
+        "textures": 1,
+        "programs": 1
+      },
+      "performance": {
+        "sampleCount": 40,
+        "capacity": 240,
+        "totalFrames": 40,
+        "totalSubsteps": 149,
+        "frameIntervalMs": {
+          "last": 83.30000000000018,
+          "mean": 68.37179487179488,
+          "p50": 83.29999999999995,
+          "p95": 100,
+          "max": 116.60000000000014
+        },
+        "frameCpuMs": {
+          "last": 1.300000000745058,
+          "mean": 5.434999999962747,
+          "p50": 0.8999999985098839,
+          "p95": 13.200000002980232,
+          "max": 108.10000000149012
+        },
+        "fixedMs": {
+          "last": 0.6999999992549419,
+          "mean": 1.2849999997764825,
+          "p50": 0.10000000149011612,
+          "p95": 6.199999999254942,
+          "max": 8.399999998509884
+        },
+        "physicsMs": {
+          "last": 0.30000000074505806,
+          "mean": 0.3925000000745058,
+          "p50": 0.10000000149011612,
+          "p95": 0.6000000014901161,
+          "max": 9.100000001490116
+        },
+        "updateMs": {
+          "last": 0,
+          "mean": 0.1800000000745058,
+          "p50": 0.10000000149011612,
+          "p95": 0.6000000014901161,
+          "max": 1.300000000745058
+        },
+        "renderMs": {
+          "last": 0.30000000074505806,
+          "mean": 3.554999999888241,
+          "p50": 0.30000000074505806,
+          "p95": 2,
+          "max": 106.80000000074506
+        },
+        "substeps": {
+          "last": 5,
+          "mean": 3.725,
+          "p50": 4,
+          "p95": 5,
+          "max": 5
+        }
+      }
+    },
+    {
+      "ready": true,
+      "disposed": false,
+      "generation": 3,
+      "frameCount": 49,
+      "canvasCount": 1,
+      "worldCount": 1,
+      "colliderCount": 3,
+      "bodyCount": 0,
+      "moduleSetups": 6,
+      "moduleDisposals": 4,
+      "locked": false,
+      "controlsLocked": false,
+      "position": {
+        "x": 0,
+        "y": 0.0029999985098838862,
+        "z": 3
+      },
+      "rotation": {
+        "yaw": 0,
+        "pitch": 0
+      },
+      "camera": {
+        "x": 0,
+        "y": 1.6529999985098838,
+        "z": 3
+      },
+      "phase": "idle",
+      "elapsedSeconds": 0,
+      "noiseCount": 0,
+      "noiseDuringControl": 0,
+      "previewCount": 4,
+      "audioState": "running",
+      "draws": 4,
+      "triangles": 48,
+      "pixelRatio": 0.75,
+      "outcomes": [
+        {
+          "id": "test:systems:1:0",
+          "outcome": "completed"
+        },
+        {
+          "id": "test:systems:1:1",
+          "outcome": "interrupted",
+          "reason": "Test interruption"
+        },
+        {
+          "id": "test:systems:1:2",
+          "outcome": "interrupted",
+          "reason": "Cinematic player disposed"
+        },
+        {
+          "id": "test:systems:2:3",
+          "outcome": "interrupted",
+          "reason": "Cinematic player disposed"
+        }
+      ],
+      "gpuResources": {
+        "geometries": 1,
+        "textures": 1,
+        "programs": 1
+      },
+      "performance": {
+        "sampleCount": 49,
+        "capacity": 240,
+        "totalFrames": 49,
+        "totalSubsteps": 185,
+        "frameIntervalMs": {
+          "last": 66.60000000000036,
+          "mean": 69.43958333333335,
+          "p50": 83.29999999999995,
+          "p95": 100,
+          "max": 133.39999999999964
+        },
+        "frameCpuMs": {
+          "last": 0.8000000007450581,
+          "mean": 7.361224489780713,
+          "p50": 1,
+          "p95": 19.899999998509884,
+          "max": 133
+        },
+        "fixedMs": {
+          "last": 0.5,
+          "mean": 1.2061224488579496,
+          "p50": 0.10000000149011612,
+          "p95": 6.199999999254942,
+          "max": 8.399999998509884
+        },
+        "physicsMs": {
+          "last": 0,
+          "mean": 0.3346938775966362,
+          "p50": 0.10000000149011612,
+          "p95": 0.6000000014901161,
+          "max": 9.100000001490116
+        },
+        "updateMs": {
+          "last": 0.10000000149011612,
+          "mean": 0.22653061219928217,
+          "p50": 0.10000000149011612,
+          "p95": 1.2000000029802322,
+          "max": 2.600000001490116
+        },
+        "renderMs": {
+          "last": 0.19999999925494194,
+          "mean": 5.571428571352545,
+          "p50": 0.30000000074505806,
+          "p95": 19.599999997764826,
+          "max": 129.09999999776483
+        },
+        "substeps": {
+          "last": 4,
+          "mean": 3.7755102040816326,
+          "p50": 4,
+          "p95": 5,
+          "max": 5
+        }
+      }
+    },
+    {
+      "ready": true,
+      "disposed": false,
+      "generation": 4,
+      "frameCount": 65,
+      "canvasCount": 1,
+      "worldCount": 1,
+      "colliderCount": 3,
+      "bodyCount": 0,
+      "moduleSetups": 8,
+      "moduleDisposals": 6,
+      "locked": false,
+      "controlsLocked": false,
+      "position": {
+        "x": 0,
+        "y": 0.0029999985098838862,
+        "z": 3
+      },
+      "rotation": {
+        "yaw": 0,
+        "pitch": 0
+      },
+      "camera": {
+        "x": 0,
+        "y": 1.6529999985098838,
+        "z": 3
+      },
+      "phase": "idle",
+      "elapsedSeconds": 0,
+      "noiseCount": 0,
+      "noiseDuringControl": 0,
+      "previewCount": 5,
+      "audioState": "running",
+      "draws": 4,
+      "triangles": 48,
+      "pixelRatio": 0.75,
+      "outcomes": [
+        {
+          "id": "test:systems:1:0",
+          "outcome": "completed"
+        },
+        {
+          "id": "test:systems:1:1",
+          "outcome": "interrupted",
+          "reason": "Test interruption"
+        },
+        {
+          "id": "test:systems:1:2",
+          "outcome": "interrupted",
+          "reason": "Cinematic player disposed"
+        },
+        {
+          "id": "test:systems:2:3",
+          "outcome": "interrupted",
+          "reason": "Cinematic player disposed"
+        },
+        {
+          "id": "test:systems:3:4",
+          "outcome": "interrupted",
+          "reason": "Cinematic player disposed"
+        }
+      ],
+      "gpuResources": {
+        "geometries": 1,
+        "textures": 1,
+        "programs": 1
+      },
+      "performance": {
+        "sampleCount": 65,
+        "capacity": 240,
+        "totalFrames": 65,
+        "totalSubsteps": 245,
+        "frameIntervalMs": {
+          "last": 66.60000000000036,
+          "mean": 68.746875,
+          "p50": 83.29999999999973,
+          "p95": 100.09999999999945,
+          "max": 133.39999999999964
+        },
+        "frameCpuMs": {
+          "last": 1,
+          "mean": 7.847692307543296,
+          "p50": 0.8999999985098839,
+          "p95": 19.899999998509884,
+          "max": 133
+        },
+        "fixedMs": {
+          "last": 0.4000000022351742,
+          "mean": 1.0846153845007602,
+          "p50": 0.10000000149011612,
+          "p95": 5.599999997764826,
+          "max": 8.399999998509884
+        },
+        "physicsMs": {
+          "last": 0.19999999925494194,
+          "mean": 0.3230769229622988,
+          "p50": 0.10000000149011612,
+          "p95": 0.6000000014901161,
+          "max": 9.100000001490116
+        },
+        "updateMs": {
+          "last": 0.09999999776482582,
+          "mean": 0.18461538455807247,
+          "p50": 0.09999999776482582,
+          "p95": 0.8999999985098839,
+          "max": 2.600000001490116
+        },
+        "renderMs": {
+          "last": 0.20000000298023224,
+          "mean": 6.233846153892004,
+          "p50": 0.30000000074505806,
+          "p95": 19.599999997764826,
+          "max": 129.09999999776483
+        },
+        "substeps": {
+          "last": 4,
+          "mean": 3.769230769230769,
+          "p50": 4,
+          "p95": 5,
+          "max": 5
+        }
+      }
+    }
+  ],
+  "final": {
+    "ready": true,
+    "disposed": false,
+    "generation": 4,
+    "frameCount": 81,
+    "canvasCount": 1,
+    "worldCount": 1,
+    "colliderCount": 3,
+    "bodyCount": 0,
+    "moduleSetups": 8,
+    "moduleDisposals": 6,
+    "locked": false,
+    "controlsLocked": false,
+    "position": {
+      "x": 0,
+      "y": 0.0029999985098838862,
+      "z": 3
+    },
+    "rotation": {
+      "yaw": 0,
+      "pitch": 0
+    },
+    "camera": {
+      "x": 0,
+      "y": 1.6529999985098838,
+      "z": 3
+    },
+    "phase": "completed",
+    "elapsedSeconds": 0.7,
+    "noiseCount": 0,
+    "noiseDuringControl": 0,
+    "previewCount": 6,
+    "audioState": "running",
+    "draws": 4,
+    "triangles": 48,
+    "pixelRatio": 0.75,
+    "outcomes": [
+      {
+        "id": "test:systems:1:0",
+        "outcome": "completed"
+      },
+      {
+        "id": "test:systems:1:1",
+        "outcome": "interrupted",
+        "reason": "Test interruption"
+      },
+      {
+        "id": "test:systems:1:2",
+        "outcome": "interrupted",
+        "reason": "Cinematic player disposed"
+      },
+      {
+        "id": "test:systems:2:3",
+        "outcome": "interrupted",
+        "reason": "Cinematic player disposed"
+      },
+      {
+        "id": "test:systems:3:4",
+        "outcome": "interrupted",
+        "reason": "Cinematic player disposed"
+      },
+      {
+        "id": "test:systems:4:5",
+        "outcome": "completed"
+      }
+    ],
+    "gpuResources": {
+      "geometries": 1,
+      "textures": 1,
+      "programs": 1
+    },
+    "performance": {
+      "sampleCount": 81,
+      "capacity": 240,
+      "totalFrames": 81,
+      "totalSubsteps": 306,
+      "frameIntervalMs": {
+        "last": 83.40000000000055,
+        "mean": 67.91375000000001,
+        "p50": 66.70000000000005,
+        "p95": 100,
+        "max": 133.39999999999964
+      },
+      "frameCpuMs": {
+        "last": 1.0999999977648258,
+        "mean": 6.46296296287098,
+        "p50": 0.8000000007450581,
+        "p95": 13.200000002980232,
+        "max": 133
+      },
+      "fixedMs": {
+        "last": 0.6999999992549419,
+        "mean": 0.9358024690530182,
+        "p50": 0.10000000149011612,
+        "p95": 4.599999997764826,
+        "max": 8.399999998509884
+      },
+      "physicsMs": {
+        "last": 0.09999999776482582,
+        "mean": 0.27777777759381284,
+        "p50": 0.09999999776482582,
+        "p95": 0.5,
+        "max": 9.100000001490116
+      },
+      "updateMs": {
+        "last": 0.10000000149011612,
+        "mean": 0.16913580259791128,
+        "p50": 0.09999999776482582,
+        "p95": 0.6000000014901161,
+        "max": 2.600000001490116
+      },
+      "renderMs": {
+        "last": 0.19999999925494194,
+        "mean": 5.059259259176475,
+        "p50": 0.30000000074505806,
+        "p95": 4.599999997764826,
+        "max": 129.09999999776483
+      },
+      "substeps": {
+        "last": 5,
+        "mean": 3.7777777777777777,
+        "p50": 4,
+        "p95": 5,
+        "max": 5
+      }
+    }
+  }
+}

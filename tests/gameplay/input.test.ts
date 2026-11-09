@@ -32,6 +32,29 @@ function inputFixture() {
 }
 
 describe('pointer-locked first-person input', () => {
+  it('suppresses cinematic input, clears held/toggled keys, and keeps Escape available', () => {
+    const f = inputFixture();
+    f.element.dispatchEvent(new Event('click'));
+    f.key('keydown', 'KeyW');
+    f.key('keydown', 'KeyC');
+    f.input.setSuppressed(true);
+    f.key('keydown', 'KeyE');
+    f.key('keydown', 'KeyD');
+    f.document.dispatchEvent(Object.assign(new Event('mousemove'), { movementX: 8, movementY: 4 }));
+    expect(f.input.read()).toEqual({ forward: 0, right: 0, sprint: false, crouch: false });
+    expect(f.onInteract).not.toHaveBeenCalled();
+    expect(f.onLook).not.toHaveBeenCalled();
+    f.input.setSuppressed(false);
+    expect(f.input.read()).toEqual({ forward: 0, right: 0, sprint: false, crouch: false });
+    f.key('keyup', 'KeyW'); f.key('keydown', 'KeyW');
+    expect(f.input.read().forward).toBe(1);
+    f.input.setSuppressed(true);
+    f.key('keydown', 'Escape');
+    expect(f.document.exitPointerLock).toHaveBeenCalledOnce();
+    expect(f.input.locked).toBe(false);
+    f.input.dispose();
+  });
+
   it('ignores controls until this canvas acquires pointer lock', () => {
     const f = inputFixture();
     f.key('keydown', 'KeyW');
