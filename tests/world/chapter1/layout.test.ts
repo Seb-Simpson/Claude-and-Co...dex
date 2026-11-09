@@ -7,6 +7,7 @@ import {
   CHAPTER1_ANCHORS, CHAPTER1_DOOR_BINDINGS, CHAPTER1_FIRE_DOORS, CHAPTER1_ROOM_BINDINGS, CHAPTER1_TRIGGERS, createHospitalWorld, getHospitalExtras,
 } from '../../../src/world';
 import { DT, Sim } from './harness';
+import { record } from './report';
 
 /**
  * NW-004A Step A: the Chapter 1 blockout's structure, collision and door clearance, on Codex's
@@ -14,7 +15,7 @@ import { DT, Sim } from './harness';
  * `NW004A_REPORT=1` and copied into docs/nw-004a/STEP-A.md.
  */
 beforeAll(async () => { await RAPIER.init(); });
-const report = (label: string, value: unknown): void => { if (process.env.NW004A_REPORT) console.log(`[step-a] ${label}: ${JSON.stringify(value)}`); };
+const report = (label: string, value: unknown): void => record('layout', label, value);
 
 const CODEX_ANCHOR_KEYS = [
   'checkpoint-start', 'checkpoint-after-nurse', 'checkpoint-after-records-power', 'checkpoint-before-patient', 'checkpoint-complete',

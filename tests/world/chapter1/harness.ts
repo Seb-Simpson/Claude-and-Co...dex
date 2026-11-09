@@ -25,7 +25,9 @@ export const dist2 = (a: Vec3, b: Vec3): number => Math.hypot(a.x - b.x, a.z - b
 export interface Step { readonly to?: { x: number; z: number }; readonly door?: string; readonly hide?: string; readonly wait?: number; readonly sprint?: boolean; readonly crouch?: boolean; readonly until?: (s: Sim) => boolean }
 
 export interface SimOptions {
-  readonly stage?: 'act1' | 'act3' | 'alarm';
+  readonly stage?: 'act1' | 'act3' | 'alarm' | 'review';
+  /** 'classic' only for baseline comparisons. */
+  readonly layout?: 'classic' | 'chapter1';
   readonly player: { x: number; z: number; yaw: number };
   readonly entities?: readonly EntityType[];
   readonly spawns?: Partial<Record<EntityType, { x: number; z: number; yaw: number }>>;
@@ -60,7 +62,7 @@ export class Sim {
 
   constructor(readonly options: SimOptions) {
     this.rapier = new RAPIER.World({ x: 0, y: -9.81, z: 0 });
-    this.hospital = createHospitalWorld({ textures: false, layout: 'chapter1', chapter1Stage: options.stage ?? 'act1' });
+    this.hospital = createHospitalWorld({ textures: false, layout: options.layout ?? 'chapter1', chapter1Stage: options.stage ?? 'act1' });
     let world = this.hospital.world;
     const types = options.entities ?? [];
     const routeFor = (type: EntityType) => options.routes?.[type];

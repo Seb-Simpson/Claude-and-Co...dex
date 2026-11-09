@@ -37,9 +37,10 @@ export interface CreateHospitalWorldOptions {
   /**
    * Chapter 1 only: door positions for a story stage, until coordinator door transactions exist.
    * 'act1' (default) Records locked; 'act3' Records released; 'alarm' after CONFIRM RELEASE: fire
-   * doors shut (closed, not locked), stair barrier and observation-bay door open.
+   * doors shut (closed, not locked), stair barrier and observation-bay door open. 'review' is for
+   * blockout review only (walkthrough recording): every ordinary door open, the cell latched.
    */
-  readonly chapter1Stage?: 'act1' | 'act3' | 'alarm';
+  readonly chapter1Stage?: 'act1' | 'act3' | 'alarm' | 'review';
 }
 
 export interface HospitalWorldBuild {

@@ -21,11 +21,11 @@ function requestedLayout(): 'classic' | 'chapter1' {
   }
 }
 
-/** `?nwStage=act3|alarm` (Chapter 1 layout only) previews later door states. */
-function requestedStage(): 'act1' | 'act3' | 'alarm' {
+/** `?nwStage=act3|alarm|review` (Chapter 1 layout only) previews later door states. */
+function requestedStage(): 'act1' | 'act3' | 'alarm' | 'review' {
   try {
     const value = typeof location !== 'undefined' ? new URLSearchParams(location.search).get('nwStage') : null;
-    return value === 'act3' || value === 'alarm' ? value : 'act1';
+    return value === 'act3' || value === 'alarm' || value === 'review' ? value : 'act1';
   } catch {
     return 'act1';
   }

@@ -215,7 +215,7 @@ export function buildChapter1Shell(b: WorldBuilder): void {
   // Stair barrier: no chain, no key. Released by CONFIRM RELEASE (stage 'alarm'), then pulled shut
   // from the landing at the end.
   door(b, {
-    name: 'stairwell-b', roomId: ROOMS.east, axis: 'x', at: -11 - T / 2, center: DOORS.stair, hinge: 'min', swing: 'neg', initial: alarm ? 'open' : 'locked', vision: 'wide',
+    name: 'stairwell-b', roomId: ROOMS.east, axis: 'x', at: -11 - T / 2, center: DOORS.stair, hinge: 'min', swing: 'neg', initial: alarm || b.stage === 'review' ? 'open' : 'locked', vision: 'wide',
     prompt: alarm ? 'Stairwell B barrier' : 'Barrier latched — Stairwell B', leafTint: 0.75,
   });
   // New staff doors.

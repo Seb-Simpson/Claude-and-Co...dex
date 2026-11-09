@@ -158,9 +158,9 @@ export class WorldBuilder {
    */
   readonly layout: 'classic' | 'chapter1';
   /** Chapter 1 world state for door positions (see createHospitalWorld's `chapter1Stage`). */
-  readonly stage: 'act1' | 'act3' | 'alarm';
+  readonly stage: 'act1' | 'act3' | 'alarm' | 'review';
 
-  constructor(seed: number, options: { textures?: boolean; suppressVisuals?: readonly Box3[]; layout?: 'classic' | 'chapter1'; stage?: 'act1' | 'act3' | 'alarm' } = {}) {
+  constructor(seed: number, options: { textures?: boolean; suppressVisuals?: readonly Box3[]; layout?: 'classic' | 'chapter1'; stage?: 'act1' | 'act3' | 'alarm' | 'review' } = {}) {
     this.layout = options.layout ?? 'classic';
     this.stage = options.stage ?? 'act1';
     this.suppress = options.suppressVisuals ?? [];
