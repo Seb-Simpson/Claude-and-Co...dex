@@ -23,6 +23,9 @@ import { doorOpening, threshold, windowOpening } from './shell';
  * doors are shut (closed, not locked: anyone can push through), the stair barrier and the
  * observation-bay door stand open.
  */
+/** Push-bar fire doors are lighter than ward doors: 0.6 s to swing (ward doors 0.9 s). */
+export const FIRE_DOOR_SECONDS = 0.6;
+
 export function buildChapter1Shell(b: WorldBuilder): void {
   const corridorFinish = { wainscot: true, rail: true } as const;
   const roomFinish = { skirting: true } as const;
@@ -199,7 +202,9 @@ export function buildChapter1Shell(b: WorldBuilder): void {
   door(b, { name: 'room-101', roomId: ROOMS.r101, axis: 'x', at: north_, center: DOORS.r101, hinge: 'max', swing: 'neg', initial: 'closed', leafTint: 0.85 });
   door(b, { name: 'room-103', roomId: ROOMS.r103, axis: 'x', at: north_, center: DOORS.r103, hinge: 'max', swing: 'neg', initial: 'closed' });
   door(b, { name: 'room-105', roomId: ROOMS.r105, axis: 'x', at: north_, center: DOORS.r105, hinge: 'max', swing: 'neg', initial: 'open', openAngle: Math.PI * 0.42 });
-  door(b, { name: 'treatment', roomId: ROOMS.treatment, axis: 'x', at: north_, center: DOORS.treatment, hinge: 'min', swing: 'neg', initial: 'closed', vision: 'wide' });
+  // Treatment's two doors stand wedged open once the alarm sounds (the interrupted procedure: staff
+  // left through them in a hurry). Route A has to lose doors, not gain them: see STEP-A.md.
+  door(b, { name: 'treatment', roomId: ROOMS.treatment, axis: 'x', at: north_, center: DOORS.treatment, hinge: 'min', swing: 'neg', initial: alarm ? 'open' : 'closed', vision: 'wide' });
   door(b, { name: 'room-107', roomId: ROOMS.r107, axis: 'x', at: north_, center: DOORS.r107, hinge: 'min', swing: 'neg', initial: 'closed', vision: 'none', leafTint: 0.8, prompt: 'Open observation gallery' });
   door(b, { name: 'room-102', roomId: ROOMS.r102, axis: 'x', at: south_, center: DOORS.r102, hinge: 'max', swing: 'pos', initial: 'open', openAngle: Math.PI * 0.3 });
   door(b, { name: 'room-104', roomId: ROOMS.r104, axis: 'x', at: south_, center: DOORS.r104, hinge: 'max', swing: 'pos', initial: 'open' });
@@ -215,17 +220,18 @@ export function buildChapter1Shell(b: WorldBuilder): void {
   });
   // New staff doors.
   door(b, { name: 'station-staff', roomId: ROOMS.nurses, axis: 'x', at: back, center: C1.stationStaff, hinge: 'max', swing: 'pos', initial: 'closed', vision: 'wide', leafTint: 0.9, prompt: 'Open staff door' });
-  door(b, { name: 'treatment-staff', roomId: ROOMS.treatment, axis: 'x', at: back, center: C1.treatmentStaff, hinge: 'min', swing: 'pos', initial: 'closed', vision: 'narrow', leafTint: 0.9, prompt: 'Open staff door' });
+  // Leaves swing into the room, never into the narrow passages (an open leaf there would pinch them).
+  door(b, { name: 'treatment-staff', roomId: ROOMS.treatment, axis: 'x', at: back, center: C1.treatmentStaff, hinge: 'min', swing: 'pos', initial: alarm ? 'open' : 'closed', vision: 'narrow', leafTint: 0.9, prompt: 'Open staff door' });
   // The boundary door is an ordinary self-closing fire door (closed in every stage): the Nurse
   // opens it on her round; the alarm keeps it shut.
   door(b, { name: 'staff-boundary', roomId: C1_ROOMS.staffPassage, axis: 'z', at: 0.2, center: C1.passageZ, hinge: 'min', swing: 'pos', initial: 'closed', vision: 'narrow', leafTint: 0.7, prompt: 'Fire door' });
-  door(b, { name: 'staff-east', roomId: C1_ROOMS.staffPassage, axis: 'z', at: X.east + T / 2, center: C1.passageEastZ, hinge: 'min', swing: 'neg', initial: 'closed', vision: 'narrow', leafTint: 0.85, prompt: 'Open staff door' });
+  door(b, { name: 'staff-east', roomId: C1_ROOMS.staffPassage, axis: 'z', at: X.east + T / 2, center: C1.passageEastZ, hinge: 'min', swing: 'pos', initial: 'closed', vision: 'narrow', leafTint: 0.85, prompt: 'Open staff door' });
   door(b, {
     name: 'observation-bay', roomId: C1_ROOMS.observationBay, axis: 'z', at: X.east + T / 2, center: C1.observationDoorZ, hinge: 'max', swing: 'neg',
     initial: alarm ? 'open' : 'locked', vision: 'narrow', leafTint: 0.6, prompt: alarm ? 'Observation bay' : 'Latched — Observation bay',
   });
   // Release vestibule: Wing B door (vision panel looking east), Electrical internal door, service door.
-  door(b, { name: 'vestibule', roomId: C1_ROOMS.vestibule, axis: 'x', at: south_, center: C1.vestibuleDoor, hinge: 'min', swing: 'pos', initial: 'closed', vision: 'wide', leafTint: 0.8, prompt: 'Open release vestibule' });
+  door(b, { name: 'vestibule', roomId: C1_ROOMS.vestibule, axis: 'x', at: south_, center: C1.vestibuleDoor, hinge: 'min', swing: 'neg', initial: 'closed', vision: 'wide', leafTint: 0.8, prompt: 'Open release vestibule' });
   door(b, { name: 'vestibule-electrical', roomId: C1_ROOMS.vestibule, axis: 'z', at: C1.vestibuleX[1], center: C1.vestibuleElectricalZ, hinge: 'max', swing: 'pos', initial: 'closed', vision: 'none', leafTint: 0.7, prompt: 'Open electrical room' });
   door(b, { name: 'vestibule-service', roomId: C1_ROOMS.vestibule, axis: 'x', at: Z.southBack + T / 2, center: C1.vestibuleDoor, hinge: 'max', swing: 'neg', initial: 'closed', vision: 'none', leafTint: 0.6, prompt: 'Open service door' });
   door(b, { name: 'hall-service', roomId: C1_ROOMS.wardHall, axis: 'x', at: Z.southBack + T / 2, center: C1.hallService, hinge: 'min', swing: 'neg', initial: 'closed', vision: 'none', leafTint: 0.6, prompt: 'Open service door' });
@@ -239,7 +245,7 @@ export function buildChapter1Shell(b: WorldBuilder): void {
     for (const [center, hinge] of [[-0.6, 'min'], [0.6, 'max']] as const) {
       door(b, {
         name: `${prefix}-${hinge === 'min' ? 'north' : 'south'}`, roomId: x < 0 ? C1_ROOMS.wardHall : C1_ROOMS.wingB, axis: 'z', at: x, center, opening: 1.2, hinge,
-        swing: x < 0 ? 'pos' : 'neg', initial: fireDoor, vision: 'wide', frame: false, openAngle: Math.PI * 0.5, prompt: 'Fire door',
+        swing: x < 0 ? 'pos' : 'neg', initial: fireDoor, vision: 'wide', frame: false, openAngle: Math.PI * 0.5, prompt: 'Fire door', duration: FIRE_DOOR_SECONDS,
       });
     }
     b.block('frame', x, 2.4, 0, 0.18, 0.6, 2.8);
@@ -251,7 +257,7 @@ export function buildChapter1Shell(b: WorldBuilder): void {
   for (const [center, hinge] of [[18.9, 'min'], [20.1, 'max']] as const) {
     door(b, {
       name: `east-fire-${hinge === 'min' ? 'west' : 'east'}`, roomId: ROOMS.east, axis: 'x', at: C1.eastFireZ, center, opening: 1.2, hinge, swing: 'neg',
-      initial: fireDoor, vision: 'wide', frame: false, openAngle: Math.PI * 0.5, prompt: 'Fire door',
+      initial: fireDoor, vision: 'wide', frame: false, openAngle: Math.PI * 0.5, prompt: 'Fire door', duration: FIRE_DOOR_SECONDS,
     });
   }
   b.block('frame', 19.5, 2.4, C1.eastFireZ, 2.7, 0.6, 0.18);

@@ -164,9 +164,17 @@ export class Sim {
     const done = (): boolean => wantOpen ? state() === 'open' : state() === 'closed';
     if (done()) return true;
     const end = this.tick + Math.round(timeout / DT);
+    let blockedSeen = 0;
     while (this.tick < end) {
       if (this.captured.length) return false;
       const s = state();
+      if (s === 'blocked' && ++blockedSeen % 20 === 1) {
+        // Standing in the leaf's arc: step back from the doorway for a moment, as a person would.
+        const c = this.doorCenter(id);
+        const p = this.position;
+        const away = { x: p.x + (p.x - c.x) * 0.6, z: p.z + (p.z - c.z) * 0.6 };
+        for (let i = 0; i < 18; i++) { this.face(away); this.step({ forward: 1 }); }
+      }
       if (s !== 'opening' && s !== 'closing') {
         // Aim where the leaf is now (closed: the doorway; open: the leaf against the wall).
         const center = new Box3().setFromObject(marker.object).getCenter(new Vector3());

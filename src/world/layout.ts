@@ -126,7 +126,8 @@ export const C1 = {
   treatmentWindow: [2.4, 4.4] as const,
   observationDoorZ: -4.0,
   galleryGlass: [-5.6, -2.4] as const,
-  eastFireZ: -1.9,
+  /** East-corridor fire door: north of the cell door, so route B runs past the cell and then the door. */
+  eastFireZ: -5.2,
   pumpBayX: [3.6, 6.6] as const,
   pumpBayS: 9.4,
   /** Ward-level stair landing. */

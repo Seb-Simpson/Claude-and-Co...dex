@@ -113,7 +113,7 @@ function eastCorridor(b: WorldBuilder): void {
   inspectMarker(b, 'stairwell-notice', 'inspect', 'Read the notice', { x: DOORS.stair + 1.0, z: -10.95, yaw: 0 }, [0.5, 0.3, 0.06], 1.5, 1.8);
   b.emitter('stairwell', ROOMS.stairwell, 19.5, 3.0, -13.6);
   b.sightlines.push({ id: 'nw:sightline:stair-lobby', roomId: id, position: new Vector3(19.4, 0, -10.1), yaw: 0 });
-  wheelchair(b, { x: 18.75, z: -9.9, yaw: 0.9 }, id);
+  wheelchair(b, b.layout === 'chapter1' ? { x: 20.35, z: -7.4, yaw: 0.9 } : { x: 18.75, z: -9.9, yaw: 0.9 }, id);
   cardboardBox(b, { x: 20.4, z: -10.5, yaw: 0.2 }, id, [0.5, 0.45, 0.45]);
   cardboardBox(b, { x: 20.42, z: -10.48, yaw: -0.15, y: 0.45 }, null, [0.4, 0.3, 0.38], true);
 

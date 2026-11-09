@@ -130,8 +130,8 @@ function wardHall(b: WorldBuilder): void {
 
 function wingB(b: WorldBuilder): void {
   const id = C1_ROOMS.wingB;
-  // The gurney pinch outside the vestibule (route A and B both start past it).
-  gurney(b, { x: 13.0, z: -0.7, yaw: HALF_PI + 0.05 }, id, { sheet: true });
+  // The gurney pinch on the Patient's way from the junction to the vestibule (about 1.1 m beside the crash cart).
+  gurney(b, { x: 15.6, z: -0.7, yaw: HALF_PI + 0.05 }, id, { sheet: true });
   sign(b, 'RELEASE VESTIBULE', { ...SIGN_ROOM, subtext: 'OBSERVATION PROGRAMME' }, 0.5, 0.2, new Matrix4().makeRotationY(Math.PI).setPosition(C1.vestibuleDoor + 0.95, 1.6, Z.corridorS - 0.012), { canvas: [512, 204] });
 }
 
