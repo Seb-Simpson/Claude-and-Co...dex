@@ -4,6 +4,8 @@ export interface ZoneMood { readonly fog: number; readonly ambient: number }
 const MOODS: readonly (readonly [string, ZoneMood])[] = [
   ['stairwell', { fog: 0.07, ambient: 0.22 }],
   ['maintenance', { fog: 0.075, ambient: 0.24 }],
+  ['electrical', { fog: 0.072, ambient: 0.23 }],
+  ['records', { fog: 0.06, ambient: 0.3 }],
   ['storage', { fog: 0.068, ambient: 0.27 }],
   ['flooded', { fog: 0.064, ambient: 0.28 }],
   ['isolation', { fog: 0.066, ambient: 0.26 }],

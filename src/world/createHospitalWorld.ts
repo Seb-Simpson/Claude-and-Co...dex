@@ -5,9 +5,11 @@ import { attachExtras, type HospitalExtras } from './extras';
 import { declareActors, declareRooms, PLAYER_SPAWN } from './metadata';
 import { buildClinicalRooms } from './rooms/clinical';
 import { buildPatientRooms } from './rooms/patientRooms';
+import { buildChapter1Details, HAZE_VOLUMES } from './rooms/chapter1';
 import { buildRecordsAndElectrical } from './rooms/records';
 import { buildServiceSpaces } from './rooms/service';
 import { buildShell } from './rooms/shell';
+import { STAGING_ANCHORS } from './staging';
 
 export interface CreateHospitalWorldOptions {
   /** Deterministic seed for clutter placement and procedural textures. */
@@ -50,6 +52,7 @@ export function createHospitalWorld(options: CreateHospitalWorldOptions = {}): H
     buildClinicalRooms(builder);
     buildServiceSpaces(builder);
     buildRecordsAndElectrical(builder);
+    buildChapter1Details(builder);
     declareActors(builder);
     builder.finalize();
   } catch (error) {
@@ -79,6 +82,8 @@ export function createHospitalWorld(options: CreateHospitalWorldOptions = {}): H
     sharedMaterials: [],
     reflectiveSurfaces: builder.reflectiveSurfaces,
     sightlines: builder.sightlines,
+    staging: STAGING_ANCHORS,
+    haze: HAZE_VOLUMES,
   };
   attachExtras(builder.root, extras);
   builder.root.updateMatrixWorld(true);

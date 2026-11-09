@@ -175,7 +175,8 @@ export function buildShell(b: WorldBuilder): void {
     troffer(b, ROOMS.east, 19.5, z, CEILING.corridor, state, ['nw:lights:corridor-east'], { rotate: true });
   }
   troffer(b, ROOMS.connector, -5.7, 3.9, CEILING.corridor, 'flicker', ['nw:lights:connector'], { rotate: true, intensity: 3.5 });
-  emergencyLight(b, ROOMS.east, new Vector3(19.5, 2.56, -10.92), 0, { intensity: 1.6 });
+  // NW-004A: the light over the stair door fails and recovers: the distant doorway that flickers.
+  emergencyLight(b, ROOMS.east, new Vector3(19.5, 2.56, -10.92), 0, { intensity: 1.6, state: 'flicker' });
   emergencyLight(b, ROOMS.stairwell, new Vector3(18.3, 2.6, -13.5), Math.PI / 2, { intensity: 3 });
   emergencyLight(b, ROOMS.corridor, new Vector3(-19.9, 2.45, -1.1), Math.PI / 2, { color: 0xffa040, intensity: 1.3, state: 'flicker' });
   emergencyLight(b, ROOMS.maintenance, new Vector3(-6.7, 2.4, 7.25), Math.PI / 2, { color: 0xff5020, intensity: 1.6 });
