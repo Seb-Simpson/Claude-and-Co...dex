@@ -159,6 +159,14 @@ content lives in `pipeline/opening.py` and is called from `room104_set.py`:
   - loose papers, a nitrile glove, a medicine cup and a pen on the floor.
 
   The print is in `textures.py → corridor_labels.jpg`.
+* **Decay pass.** All of these are flat, overhead or wall-mounted, so none needs a collider:
+  - the wall paint and ceiling tile textures are dingier;
+  - 27 more corridor decals;
+  - the ceiling collapse at x −9.4;
+  - debris: glass, pills, chart, slipper.
+
+  The bake's corridor lights match the game's states: x −14.6 and −7.4 are dead and bake no
+  light, x −18.2 is dying, and x −11.0 flickers.
 * **Textures.** `textures.py` adds `door_veneer` (a grain set) and `opening_labels.jpg`, which
   holds the ID card, the reader face, the intercom badge and the station sign.
 * **Light.** The bake adds the corridor troffers at x −3.8 and −0.2, the station troffer and the
