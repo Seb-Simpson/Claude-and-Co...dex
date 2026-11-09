@@ -38,7 +38,7 @@ describe('actual hospital doorway floor seams', () => {
   it.each(cases)('walks through an open doorway without sticking or gaining height: %j', (test) => {
     const f = fixture(test.x, test.y);
     try {
-      expect(f.hospital.world.colliders).toHaveLength(243); // NW-004A: +20 (Records 112, Electrical 114); existing colliders unchanged
+      expect(f.hospital.world.colliders).toHaveLength(223);
       const doorId = test.door ?? 'nw:door:room-103';
       expect(f.interactions.requestDoorOpen(doorId)).toBe(true);
       for (let tick = 0; tick < 75; tick += 1) {

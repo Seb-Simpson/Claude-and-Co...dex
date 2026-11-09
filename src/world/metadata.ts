@@ -29,8 +29,6 @@ export function declareRooms(b: WorldBuilder): void {
     { id: ROOMS.r106, name: 'Room 106 — Water damage', bounds: bounds(-11.2, -6.8, Z.southFace, Z.southBack), tags: ['patient-room', 'flooded', 'hiding'] },
     { id: ROOMS.r108, name: 'Room 108 — Ransacked', bounds: bounds(-4.6, -0.2, Z.southFace, Z.southBack), tags: ['patient-room', 'ransacked'] },
     { id: ROOMS.r110, name: 'Room 110', bounds: bounds(6, 10.4, Z.southFace, Z.southBack), tags: ['patient-room', 'occupied', 'monitor', 'lamp'] },
-    { id: ROOMS.records, name: '112 — Medical Records', bounds: bounds(10.4, 14.2, Z.southFace, Z.southBack), tags: ['records', 'archive', 'staff', 'hiding', 'chapter-1'] },
-    { id: ROOMS.electrical, name: '114 — Electrical', bounds: bounds(14.2, 18, Z.southFace, Z.southBack), tags: ['service', 'electrical', 'dark', 'maintenance-access', 'chapter-1'] },
   ];
   rooms.forEach((room) => b.room(room));
 }

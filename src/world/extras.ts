@@ -1,5 +1,3 @@
-import type { HazeVolume } from './rooms/chapter1';
-import type { StagingAnchor } from './staging';
 import type { Color, InstancedMesh, Material, Mesh, MeshBasicMaterial, Object3D, Sprite, Vector3 } from 'three';
 import type { HospitalWorld, ObjectId, RoomMetadata } from '../contracts';
 
@@ -86,7 +84,7 @@ export type AnomalyTarget =
     readonly amplitude: number;
   };
 
-export type SoundEmitterKind = 'pipes' | 'stairwell' | 'lift' | 'drip' | 'vent' | 'distant' | 'trolley' | 'door' | 'intercom';
+export type SoundEmitterKind = 'pipes' | 'stairwell' | 'lift' | 'drip' | 'vent' | 'distant' | 'trolley' | 'door';
 export interface SoundEmitter {
   readonly id: ObjectId;
   readonly kind: SoundEmitterKind;
@@ -129,10 +127,6 @@ export interface HospitalExtras {
   readonly sharedMaterials: readonly Material[];
   readonly reflectiveSurfaces: readonly ReflectiveSurface[];
   readonly sightlines: readonly SightlineAnchor[];
-  /** NW-004A: cinematic camera/entity anchors for Chapter 1 (data only; see staging.ts). */
-  readonly staging: readonly StagingAnchor[];
-  /** NW-004A: local haze volumes the atmosphere renders (data only). */
-  readonly haze: readonly HazeVolume[];
 }
 
 const EXTRAS_KEY = 'nightWardHospital';

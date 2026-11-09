@@ -360,9 +360,7 @@ export function door(b: WorldBuilder, spec: DoorSpec): DoorResult {
   const angle = spec.openAngle ?? Math.PI * 0.5;
   const worldDir = (yaw: number): Vector3 => new Vector3(leafDir * Math.cos(yaw), 0, -leafDir * Math.sin(yaw));
   const openYaw = worldDir(closedYaw + angle).dot(roomNormal) > 0 ? closedYaw + angle : closedYaw - angle;
-  // NW-004A blockout review stage: every ordinary (closed, unlocked) door starts open.
-  const initialState = b.layout === 'chapter1' && b.stage === 'review' && spec.initial === 'closed' ? 'open' : spec.initial;
-  const initialOpen = initialState === 'open';
+  const initialOpen = spec.initial === 'open';
   const initialYaw = initialOpen ? openYaw : closedYaw;
 
   // Leaf with an optional vision panel cut out of it (built from four rails around the glass).
@@ -435,7 +433,7 @@ export function door(b: WorldBuilder, spec: DoorSpec): DoorResult {
     prompt: spec.prompt ?? (locked ? 'Locked' : 'Open door'),
     range: 2.2,
     colliderIds: [colliderId],
-    initialState,
+    initialState: spec.initial,
     closedPose: { position: { x: hinge.x, y: hinge.y, z: hinge.z }, rotation: yawQuaternion(closedYaw) },
     openPose: { position: { x: hinge.x, y: hinge.y, z: hinge.z }, rotation: yawQuaternion(openYaw) },
     durationSeconds: spec.duration ?? 0.9,

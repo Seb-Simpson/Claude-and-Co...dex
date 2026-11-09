@@ -12,25 +12,6 @@ function proceduralSetRequested(): boolean {
   }
 }
 
-/** `?nwLayout=chapter1` builds the NW-004A Chapter 1 layout v2 blockout instead of the classic ward. */
-function requestedLayout(): 'classic' | 'chapter1' {
-  try {
-    return typeof location !== 'undefined' && new URLSearchParams(location.search).get('nwLayout') === 'chapter1' ? 'chapter1' : 'classic';
-  } catch {
-    return 'classic';
-  }
-}
-
-/** `?nwStage=act3|alarm|review` (Chapter 1 layout only) previews later door states. */
-function requestedStage(): 'act1' | 'act3' | 'alarm' | 'review' {
-  try {
-    const value = typeof location !== 'undefined' ? new URLSearchParams(location.search).get('nwStage') : null;
-    return value === 'act3' || value === 'alarm' || value === 'review' ? value : 'act1';
-  } catch {
-    return 'act1';
-  }
-}
-
 /**
  * Publishes the Ward 4 West hospital. The registry validates and mounts `world.root`.
  *
@@ -52,12 +33,7 @@ export default {
         console.warn('NIGHT WARD: Room 104 visual set unavailable, using the procedural room:', error instanceof Error ? error.message : error);
       }
     }
-    const layout = requestedLayout();
-    const build = createHospitalWorld({
-      ...(set ? { suppressVisuals: PROTOTYPE_SUPPRESSION } : {}),
-      ...(layout === 'chapter1' ? { layout, chapter1Stage: requestedStage() } : {}),
-    });
-    if (layout === 'chapter1') console.info(`NIGHT WARD: Chapter 1 layout v2 BLOCKOUT (stage ${requestedStage()})`);
+    const build = createHospitalWorld(set ? { suppressVisuals: PROTOTYPE_SUPPRESSION } : {});
     let swapped: { group: { children: { visible: boolean }[] }; hidden: { visible: boolean }[] } | null = null;
     if (set) {
       build.world.root.add(set.root);
