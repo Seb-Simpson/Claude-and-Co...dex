@@ -376,7 +376,8 @@ def wet_floor_sign(Prop, cl, col):
     x, z, yaw = -8.85, 0.5, 0.6
     p = Prop('wet_floor', x, z, yaw, col=col)
     for s in (-1, 1):
-        p.box('safety_yellow', (0.3, 0.64, 0.012), (0, 0.32, s * 0.09), rot=(s * 0.28, 0, 0), bevel=0.01, segments=3)
+        # Blender +X rotation tips a panel's top toward game +z, so -s leans each top inward: an A.
+        p.box('safety_yellow', (0.3, 0.64, 0.012), (0, 0.32, s * 0.1), rot=(-s * 0.28, 0, 0), bevel=0.01, segments=3)
     p.box('safety_yellow', (0.1, 0.03, 0.05), (0, 0.66, 0), bevel=0.01)
     ob = p.finish()
     out = [ob]
@@ -387,8 +388,8 @@ def wet_floor_sign(Prop, cl, col):
         q = rect_quad(f'wet_floor_print_{s}', col, cl, 0.27, 0.135, (0, 0, 0), '+z' if s > 0 else '-z', rect)
         bpy.context.view_layer.update()
         base = q.matrix_world.copy()
-        q.matrix_world = (Matrix.Translation(g(x, 0, z)) @ Matrix.Rotation(yaw, 4, 'Z') @ Matrix.Translation(g(0, 0.32, s * 0.09))
-                          @ Matrix.Rotation(s * 0.28, 4, 'X') @ Matrix.Translation(g(0, 0.13, s * 0.0075)) @ base)
+        q.matrix_world = (Matrix.Translation(g(x, 0, z)) @ Matrix.Rotation(yaw, 4, 'Z') @ Matrix.Translation(g(0, 0.32, s * 0.1))
+                          @ Matrix.Rotation(-s * 0.28, 4, 'X') @ Matrix.Translation(g(0, 0.13, s * 0.0075)) @ base)
         nw.select_only([q])
         bpy.ops.object.transform_apply(location=True, rotation=True, scale=True)
         out.append(q)
