@@ -218,9 +218,8 @@ test('reduced motion stills the title scene and the loading plates', async ({ pa
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await openTitle(page);
   await expect(page.locator('html')).toHaveClass(/nw-reduce-motion/);
-  await expect(page.locator('.nw-scene')).toHaveClass(/is-still/);
-  const animation = await page.locator('.nw-scene__camera').evaluate((n) => getComputedStyle(n).animationName);
-  expect(animation).toBe('none');
+  // NW-003B: the corridor's lighting director switches to slow fades (see nw-003b-menu.spec.ts).
+  await expect(page.locator('.nw-corridor')).toHaveClass(/is-still/);
 });
 
 for (const viewport of [{ name: 'phone', width: 390, height: 844 }, { name: 'laptop-small', width: 1024, height: 600 }]) {

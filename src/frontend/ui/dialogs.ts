@@ -1,6 +1,6 @@
 import type { UiSound } from '../sound';
 import { el, trapFocus, reveal } from './dom';
-import { insigniaSvg } from './insignia';
+import sealUrl from '../media/menu/seal.webp?url';
 
 /** Modal confirmation for destructive actions (restart, leave, overwrite a save). */
 export interface ConfirmDialog {
@@ -51,8 +51,7 @@ export function createConfirmDialog(sound: UiSound): ConfirmDialog {
 export interface CreditsScreen { readonly root: HTMLElement; open(onClose: () => void): void; close(): void; readonly isOpen: boolean; dispose(): void }
 
 export function createCredits(sound: UiSound): CreditsScreen {
-  const seal = el('div', { class: 'nw-credits__seal', 'aria-hidden': 'true' });
-  seal.innerHTML = insigniaSvg('nw-seal-credits');
+  const seal = el('img', { class: 'nw-credits__seal', src: sealUrl, alt: '', width: 260, height: 260, decoding: 'async' });
   const row = (role: string, ...names: string[]): HTMLElement => el('div', { class: 'nw-credit' }, el('dt', { text: role }), ...names.map((n) => el('dd', { text: n })));
   const back = el('button', { type: 'button', class: 'nw-button nw-button--primary', text: 'Back' });
   const panel = el('section', { class: 'nw-credits__panel', role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'nw-credits-title' },
@@ -67,8 +66,8 @@ export function createCredits(sound: UiSound): CreditsScreen {
       row('Rendering', 'three.js (MIT)'),
       row('Physics', 'Rapier by Dimforge (Apache-2.0)'),
       row('Build tooling', 'Vite (MIT) · TypeScript (Apache-2.0)'),
-      row('Typefaces', 'Cormorant Garamond (OFL) · Barlow Condensed (OFL) · IBM Plex Mono (OFL)'),
-      row('Sound', 'Synthesised in the browser with the Web Audio API'),
+      row('Typefaces', 'Cormorant Garamond (OFL) · Barlow Condensed (OFL) · IBM Plex Mono (OFL) · Rock Salt (Apache-2.0)'),
+      row('Music and sound', 'Original title soundtrack and ambience synthesised for NIGHT WARD · in-game sound synthesised live with the Web Audio API'),
     ),
     el('p', { class: 'nw-credits__note', text: 'Halden Vale Infirmary, its staff and its patients are fictional.' }),
     back);

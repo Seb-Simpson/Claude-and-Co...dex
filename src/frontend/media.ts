@@ -6,13 +6,6 @@
  */
 const url = (name: string): string => new URL(`./media/${name}.webp`, import.meta.url).href;
 
-export const MENU_SCENE = {
-  lit: url('menu_lit'),
-  dark: url('menu_dark'),
-  figure: url('menu_figure'),
-  alt: 'The west corridor of Ward 4 at night: green wainscot, a wooden handrail, a blue guide line on the floor, one fluorescent panel buzzing overhead and darkness at the far end.',
-} as const;
-
 export interface Plate {
   readonly src: string;
   readonly alt: string;

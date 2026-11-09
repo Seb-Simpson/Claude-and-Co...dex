@@ -7,7 +7,7 @@ import sys
 
 from PIL import Image
 
-NAMES = ['menu_lit', 'menu_dark', 'menu_figure', 'load_room104', 'load_patient_doorway', 'load_rot',
+NAMES = ['load_room104', 'load_patient_doorway', 'load_rot',
          'load_crawler', 'load_reflection', 'load_nurse', 'load_clock']
 
 src, out = sys.argv[1], sys.argv[2]
@@ -18,8 +18,7 @@ for name in NAMES:
     if im.width > 1600:
         im = im.resize((1600, round(im.height * 1600 / im.width)), Image.LANCZOS)
     path = os.path.join(out, f'{name}.webp')
-    # The menu frames are crossfaded, so they are encoded identically (same quality, same size).
-    im.save(path, 'WEBP', quality=80 if name.startswith('menu') else 76, method=6)
+    im.save(path, 'WEBP', quality=76, method=6)
     total += os.path.getsize(path)
     print('NW_MEDIA', name, im.size, os.path.getsize(path))
 print('NW_MEDIA_TOTAL', total)

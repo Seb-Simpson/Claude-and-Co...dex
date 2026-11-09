@@ -1,3 +1,4 @@
+import { outputLevel } from '../audio/mixer';
 import { SUBTITLE_EVENT, type SubtitleLine } from '../audio/subtitles';
 import type { Application, ApplicationProgress } from '../integration/application';
 import type { ApplicationState } from '../integration/testing';
@@ -5,6 +6,9 @@ import { DEFAULT_PLAYER_CONFIG } from '../gameplay/player';
 import { prefersReducedMotion, type Settings, type SettingsStore } from '../settings/settings';
 import { attachDisplay, type DisplayController } from './display';
 import { createLoadingPlan, type LoadingPlan } from './loading/plan';
+import type { CorridorDebug } from './menu/corridor';
+import type { Director } from './menu/director';
+import { createMenuAudio, type MenuAudio } from './menuAudio';
 import type { LoadingSnapshot } from './loading/tracker';
 import { createSaveStore, ROOM_104_CHECKPOINT, type SaveStore } from './saves';
 import { createUiSound } from './sound';
@@ -29,6 +33,8 @@ export interface FrontendOptions {
   /** QA mode: skip the title screen and start a session immediately. */
   readonly autoStart?: boolean;
   readonly saves?: SaveStore;
+  /** QA: seed the title screen's lighting director (deterministic events). */
+  readonly menuSeed?: number;
 }
 
 export interface Frontend {
@@ -42,6 +48,8 @@ export interface Frontend {
   readonly loadingHistory: readonly LoadingSnapshot[];
   /** Diagnostics for tests: application states as the frontend received them. */
   readonly stateHistory: readonly ApplicationState[];
+  /** Diagnostics for tests: the title screen's corridor, its lighting director and its sound. */
+  readonly menu: { readonly corridor: CorridorDebug; readonly director: Director; readonly audio: MenuAudio; outputLevel(): number };
   dispose(): void;
 }
 
@@ -58,7 +66,12 @@ export function createFrontend(options: FrontendOptions): Frontend {
   const html = document.documentElement;
   const saves = options.saves ?? createSaveStore();
   const sound = createUiSound();
-  const menu = createMainMenu((a) => void onMenu(a), sound);
+  const menuAudio = createMenuAudio();
+  const menu = createMainMenu((a) => void onMenu(a), sound, {
+    audio: menuAudio,
+    onSoundToggle: toggleMenuSound,
+    ...(options.menuSeed !== undefined ? { seed: options.menuSeed } : {}),
+  });
   const loading = createLoadingScreen(sound);
   const pause = createPauseMenu((a) => void onPause(a), sound);
   const settingsPanel = createSettingsPanel(settings, sound);
@@ -90,7 +103,8 @@ export function createFrontend(options: FrontendOptions): Frontend {
     const reduced = prefersReducedMotion(s, motionQuery);
     html.classList.toggle('nw-reduce-motion', reduced);
     html.style.setProperty('--nw-effects', String(s.effects));
-    menu.scene.setReducedMotion(reduced);
+    menu.setReducedMotion(reduced);
+    menu.setEffects(s.effects);
     loading.setReducedMotion(reduced);
     const base = DEFAULT_PLAYER_CONFIG.lookSensitivity * s.mouseSensitivity;
     app.setLookSensitivity(base, s.invertY ? -base : base);
@@ -131,7 +145,6 @@ export function createFrontend(options: FrontendOptions): Frontend {
     setMode('title');
     pause.hide(); loading.hide();
     menu.show(saves.load());
-    sound.hum(true);
     menu.focus(focus);
   }
 
@@ -142,7 +155,6 @@ export function createFrontend(options: FrontendOptions): Frontend {
     plan = next;
     unsubscribePlan = next.tracker.subscribe((s) => { history.push(s); loading.update(s); });
     menu.hide(); pause.hide();
-    sound.hum(false);
     setMode('loading');
     loading.show(title);
     return next;
@@ -156,6 +168,8 @@ export function createFrontend(options: FrontendOptions): Frontend {
     }
     busy = true;
     try {
+      // The corridor goes dark on the way in.
+      if (mode === 'title' && !options.autoStart) await menu.leave(prefersReducedMotion(settings.get(), motionQuery));
       if (kind === 'new') saves.begin(); else if (!saves.load()) saves.begin();
       sessionCounted = false; sessionSeconds = 0;
       const current = beginLoading(kind === 'new' ? 'Admitting' : 'Resuming', true);
@@ -209,8 +223,16 @@ export function createFrontend(options: FrontendOptions): Frontend {
   async function onMenu(action: MenuAction): Promise<void> {
     sound.unlock();
     if (action === 'new' || action === 'continue') await startSession(action);
-    else if (action === 'settings') settingsPanel.open(() => menu.focus('settings'));
-    else credits.open(() => menu.focus('credits'));
+    else if (action === 'settings') { menu.setBehind(true); settingsPanel.open(() => { menu.setBehind(false); menu.focus('settings'); }); }
+    else { menu.setBehind(true); credits.open(() => { menu.setBehind(false); menu.focus('credits'); }); }
+  }
+
+  /** The title screen's sound control (a user gesture, so audio may start). */
+  function toggleMenuSound(): void {
+    sound.unlock();
+    if (menuAudio.state === 'playing' || menuAudio.state === 'loading') { menuAudio.setMuted(true); return; }
+    if (menuAudio.muted) menuAudio.setMuted(false);
+    void menuAudio.enable(sound.context);
   }
 
   async function onPause(action: PauseAction): Promise<void> {
@@ -260,6 +282,12 @@ export function createFrontend(options: FrontendOptions): Frontend {
     get mode() { return mode; },
     get loadingHistory() { return history; },
     get stateHistory() { return states; },
+    menu: {
+      get corridor() { return menu.corridor.debug; },
+      get director() { return menu.corridor.director; },
+      get audio() { return menuAudio; },
+      outputLevel: () => (sound.context ? outputLevel(sound.context) : 0),
+    },
     onProgress(progress) {
       if (progress.stage === 'engine' && progress.state === 'done') queueMicrotask(() => { ensureDisplay(); applySettings(settings.get()); });
       plan?.onProgress(progress);
@@ -300,7 +328,14 @@ export function createFrontend(options: FrontendOptions): Frontend {
     start() {
       applySettings(settings.get());
       // The very first gesture anywhere unlocks interface sound.
-      const unlock = (): void => { sound.unlock(); window.removeEventListener('pointerdown', unlock); window.removeEventListener('keydown', unlock); };
+      // On the title screen it also starts the soundtrack (unless the player muted it).
+      const unlock = (event: Event): void => {
+        sound.unlock();
+        // The sound control handles its own click (it may be the player turning sound off).
+        const onControl = event.target instanceof Element && !!event.target.closest('.nw-sound');
+        if (mode === 'title' && !menuAudio.muted && !onControl) void menuAudio.enable(sound.context);
+        window.removeEventListener('pointerdown', unlock); window.removeEventListener('keydown', unlock);
+      };
       window.addEventListener('pointerdown', unlock);
       window.addEventListener('keydown', unlock);
       if (options.autoStart) void startSession('new');
@@ -321,6 +356,7 @@ export function createFrontend(options: FrontendOptions): Frontend {
       display?.dispose();
       for (const part of [menu, loading, pause, settingsPanel, credits, confirm]) part.dispose();
       errorScreen.root.remove(); subtitle.remove();
+      menuAudio.dispose();
       sound.dispose();
       delete html.dataset.nwMode;
     },

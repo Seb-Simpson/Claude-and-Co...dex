@@ -69,3 +69,23 @@ settings.subscribe((value) => {
 
 /** For tests and diagnostics. */
 export function mixerCount(): number { return mixers.size; }
+
+const taps = new WeakMap<BaseAudioContext, AnalyserNode>();
+/**
+ * Diagnostics: the RMS level (0..1) leaving a context's master bus, after every volume setting.
+ * Tests use it to prove that sound is actually playing and that the sliders change it.
+ */
+export function outputLevel(context: BaseAudioContext): number {
+  let tap = taps.get(context);
+  if (!tap) {
+    tap = context.createAnalyser();
+    tap.fftSize = 2048;
+    mixerFor(context).master.connect(tap);
+    taps.set(context, tap);
+  }
+  const data = new Float32Array(tap.fftSize);
+  tap.getFloatTimeDomainData(data);
+  let sum = 0;
+  for (const v of data) sum += v * v;
+  return Math.sqrt(sum / data.length);
+}

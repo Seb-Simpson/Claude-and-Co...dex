@@ -1,0 +1,76 @@
+{
+  "width": 1920,
+  "height": 1080,
+  "levels": {
+    "ambient": 1.0,
+    "exit": 0.6,
+    "main": 0.085,
+    "far": 0.4,
+    "exposure": 4.0
+  },
+  "grade": {
+    "exposure": 1.0,
+    "saturation": 0.7,
+    "tint": [
+      0.92,
+      1.0,
+      1.0
+    ]
+  },
+  "passes": {
+    "ambient": {
+      "file": "ambient.webp",
+      "scale": 0.01531384654880799,
+      "bytes": 43728
+    },
+    "exit": {
+      "file": "exit.webp",
+      "scale": 0.05436533505154639,
+      "bytes": 39784
+    },
+    "main_a": {
+      "file": "main_a.webp",
+      "scale": 3.286082474226804,
+      "bytes": 43402
+    },
+    "main_b": {
+      "file": "main_b.webp",
+      "scale": 3.3585695876288657,
+      "bytes": 41256
+    },
+    "far": {
+      "file": "far.webp",
+      "scale": 0.13981518302994728,
+      "bytes": 40384
+    },
+    "figure": {
+      "file": "figure.webp",
+      "scale": 0.03438733287693299,
+      "bytes": 20616
+    }
+  },
+  "figureBox": [
+    0.7671875,
+    0.3648148148148148,
+    0.7921875,
+    0.6462962962962963
+  ],
+  "tubeAt": [
+    0.8935443549366966,
+    0.2882173107714407
+  ],
+  "posters": {
+    "lit": {
+      "file": "poster_lit.webp",
+      "bytes": 40798
+    },
+    "dark": {
+      "file": "poster_dark.webp",
+      "bytes": 17530
+    },
+    "figure": {
+      "file": "poster_figure.webp",
+      "bytes": 19890
+    }
+  }
+}
