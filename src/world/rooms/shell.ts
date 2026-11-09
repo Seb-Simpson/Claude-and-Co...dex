@@ -44,7 +44,7 @@ export function buildShell(b: WorldBuilder): void {
   });
   wall(b, {
     axis: 'x', at: Z.corridorS + T / 2, from: -20 - T, to: X.eastCorridorW, roomId: ROOMS.corridor,
-    openings: [doorOpening(DOORS.r102), doorOpening(DOORS.r104), doorOpening(DOORS.r106), { from: -6.8 + T / 2, to: -4.6 - T / 2, bottom: 0, top: 2.4 }, doorOpening(DOORS.r108), { from: 0.2, to: 5.6, bottom: 0, top: 2.4 }, doorOpening(DOORS.r110)],
+    openings: [doorOpening(DOORS.r102), doorOpening(DOORS.r104), doorOpening(DOORS.r106), { from: -6.8 + T / 2, to: -4.6 - T / 2, bottom: 0, top: 2.4 }, doorOpening(DOORS.r108), { from: 0.2, to: 5.6, bottom: 0, top: 2.4 }, doorOpening(DOORS.r110), doorOpening(DOORS.records), doorOpening(DOORS.electrical)],
     neg: corridorFinish, pos: roomFinish,
   });
   // North exterior with patient-room windows.
@@ -68,7 +68,7 @@ export function buildShell(b: WorldBuilder): void {
   }
   // Rear of the south rooms / maintenance passage north wall.
   wall(b, {
-    axis: 'x', at: Z.southBack + T / 2, from: -20 - T, to: X.eastCorridorW, openings: [doorOpening(DOORS.maintenanceWest)],
+    axis: 'x', at: Z.southBack + T / 2, from: -20 - T, to: X.eastCorridorW, openings: [doorOpening(DOORS.maintenanceWest), doorOpening(DOORS.electricalService)],
     neg: roomFinish, pos: { skin: 'concrete', skirting: false },
   });
   // Maintenance passage outer wall and west end (raw concrete).
@@ -161,7 +161,8 @@ export function buildShell(b: WorldBuilder): void {
   for (const [axis, at, center] of [
     ['x', north_, DOORS.r101], ['x', north_, DOORS.r103], ['x', north_, DOORS.r105], ['x', north_, DOORS.treatment], ['x', north_, DOORS.r107], ['x', north_, DOORS.storage],
     ['x', south_, DOORS.r102], ['x', south_, DOORS.r104], ['x', south_, DOORS.r106], ['x', south_, DOORS.r108], ['x', south_, DOORS.r110],
-    ['x', Z.southBack + T / 2, DOORS.maintenanceWest], ['z', X.east + T / 2, DOORS.maintenanceEast], ['x', -11 - T / 2, DOORS.stair], ['z', X.eastCorridorE + T / 2, -4.0],
+    ['x', Z.southBack + T / 2, DOORS.maintenanceWest], ['z', X.east + T / 2, DOORS.maintenanceEast],
+    ['x', south_, DOORS.records], ['x', south_, DOORS.electrical], ['x', Z.southBack + T / 2, DOORS.electricalService], ['x', -11 - T / 2, DOORS.stair], ['z', X.eastCorridorE + T / 2, -4.0],
   ] as const) threshold(b, axis, at, center);
 
   // ---- Corridor lighting ---------------------------------------------------------------------

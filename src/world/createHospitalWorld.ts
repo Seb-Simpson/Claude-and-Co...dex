@@ -5,6 +5,7 @@ import { attachExtras, type HospitalExtras } from './extras';
 import { declareActors, declareRooms, PLAYER_SPAWN } from './metadata';
 import { buildClinicalRooms } from './rooms/clinical';
 import { buildPatientRooms } from './rooms/patientRooms';
+import { buildRecordsAndElectrical } from './rooms/records';
 import { buildServiceSpaces } from './rooms/service';
 import { buildShell } from './rooms/shell';
 
@@ -48,6 +49,7 @@ export function createHospitalWorld(options: CreateHospitalWorldOptions = {}): H
     buildPatientRooms(builder);
     buildClinicalRooms(builder);
     buildServiceSpaces(builder);
+    buildRecordsAndElectrical(builder);
     declareActors(builder);
     builder.finalize();
   } catch (error) {

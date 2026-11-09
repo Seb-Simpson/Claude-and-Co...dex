@@ -11,7 +11,7 @@
  *  ├─d──┴─d──┴─d──┴counter┴─d─────┴d───┴─d──────┘   │        │
  *  W  window      MAIN PATIENT CORRIDOR      ║smoke doors     │  z = -1.4 .. 1.4
  *  ├─d──┬─d──┬─d──┬conn┬─d──┬ waiting ┬─d──┬───────┐ │        │
- *  │102 │104 │106 │ ↓  │108 │  bay    │110 │(solid)│ │        │
+ *  │102 │104 │106 │ ↓  │108 │  bay    │110 │112│114│ │        │   112 records, 114 electrical
  *  └────┴────┴────┴─d──┴────┴─────────┴────┴───────┘ │        │
  *                 │   MAINTENANCE PASSAGE ═══════════d        │  z = 6.55 .. 7.95
  *                 └────────────────────────────────────────────┘
@@ -39,6 +39,8 @@ export const ROOMS = {
   r107: 'nw:ward4:room-107',
   r108: 'nw:ward4:room-108',
   r110: 'nw:ward4:room-110',
+  records: 'nw:ward4:records-112',
+  electrical: 'nw:ward4:electrical-114',
 } as const;
 
 export type RoomKey = keyof typeof ROOMS;
@@ -73,6 +75,10 @@ export const DOORS = {
   r101: -16.4, r103: -12.0, r105: -7.6, treatment: 1.4, r107: 7.45, storage: 12.0,
   r102: -16.4, r104: -12.0, r106: -7.6, r108: -1.0, r110: 6.95,
   maintenanceWest: -5.7, maintenanceEast: 7.25, stair: 19.5, smoke: 8.4,
+  // NW-004A (Records 112, Electrical 114; service door into the maintenance passage)
+  records: 11.95, electrical: 16.4, electricalService: 16.6,
 } as const;
 
 export const KEY_STAIRWELL = { id: 'nw:key:stairwell-b', description: 'Stairwell B key (chain and padlock)' } as const;
+/** Provisional (NW-004A): Codex decides whether Chapter 1 hands this out. */
+export const KEY_ELECTRICAL = { id: 'nw:key:electrical-114', description: 'Electrical room service key' } as const;
