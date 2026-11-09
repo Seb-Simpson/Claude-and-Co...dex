@@ -1,0 +1,1211 @@
+{
+ "status": "PROPOSAL \u2014 awaiting approval",
+ "rooms": [
+  {
+   "id": "nw:ward4:corridor-main",
+   "label": "Wing A corridor",
+   "zone": "wingA",
+   "x": [
+    -20,
+    -7
+   ],
+   "z": [
+    -1.4,
+    1.4
+   ],
+   "status": "kept",
+   "level": 4,
+   "note": "Blender set; lobby + bulkhead at x -9.3 break the sightline (Option A)",
+   "size": "13.0 x 2.8 m"
+  },
+  {
+   "id": "nw:ward4:room-101",
+   "label": "101",
+   "zone": "wingA",
+   "x": [
+    -20,
+    -15.6
+   ],
+   "z": [
+    -6.4,
+    -1.55
+   ],
+   "status": "kept",
+   "level": 4,
+   "note": "unchanged; exterior windows",
+   "size": "4.4 x 4.9 m"
+  },
+  {
+   "id": "nw:ward4:room-103",
+   "label": "103",
+   "zone": "wingA",
+   "x": [
+    -15.6,
+    -11.2
+   ],
+   "z": [
+    -6.4,
+    -1.55
+   ],
+   "status": "kept",
+   "level": 4,
+   "note": "unchanged; exterior windows",
+   "size": "4.4 x 4.9 m"
+  },
+  {
+   "id": "nw:ward4:room-105",
+   "label": "105",
+   "zone": "wingA",
+   "x": [
+    -11.2,
+    -6.8
+   ],
+   "z": [
+    -6.4,
+    -1.55
+   ],
+   "status": "kept",
+   "level": 4,
+   "note": "unchanged; exterior windows",
+   "size": "4.4 x 4.9 m"
+  },
+  {
+   "id": "nw:ward4:room-102",
+   "label": "102",
+   "zone": "wingA",
+   "x": [
+    -20,
+    -15.6
+   ],
+   "z": [
+    1.55,
+    6.4
+   ],
+   "status": "kept",
+   "level": 4,
+   "note": "",
+   "size": "4.4 x 4.9 m"
+  },
+  {
+   "id": "nw:ward4:room-104",
+   "label": "104",
+   "zone": "wingA",
+   "x": [
+    -15.6,
+    -11.2
+   ],
+   "z": [
+    1.55,
+    6.4
+   ],
+   "status": "kept",
+   "level": 4,
+   "note": "104: player start, Blender set",
+   "size": "4.4 x 4.9 m"
+  },
+  {
+   "id": "nw:ward4:room-106",
+   "label": "106",
+   "zone": "wingA",
+   "x": [
+    -11.2,
+    -6.8
+   ],
+   "z": [
+    1.55,
+    6.4
+   ],
+   "status": "kept",
+   "level": 4,
+   "note": "",
+   "size": "4.4 x 4.9 m"
+  },
+  {
+   "id": "nw:ward4:nurses-station",
+   "label": "Nurses' station",
+   "zone": "station",
+   "x": [
+    -6.8,
+    0.2
+   ],
+   "z": [
+    -6.4,
+    -1.4
+   ],
+   "status": "kept-mod",
+   "level": 4,
+   "note": "+ glazed north screen and door to the Observation Walk",
+   "size": "7.0 x 5.0 m"
+  },
+  {
+   "id": "nw:ward4:corridor-main#east",
+   "label": "Clinical street (corridor east)",
+   "zone": "circ",
+   "x": [
+    -7,
+    18
+   ],
+   "z": [
+    -1.4,
+    1.4
+   ],
+   "status": "kept-mod",
+   "level": 4,
+   "note": "same ID; fire-door lobby at x 8.4 kept closed-ish; Phase 2 may add a dogleg",
+   "size": "25.0 x 2.8 m"
+  },
+  {
+   "id": "nw:ward4:connector",
+   "label": "Service connector",
+   "zone": "maint",
+   "x": [
+    -6.8,
+    -4.6
+   ],
+   "z": [
+    1.4,
+    6.4
+   ],
+   "status": "kept",
+   "level": 4,
+   "note": "",
+   "size": "2.2 x 5.0 m"
+  },
+  {
+   "id": "nw:ward4:room-108",
+   "label": "108",
+   "zone": "wingA",
+   "x": [
+    -4.6,
+    -0.2
+   ],
+   "z": [
+    1.55,
+    6.4
+   ],
+   "status": "kept",
+   "level": 4,
+   "note": "",
+   "size": "4.4 x 4.9 m"
+  },
+  {
+   "id": "nw:ward4:waiting-bay",
+   "label": "Waiting bay",
+   "zone": "circ",
+   "x": [
+    -0.2,
+    6.0
+   ],
+   "z": [
+    1.4,
+    6.4
+   ],
+   "status": "kept-mod",
+   "level": 4,
+   "note": "+ fire-door airlock south across the maintenance passage to Wing B",
+   "size": "6.2 x 5.0 m"
+  },
+  {
+   "id": "nw:ward4:room-110",
+   "label": "110",
+   "zone": "wingB",
+   "x": [
+    6.0,
+    10.4
+   ],
+   "z": [
+    1.55,
+    6.4
+   ],
+   "status": "kept",
+   "level": 4,
+   "note": "",
+   "size": "4.4 x 4.9 m"
+  },
+  {
+   "id": "nw:ward4:records-112",
+   "label": "112 Records",
+   "zone": "service",
+   "x": [
+    10.4,
+    14.2
+   ],
+   "z": [
+    1.55,
+    6.4
+   ],
+   "status": "kept",
+   "level": 4,
+   "note": "built in NW-004A",
+   "size": "3.8 x 4.9 m"
+  },
+  {
+   "id": "nw:ward4:electrical-114",
+   "label": "114 Electrical",
+   "zone": "service",
+   "x": [
+    14.2,
+    18
+   ],
+   "z": [
+    1.55,
+    6.4
+   ],
+   "status": "kept",
+   "level": 4,
+   "note": "built in NW-004A; locked service door to maintenance",
+   "size": "3.8 x 4.9 m"
+  },
+  {
+   "id": "nw:ward4:treatment",
+   "label": "Treatment",
+   "zone": "treat",
+   "x": [
+    0.2,
+    6.6
+   ],
+   "z": [
+    -6.4,
+    -1.55
+   ],
+   "status": "kept-mod",
+   "level": 4,
+   "note": "+ internal door east, + north door to the Walk",
+   "size": "6.4 x 4.9 m"
+  },
+  {
+   "id": "nw:ward4:room-107",
+   "label": "Procedure (was 107)",
+   "zone": "treat",
+   "x": [
+    6.6,
+    11.0
+   ],
+   "z": [
+    -6.4,
+    -1.55
+   ],
+   "status": "new2",
+   "level": 4,
+   "note": "ID kept; becomes the procedure room",
+   "size": "4.4 x 4.9 m"
+  },
+  {
+   "id": "nw:ward4:observation",
+   "label": "Observation",
+   "zone": "treat",
+   "x": [
+    11.0,
+    14.4
+   ],
+   "z": [
+    -6.4,
+    -1.55
+   ],
+   "status": "new2",
+   "level": 4,
+   "note": "one-way glass into Procedure",
+   "size": "3.4 x 4.9 m"
+  },
+  {
+   "id": "nw:ward4:storage",
+   "label": "Clean utility (was storage)",
+   "zone": "treat",
+   "x": [
+    14.4,
+    18
+   ],
+   "z": [
+    -6.4,
+    -1.55
+   ],
+   "status": "new2",
+   "level": 4,
+   "note": "ID kept; the 4 hiding lockers must stay or be migrated",
+   "size": "3.6 x 4.9 m"
+  },
+  {
+   "id": "nw:ward4:observation-walk",
+   "label": "Observation Walk (glazed link)",
+   "zone": "circ",
+   "x": [
+    -6.8,
+    18
+   ],
+   "z": [
+    -8.2,
+    -6.55
+   ],
+   "status": "new1",
+   "level": 4,
+   "note": "glass to the atrium on its north side",
+   "size": "24.8 x 1.6 m"
+  },
+  {
+   "id": "nw:ward4:atrium",
+   "label": "Central Atrium (double height)",
+   "zone": "atrium",
+   "x": [
+    -4,
+    14
+   ],
+   "z": [
+    -21,
+    -8.2
+   ],
+   "status": "new1",
+   "level": 4,
+   "note": "18 x 12.8 m, 8.4 m high, skylight; dead tree in a dry fountain at (5, -14.5)",
+   "size": "18.0 x 12.8 m"
+  },
+  {
+   "id": "nw:ward4:atrium-east-lobby",
+   "label": "East lobby + lift 2",
+   "zone": "circ",
+   "x": [
+    14,
+    18.15
+   ],
+   "z": [
+    -15,
+    -8.2
+   ],
+   "status": "new1",
+   "level": 4,
+   "note": "",
+   "size": "4.1 x 6.8 m"
+  },
+  {
+   "id": "nw:ward4:corridor-east",
+   "label": "East corridor",
+   "zone": "circ",
+   "x": [
+    18.15,
+    20.85
+   ],
+   "z": [
+    -11,
+    12
+   ],
+   "status": "kept-mod",
+   "level": 4,
+   "note": "extended south to z 12 to reach Wing B",
+   "size": "2.7 x 23.0 m"
+  },
+  {
+   "id": "nw:ward4:lift-car",
+   "label": "Lift",
+   "zone": "circ",
+   "x": [
+    21,
+    22.6
+   ],
+   "z": [
+    -4.85,
+    -3.15
+   ],
+   "status": "kept",
+   "level": 4,
+   "note": "",
+   "size": "1.6 x 1.7 m"
+  },
+  {
+   "id": "nw:ward4:stairwell-b",
+   "label": "Stairwell B tower",
+   "zone": "stair",
+   "x": [
+    18.15,
+    22.6
+   ],
+   "z": [
+    -21,
+    -11
+   ],
+   "status": "kept-mod",
+   "level": 4,
+   "note": "grows from 2.7 x 4.4 m to 4.45 x 10 m, L3-L5 with an open well; door ID kept",
+   "size": "4.5 x 10.0 m"
+  },
+  {
+   "id": "nw:ward4:maintenance",
+   "label": "Maintenance passage",
+   "zone": "maint",
+   "x": [
+    -6.8,
+    18
+   ],
+   "z": [
+    6.55,
+    7.95
+   ],
+   "status": "kept",
+   "level": 4,
+   "note": "",
+   "size": "24.8 x 1.4 m"
+  },
+  {
+   "id": "nw:ward4:maint-junction",
+   "label": "Pump junction",
+   "zone": "maint",
+   "x": [
+    8,
+    11
+   ],
+   "z": [
+    7.95,
+    9.6
+   ],
+   "status": "new1",
+   "level": 4,
+   "note": "widening with pumps; branch south into Wing B service corridor",
+   "size": "3.0 x 1.6 m"
+  },
+  {
+   "id": "nw:ward4:maint-west",
+   "label": "West service run",
+   "zone": "maint",
+   "x": [
+    -20,
+    -6.8
+   ],
+   "z": [
+    6.55,
+    7.6
+   ],
+   "status": "new1",
+   "level": 4,
+   "note": "1.05 m wide, pipe-choked; ends at the riser room",
+   "size": "13.2 x 1.0 m"
+  },
+  {
+   "id": "nw:ward4:riser",
+   "label": "Riser / plant",
+   "zone": "maint",
+   "x": [
+    -20,
+    -17.5
+   ],
+   "z": [
+    7.6,
+    9.6
+   ],
+   "status": "new1",
+   "level": 4,
+   "note": "dead end with a hiding cupboard; ladder (scenery)",
+   "size": "2.5 x 2.0 m"
+  },
+  {
+   "id": "nw:ward4:wingb-corridor",
+   "label": "Wing B corridor (L)",
+   "zone": "wingB",
+   "x": [
+    -2,
+    18.15
+   ],
+   "z": [
+    9.6,
+    11.6
+   ],
+   "status": "new1",
+   "level": 4,
+   "note": "older 1960s wing: terrazzo, timber, radiators",
+   "size": "20.1 x 2.0 m"
+  },
+  {
+   "id": "nw:ward4:wingb-corridor-s",
+   "label": "Wing B corridor (south leg)",
+   "zone": "wingB",
+   "x": [
+    14,
+    16
+   ],
+   "z": [
+    11.6,
+    21
+   ],
+   "status": "new1",
+   "level": 4,
+   "note": "",
+   "size": "2.0 x 9.4 m"
+  },
+  {
+   "id": "nw:ward4:room-121",
+   "label": "121 (4-bed bay)",
+   "zone": "wingB",
+   "x": [
+    -2,
+    2.4
+   ],
+   "z": [
+    11.6,
+    17.0
+   ],
+   "status": "new1",
+   "level": 4,
+   "note": "",
+   "size": "4.4 x 5.4 m"
+  },
+  {
+   "id": "nw:ward4:room-123",
+   "label": "123 (single)",
+   "zone": "wingB",
+   "x": [
+    2.4,
+    6.8
+   ],
+   "z": [
+    11.6,
+    17.0
+   ],
+   "status": "new1",
+   "level": 4,
+   "note": "",
+   "size": "4.4 x 5.4 m"
+  },
+  {
+   "id": "nw:ward4:room-125",
+   "label": "125 (4-bed bay)",
+   "zone": "wingB",
+   "x": [
+    6.8,
+    11.2
+   ],
+   "z": [
+    11.6,
+    17.0
+   ],
+   "status": "new1",
+   "level": 4,
+   "note": "",
+   "size": "4.4 x 5.4 m"
+  },
+  {
+   "id": "nw:ward4:dayroom",
+   "label": "Dayroom (bay window, piano)",
+   "zone": "wingB",
+   "x": [
+    -2,
+    8
+   ],
+   "z": [
+    17.0,
+    21
+   ],
+   "status": "new1",
+   "level": 4,
+   "note": "the Wing B landmark; long view out to the dark courtyard",
+   "size": "10.0 x 4.0 m"
+  },
+  {
+   "id": "nw:ward4:room-127",
+   "label": "127 (bathroom, tubs)",
+   "zone": "wingB",
+   "x": [
+    8,
+    14
+   ],
+   "z": [
+    17.0,
+    21
+   ],
+   "status": "new1",
+   "level": 4,
+   "note": "",
+   "size": "6.0 x 4.0 m"
+  },
+  {
+   "id": "nw:ward4:room-129",
+   "label": "129 (side room)",
+   "zone": "wingB",
+   "x": [
+    11.2,
+    14
+   ],
+   "z": [
+    11.6,
+    17.0
+   ],
+   "status": "new1",
+   "level": 4,
+   "note": "",
+   "size": "2.8 x 5.4 m"
+  },
+  {
+   "id": "nw:ward4:wingb-sluice",
+   "label": "Sluice",
+   "zone": "wingB",
+   "x": [
+    16,
+    18.15
+   ],
+   "z": [
+    11.6,
+    15
+   ],
+   "status": "new1",
+   "level": 4,
+   "note": "",
+   "size": "2.1 x 3.4 m"
+  },
+  {
+   "id": "nw:ward4:gallery",
+   "label": "Gallery (mezzanine)",
+   "zone": "atrium",
+   "x": [
+    -4,
+    18.15
+   ],
+   "z": [
+    -21,
+    -18
+   ],
+   "status": "new1",
+   "level": 5,
+   "note": "3 m wide, glass balustrade; looks down on the whole atrium floor",
+   "size": "22.1 x 3.0 m"
+  },
+  {
+   "id": "nw:ward4:gallery-east",
+   "label": "Gallery east arm",
+   "zone": "atrium",
+   "x": [
+    11,
+    14
+   ],
+   "z": [
+    -18,
+    -8.2
+   ],
+   "status": "new1",
+   "level": 5,
+   "note": "",
+   "size": "3.0 x 9.8 m"
+  },
+  {
+   "id": "nw:ward4:stair-l5",
+   "label": "Stair tower L5 landing",
+   "zone": "stair",
+   "x": [
+    18.15,
+    22.6
+   ],
+   "z": [
+    -21,
+    -18
+   ],
+   "status": "new1",
+   "level": 5,
+   "note": "",
+   "size": "4.5 x 3.0 m"
+  },
+  {
+   "id": "nw:ward4:stair-l3",
+   "label": "Stair tower L3 landing / exit",
+   "zone": "stair",
+   "x": [
+    18.15,
+    22.6
+   ],
+   "z": [
+    -14,
+    -11
+   ],
+   "status": "new1",
+   "level": 3,
+   "note": "Chapter 1 ending: the door down and out",
+   "size": "4.5 x 3.0 m"
+  }
+ ],
+ "doors": [
+  {
+   "id": "nw:door:station-walk",
+   "at": [
+    -3.0,
+    -6.48
+   ],
+   "level": 4,
+   "status": "new1",
+   "between": "station <-> Observation Walk"
+  },
+  {
+   "id": "nw:door:treatment-walk",
+   "at": [
+    3.4,
+    -6.48
+   ],
+   "level": 4,
+   "status": "new1",
+   "between": "treatment <-> Walk"
+  },
+  {
+   "id": "nw:door:walk-atrium-w",
+   "at": [
+    -1.0,
+    -8.2
+   ],
+   "level": 4,
+   "status": "new1",
+   "between": "Walk <-> atrium (glazed double doors)"
+  },
+  {
+   "id": "nw:door:walk-atrium-e",
+   "at": [
+    9.0,
+    -8.2
+   ],
+   "level": 4,
+   "status": "new1",
+   "between": "Walk <-> atrium"
+  },
+  {
+   "id": "nw:door:atrium-lobby",
+   "at": [
+    14.0,
+    -11.6
+   ],
+   "level": 4,
+   "status": "new1",
+   "between": "atrium <-> east lobby"
+  },
+  {
+   "id": "nw:door:lobby-stair",
+   "at": [
+    18.15,
+    -13.2
+   ],
+   "level": 4,
+   "status": "new1",
+   "between": "east lobby <-> stair tower"
+  },
+  {
+   "id": "nw:door:stairwell-b",
+   "at": [
+    19.5,
+    -11.0
+   ],
+   "level": 4,
+   "status": "kept",
+   "between": "east corridor <-> stair tower (chained)"
+  },
+  {
+   "id": "nw:door:gallery-stair",
+   "at": [
+    18.15,
+    -19.5
+   ],
+   "level": 5,
+   "status": "new1",
+   "between": "gallery <-> stair L5"
+  },
+  {
+   "id": "nw:door:stair-l3-exit",
+   "at": [
+    22.6,
+    -12.5
+   ],
+   "level": 3,
+   "status": "new1",
+   "between": "L3 exit (chapter end)"
+  },
+  {
+   "id": "nw:door:waiting-airlock-n",
+   "at": [
+    3.0,
+    6.48
+   ],
+   "level": 4,
+   "status": "new1",
+   "between": "waiting bay <-> maintenance"
+  },
+  {
+   "id": "nw:door:waiting-airlock-s",
+   "at": [
+    3.0,
+    7.95
+   ],
+   "level": 4,
+   "status": "new1",
+   "between": "maintenance <-> Wing B"
+  },
+  {
+   "id": "nw:door:maint-junction-wingb",
+   "at": [
+    9.5,
+    9.6
+   ],
+   "level": 4,
+   "status": "new1",
+   "between": "pump junction <-> Wing B"
+  },
+  {
+   "id": "nw:door:east-wingb",
+   "at": [
+    18.15,
+    10.6
+   ],
+   "level": 4,
+   "status": "new1",
+   "between": "east corridor <-> Wing B"
+  },
+  {
+   "id": "nw:door:electrical-service",
+   "at": [
+    16.6,
+    6.48
+   ],
+   "level": 4,
+   "status": "kept",
+   "between": "electrical <-> maintenance (locked)"
+  },
+  {
+   "id": "nw:door:maintenance-west",
+   "at": [
+    -5.7,
+    6.48
+   ],
+   "level": 4,
+   "status": "kept",
+   "between": "connector <-> maintenance"
+  },
+  {
+   "id": "nw:door:maintenance-east",
+   "at": [
+    18.08,
+    7.25
+   ],
+   "level": 4,
+   "status": "kept",
+   "between": "maintenance <-> east corridor"
+  },
+  {
+   "id": "nw:door:procedure-observe",
+   "at": [
+    11.0,
+    -4.0
+   ],
+   "level": 4,
+   "status": "new2",
+   "between": "procedure <-> observation"
+  },
+  {
+   "id": "nw:door:treatment-procedure",
+   "at": [
+    6.6,
+    -4.0
+   ],
+   "level": 4,
+   "status": "new2",
+   "between": "treatment <-> procedure (enfilade)"
+  }
+ ],
+ "routes": {
+  "player golden path (provisional, Codex owns objectives)": [
+   [
+    -12.4,
+    4.1
+   ],
+   [
+    -12.0,
+    0
+   ],
+   [
+    -6,
+    0
+   ],
+   [
+    -3.5,
+    -2.0
+   ],
+   [
+    -3.0,
+    -7.4
+   ],
+   [
+    -1.0,
+    -9.5
+   ],
+   [
+    5,
+    -11.5
+   ],
+   [
+    9,
+    -9.5
+   ],
+   [
+    9,
+    -7.4
+   ],
+   [
+    3.4,
+    -5.0
+   ],
+   [
+    3.4,
+    0
+   ],
+   [
+    11.95,
+    0
+   ],
+   [
+    11.95,
+    4.5
+   ],
+   [
+    11.95,
+    0
+   ],
+   [
+    16.4,
+    0
+   ],
+   [
+    16.4,
+    4.5
+   ],
+   [
+    16.6,
+    7.25
+   ],
+   [
+    9.5,
+    7.25
+   ],
+   [
+    9.5,
+    10.6
+   ],
+   [
+    3,
+    14
+   ],
+   [
+    3,
+    19
+   ],
+   [
+    15,
+    19
+   ],
+   [
+    15,
+    10.6
+   ],
+   [
+    19.5,
+    10.6
+   ],
+   [
+    19.5,
+    -11.5
+   ],
+   [
+    20.4,
+    -16
+   ]
+  ],
+  "Nurse patrol (glass-visible loop)": [
+   [
+    -3.6,
+    -4.3
+   ],
+   [
+    -3.0,
+    -7.4
+   ],
+   [
+    2,
+    -7.4
+   ],
+   [
+    2,
+    -12
+   ],
+   [
+    5,
+    -17.5
+   ],
+   [
+    11,
+    -14
+   ],
+   [
+    9,
+    -9
+   ],
+   [
+    9,
+    -7.4
+   ],
+   [
+    3.4,
+    -7.4
+   ],
+   [
+    3.4,
+    -3.5
+   ],
+   [
+    -0.8,
+    -2.2
+   ],
+   [
+    -3.6,
+    -4.3
+   ]
+  ],
+  "Patient chase loop (atrium circuit)": [
+   [
+    -5,
+    0
+   ],
+   [
+    -3.0,
+    -3.5
+   ],
+   [
+    -3.0,
+    -7.4
+   ],
+   [
+    -1,
+    -10
+   ],
+   [
+    2,
+    -16
+   ],
+   [
+    8,
+    -18.5
+   ],
+   [
+    13,
+    -14
+   ],
+   [
+    16,
+    -11.6
+   ],
+   [
+    19.5,
+    -9
+   ],
+   [
+    19.5,
+    0
+   ],
+   [
+    8,
+    0
+   ],
+   [
+    -5,
+    0
+   ]
+  ],
+  "Patient chase loop (Wing B / service circuit)": [
+   [
+    3,
+    0
+   ],
+   [
+    3,
+    4
+   ],
+   [
+    3,
+    7.25
+   ],
+   [
+    3,
+    10.6
+   ],
+   [
+    15,
+    10.6
+   ],
+   [
+    19.5,
+    10.6
+   ],
+   [
+    19.5,
+    0
+   ],
+   [
+    3,
+    0
+   ]
+  ]
+ },
+ "sightlines": [
+  {
+   "from_": [
+    -9.5,
+    0.6
+   ],
+   "to": [
+    -3.6,
+    -4.5
+   ],
+   "why": "Wing A corridor -> station glass: first glimpse of the Nurse"
+  },
+  {
+   "from_": [
+    8,
+    -19.5
+   ],
+   "to": [
+    5,
+    -12
+   ],
+   "why": "gallery -> atrium floor: movement at a distance"
+  },
+  {
+   "from_": [
+    -13,
+    -3.5
+   ],
+   "to": [
+    -12,
+    -9
+   ],
+   "why": "103 north window -> atrium edge"
+  },
+  {
+   "from_": [
+    19.5,
+    -15
+   ],
+   "to": [
+    19.5,
+    -12
+   ],
+   "why": "stair well: look down to L3, up to L5"
+  },
+  {
+   "from_": [
+    12.6,
+    -4
+   ],
+   "to": [
+    8.8,
+    -4
+   ],
+   "why": "observation one-way glass -> procedure"
+  },
+  {
+   "from_": [
+    -1,
+    -6.6
+   ],
+   "to": [
+    -1,
+    -14
+   ],
+   "why": "Walk glazing -> landmark tree"
+  }
+ ]
+}
