@@ -1,6 +1,6 @@
 {
  "glb": "room104_set.glb",
- "bytes": 9278228,
+ "bytes": 9282308,
  "triangles": 97436,
  "meshes": {
   "props": 87498,
@@ -40,6 +40,6 @@
  "atlas": 2048,
  "lightmap": "room104_lightmap.jpg",
  "lightmapSize": 2048,
- "lightmapBytes": 939333,
+ "lightmapBytes": 935882,
  "samples": 96
 }
