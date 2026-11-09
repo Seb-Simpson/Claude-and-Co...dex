@@ -684,8 +684,8 @@ def place_decals():
     for i, (x, z, L, sp) in enumerate(((-11.0, 0.55, 2.4, 1.52), (-8.6, 0.35, 2.6, 1.6), (-6.1, 0.15, 2.4, 1.55), (-3.9, -0.1, 2.2, 1.66))):
         out.append(decal(f'drag_cor_{i}', 'wear', 0.7, L, (x, 0.0062 + i * 0.0002, z), 'y', spin=sp))
     # The rot follows the skirting out of 104, along to 106, and reaches the ceiling above its door.
-    out.append(decal('rot_cor_s2', 'rot', 1.1, 1.1, (-10.6, 0.45, Z_CS - 0.012), '-z', spin=0.8))
-    out.append(decal('rot_cor_s3', 'rot', 0.9, 0.9, (-8.9, 0.35, Z_CS - 0.012), '-z', spin=2.1))
+    out.append(decal('rot_cor_s2', 'rot', 1.0, 1.0, (-10.6, 0.6, Z_CS - 0.012), '-z', spin=0.8))
+    out.append(decal('rot_cor_s3', 'rot', 0.8, 0.8, (-8.9, 0.5, Z_CS - 0.012), '-z', spin=2.1))
     out.append(decal('rot_cor_ceil', 'rot', 1.4, 1.4, (-12.0, CEIL_COR - 0.005, 0.7), '-y', spin=1.3))
     # Ash handprints: low on the wall beside 106, and dragged along the station's counter front.
     out.append(decal('hands_106', 'hands', 0.6, 0.6, (-6.95, 0.75, Z_CS - 0.012), '-z', spin=0.3))

@@ -66,7 +66,8 @@ describe('Room 104 set asset', () => {
 
   it('lies inside Room 104 and the corridor to the nurses\u2019 station, on the game coordinates', () => {
     const bounds = new Box3().setFromObject(set.root);
-    const allowed = new Box3(new Vector3(-20.06, -0.02, -1.6), new Vector3(-0.1, 2.8, 6.46));
+    // z down to -1.9: the station counter's remodelled front and ledge (over the procedural counter's collider).
+    const allowed = new Box3(new Vector3(-20.06, -0.02, -1.9), new Vector3(-0.1, 2.8, 6.46));
     expect(allowed.containsBox(bounds), JSON.stringify(bounds)).toBe(true);
     // The bed stands where the procedural bed (and its collider) is: centred on x -14.25, z 5.35.
     const props = meshes(set.root).find((m) => (m.material as MeshStandardMaterial).name === 'props_atlas')!;
