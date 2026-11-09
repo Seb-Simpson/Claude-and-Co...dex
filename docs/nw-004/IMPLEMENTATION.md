@@ -1,5 +1,11 @@
 # NW-004 phase one implementation report
 
+The subsequent Patient-sequence increment adds a real staged Patient, anonymous
+environmental hearing, route/fairness preflight and the chase/retry/exit controller.
+See [PATIENT-CHASE.md](PATIENT-CHASE.md) for exact APIs, the full sequence and
+current environment-proposal status. Its isolated browser evidence is stored
+separately from the phase-one baseline. The complete chapter is still unfinished.
+
 ## Delivery status
 
 **Chapter One remains incomplete.** This phase implements the independent gameplay

@@ -1,4 +1,6 @@
 import type { PerceptionConfig, PlayerNoiseEvent, PlayerSnapshot, Vec3 } from '../contracts';
+import { isEnvironmentalSoundStimulus } from './environmentalSound';
+import type { EnvironmentalSoundStimulus } from './environmentalSound';
 
 export interface VisionOptions {
   readonly observerPosition: Vec3;
@@ -19,6 +21,9 @@ export interface HearingOptions {
   readonly maxAgeSeconds: number;
   readonly hasLineOfSight: (from: Vec3, to: Vec3) => boolean;
   readonly occludedMultiplier?: number;
+}
+export interface EnvironmentalHearingOptions extends Omit<HearingOptions, 'noise'> {
+  readonly sound: EnvironmentalSoundStimulus;
 }
 
 export interface ObservationOptions {
@@ -71,9 +76,22 @@ export function canSeePlayer(options: VisionOptions): boolean {
 
 /** Hearing is a finite, recent observation; obstruction attenuates rather than grants exact vision. */
 export function canHearNoise(options: HearingOptions): boolean {
-  const { observerPosition, noise, config, timeSeconds, maxAgeSeconds, hasLineOfSight } = options;
+  if (typeof options.noise.playerId !== 'string' || !options.noise.playerId.trim()) return false;
+  return canHearSample({ ...options, sample: options.noise });
+}
+
+/** Same acoustic rules as footsteps, without claiming that a world sound identifies a player. */
+export function canHearEnvironmentalSound(options: EnvironmentalHearingOptions): boolean {
+  if (!isEnvironmentalSoundStimulus(options.sound)) return false;
+  return canHearSample({ ...options, sample: options.sound });
+}
+
+function canHearSample(options: Omit<HearingOptions, 'noise'> & {
+  readonly sample: Pick<PlayerNoiseEvent, 'position' | 'radius' | 'intensity' | 'timeSeconds'>;
+}): boolean {
+  const { observerPosition, sample: noise, config, timeSeconds, maxAgeSeconds, hasLineOfSight } = options;
   const occludedMultiplier = options.occludedMultiplier ?? 0.35;
-  if (!finiteVector(observerPosition) || !finiteVector(noise.position) || !noise.playerId.trim() ||
+  if (!finiteVector(observerPosition) || !finiteVector(noise.position) ||
       !Number.isFinite(timeSeconds) || !Number.isFinite(noise.timeSeconds) ||
       !Number.isFinite(maxAgeSeconds) || maxAgeSeconds < 0 || timeSeconds < noise.timeSeconds ||
       timeSeconds - noise.timeSeconds > maxAgeSeconds ||

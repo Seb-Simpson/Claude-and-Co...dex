@@ -12,3 +12,5 @@ export * from './bindings';
 export * from './cinematics';
 export * from './dialogue';
 export * from './chapterCinematics';
+export * from './patientChaseLayout';
+export * from './patientChase';
