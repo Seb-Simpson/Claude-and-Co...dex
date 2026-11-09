@@ -1,5 +1,6 @@
 import type { EntityBehaviourState } from '../contracts';
 import { envelope, filter, noiseSource } from './synth';
+import { audioOutput } from '../audio/mixer';
 
 export type TensionLevel = 'calm' | 'uneasy' | 'search' | 'chase';
 
@@ -53,7 +54,7 @@ export class TensionScore {
     this.ctx = ctx;
     const master = ctx.createGain();
     master.gain.value = 1;
-    master.connect(ctx.destination);
+    master.connect(audioOutput(ctx, 'music'));
     const mk = (): GainNode => { const g = ctx.createGain(); g.gain.value = 0; g.connect(master); return g; };
     const drone = mk();
     const search = mk();

@@ -1,3 +1,5 @@
+import { prefersReducedMotion, settings } from '../../settings/settings';
+
 /**
  * Screen-space vignette and colour wash using two absolutely positioned DOM layers over the
  * canvas. Costs no extra render pass. Without a DOM it records values only (unit tests).
@@ -54,12 +56,17 @@ export class ScreenOverlay {
     this.time += dt;
     let vignette = this.base;
     let tint = 0;
-    this.pulses = this.pulses.filter((p) => this.time - p.start < p.attack + p.hold + p.release);
+    // Player settings: Screen effects scales every pulse; reduced motion turns sudden flashes into fades.
+    const preferences = settings.get();
+    const strength = preferences.effects;
+    const minAttack = prefersReducedMotion(preferences) ? 0.35 : 0;
+    this.pulses = this.pulses.filter((p) => this.time - p.start < Math.max(p.attack, minAttack) + p.hold + p.release);
     for (const p of this.pulses) {
       const t = this.time - p.start;
-      const k = t < p.attack ? t / Math.max(0.001, p.attack) : t < p.attack + p.hold ? 1 : 1 - (t - p.attack - p.hold) / Math.max(0.001, p.release);
-      vignette = Math.max(vignette, p.vignette * k);
-      tint = Math.max(tint, (p.tintStrength ?? 0) * k);
+      const attack = Math.max(p.attack, minAttack);
+      const k = t < attack ? t / Math.max(0.001, attack) : t < attack + p.hold ? 1 : Math.max(0, 1 - (t - attack - p.hold) / Math.max(0.001, p.release));
+      vignette = Math.max(vignette, this.base + (p.vignette * k - this.base) * strength);
+      tint = Math.max(tint, (p.tintStrength ?? 0) * k * strength);
     }
     this.vignetteValue = vignette;
     this.tintValue = tint;

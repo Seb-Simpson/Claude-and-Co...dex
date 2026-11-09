@@ -1,3 +1,5 @@
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { type PreloadEntry, takePreloaded } from '../../../assets/preload';
 import manifest from '../assets/manifest.json';
 import { type EntityModelManifest, loadModelLibrary, type ModelEntity, type ModelLibrary } from './library';
 
@@ -24,9 +26,22 @@ export function proceduralEntitiesRequested(): boolean {
 /** Load every entity model. Never throws: failures are reported per entity in `library.failures`. */
 export async function loadEntityModels(): Promise<ModelLibrary> {
   try {
-    return await loadModelLibrary({ urls: MODEL_URLS, manifests: MODEL_MANIFESTS });
+    const loader = new GLTFLoader();
+    return await loadModelLibrary({
+      urls: MODEL_URLS, manifests: MODEL_MANIFESTS,
+      // Bytes the loading screen already streamed are parsed from memory (no second download).
+      load: (url) => {
+        const buffer = takePreloaded(url);
+        return buffer ? loader.parseAsync(buffer, '') : loader.loadAsync(url);
+      },
+    });
   } catch (error) {
     const reason = error instanceof Error ? error.message : String(error);
     return { get: () => undefined, failures: { patient: reason, nurse: reason, crawler: reason, watcher: reason, reflection: reason }, dispose() {} };
   }
+}
+
+/** The entity GLBs, with their manifest sizes, for the loading screen's byte-tracked preload. */
+export function entityModelPreloads(): PreloadEntry[] {
+  return Object.entries(MODEL_URLS).map(([entity, url]) => ({ url, bytes: MODEL_MANIFESTS[entity as ModelEntity].bytes, label: `${entity} model` }));
 }

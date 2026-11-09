@@ -1,4 +1,5 @@
 import type { AudioService, ChaseStartedEvent, FrameContext, GameEvents } from '../contracts';
+import { audioOutput } from '../audio/mixer';
 
 export interface PatientEncounterOptions {
   readonly events: GameEvents;
@@ -109,7 +110,7 @@ export function createPatientEncounter(options: PatientEncounterOptions): Patien
       output.gain.setTargetAtTime(0.38, now, 0.2);
       carrier.connect(envelope);
       envelope.connect(output);
-      output.connect(context.destination);
+      output.connect(audioOutput(context, 'music'));
       beat.connect(modulation);
       modulation.connect(envelope.gain);
       const startedPulse = pulse;

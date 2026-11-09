@@ -56,6 +56,11 @@ export interface PlayerController extends PlayerProvider {
   fixedUpdate(frame: FrameContext, input: PlayerInput): void;
   update(frame: FrameContext): void;
   look(deltaX: number, deltaY: number): void;
+  /**
+   * Live look sensitivity (radians per pixel) for the settings menu. The vertical value may be
+   * negative to invert Y. Defaults come from `config.lookSensitivity`.
+   */
+  setLookSensitivity(horizontal: number, vertical?: number): void;
   setViewRotation(rotation: ViewRotation): void;
   setCaptured(captured: boolean): void;
   setHiding(state: HidingState, spotId: string | null, cameraPose?: Pose): void;
@@ -78,6 +83,8 @@ function approach(value: number, target: number, maximumDelta: number): number {
 /** Authoritative motion belongs to fixedUpdate; update only presents the shared camera. */
 export function createPlayerController(options: PlayerControllerOptions): PlayerController {
   const config = { ...DEFAULT_PLAYER_CONFIG, ...options.config };
+  let lookX = config.lookSensitivity;
+  let lookY = config.lookSensitivity;
   for (const [key, value] of Object.entries(config)) {
     if (!Number.isFinite(value) || value <= 0) throw new Error(`Player ${key} must be finite and positive`);
   }
@@ -224,7 +231,10 @@ export function createPlayerController(options: PlayerControllerOptions): Player
     },
     look(deltaX, deltaY) {
       if (disposed || captured || hidingState !== 'outside' || !Number.isFinite(deltaX) || !Number.isFinite(deltaY)) return;
-      setViewRotation({ yaw: yaw - deltaX * config.lookSensitivity, pitch: pitch - deltaY * config.lookSensitivity });
+      setViewRotation({ yaw: yaw - deltaX * lookX, pitch: pitch - deltaY * lookY });
+    },
+    setLookSensitivity(horizontal, vertical = horizontal) {
+      if (Number.isFinite(horizontal) && Number.isFinite(vertical)) { lookX = horizontal; lookY = vertical; }
     },
     setViewRotation,
     setCaptured(value) {

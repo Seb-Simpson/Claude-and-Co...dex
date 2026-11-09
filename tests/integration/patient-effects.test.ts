@@ -3,6 +3,10 @@ import type { AudioService, ChaseStartedEvent, FrameContext, SoundEvent } from '
 import { createEventBus } from '../../src/integration/events';
 import { createPatientEncounter } from '../../src/integration/patientEncounter';
 
+// The encounter's output joins the shared music bus (src/audio/mixer.ts, tested on its own). Here it
+// is pointed at the destination so these assertions keep covering only the encounter's own nodes.
+vi.mock('../../src/audio/mixer', () => ({ audioOutput: (context: { destination: unknown }) => context.destination }));
+
 const frame: FrameContext = { deltaSeconds: 1 / 60, elapsedSeconds: 10 };
 const chase: ChaseStartedEvent = {
   chaseId: 'chase:patient:1', entityId: 'nw:patient', playerId: 'player',

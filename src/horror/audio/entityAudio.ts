@@ -2,6 +2,7 @@ import type { Vector3 } from 'three';
 import { envelope, filter, makePanner, noiseSource, placePanner, releaseLater } from '../../atmosphere/synth';
 import type { VisualState } from '../entities/animator';
 import type { BodiedEntityType } from '../entities/visual';
+import { audioOutput } from '../../audio/mixer';
 
 /** What the entity audio needs per entity each frame (all presentation-side measurements). */
 export interface EntityAudioFrame {
@@ -63,7 +64,7 @@ export class EntityAudio {
     master.gain.value = 0.9;
     const duck = ctx.createGain();
     duck.gain.value = 1;
-    master.connect(duck).connect(ctx.destination);
+    master.connect(duck).connect(audioOutput(ctx, 'sfx'));
     this.master = master;
     this.duckGain = duck;
     // Patient presence: a low, beating drone that rises as it gets near.
