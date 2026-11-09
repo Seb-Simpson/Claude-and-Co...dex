@@ -23,6 +23,9 @@ TARGETS = {  # image name prefix -> max size
     'wheelchair_orm': 512,
     'wheelchair_normal': 512,
     'doorleaf_orm': 512,
+    # NW-005A: low-frequency roughness of the tiling wall and floor (keeps the GLB under 9 MiB).
+    'wall_paint_orm': 512,
+    'floor_vinyl_orm': 512,
     'doorleaf_normal': 512,
 }
 
