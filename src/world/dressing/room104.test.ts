@@ -31,8 +31,9 @@ describe('Room 104 set asset', () => {
     expect(statSync(setPath).size).toBeLessThan(9 * 1024 * 1024);
     expect(statSync(fileURLToPath(ROOM104_LIGHTMAP_URL)).size).toBeLessThan(1.5 * 1024 * 1024);
     expect(set.stats.triangles).toBeLessThan(90000);
-    // One mesh per material: few draw calls for the whole room and corridor.
-    expect(set.stats.meshes).toBeLessThanOrEqual(12);
+    // One mesh per material: few draw calls for the whole room and corridor (NW-005A adds the
+    // veneer, labels, door-leaf atlas and glass, the access card and the door leaf itself).
+    expect(set.stats.meshes).toBeLessThanOrEqual(16);
   });
 
   it('ships the furniture atlas, the tiling shell materials, signage and decals', () => {
@@ -41,7 +42,12 @@ describe('Room 104 set asset', () => {
   });
 
   it('gives every static surface the light-map UV set and binds the baked light to direct light too', () => {
+    const card = set.root.getObjectByName('nw:opening:access-card-prop');
     for (const mesh of meshes(set.root)) {
+      // The access card is a pickup (it moves): no baked light.
+      let isCard = false;
+      mesh.traverseAncestors((a) => { if (a === card) isCard = true; });
+      if (mesh === card || isCard) continue;
       // Decals are overlays: they stay out of the light bake (they would shade their own surface).
       if ((mesh.material as MeshStandardMaterial).name === 'decals') {
         expect(mesh.geometry.getAttribute('uv1')).toBeUndefined();
@@ -57,9 +63,9 @@ describe('Room 104 set asset', () => {
     }
   });
 
-  it('lies inside Room 104 and the west corridor, on the game coordinates', () => {
+  it('lies inside Room 104 and the corridor to the nurses\u2019 station, on the game coordinates', () => {
     const bounds = new Box3().setFromObject(set.root);
-    const allowed = new Box3(new Vector3(-20.06, -0.02, -1.46), new Vector3(-6.94, 2.8, 6.46));
+    const allowed = new Box3(new Vector3(-20.06, -0.02, -1.6), new Vector3(-0.1, 2.8, 6.46));
     expect(allowed.containsBox(bounds), JSON.stringify(bounds)).toBe(true);
     // The bed stands where the procedural bed (and its collider) is: centred on x -14.25, z 5.35.
     const props = meshes(set.root).find((m) => (m.material as MeshStandardMaterial).name === 'props_atlas')!;

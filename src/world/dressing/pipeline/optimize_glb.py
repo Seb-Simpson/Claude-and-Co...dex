@@ -22,6 +22,8 @@ TARGETS = {  # image name prefix -> max size
     'wheelchair_albedo': 512,
     'wheelchair_orm': 512,
     'wheelchair_normal': 512,
+    'doorleaf_orm': 512,
+    'doorleaf_normal': 512,
 }
 
 

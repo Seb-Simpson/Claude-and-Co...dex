@@ -420,9 +420,75 @@ def decal_atlas(out):
     glow.save(os.path.join(out, 'decals_glow.jpg'), quality=90)
 
 
+# ---------------------------------------------------------------------------------------------
+# NW-005A: door veneer and the opening's labels.
+
+
+def door_veneer(out, n=512):
+    """Beech-veneer fire-door leaf (UV: 1 unit = 1 m, grain running up the leaf): long vertical
+    grain, darker hand-height band where decades of palms polished and greyed it."""
+    grain = fbm(n, 1.4, 2, 200, seed=301, aniso=(6.0, 0.15))
+    flake = smooth(0.7, 0.95, fbm(n, 1.0, 20, 300, seed=302, aniso=(3.0, 0.4)))
+    tone = fbm(n, 2.6, 1, seed=303)
+    base = tint(grain * 0.8 + 0.2 * tone, lin((176, 136, 92)), lin((134, 98, 62)))
+    base = base * (1 - 0.12 * flake[..., None]) + lin((196, 160, 112))[None, None, :] * 0.12 * flake[..., None]
+    grime = fbm(n, 2.4, 1, seed=304)
+    base *= (0.86 + 0.14 * grime[..., None])
+    rough = 0.48 + 0.18 * grime - 0.08 * flake
+    height = 0.6 * grain + 0.2 * flake
+    save_set(out, 'door_veneer', base, rough, np.zeros_like(rough), height, 0.9)
+
+
+def opening_labels(out):
+    """1024 x 512 label sheet for the opening's semantic props (see OPENING_CELLS):
+    0 staff access card face, 1 card reader face, 2 intercom badge, 3 'STAFF ONLY' door sign."""
+    W, H = 1024, 512
+    img = Image.new('RGB', (W, H), (20, 22, 24))
+    d = ImageDraw.Draw(img)
+    # 0: staff ID card (85.6 x 54 mm) in the top-left 512 x 256 cell.
+    x, y = 0, 0
+    d.rounded_rectangle([x + 8, y + 8, x + 504, y + 248], radius=26, fill=(238, 238, 232))
+    d.rectangle([x + 8, y + 8, x + 504, y + 62], fill=(20, 72, 120))
+    d.text((x + 24, y + 35), 'HALDEN VALE INFIRMARY', font=_font(30), fill=(245, 248, 250), anchor='lm')
+    d.rectangle([x + 28, y + 80, x + 148, y + 226], fill=(120, 126, 130))  # photo, faded to a grey ghost
+    d.ellipse([x + 58, y + 98, x + 118, y + 162], fill=(150, 154, 156))
+    d.rectangle([x + 46, y + 170, x + 130, y + 226], fill=(150, 154, 156))
+    d.text((x + 170, y + 100), 'E. SHAW', font=_font(40), fill=(25, 25, 25), anchor='lm')
+    d.text((x + 170, y + 142), 'Senior Staff Nurse', font=_font(24, False), fill=(40, 40, 40), anchor='lm')
+    d.text((x + 170, y + 176), 'WARD 4 WEST  -  NIGHTS', font=_font(22), fill=(150, 30, 28), anchor='lm')
+    d.text((x + 170, y + 214), 'STAFF ACCESS  0317', font=_font(20, False), fill=(60, 60, 60), anchor='lm')
+    # 1: card reader face: black gloss, logo, LED strip, 'PRESENT CARD'.
+    x, y = 512, 0
+    d.rectangle([x, y, x + 512, y + 256], fill=(14, 15, 17))
+    d.rounded_rectangle([x + 150, y + 40, x + 362, y + 150], radius=18, outline=(70, 74, 80), width=5)
+    d.arc([x + 206, y + 62, x + 306, y + 128], 200, 340, fill=(95, 100, 106), width=6)
+    d.arc([x + 226, y + 76, x + 286, y + 118], 200, 340, fill=(95, 100, 106), width=6)
+    d.rectangle([x + 150, y + 176, x + 362, y + 196], fill=(140, 18, 16))
+    d.text((x + 256, y + 228), 'PRESENT CARD', font=_font(24), fill=(150, 156, 160), anchor='mm')
+    # 2: intercom badge.
+    x, y = 0, 256
+    d.rectangle([x, y, x + 512, y + 256], fill=(206, 206, 198))
+    d.text((x + 256, y + 90), 'WARD INTERCOM', font=_font(44), fill=(30, 34, 38), anchor='mm')
+    d.text((x + 256, y + 160), 'Do not obstruct', font=_font(26, False), fill=(70, 72, 74), anchor='mm')
+    # 3: 'STAFF ONLY' sign.
+    x, y = 512, 256
+    d.rectangle([x + 6, y + 6, x + 506, y + 250], fill=(236, 234, 226))
+    d.rectangle([x + 6, y + 6, x + 506, y + 70], fill=(22, 58, 112))
+    d.text((x + 256, y + 38), 'NURSES\u2019 STATION', font=_font(34), fill=(245, 245, 245), anchor='mm')
+    d.text((x + 256, y + 140), 'STAFF ONLY', font=_font(56), fill=(30, 30, 30), anchor='mm')
+    d.text((x + 256, y + 210), 'Please ring for assistance', font=_font(24, False), fill=(70, 70, 70), anchor='mm')
+    arr = np.asarray(img).astype(np.float64) / 255.0
+    arr *= (0.92 + 0.08 * np.asarray(Image.fromarray((fbm(512, 2.2, 2, seed=305) * 255).astype(np.uint8)).resize((W, H)))[..., None] / 255.0)
+    Image.fromarray((np.clip(arr, 0, 1) * 255).astype(np.uint8)).save(os.path.join(out, 'opening_labels.jpg'), quality=92)
+
+
+# (u0, v0, u1, v1) of each label cell, v measured from the bottom (Blender/glTF UV convention).
+OPENING_CELLS = {'card': (0.0, 0.5, 0.5, 1.0), 'reader': (0.5, 0.5, 1.0, 1.0), 'intercom': (0.0, 0.0, 0.5, 0.5), 'staff': (0.5, 0.0, 1.0, 0.5)}
+
+
 if __name__ == '__main__':
     out = sys.argv[1] if len(sys.argv) > 1 else 'textures'
     os.makedirs(out, exist_ok=True)
-    for fn in (floor_vinyl, wall_paint, wainscot, ceiling_tile, wood_rail, water_stain, rust_drip, scratches, handprints, rot_veins, floor_wear, peeling, signage, decal_atlas):
+    for fn in (floor_vinyl, wall_paint, wainscot, ceiling_tile, wood_rail, water_stain, rust_drip, scratches, handprints, rot_veins, floor_wear, peeling, signage, decal_atlas, door_veneer, opening_labels):
         fn(out)
         print('NW_TEX', fn.__name__)

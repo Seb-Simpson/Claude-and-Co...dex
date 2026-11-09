@@ -13,5 +13,7 @@ python3 "$HERE/textures.py" "$WORK/tex"
 "$PY" "$HERE/bake_export.py" -- "$WORK/room104_set.blend" "$WORK/tex" "$WORK/game" "$@"
 python3 "$HERE/optimize_glb.py" "$WORK/game/room104_set.glb" "$ASSETS/room104_set.glb"
 cp "$WORK/game/room104_lightmap.jpg" "$WORK/game/room104_set.json" "$ASSETS/"
+# The manifest's byte count feeds the loading screen: record the optimised GLB's size.
+python3 -c "import json,os,sys;p=sys.argv[1];m=json.load(open(p));m['bytes']=os.path.getsize(sys.argv[2]);json.dump(m,open(p,'w'),indent=1)" "$ASSETS/room104_set.json" "$ASSETS/room104_set.glb"
 "$PY" "$HERE/preview_set.py" -- "$WORK/room104_set.blend" "$WORK/preview" "$@"
 echo "Room 104 set written to $ASSETS (previews in $WORK/preview)"

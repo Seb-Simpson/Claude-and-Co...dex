@@ -18,6 +18,7 @@ from mathutils import Euler, Matrix, Vector
 
 sys.path.insert(0, os.path.dirname(__file__))
 import nwset as nw  # noqa: E402
+import opening as op  # noqa: E402
 from nwset import g  # noqa: E402
 
 ARGS = sys.argv[sys.argv.index('--') + 1:] if '--' in sys.argv else []
@@ -32,7 +33,10 @@ R104 = (-15.6 + T / 2, -11.2 - T / 2)          # interior x range
 DOOR_W, DOOR_H = 1.2, 2.1
 DOORS_N = {'101': -16.4, '103': -12.0, '105': -7.6}
 DOORS_S = {'102': -16.4, '104': -12.0, '106': -7.6}
-COR_X = (-20.0, -7.0)
+COR_X = (-20.0, -0.2)
+# NW-005A: the set runs on to the station. Corridor openings per side: (from, to, bottom, top).
+OPEN_N = [(x - 0.6, x + 0.6, 0.0, 2.1) for x in DOORS_N.values()] + [(-6.4, -0.2, 0.0, 2.3)]          # + station counter
+OPEN_S = [(x - 0.6, x + 0.6, 0.0, 2.1) for x in list(DOORS_S.values()) + [-1.0]] + [(-6.725, -4.675, 0.0, 2.4)]  # + 108, connector
 HALF_PI = math.pi / 2
 
 nw.reset()
@@ -41,6 +45,8 @@ PROPS = nw.collection('props')
 WHEEL = nw.collection('wheelchair')
 DECALS = nw.collection('decals')
 OCCLUDERS = nw.collection('occluders')
+DOORLEAF = nw.collection('doorleaf')
+PICKUPS = nw.collection('pickups')
 
 # ---------------------------------------------------------------------------------------------
 # Materials. Shell materials are tiling image materials (UV in metres / tile size). Props use
@@ -57,6 +63,8 @@ M_WAINSCOT = nw.image_material('wainscot', tex('wainscot_albedo.jpg'), tex('wain
 M_CEIL = nw.image_material('ceiling_tile', tex('ceiling_tile_albedo.jpg'), tex('ceiling_tile_normal.jpg'), tex('ceiling_tile_orm.jpg'))
 M_RAIL = nw.image_material('wood_rail', tex('wood_rail_albedo.jpg'), tex('wood_rail_normal.jpg'), tex('wood_rail_orm.jpg'))
 M_SIGN = nw.image_material('signage', tex('signage.jpg'), rough_value=0.35)
+M_VENEER = nw.image_material('door_veneer', tex('door_veneer_albedo.jpg'), tex('door_veneer_normal.jpg'), tex('door_veneer_orm.jpg'))
+M_LABELS = op.labels_material(tex)
 M_DECAL = nw.image_material('decals', tex('decals.png'), rough_value=0.8, alpha_blend=True, emissive=tex('decals_glow.jpg'), emissive_strength=1.0)
 
 P = {
@@ -85,6 +93,11 @@ P = {
     'enamel': nw.pbr('enamel_white', (0.88, 0.88, 0.86), rough=0.3, grime=0.25),
     'dark': nw.pbr('void', (0.01, 0.01, 0.01), rough=1.0, grime=0.0),
     'skirting': nw.pbr('skirting_vinyl', (0.11, 0.17, 0.17), rough=0.45, grime=0.3),
+    # NW-005A door kit, curtain.
+    'frame': nw.pbr('frame_gloss', (0.74, 0.74, 0.69), rough=0.3, grime=0.45, grime_scale=4.0, bump=0.03, wear_color=(0.42, 0.33, 0.24), wear=0.12, streaks=0.1),
+    'bead': nw.pbr('bead_paint', (0.62, 0.6, 0.55), rough=0.35, grime=0.4, bump=0.03),
+    'lipping': nw.pbr('lipping_beech', (0.5, 0.36, 0.22), rough=0.4, grime=0.35, bump=0.03, wear_color=(0.3, 0.22, 0.14), wear=0.15),
+    'curtain': nw.pbr('curtain_print', (0.42, 0.55, 0.62), rough=0.92, grime=0.35, grime_scale=3.0, weave=1.0, bump=0.3, streaks=0.15),
 }
 
 
@@ -410,14 +423,11 @@ def tv_body():
     return p.finish()
 
 
-def wall_clock():
-    p = Prop('clock', -13.4, Z_SF, 0.0)
-    p.cyl('white', 0.17, 0.05, (0, 2.2, 0.025), axis='z', verts=40)
-    ob = p.finish()
-    # Dial on the signage atlas (cell 6: x 0-256, y 768-1024 of 1024).
-    dial = nw.cylinder('clock_dial', PROPS, 0.155, 0.002, g(0, 0, 0), axis='z', mat=M_SIGN, verts=40)
-    dial.rotation_euler = (math.pi / 2, 0, 0)
-    dial.location = g(-13.4, 2.2, Z_SF + 0.057)  # 7 mm proud of the body: no depth fighting in game
+def clock_dial(name, x, y, z, facing=1):
+    """Dial on the signage atlas (cell 6), 7 mm proud of the clock body; facing +1 looks +z."""
+    dial = nw.cylinder(name, PROPS, 0.155, 0.002, g(0, 0, 0), axis='z', mat=M_SIGN, verts=40)
+    dial.rotation_euler = (math.pi / 2, 0, 0 if facing > 0 else math.pi)
+    dial.location = g(x, y, z)
     nw.select_only([dial])
     bpy.ops.object.transform_apply(location=True, rotation=True, scale=True)
     me = dial.data
@@ -425,10 +435,17 @@ def wall_clock():
     for poly in me.polygons:
         for li in poly.loop_indices:
             co = me.vertices[me.loops[li].vertex_index].co
-            u = (co.x - (-13.4)) / 0.31 + 0.5
-            v = (co.z - 2.2) / 0.31 + 0.5
+            u = ((co.x - x) * facing) / 0.31 + 0.5
+            v = (co.z - y) / 0.31 + 0.5
             uv.data[li].uv = (u * 0.25, (1 - 0.75 - 0.25) + v * 0.25)
-    return [ob, dial]
+    return dial
+
+
+def wall_clock():
+    p = Prop('clock', -13.4, Z_SF, 0.0)
+    p.cyl('white', 0.17, 0.05, (0, 2.2, 0.025), axis='z', verts=40)
+    ob = p.finish()
+    return [ob, clock_dial('clock_dial', -13.4, 2.2, Z_SF + 0.057)]
 
 
 def troffer_housing(x, z, ceiling, name):
@@ -527,16 +544,15 @@ def corridor_shell():
     # Blue wayfinding line (the old procedural floor paint) at z 0.95.
     line = nw.box('cor_guide_line', SHELL, (a1 - a0, 0.002, 0.05), ((a0 + a1) / 2, 0.005, 0.95), mat=nw.pbr('guide_blue', (0.05, 0.16, 0.42), rough=0.35, grime=0.45, grime_scale=2.0), bevel=0.0)
     objs.append(line)
-    for zf, facing, doors in ((Z_CN, +1, DOORS_N), (Z_CS, -1, DOORS_S)):
+    for zf, facing, opens in ((Z_CN, +1, OPEN_N), (Z_CS, -1, OPEN_S)):
         tag = 'n' if facing > 0 else 's'
-        opens = [(x - DOOR_W / 2, x + DOOR_W / 2, 0.0, DOOR_H) for x in doors.values()]
         upper = nw.wall_skin(f'cor_wall_{tag}', SHELL, 'x', zf, a0, a1, 1.05, CEIL_COR, facing, opens, M_WALL)
         nw.world_uvs(upper, 1.5)
         lower = nw.wall_skin(f'cor_wainscot_{tag}', SHELL, 'x', zf, a0, a1, 0.1, 1.05, facing, opens, M_WAINSCOT, inset=0.008)
         nw.world_uvs(lower, 1.2)
         objs += [upper, lower]
         # Runs between door openings: skirting, wainscot cap and the beech crash rail on brackets.
-        cuts = sorted([a0, a1] + [v for x in doors.values() for v in (x - DOOR_W / 2, x + DOOR_W / 2)])
+        cuts = sorted([a0, a1] + [v for o in opens for v in (o[0], o[1])])
         runs = [(cuts[i], cuts[i + 1]) for i in range(0, len(cuts) - 1, 2) if cuts[i + 1] - cuts[i] > 0.3]
         for i, (r0, r1) in enumerate(runs):
             L = r1 - r0
@@ -567,8 +583,8 @@ def corridor_shell():
     # bulkhead trim, so the change of finish reads as a fire-compartment line, not a seam.
     objs.append(nw.box('cor_threshold', SHELL, (0.09, 0.006, Z_CS - Z_CN), (a1, 0.004, 0), mat=P['steel'], bevel=0.002))
     objs.append(nw.box('cor_bulkhead', SHELL, (0.12, 0.1, Z_CS - Z_CN), (a1, CEIL_COR - 0.05, 0), mat=P['enamel'], bevel=0.004))
-    # Ceiling troffer housings (x -18.2, -14.6, -11.0); -7.4 straddles x=-7 and stays procedural.
-    for x in (-18.2, -14.6, -11.0):
+    # Ceiling troffer housings (x -18.2 ... -3.8); -0.2 straddles the set's end and stays procedural.
+    for x in (-18.2, -14.6, -11.0, -7.4, -3.8):
         objs.append(troffer_housing(x, 0.0, CEIL_COR, f'cor_troffer_{x}'))
     return objs
 
@@ -659,7 +675,18 @@ def occluders():
     obs.append(nw.box('occ_w', OCCLUDERS, (0.1, 3.2, 5.2), (x0 - 0.06, 1.5, (Z_SF + Z_SB) / 2)))
     obs.append(nw.box('occ_e', OCCLUDERS, (0.1, 3.2, 5.2), (x1 + 0.06, 1.5, (Z_SF + Z_SB) / 2)))
     obs.append(nw.box('occ_door_leaf', OCCLUDERS, (0.05, 2.08, 1.1), (-11.45, 1.05, 2.2)))
-    obs.append(nw.box('occ_cor_end', OCCLUDERS, (0.1, 3.0, 3.0), (COR_X[1] - 3.0, 1.5, 0)))
+    obs.append(nw.box('occ_cor_end', OCCLUDERS, (0.1, 3.0, 3.0), (COR_X[1] + 0.6, 1.5, 0)))
+    # The station: its counter (light from the station pool falls over it into the corridor), its
+    # side partitions and back wall; and the connector's far wall.
+    obs.append(nw.box('occ_counter', OCCLUDERS, (5.0, 1.12, 0.95), (-3.8, 0.56, -1.97)))
+    obs.append(nw.box('occ_station_back', OCCLUDERS, (7.2, 3.0, 0.1), (-3.3, 1.5, -6.5)))
+    obs.append(nw.box('occ_station_w', OCCLUDERS, (0.1, 3.0, 5.0), (-6.85, 1.5, -3.9)))
+    obs.append(nw.box('occ_station_e', OCCLUDERS, (0.1, 3.0, 5.0), (0.25, 1.5, -3.9)))
+    obs.append(nw.box('occ_station_ceil', OCCLUDERS, (7.2, 0.1, 5.0), (-3.3, 2.76, -3.9)))
+    obs.append(nw.box('occ_connector_s', OCCLUDERS, (2.4, 3.0, 0.1), (-5.7, 1.5, 6.5)))
+    # Door leaves in their initial poses: 101, 103 closed (north), 106 closed (south); 105, 102 ajar.
+    for x, z in ((-16.4, -1.475), (-12.0, -1.475), (-7.6, 1.475), (-1.0, 1.475)):
+        obs.append(nw.box(f'occ_leaf_{x}', OCCLUDERS, (1.1, 2.08, 0.05), (x, 1.05, z)))
     return obs
 
 
@@ -671,10 +698,19 @@ def build():
     shell.append(clock[1])
     props.append(troffer_housing(-13.4, 3.6, CEIL_ROOM, 'r104_troffer'))
     props += bedding()
+    # NW-005A: door kit, the opening's props, corridor fixtures.
+    props += op.door_frames(PROPS, P)
+    props += op.card_reader(Prop, M_LABELS, PROPS)
+    props += op.intercom(Prop, M_LABELS, PROPS)
+    props += op.bed_curtain(Prop, P, PROPS)
+    props += op.corridor_fixtures(Prop, P, M_LABELS, M_SIGN, PROPS, clock_dial)
+    op.access_card(M_LABELS, PICKUPS)
+    hw, ven = op.door_leaf(Prop, P, M_VENEER, DOORLEAF)
+    op.door_glass(DOORLEAF)
     wc = wheelchair()
     decals = place_decals()
     occluders()
-    for ob in props + [wc]:
+    for ob in props + [wc, hw]:
         if ob.type == 'MESH':
             nw.select_only([ob])
             bpy.ops.object.shade_auto_smooth(angle=math.radians(35)) if hasattr(bpy.ops.object, 'shade_auto_smooth') else None
