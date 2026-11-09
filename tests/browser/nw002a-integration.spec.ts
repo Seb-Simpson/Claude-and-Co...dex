@@ -199,6 +199,29 @@ test('capture transitions to restart and recreates a clean session repeatedly', 
     });
   });
   const errors = await bootHospital(page);
+  const spawn = (await snapshot(page)).player!.position;
+  async function freshRenderedFrames(): Promise<void> {
+    // Capture the counter after ready/positioning. Counting from before a click
+    // can accidentally count frames from the old captured session.
+    const current = (await snapshot(page)).frameCount;
+    await expect.poll(async () => (await snapshot(page)).frameCount, { timeout: 30_000 }).toBeGreaterThan(current + 2);
+  }
+  async function prewarmPatient(): Promise<void> {
+    expect((await snapshot(page)).state).toBe('ready');
+    await freshRenderedFrames();
+    await positionPlayer(page, { x: -1, y: 0.01, z: 7.2 }, { x: 6, y: 1.65, z: 7.2 });
+    await freshRenderedFrames();
+    const visible = await snapshot(page);
+    await testInfo.attach(`session-${visible.sessionId}-visible-patient`, {
+      body: JSON.stringify({ frameCount: visible.frameCount, state: visible.state, player: visible.player!.position,
+        patient: visible.entities.find(entity => entity.type === 'patient'), renderer: visible.renderer,
+        performance: visible.performance }, null, 2), contentType: 'application/json',
+    });
+    // Preserve one identical spawn-camera view for each resource comparison.
+    await positionPlayer(page, spawn);
+    await freshRenderedFrames();
+  }
+  await prewarmPatient();
   await enterWard(page);
   const initial = await snapshot(page);
   const initialListeners = await page.evaluate(() => (window as unknown as Window & { nightWardListenerCount(): number }).nightWardListenerCount());
@@ -208,13 +231,11 @@ test('capture transitions to restart and recreates a clean session repeatedly', 
     await expect(page.getByRole('button', { name: /restart/i })).toBeVisible();
     await expect.poll(() => page.evaluate(() => document.pointerLockElement)).toBeNull();
     if (attempt === 1) await page.screenshot({ path: testInfo.outputPath('nw002a-captured.png') });
-    const previousFrame = (await snapshot(page)).frameCount;
     await page.getByRole('button', { name: /restart/i }).click();
     await expect.poll(async () => (await snapshot(page)).sessionId, { timeout: 60_000 }).toBe(initial.sessionId + attempt);
     await expect.poll(async () => (await snapshot(page)).state).toBe('ready');
-    // Ready includes GLB loading; two fresh renders attach/upload the final model
-    // before comparing same-pose resources across complete session resets.
-    await expect.poll(async () => (await snapshot(page)).frameCount).toBeGreaterThan(previousFrame + 1);
+    // Render the actual model before testing GPU resource release on each reset.
+    await prewarmPatient();
     const restarted = await snapshot(page);
     expect(restarted.player!.captured).toBe(false);
     expect(restarted.player!.hiding.state).toBe('outside');
@@ -233,7 +254,11 @@ test('capture transitions to restart and recreates a clean session repeatedly', 
     await testInfo.attach(`session-${attempt}-listeners`, { body: JSON.stringify({ baseline: initialListeners, current: listenerCount }, null, 2), contentType: 'application/json' });
   }
   await page.screenshot({ path: testInfo.outputPath('nw002a-restarted-room104.png') });
-  await page.evaluate(() => (window as DiagnosticWindow).nightWardTest.dispose());
+  await page.evaluate(async () => {
+    const frontend = (window as unknown as { nightWardFrontend?: { dispose(): void | Promise<void> } }).nightWardFrontend;
+    await frontend?.dispose();
+    await (window as DiagnosticWindow).nightWardTest.dispose();
+  });
   const final = await snapshot(page);
   expect(final.state).toBe('disposed');
   await expect(page.locator('canvas')).toHaveCount(0);
@@ -275,10 +300,12 @@ test('The Patient sees the player, pursues physically, loses an occluded trail a
 test('a physical Patient approach captures after a response window and offers restart', async ({ page }, testInfo) => {
   test.setTimeout(90_000);
   const errors = await bootHospital(page);
-  await positionPlayer(page, { x: 4.7, y: 0.01, z: 7.2 }, { x: 6, y: 1.35, z: 7.2 });
+  await positionPlayer(page, { x: 4.7, y: 0.01, z: 7.2 }, { x: 6, y: 1.65, z: 7.2 });
   await enterWard(page);
   const first = await snapshot(page);
   expect(first.player!.captured).toBe(false);
+  await page.screenshot({ path: testInfo.outputPath('nw002a-patient-closeup.png') });
+  expect((await snapshot(page)).player!.captured).toBe(false);
   await expect.poll(async () => (await snapshot(page)).state, { timeout: 30_000 }).toBe('captured');
   const captured = await snapshot(page);
   expect(captured.events.some(event => event.type === 'player:captured')).toBe(true);

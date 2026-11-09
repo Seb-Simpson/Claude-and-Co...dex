@@ -1,260 +1,555 @@
 {
-  "build": "index-BVyC75EZ.js",
-  "collectedRun": {
+  "run": "Fresh live production soak on final application source",
+  "startedAt": "2026-11-08T20:45:40.135Z",
+  "endedAt": "2026-11-08T20:56:14.965Z",
+  "browserVersion": "156.0.8078.79",
+  "applicationScripts": [
+    "http://127.0.0.1:4181/assets/index-DeSHEK8W.js"
+  ],
+  "softwareWebGL": true,
+  "viewport": {
     "width": 320,
-    "height": 180,
-    "softwareWebGL": true,
-    "baselineWallSeconds": 304.381,
-    "simulationSeconds": 128.61666666666173,
+    "height": 180
+  },
+  "durationSeconds": 634.83,
+  "measuredBaselineSeconds": 545.8620000000001,
+  "gameplaySecondsAtLateWindowEnd": 125.91666666666077,
+  "validation": {
+    "failures": [],
+    "limitations": [],
+    "earlyFps": 2.68380896392194,
+    "lateFps": 2.7452056943409504,
+    "ratio": 1.0228767141195063,
+    "postGcEarlyHeapMb": 13.966583251953125,
+    "postGcLateHeapMb": 13.522346496582031,
+    "postGcEarlyAudioNodes": 66,
+    "postGcLateAudioNodes": 64
+  },
+  "comparison": {
+    "earlyFps": 2.68380896392194,
+    "lateFps": 2.7452056943409504,
+    "ratio": 1.0228767141195063,
+    "absolutePlayableBaseline": false,
+    "earlyHeapMb": 13.966583251953125,
+    "lateHeapMb": 13.522346496582031,
+    "lateIntervalP95Ms": 716.6999999999534,
     "eastDoorOpened": true
   },
-  "validation": {
-    "source": "/workspace/night-ward/.playwright/nw002a-current-main-soak/report.json",
-    "assertionReplay": true,
-    "originalRunFailures": [
-      "Native AudioContext remained after disposal"
-    ],
-    "applicationSourceChanged": false,
-    "failures": [],
-    "limitations": [
-      "Initial recorded run did not count HUDs; full browser lifecycle tests cover HUD cleanup separately.",
-      "Initial run recorded native AudioContext.state via statechange, but did not record CDP contextChanged states."
-    ],
-    "earlyFps": 4.836790985267397,
-    "lateFps": 4.912846110008439,
-    "ratio": 1.0157242942630147,
-    "postGcEarlyHeapMb": 13.339851379394531,
-    "postGcLateHeapMb": 12.709392547607422,
-    "postGcEarlyAudioNodes": 61,
-    "postGcLateAudioNodes": 67
-  },
-  "early": {
-    "renderer": {
-      "calls": 187,
-      "triangles": 52522,
-      "geometries": 401,
-      "textures": 57
+  "assetResponses": [
+    {
+      "url": "http://127.0.0.1:4181/assets/room104_lightmap-D_2b-A71.jpg",
+      "filename": "room104_lightmap-D_2b-A71.jpg",
+      "status": 200
     },
+    {
+      "url": "http://127.0.0.1:4181/assets/room104_set-DGzj6Ffy.glb",
+      "filename": "room104_set-DGzj6Ffy.glb",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:4181/assets/patient-DM73rwxX.glb",
+      "filename": "patient-DM73rwxX.glb",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:4181/assets/nurse-BIF5i9Jb.glb",
+      "filename": "nurse-BIF5i9Jb.glb",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:4181/assets/crawler-BQpvZLcf.glb",
+      "filename": "crawler-BQpvZLcf.glb",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:4181/assets/watcher-CJf9k_Xr.glb",
+      "filename": "watcher-CJf9k_Xr.glb",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:4181/assets/reflection-qM1Wx9e4.glb",
+      "filename": "reflection-qM1Wx9e4.glb",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:4181/assets/room104_set-DGzj6Ffy.glb",
+      "filename": "room104_set-DGzj6Ffy.glb",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:4181/assets/patient-DM73rwxX.glb",
+      "filename": "patient-DM73rwxX.glb",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:4181/assets/watcher-CJf9k_Xr.glb",
+      "filename": "watcher-CJf9k_Xr.glb",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:4181/assets/nurse-BIF5i9Jb.glb",
+      "filename": "nurse-BIF5i9Jb.glb",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:4181/assets/crawler-BQpvZLcf.glb",
+      "filename": "crawler-BQpvZLcf.glb",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:4181/assets/reflection-qM1Wx9e4.glb",
+      "filename": "reflection-qM1Wx9e4.glb",
+      "status": 200
+    }
+  ],
+  "bootMessages": [
+    {
+      "type": "info",
+      "text": "NIGHT WARD: Room 104 visual set loaded (56446 triangles, 9 materials, 25 textures)"
+    },
+    {
+      "type": "info",
+      "text": "NIGHT WARD: Blender entity models loaded (5/5): patient, nurse, crawler, watcher, reflection"
+    },
+    {
+      "type": "info",
+      "text": "NIGHT WARD: Room 104 visual set loaded (56446 triangles, 9 materials, 25 textures)"
+    },
+    {
+      "type": "info",
+      "text": "NIGHT WARD: Blender entity models loaded (5/5): patient, nurse, crawler, watcher, reflection"
+    }
+  ],
+  "early": {
+    "wallSeconds": 33.922,
+    "simulationSeconds": 6.233333333333315,
+    "renderer": {
+      "calls": 183,
+      "triangles": 125714,
+      "geometries": 396,
+      "textures": 83
+    },
+    "colliders": 225,
     "engine": {
-      "sampleCount": 101,
+      "sampleCount": 87,
       "capacity": 240,
-      "totalFrames": 101,
-      "totalSubsteps": 465,
+      "totalFrames": 87,
+      "totalSubsteps": 405,
       "frameIntervalMs": {
-        "last": 266.7000000000007,
-        "mean": 256.156,
-        "p50": 200.10000000000036,
-        "p95": 433.40000000000146,
-        "max": 2166.5
+        "last": 50,
+        "mean": 350.9546511627907,
+        "p50": 300,
+        "p95": 633.2999999999993,
+        "max": 1833.2000000000003
       },
       "frameCpuMs": {
-        "last": 18.400000002235174,
-        "mean": 30.201980198078818,
-        "p50": 7.5,
-        "p95": 42.19999999925494,
-        "max": 1120
+        "last": 5.300000004470348,
+        "mean": 33.204597701629005,
+        "p50": 12.900000005960464,
+        "p95": 48.20000000298023,
+        "max": 1420.6999999955297
       },
       "fixedMs": {
-        "last": 5.299999997019768,
-        "mean": 1.648514851190076,
-        "p50": 1.4000000022351742,
-        "p95": 5.699999999254942,
-        "max": 7.599999997764826
+        "last": 0.8999999985098839,
+        "mean": 1.9885057470407979,
+        "p50": 1.5,
+        "p95": 5.699999995529652,
+        "max": 11.00000000745058
       },
       "physicsMs": {
-        "last": 0.5000000037252903,
-        "mean": 0.6297029706437399,
-        "p50": 0.3999999985098839,
-        "p95": 0.8000000007450581,
-        "max": 24
+        "last": 0.20000000298023224,
+        "mean": 0.579310344467903,
+        "p50": 0.30000000447034836,
+        "p95": 0.7999999970197678,
+        "max": 20.100000001490116
       },
       "updateMs": {
-        "last": 9.600000001490116,
-        "mean": 3.289108910736176,
-        "p50": 1,
-        "p95": 7,
-        "max": 54.600000001490116
+        "last": 1,
+        "mean": 8.732183908508427,
+        "p50": 6,
+        "p95": 41.20000000298023,
+        "max": 52.29999999701977
       },
       "renderMs": {
-        "last": 3,
-        "mean": 24.616831683286346,
-        "p50": 2.5,
-        "p95": 37.400000002235174,
-        "max": 1081.4000000022352
+        "last": 3.2000000029802322,
+        "mean": 21.882758620997954,
+        "p50": 3.7999999970197678,
+        "p95": 34.79999999701977,
+        "max": 1398.5
       },
       "substeps": {
-        "last": 5,
-        "mean": 4.603960396039604,
+        "last": 3,
+        "mean": 4.655172413793103,
         "p50": 5,
         "p95": 5,
         "max": 5
       }
     },
-    "heapMb": 13.339851379394531,
-    "nativeAudioNodes": {
+    "heapMb": 13.966583251953125,
+    "nativeAudio": {
       "available": true,
-      "nodes": 61,
+      "nodes": 66,
       "contexts": 1,
-      "created": 156,
-      "destroyed": 95
+      "created": 154,
+      "destroyed": 88,
+      "contextStates": [
+        "running"
+      ]
     },
     "activeSources": 21
   },
   "late": {
+    "wallSeconds": 595.08,
+    "simulationSeconds": 122.5499999999943,
     "renderer": {
-      "calls": 187,
-      "triangles": 52522,
-      "geometries": 401,
-      "textures": 57
+      "calls": 183,
+      "triangles": 125714,
+      "geometries": 396,
+      "textures": 83
     },
+    "colliders": 225,
     "engine": {
       "sampleCount": 240,
       "capacity": 240,
-      "totalFrames": 1694,
-      "totalSubsteps": 7759,
+      "totalFrames": 1553,
+      "totalSubsteps": 7384,
       "frameIntervalMs": {
-        "last": 183.29999999998836,
-        "mean": 201.24166666666667,
-        "p50": 200,
-        "p95": 383.29999999998836,
-        "max": 533.2999999999884
+        "last": 383.29999999993015,
+        "mean": 371.9987499999998,
+        "p50": 366.70000000001164,
+        "p95": 750,
+        "max": 900
       },
       "frameCpuMs": {
-        "last": 7.700000002980232,
-        "mean": 7.723333333308498,
-        "p50": 5.199999999254942,
-        "p95": 35.600000001490116,
-        "max": 46
+        "last": 8.600000001490116,
+        "mean": 10.236666666840513,
+        "p50": 7.700000002980232,
+        "p95": 41.100000001490116,
+        "max": 47.79999999701977
       },
       "fixedMs": {
-        "last": 1.1000000014901161,
-        "mean": 1.2812500000620881,
-        "p50": 0.7999999970197678,
-        "p95": 1.6000000014901161,
-        "max": 38.49999999627471
+        "last": 0.8000000044703484,
+        "mean": 1.3316666673558453,
+        "p50": 0.8000000044703484,
+        "p95": 2.7000000029802322,
+        "max": 39.599999994039536
       },
       "physicsMs": {
-        "last": 0.5,
-        "mean": 0.27624999994101623,
-        "p50": 0.20000000298023224,
+        "last": 0.19999999552965164,
+        "mean": 0.3287499994660417,
+        "p50": 0.29999999701976776,
         "p95": 0.5,
-        "max": 5.5
+        "max": 4.300000004470348
       },
       "updateMs": {
-        "last": 0.5,
-        "mean": 1.8549999999503295,
-        "p50": 0.6999999992549419,
-        "p95": 5.600000001490116,
-        "max": 38.899999998509884
+        "last": 1.8000000044703484,
+        "mean": 2.1979166666045784,
+        "p50": 0.8999999985098839,
+        "p95": 6.799999997019768,
+        "max": 40
       },
       "renderMs": {
-        "last": 5.600000001490116,
-        "mean": 4.30791666667598,
-        "p50": 2.199999999254942,
-        "p95": 8.300000000745058,
-        "max": 40.399999998509884
+        "last": 5.799999997019768,
+        "mean": 6.37375000010555,
+        "p50": 3.7000000029802322,
+        "p95": 35.5,
+        "max": 43.399999998509884
       },
       "substeps": {
         "last": 5,
-        "mean": 4.575,
+        "mean": 4.758333333333334,
         "p50": 5,
         "p95": 5,
         "max": 5
       }
     },
-    "heapMb": 12.709392547607422,
-    "nativeAudioNodes": {
+    "heapMb": 13.522346496582031,
+    "nativeAudio": {
       "available": true,
-      "nodes": 67,
+      "nodes": 64,
       "contexts": 1,
-      "created": 1655,
-      "destroyed": 1588
+      "created": 1911,
+      "destroyed": 1847,
+      "contextStates": [
+        "running"
+      ]
     },
     "activeSources": 19
   },
-  "noDrawFps": 56.23985108321135,
-  "earlyCpuTop": [
-    {
-      "functionName": "(idle) @ native:-1",
-      "milliseconds": 14111.825
-    },
-    {
-      "functionName": "(program) @ native:-1",
-      "milliseconds": 351.521
-    },
-    {
-      "functionName": "(garbage collector) @ native:-1",
-      "milliseconds": 75.914
-    },
-    {
-      "functionName": "multiplyMatrices @ http://127.0.0.1:4181/assets/three-B6KhIXl8.js:0",
-      "milliseconds": 52.114
-    },
-    {
-      "functionName": "uniform3f @ native:-1",
-      "milliseconds": 40.795
-    },
-    {
-      "functionName": "q @ http://127.0.0.1:4181/assets/three-B6KhIXl8.js:3986",
-      "milliseconds": 36.087
-    },
-    {
-      "functionName": "useProgram @ native:-1",
-      "milliseconds": 35.993
-    },
-    {
-      "functionName": "bindVertexArray @ native:-1",
-      "milliseconds": 32.631
-    }
-  ],
-  "lateCpuTop": [
-    {
-      "functionName": "(idle) @ native:-1",
-      "milliseconds": 14094.412
-    },
-    {
-      "functionName": "(program) @ native:-1",
-      "milliseconds": 251.696
-    },
-    {
-      "functionName": "uniformMatrix4fv @ native:-1",
-      "milliseconds": 88.937
-    },
-    {
-      "functionName": "bindVertexArray @ native:-1",
-      "milliseconds": 56.178
-    },
-    {
-      "functionName": "uniformMatrix3fv @ native:-1",
-      "milliseconds": 50.987
-    },
-    {
-      "functionName": "update @ http://127.0.0.1:4181/assets/index-BVyC75EZ.js:17",
-      "milliseconds": 46.009
-    },
-    {
-      "functionName": "(garbage collector) @ native:-1",
-      "milliseconds": 43.54
-    },
-    {
-      "functionName": "updateMatrixWorld @ http://127.0.0.1:4181/assets/three-B6KhIXl8.js:0",
-      "milliseconds": 39.317
-    }
-  ],
+  "noDrawFps": 53.3791999051034,
+  "cpuTop": {
+    "early": [
+      {
+        "functionName": "(idle) @ native:-1",
+        "milliseconds": 14379.303
+      },
+      {
+        "functionName": "(program) @ native:-1",
+        "milliseconds": 281.2
+      },
+      {
+        "functionName": "(garbage collector) @ native:-1",
+        "milliseconds": 115.768
+      },
+      {
+        "functionName": "setValue @ http://127.0.0.1:4181/assets/three-Bo8tlBzZ.js:3908",
+        "milliseconds": 53.385
+      },
+      {
+        "functionName": "Ir @ http://127.0.0.1:4181/assets/three-Bo8tlBzZ.js:4010",
+        "milliseconds": 45.957
+      },
+      {
+        "functionName": "intersectsShape @ http://127.0.0.1:4181/assets/rapier-DBjBuyhF.js:0",
+        "milliseconds": 32.887
+      },
+      {
+        "functionName": "getVertexPosition @ http://127.0.0.1:4181/assets/three-Bo8tlBzZ.js:0",
+        "milliseconds": 22.569
+      },
+      {
+        "functionName": "bindTexture @ native:-1",
+        "milliseconds": 15.918
+      },
+      {
+        "functionName": "updateMatrixWorld @ http://127.0.0.1:4181/assets/three-Bo8tlBzZ.js:0",
+        "milliseconds": 14.088
+      },
+      {
+        "functionName": "qo @ http://127.0.0.1:4181/assets/three-Bo8tlBzZ.js:4010",
+        "milliseconds": 13.54
+      },
+      {
+        "functionName": "uniform3f @ native:-1",
+        "milliseconds": 12.483
+      },
+      {
+        "functionName": "ff @ http://127.0.0.1:4181/assets/three-Bo8tlBzZ.js:3908",
+        "milliseconds": 10.83
+      },
+      {
+        "functionName": "clear @ native:-1",
+        "milliseconds": 9.507
+      },
+      {
+        "functionName": "renderBufferDirect @ http://127.0.0.1:4181/assets/three-Bo8tlBzZ.js:4010",
+        "milliseconds": 8.381
+      },
+      {
+        "functionName": "applyMatrix4 @ http://127.0.0.1:4181/assets/three-Bo8tlBzZ.js:0",
+        "milliseconds": 8.307
+      },
+      {
+        "functionName": "uniform1f @ native:-1",
+        "milliseconds": 8.143
+      },
+      {
+        "functionName": "update @ http://127.0.0.1:4181/assets/index-DeSHEK8W.js:13",
+        "milliseconds": 7.744
+      },
+      {
+        "functionName": "wasm-function[338] @ wasm://wasm/005fccd2:0",
+        "milliseconds": 7.479
+      },
+      {
+        "functionName": "multiplyMatrices @ http://127.0.0.1:4181/assets/three-Bo8tlBzZ.js:0",
+        "milliseconds": 7.152
+      },
+      {
+        "functionName": "requestAnimationFrame @ native:-1",
+        "milliseconds": 6.904
+      },
+      {
+        "functionName": "Af @ http://127.0.0.1:4181/assets/three-Bo8tlBzZ.js:3908",
+        "milliseconds": 6.785
+      },
+      {
+        "functionName": "Dr @ http://127.0.0.1:4181/assets/index-DeSHEK8W.js:0",
+        "milliseconds": 6.783
+      },
+      {
+        "functionName": "move @ http://127.0.0.1:4181/assets/index-DeSHEK8W.js:0",
+        "milliseconds": 6.424
+      },
+      {
+        "functionName": "q @ http://127.0.0.1:4181/assets/three-Bo8tlBzZ.js:3986",
+        "milliseconds": 6.064
+      },
+      {
+        "functionName": "Dp @ http://127.0.0.1:4181/assets/three-Bo8tlBzZ.js:3959",
+        "milliseconds": 5.967
+      },
+      {
+        "functionName": "activeTexture @ native:-1",
+        "milliseconds": 5.895
+      },
+      {
+        "functionName": "Bi @ http://127.0.0.1:4181/assets/three-Bo8tlBzZ.js:4010",
+        "milliseconds": 5.236
+      },
+      {
+        "functionName": "update @ http://127.0.0.1:4181/assets/index-DeSHEK8W.js:32",
+        "milliseconds": 5.119
+      },
+      {
+        "functionName": "update @ http://127.0.0.1:4181/assets/index-DeSHEK8W.js:0",
+        "milliseconds": 4.744
+      },
+      {
+        "functionName": "intersectTriangle @ http://127.0.0.1:4181/assets/three-Bo8tlBzZ.js:0",
+        "milliseconds": 4.391
+      }
+    ],
+    "late": [
+      {
+        "functionName": "(idle) @ native:-1",
+        "milliseconds": 14422.682
+      },
+      {
+        "functionName": "(program) @ native:-1",
+        "milliseconds": 265.329
+      },
+      {
+        "functionName": "intersectTriangle @ http://127.0.0.1:4181/assets/three-Bo8tlBzZ.js:0",
+        "milliseconds": 42.595
+      },
+      {
+        "functionName": "connect @ native:-1",
+        "milliseconds": 41.034
+      },
+      {
+        "functionName": "(garbage collector) @ native:-1",
+        "milliseconds": 26.113
+      },
+      {
+        "functionName": "multiplyMatrices @ http://127.0.0.1:4181/assets/three-Bo8tlBzZ.js:0",
+        "milliseconds": 19.086
+      },
+      {
+        "functionName": "getVertexPosition @ http://127.0.0.1:4181/assets/three-Bo8tlBzZ.js:0",
+        "milliseconds": 15.188
+      },
+      {
+        "functionName": "bindVertexArray @ native:-1",
+        "milliseconds": 14.762
+      },
+      {
+        "functionName": "convert @ http://127.0.0.1:4181/assets/three-Bo8tlBzZ.js:0",
+        "milliseconds": 13.096
+      },
+      {
+        "functionName": "updateMatrixWorld @ http://127.0.0.1:4181/assets/three-Bo8tlBzZ.js:0",
+        "milliseconds": 11.253
+      },
+      {
+        "functionName": "Os @ http://127.0.0.1:4181/assets/three-Bo8tlBzZ.js:4010",
+        "milliseconds": 11.122
+      },
+      {
+        "functionName": "Ir @ http://127.0.0.1:4181/assets/three-Bo8tlBzZ.js:4010",
+        "milliseconds": 10.127
+      },
+      {
+        "functionName": "renderBufferDirect @ http://127.0.0.1:4181/assets/three-Bo8tlBzZ.js:4010",
+        "milliseconds": 9.815
+      },
+      {
+        "functionName": "uniform3f @ native:-1",
+        "milliseconds": 8.987
+      },
+      {
+        "functionName": "s @ http://127.0.0.1:4181/assets/three-Bo8tlBzZ.js:4010",
+        "milliseconds": 8.515
+      },
+      {
+        "functionName": "ie @ http://127.0.0.1:4181/assets/three-Bo8tlBzZ.js:3986",
+        "milliseconds": 8.364
+      },
+      {
+        "functionName": "Bi @ http://127.0.0.1:4181/assets/three-Bo8tlBzZ.js:4010",
+        "milliseconds": 8.092
+      },
+      {
+        "functionName": "update @ http://127.0.0.1:4181/assets/index-DeSHEK8W.js:13",
+        "milliseconds": 7.564
+      },
+      {
+        "functionName": "Yo @ http://127.0.0.1:4181/assets/three-Bo8tlBzZ.js:4010",
+        "milliseconds": 7.234
+      },
+      {
+        "functionName": "clear @ native:-1",
+        "milliseconds": 7.207
+      },
+      {
+        "functionName": "uniformMatrix3fv @ native:-1",
+        "milliseconds": 6.729
+      },
+      {
+        "functionName": "setValue @ http://127.0.0.1:4181/assets/three-Bo8tlBzZ.js:3908",
+        "milliseconds": 6.283
+      },
+      {
+        "functionName": "m @ http://127.0.0.1:4181/assets/three-Bo8tlBzZ.js:3959",
+        "milliseconds": 6.261
+      },
+      {
+        "functionName": "Gs @ http://127.0.0.1:4181/assets/index-DeSHEK8W.js:0",
+        "milliseconds": 6.1
+      },
+      {
+        "functionName": "texSubImage2D @ native:-1",
+        "milliseconds": 5.978
+      },
+      {
+        "functionName": "update @ http://127.0.0.1:4181/assets/index-DeSHEK8W.js:0",
+        "milliseconds": 5.915
+      },
+      {
+        "functionName": "qo @ http://127.0.0.1:4181/assets/three-Bo8tlBzZ.js:4010",
+        "milliseconds": 5.903
+      },
+      {
+        "functionName": "vs @ http://127.0.0.1:4181/assets/three-Bo8tlBzZ.js:39",
+        "milliseconds": 5.622
+      },
+      {
+        "functionName": "bindTexture @ native:-1",
+        "milliseconds": 5.022
+      },
+      {
+        "functionName": "Qi @ http://127.0.0.1:4181/assets/three-Bo8tlBzZ.js:0",
+        "milliseconds": 4.765
+      }
+    ]
+  },
+  "afterRestart": {
+    "state": "playing",
+    "sessionId": 2,
+    "colliders": 225,
+    "audioState": "running"
+  },
   "afterDispose": {
     "state": "disposed",
     "colliders": 0,
     "canvases": 0,
-    "audioContextStates": [
-      {
-        "id": 0,
-        "state": "closed"
-      }
-    ]
+    "huds": 0,
+    "activeAudioSources": 0,
+    "nativeAudio": {
+      "contextStates": [
+        "closed"
+      ],
+      "nodes": 63
+    }
   },
-  "interpretation": [
-    "No progressive frame-rate collapse was observed through the timed east-door navigation regression.",
-    "The initial full collection exited on an incorrect context-object-destruction expectation. Corrected assertions were replayed offline on its unchanged raw measurements; this is disclosed in validation.",
-    "Only renderer-independent CPU stability is characterized at this software-rendering resolution. Native desktop GPU performance remains unverified."
+  "rawEvidence": {
+    "file": "soak-observations.json.gz",
+    "uncompressedSha256": "8d1c28a9102ab835048d1947b49594c387116ce16722626dd40f43f8ee118485",
+    "assertionReplay": false
+  },
+  "limits": [
+    "Software rendering at this resolution was slow from startup; this is not a native GPU benchmark.",
+    "Diagnostic draw suppression was enabled only after the measured soak.",
+    "The raw recording includes initial scenario positioning and identical-pose normalization; actual walking uses WASD/E."
   ]
 }

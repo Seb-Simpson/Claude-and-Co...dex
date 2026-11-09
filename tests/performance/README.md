@@ -23,9 +23,9 @@ Options use `--name=value`:
 - `--seconds=300 --simulation=120`: minimum baseline durations; smaller values are clamped to these minima.
 - `--timeout=2400`: maximum measured baseline wall seconds; slow software rendering may need longer than five minutes to reach 120 simulation seconds.
 - `--diagnostic-only`: short CPU/RAF and draw-suppression comparison; **does not constitute the full soak**.
-- `--analyze=.playwright/NAME/report.json`: re-evaluate recorded observations without launching a browser; writes `corrected-assertions.json` and explicitly labels this an assertion replay, not a new soak.
+- `--analyze=.playwright/NAME/report.json` (also accepts `.json.gz`): re-evaluate recorded observations without launching a browser; writes `corrected-assertions.json` and explicitly labels this an assertion replay, not a new soak.
 - `--output=.playwright/NAME`: JSON, `.cpuprofile`, and screenshot directory.
 
 Run with one browser process at a time. The Chromium path may be omitted when it is `/usr/bin/chromium`; this harness intentionally selects software WebGL for reproducible Linux CI diagnostics. Review the generated CPU profiles and native node trends before attributing a failure to an application leak.
 
-Audio disposal means the native context reaches `closed`, the application/backend/canvas/HUD are disposed, and restart reused one running context. It does not require the inspectable closed JavaScript context object to be immediately destroyed, nor every scheduled source to receive an `ended` callback after context closure.
+Audio disposal means the native context reaches `closed`, the application/backend/canvas/HUD are disposed, and restart preserves the initial context count while game audio stays running. The optional frontend is disposed too, because it owns a separate UI AudioContext. It does not require the inspectable closed JavaScript context object to be immediately destroyed, nor every scheduled source to receive an `ended` callback after context closure.

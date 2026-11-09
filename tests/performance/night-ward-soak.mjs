@@ -4,6 +4,7 @@ import { spawn } from 'node:child_process';
 import { mkdir, readFile, writeFile, access } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { resolve, join } from 'node:path';
+import { gunzipSync } from 'node:zlib';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const options = Object.fromEntries(process.argv.slice(2).map(arg => {
@@ -86,7 +87,7 @@ function validateSoak(data) {
   check(data.errors.length === 0, `Browser errors: ${data.errors.join('; ')}`);
   check(data.afterRestart.app.state === 'playing' && data.afterRestart.app.sessionId === early.app.sessionId + 1, 'Restart did not create one new playing session');
   check(data.afterRestart.app.colliderCount === early.app.colliderCount, 'Restart collider count changed');
-  check(data.afterRestart.nativeAudio.contexts === 1 && data.afterRestart.app.audioState === 'running', 'Restart did not reuse one running AudioContext');
+  check(data.afterRestart.nativeAudio.contexts === early.nativeAudio.contexts && data.afterRestart.app.audioState === 'running', 'Restart changed the baseline AudioContext count or stopped game audio');
   check(data.afterDispose.app.state === 'disposed' && data.afterDispose.app.colliderCount === 0 && data.afterDispose.canvases === 0, 'Backend/canvas disposal incomplete');
   if (data.afterDispose.huds !== undefined) check(data.afterDispose.huds === 0, 'HUD remained after disposal');
   else limitations.push('Initial recorded run did not count HUDs; full browser lifecycle tests cover HUD cleanup separately.');
@@ -97,7 +98,9 @@ function validateSoak(data) {
     postGcEarlyAudioNodes: early.nativeAudio.nodes, postGcLateAudioNodes: late.nativeAudio.nodes };
 }
 if (typeof options.analyze === 'string') {
-  const source = resolve(root, options.analyze); const data = JSON.parse(await readFile(source, 'utf8'));
+  const source = resolve(root, options.analyze);
+  const bytes = await readFile(source);
+  const data = JSON.parse((source.endsWith('.gz') ? gunzipSync(bytes) : bytes).toString('utf8'));
   const validation = validateSoak(data);
   const analysis = { source, assertionReplay: true, originalRunFailures: data.failures ?? [], runtimeRerun: false, ...validation };
   await save('corrected-assertions.json', analysis); console.log(JSON.stringify(analysis, null, 2));
@@ -369,9 +372,13 @@ try {
   await page.waitForFunction(() => window.nightWardTest.snapshot().state === 'ready', null, { timeout: 120_000 });
   await page.getByRole('button', { name: 'Enter ward', exact: true }).click();
   await sleep(5000); report.afterRestart = await observe('after-restart');
-  await page.evaluate(() => window.nightWardTest.dispose());
+  await page.evaluate(async () => {
+    await window.nightWardFrontend?.dispose();
+    await window.nightWardTest.dispose();
+  });
   await sleep(1000);
-  report.afterDispose = await page.evaluate(() => ({ app: window.nightWardTest.snapshot(), audit: window.__nwSoak.audio, canvases: document.querySelectorAll('canvas').length, huds: document.querySelectorAll('[data-night-ward-hud]').length }));
+  report.afterDispose = await page.evaluate(() => ({ app: window.nightWardTest.snapshot(), audit: window.__nwSoak.audio, canvases: document.querySelectorAll('canvas').length, huds: document.querySelectorAll('[data-night-ward-hud]').length,
+    frontend: window.nightWardFrontend ? { mode: window.nightWardFrontend.mode } : null }));
   report.afterDispose.nativeAudio = { contextStates: [...audioContexts.values()], nodes: audioNodes.size };
   report.endedAt = new Date().toISOString(); report.durationSeconds = (Date.now() - startedAt) / 1000;
   report.validation = validateSoak(report); report.failures = report.validation.failures;
