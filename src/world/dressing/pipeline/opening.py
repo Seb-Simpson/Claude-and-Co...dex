@@ -454,3 +454,51 @@ def floor_clutter(Prop, P, col):
     p.cyl('white', 0.0045, 0.14, (0, 0.0075, 0), axis='x', verts=8)
     out.append(p.finish())
     return out
+
+
+def decay(Prop, P, ceil_mat, col):
+    """NW-005A scarier pass: the ward has been left to rot. A ceiling tile has fallen between the
+    tubes at x -11 and -7.4, over the old leak and its wet-floor sign (void, insulation, cables, the tile in pieces below), glass from a smashed
+    sharps-bin lid by the station, spilled pills, a single slipper from 104 in the corridor, and
+    a dropped observation chart. Everything is overhead or flat: nothing needs a collider."""
+    out = []
+    # The void: a black opening where the tile was (just below the set ceiling), its dirty edge,
+    # fibreglass insulation sagging out, two cables hanging into the corridor.
+    cx, cz = -9.4, -0.35
+    out.append(nw.box('ceiling_void', col, (0.6, 0.004, 0.6), (cx, CEIL_COR - 0.006, cz), mat=P['dark'], bevel=0.0))
+    p = Prop('ceiling_hole', cx, cz, 0.15, col=col)
+    for (sx, sz, ox, oz) in ((0.62, 0.025, 0, 0.3), (0.62, 0.025, 0, -0.3), (0.025, 0.62, 0.3, 0), (0.025, 0.62, -0.3, 0)):
+        p.box('steel', (sx, 0.02, sz), (ox, CEIL_COR - 0.01, oz), bevel=0.002)
+    p.box('insulation', (0.4, 0.14, 0.32), (0.05, CEIL_COR - 0.07, 0.04), rot=(0.25, 0, 0.1), bevel=0.05, segments=3)
+    p.tube('rubber', [(0.1, CEIL_COR, 0.05), (0.16, CEIL_COR - 0.4, 0.1), (0.1, CEIL_COR - 0.95, 0.12), (0.14, CEIL_COR - 1.1, 0.06)], 0.007)
+    p.tube('rubber', [(-0.12, CEIL_COR, -0.05), (-0.18, CEIL_COR - 0.3, -0.02), (-0.15, CEIL_COR - 0.62, -0.08)], 0.005)
+    p.box('steel', (0.03, 0.03, 0.05), (0.14, CEIL_COR - 1.12, 0.06), bevel=0.004)
+    out.append(p.finish())
+    # The fallen tile, in two pieces on the floor, face down and face up.
+    t1 = nw.box('fallen_tile_a', col, (0.36, 0.012, 0.6), (cx - 0.25, 0.01, cz + 0.4), yaw=0.5, mat=ceil_mat, bevel=0.002)
+    t2 = nw.box('fallen_tile_b', col, (0.26, 0.012, 0.45), (cx + 0.3, 0.012, cz + 0.15), yaw=-0.9, rot=(0.0, 0, 0.06), mat=ceil_mat, bevel=0.002)
+    for t in (t1, t2):
+        nw.world_uvs(t, 0.6)
+        out.append(t)
+    for i in range(9):
+        a = i * 2.3
+        out.append(nw.box(f'tile_crumb_{i}', col, (0.03 + (i % 3) * 0.01, 0.008, 0.02 + (i % 2) * 0.015), (cx + 0.5 * math.cos(a) * (0.3 + i * 0.06), 0.008, cz + 0.4 * math.sin(a) * (0.3 + i * 0.05)), yaw=a, mat=P['white'], bevel=0.002))
+    # Broken glass by the station (a sharps-bin lid), spilled pills, a dropped obs chart.
+    for i in range(12):
+        a = i * 1.37
+        r = 0.08 + (i % 5) * 0.07
+        out.append(nw.box(f'shard_{i}', col, (0.03 + (i % 4) * 0.012, 0.003, 0.02 + (i % 3) * 0.01), (-1.9 + r * math.cos(a), 0.0055, -0.9 + r * math.sin(a)), yaw=a * 1.7, mat=P['shard'], bevel=0.0))
+    for i in range(14):
+        a = i * 0.83
+        r = 0.05 + (i % 6) * 0.05
+        out.append(nw.cylinder(f'pill_{i}', col, 0.005, 0.004, (-5.3 + r * math.cos(a), 0.0065, -0.7 + r * math.sin(a) * 0.6), mat=P['pill_white'], verts=8))
+    p = Prop('obs_chart', -9.7, -0.75, 2.6, col=col)
+    p.box('beige', (0.25, 0.008, 0.33), (0, 0.008, 0), bevel=0.003)
+    p.box('paper', (0.22, 0.003, 0.29), (0, 0.0135, 0.01), bevel=0.0)
+    p.box('steel', (0.1, 0.012, 0.03), (0, 0.018, -0.15), bevel=0.003)
+    out.append(p.finish())
+    # One slipper, like the pair left by 104's bed, in the corridor outside 106.
+    p = Prop('slipper', -8.1, 0.95, 2.2, col=col)
+    p.box('slipper', (0.1, 0.035, 0.26), (0, 0.02, 0), bevel=0.015, segments=3)
+    out.append(p.finish())
+    return out

@@ -166,7 +166,9 @@ export function buildShell(b: WorldBuilder): void {
 
   // ---- Corridor lighting ---------------------------------------------------------------------
   const corridorStates = [
-    [-18.2, 'flicker'], [-14.6, 'dead'], [-11.0, 'steady'], [-7.4, 'buzz'], [-3.8, 'steady'], [-0.2, 'dying'],
+    // NW-005A: most of Wing A's tubes have failed. Outside 104 one stutters (what the player sees
+    // through the door on waking); the next working tube is over the station approach.
+    [-18.2, 'dying'], [-14.6, 'dead'], [-11.0, 'flicker'], [-7.4, 'dead'], [-3.8, 'steady'], [-0.2, 'dying'],
     [3.4, 'steady'], [7.0, 'dead'], [10.6, 'flicker'], [14.2, 'dead'],
   ] as const;
   for (const [x, state] of corridorStates) troffer(b, ROOMS.corridor, x, 0, CEILING.corridor, state, ['nw:lights:corridor-main']);

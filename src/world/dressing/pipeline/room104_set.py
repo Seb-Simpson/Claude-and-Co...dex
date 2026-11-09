@@ -106,6 +106,10 @@ P = {
     'safety_yellow': nw.pbr('safety_yellow', (0.8, 0.62, 0.05), rough=0.45, grime=0.35, wear_color=(0.4, 0.35, 0.2), wear=0.1),
     'apron_white': nw.pbr('apron_film', (0.88, 0.9, 0.9), rough=0.3, grime=0.2, bump=0.1),
     'nitrile': nw.pbr('nitrile_blue', (0.12, 0.26, 0.62), rough=0.55, grime=0.2, bump=0.1),
+    'insulation': nw.pbr('insulation', (0.62, 0.5, 0.26), rough=0.98, grime=0.45, bump=0.6, bump_scale=30.0),
+    'shard': nw.pbr('glass_shard', (0.5, 0.56, 0.56), rough=0.08, grime=0.15, bump=0.0),
+    'pill_white': nw.pbr('pill_white', (0.86, 0.84, 0.8), rough=0.6, grime=0.15),
+    'slipper': nw.pbr('slipper_felt', (0.44, 0.54, 0.7), rough=0.95, grime=0.45, weave=1.0, bump=0.3),
     'curtain': nw.pbr('curtain_print', (0.42, 0.55, 0.62), rough=0.92, grime=0.35, grime_scale=3.0, weave=1.0, bump=0.3, streaks=0.15),
 }
 
@@ -665,6 +669,28 @@ def place_decals():
     out.append(decal('water_cor2', 'water', 1.2, 1.2, (-9.3, CEIL_COR - 0.004, -0.3), '-y', spin=2.0))
     out.append(decal('rust_cor', 'rust', 0.4, 0.9, (-9.6, 1.9, Z_CN + 0.012), '+z'))
     out.append(decal('scratches_cor', 'scratches', 0.6, 0.6, (-12.75, 1.35, Z_CS - 0.012), '-z', spin=0.2))
+    # NW-005A: years of neglect down the whole stretch to the station.
+    # Water through the ceiling: stains spreading from the tile joints, rust running down the walls.
+    for i, (x, z, s_, sp) in enumerate(((-13.9, -0.5, 1.4, 0.7), (-6.4, 0.4, 1.8, 2.4), (-5.6, -0.3, 1.1, 0.2), (-2.3, -0.1, 1.5, 1.4), (-18.6, 0.6, 1.2, 0.9))):
+        out.append(decal(f'water_cor_e{i}', 'water', s_, s_, (x, CEIL_COR - 0.004, z), '-y', spin=sp))
+    for i, (x, side) in enumerate(((-17.3, 'n'), (-13.6, 's'), (-5.9, 's'), (-4.9, 'n'), (-0.9, 'n'))):
+        zf = Z_CN + 0.012 if side == 'n' else Z_CS - 0.012
+        out.append(decal(f'rust_cor_e{i}', 'rust', 0.35, 0.9, (x, CEIL_COR - 0.5, zf), '+z' if side == 'n' else '-z'))
+    # Paint lifting off the upper walls in sheets.
+    for i, (x, y, side, w) in enumerate(((-19.2, 2.1, 'n', 0.9), (-15.0, 1.9, 's', 0.8), (-10.1, 2.25, 's', 0.7), (-8.9, 1.7, 'n', 0.9), (-6.6, 2.2, 'n', 0.6), (-3.0, 1.9, 's', 0.8), (-1.6, 2.3, 'n', 0.7))):
+        zf = Z_CN + 0.012 if side == 'n' else Z_CS - 0.012
+        out.append(decal(f'peeling_cor_{i}', 'peeling', w, w, (x, y, zf), '+z' if side == 'n' else '-z', spin=i * 0.9))
+    # Drag marks: something heavy was pulled from 104 down the corridor toward the station.
+    for i, (x, z, L, sp) in enumerate(((-11.0, 0.55, 2.4, 1.52), (-8.6, 0.35, 2.6, 1.6), (-6.1, 0.15, 2.4, 1.55), (-3.9, -0.1, 2.2, 1.66))):
+        out.append(decal(f'drag_cor_{i}', 'wear', 0.7, L, (x, 0.0062 + i * 0.0002, z), 'y', spin=sp))
+    # The rot follows the skirting out of 104, along to 106, and reaches the ceiling above its door.
+    out.append(decal('rot_cor_s2', 'rot', 1.1, 1.1, (-10.6, 0.45, Z_CS - 0.012), '-z', spin=0.8))
+    out.append(decal('rot_cor_s3', 'rot', 0.9, 0.9, (-8.9, 0.35, Z_CS - 0.012), '-z', spin=2.1))
+    out.append(decal('rot_cor_ceil', 'rot', 1.4, 1.4, (-12.0, CEIL_COR - 0.005, 0.7), '-y', spin=1.3))
+    # Ash handprints: low on the wall beside 106, and dragged along the station's counter front.
+    out.append(decal('hands_106', 'hands', 0.6, 0.6, (-6.95, 0.75, Z_CS - 0.012), '-z', spin=0.3))
+    out.append(decal('hands_counter', 'hands', 0.7, 0.7, (-2.6, 0.75, -1.565), '+z', spin=-0.2))
+    out.append(decal('scratches_106', 'scratches', 0.5, 0.5, (-8.35, 1.0, Z_CS - 0.012), '-z', spin=1.0))
     return out
 
 
@@ -716,6 +742,7 @@ def build():
     props += op.wet_floor_sign(Prop, M_CLABELS, PROPS)
     props += op.wall_details(Prop, P, M_CLABELS, PROPS)
     props += op.floor_clutter(Prop, P, PROPS)
+    props += op.decay(Prop, P, M_CEIL, PROPS)
     op.access_card(M_LABELS, PICKUPS)
     hw, ven = op.door_leaf(Prop, P, M_VENEER, DOORLEAF)
     op.door_glass(DOORLEAF)

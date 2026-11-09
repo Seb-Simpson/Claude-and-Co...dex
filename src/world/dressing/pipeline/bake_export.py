@@ -158,8 +158,10 @@ def area_light(name, pos, size, power, color, rot=(0, 0, 0)):
 
 
 cool = (0.86, 0.92, 1.0)
-area_light('L_r104', (-13.4, 2.72, 3.6), (1.15, 0.55), 70, cool)
-for x, p in ((-18.2, 30), (-11.0, 55), (-7.4, 25), (-3.8, 50), (-0.2, 8)):
+area_light('L_r104', (-13.4, 2.72, 3.6), (1.15, 0.55), 60, cool)
+# NW-005A: the game's corridor states: -18.2 dying, -14.6 and -7.4 dead, -11.0 flickering,
+# -3.8 working, -0.2 dying. Dead tubes bake no light.
+for x, p in ((-18.2, 10), (-11.0, 40), (-3.8, 50), (-0.2, 8)):
     area_light(f'L_cor_{x}', (x, 2.67, 0), (1.15, 0.55), p, cool)
 # NW-005A: the station is the lit island at the end of the corridor: its troffer and the desk lamp
 # (warm) spill over the counter into the corridor.
@@ -213,7 +215,7 @@ covered = i > 1e-5
 ref = np.percentile(i[covered], 97) if covered.any() else 1.0
 light = np.clip(i / ref, 0, 1) ** 0.5
 # NW-005A: deeper falloff away from the fixtures and darker contact shadows (was 0.45 + 0.55 each).
-lm = np.clip((0.3 + 0.7 * light) * (0.38 + 0.62 * a), 0, 1)
+lm = np.clip((0.2 + 0.8 * light) * (0.34 + 0.66 * a), 0, 1)
 lm_img = nw.new_image('room104_lightmap', LIGHTMAP, non_color=True)
 px = np.ones((LIGHTMAP * LIGHTMAP, 4))
 px[:, 0] = px[:, 1] = px[:, 2] = lm
