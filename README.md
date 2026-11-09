@@ -13,9 +13,9 @@ npm install
 npm run dev
 ```
 
-Open the Vite URL and click **Enter ward**. This captures the mouse and unlocks
+Open the Vite URL, choose **New Game**, then click **Enter ward**. This captures the mouse and unlocks
 browser audio. You start in room 104. WASD moves, Shift sprints, Ctrl/C crouches,
-E interacts and Escape releases the mouse. There are no weapons or attacks.
+E interacts and Escape pauses and releases the mouse. There are no weapons or attacks.
 
 Leave room 104 through its open door. The service connector leads to the
 maintenance passage; it rejoins the east corridor to form an escape loop. Listen
@@ -26,6 +26,7 @@ scene and presents **Restart**, which resets the ward without reloading the page
 For lighter graphics, open `/?nwSet=procedural` to use the original Room 104 and
 west corridor visuals. Collision, interactions, hiding and enemy behaviour stay
 the same. Both visual modes are covered by browser tests.
+The frontend's Settings → Display → Low preset also reduces render resolution.
 
 For a production build:
 

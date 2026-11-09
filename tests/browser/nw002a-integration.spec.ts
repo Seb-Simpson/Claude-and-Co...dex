@@ -254,7 +254,11 @@ test('capture transitions to restart and recreates a clean session repeatedly', 
     await testInfo.attach(`session-${attempt}-listeners`, { body: JSON.stringify({ baseline: initialListeners, current: listenerCount }, null, 2), contentType: 'application/json' });
   }
   await page.screenshot({ path: testInfo.outputPath('nw002a-restarted-room104.png') });
-  await page.evaluate(() => (window as DiagnosticWindow).nightWardTest.dispose());
+  await page.evaluate(async () => {
+    const frontend = (window as unknown as { nightWardFrontend?: { dispose(): void | Promise<void> } }).nightWardFrontend;
+    await frontend?.dispose();
+    await (window as DiagnosticWindow).nightWardTest.dispose();
+  });
   const final = await snapshot(page);
   expect(final.state).toBe('disposed');
   await expect(page.locator('canvas')).toHaveCount(0);

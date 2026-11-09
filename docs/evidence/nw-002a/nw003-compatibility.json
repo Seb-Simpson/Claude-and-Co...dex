@@ -1,0 +1,610 @@
+{
+  "scope": "Bounded compatibility against main5915f268e76700d3d4147aa77c5908cbd3c599ea; runtime unchanged",
+  "applicationBundle": "index-C6W9raLN.js",
+  "stats": {
+    "startTime": "2026-11-09T08:12:05.683Z",
+    "duration": 225274.572,
+    "expected": 3,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "tests": [
+    {
+      "test": "screens adapt to a laptop-small viewport",
+      "status": "passed",
+      "durationMs": 32018,
+      "evidence": {}
+    },
+    {
+      "test": "capture transitions to restart and recreates a clean session repeatedly",
+      "status": "passed",
+      "durationMs": 139027,
+      "evidence": {
+        "session-1-visible-patient": {
+          "frameCount": 10,
+          "state": "ready",
+          "player": {
+            "x": -1,
+            "y": 0.01,
+            "z": 7.2
+          },
+          "patient": {
+            "id": "nw:entity:patient",
+            "type": "patient",
+            "position": {
+              "x": 6,
+              "y": 0,
+              "z": 7.2
+            },
+            "state": "idle",
+            "lastKnownPlayer": null
+          },
+          "renderer": {
+            "calls": 235,
+            "triangles": 56264,
+            "geometries": 359,
+            "textures": 77
+          },
+          "performance": {
+            "fixedMaxMs": 0,
+            "updateMaxMs": 25.599999999976717,
+            "frameDeltaMaxMs": 100,
+            "simulatedSeconds": 0,
+            "engine": {
+              "sampleCount": 10,
+              "capacity": 240,
+              "totalFrames": 10,
+              "totalSubsteps": 41,
+              "frameIntervalMs": {
+                "last": 33.29999999999927,
+                "mean": 1164.7666666666667,
+                "p50": 266.7000000000007,
+                "p95": 6466.4,
+                "max": 6466.4
+              },
+              "frameCpuMs": {
+                "last": 2.900000000023283,
+                "mean": 664.259999999986,
+                "p50": 19.5,
+                "p95": 6415.199999999953,
+                "max": 6415.199999999953
+              },
+              "fixedMs": {
+                "last": 0,
+                "mean": 0.01999999999534339,
+                "p50": 0,
+                "p95": 0.09999999997671694,
+                "max": 0.09999999997671694
+              },
+              "physicsMs": {
+                "last": 0.09999999997671694,
+                "mean": 2.2699999999953433,
+                "p50": 0.5,
+                "p95": 18.699999999953434,
+                "max": 18.699999999953434
+              },
+              "updateMs": {
+                "last": 0.5999999999767169,
+                "mean": 6.329999999993015,
+                "p50": 2.900000000023283,
+                "p95": 25.599999999976717,
+                "max": 25.599999999976717
+              },
+              "renderMs": {
+                "last": 2.200000000069849,
+                "mean": 655.6000000000116,
+                "p50": 10.800000000046566,
+                "p95": 6389.5,
+                "max": 6389.5
+              },
+              "substeps": {
+                "last": 2,
+                "mean": 4.1,
+                "p50": 5,
+                "p95": 5,
+                "max": 5
+              }
+            }
+          }
+        },
+        "session-2-visible-patient": {
+          "frameCount": 35,
+          "state": "ready",
+          "player": {
+            "x": -1,
+            "y": 0.01,
+            "z": 7.2
+          },
+          "patient": {
+            "id": "nw:entity:patient",
+            "type": "patient",
+            "position": {
+              "x": 6,
+              "y": 0,
+              "z": 7.2
+            },
+            "state": "idle",
+            "lastKnownPlayer": null
+          },
+          "renderer": {
+            "calls": 235,
+            "triangles": 56264,
+            "geometries": 359,
+            "textures": 77
+          },
+          "performance": {
+            "fixedMaxMs": 0,
+            "updateMaxMs": 29.100000000093132,
+            "frameDeltaMaxMs": 100,
+            "simulatedSeconds": 0,
+            "engine": {
+              "sampleCount": 9,
+              "capacity": 240,
+              "totalFrames": 9,
+              "totalSubsteps": 34,
+              "frameIntervalMs": {
+                "last": 1749.9000000000015,
+                "mean": 1462.4375,
+                "p50": 116.69999999999709,
+                "p95": 8716.299999999996,
+                "max": 8716.299999999996
+              },
+              "frameCpuMs": {
+                "last": 3.299999999930151,
+                "mean": 982.3555555555504,
+                "p50": 12,
+                "p95": 8693.599999999977,
+                "max": 8693.599999999977
+              },
+              "fixedMs": {
+                "last": 0.09999999997671694,
+                "mean": 0.02222222221704821,
+                "p50": 0,
+                "p95": 0.09999999997671694,
+                "max": 0.09999999997671694
+              },
+              "physicsMs": {
+                "last": 0.19999999995343387,
+                "mean": 0.3111111111292202,
+                "p50": 0.30000000004656613,
+                "p95": 0.9000000000232831,
+                "max": 0.9000000000232831
+              },
+              "updateMs": {
+                "last": 0.9000000000232831,
+                "mean": 4.622222222219635,
+                "p50": 1.2999999999301508,
+                "p95": 29.100000000093132,
+                "max": 29.100000000093132
+              },
+              "renderMs": {
+                "last": 2,
+                "mean": 977.3444444444418,
+                "p50": 8.599999999976717,
+                "p95": 8664.399999999907,
+                "max": 8664.399999999907
+              },
+              "substeps": {
+                "last": 5,
+                "mean": 3.7777777777777777,
+                "p50": 5,
+                "p95": 5,
+                "max": 5
+              }
+            }
+          }
+        },
+        "session-1-resources": {
+          "sessionId": 2,
+          "colliderCount": 225,
+          "renderer": {
+            "calls": 183,
+            "triangles": 125714,
+            "geometries": 359,
+            "textures": 77
+          },
+          "performance": {
+            "fixedMaxMs": 0,
+            "updateMaxMs": 29.100000000093132,
+            "frameDeltaMaxMs": 100,
+            "simulatedSeconds": 0,
+            "engine": {
+              "sampleCount": 14,
+              "capacity": 240,
+              "totalFrames": 14,
+              "totalSubsteps": 57,
+              "frameIntervalMs": {
+                "last": 249.89999999999418,
+                "mean": 1126.8692307692304,
+                "p50": 249.89999999999418,
+                "p95": 8716.299999999996,
+                "max": 8716.299999999996
+              },
+              "frameCpuMs": {
+                "last": 8.399999999906868,
+                "mean": 633.5928571428522,
+                "p50": 8.399999999906868,
+                "p95": 8693.599999999977,
+                "max": 8693.599999999977
+              },
+              "fixedMs": {
+                "last": 0,
+                "mean": 0.014285714282388133,
+                "p50": 0,
+                "p95": 0.09999999997671694,
+                "max": 0.09999999997671694
+              },
+              "physicsMs": {
+                "last": 0.5,
+                "mean": 0.3285714285947116,
+                "p50": 0.30000000004656613,
+                "p95": 0.9000000000232831,
+                "max": 0.9000000000232831
+              },
+              "updateMs": {
+                "last": 2.5,
+                "mean": 3.549999999996674,
+                "p50": 1.1999999999534339,
+                "p95": 29.100000000093132,
+                "max": 29.100000000093132
+              },
+              "renderMs": {
+                "last": 5.399999999906868,
+                "mean": 629.6571428571312,
+                "p50": 5.399999999906868,
+                "p95": 8664.399999999907,
+                "max": 8664.399999999907
+              },
+              "substeps": {
+                "last": 5,
+                "mean": 4.071428571428571,
+                "p50": 5,
+                "p95": 5,
+                "max": 5
+              }
+            }
+          }
+        },
+        "session-1-listeners": {
+          "baseline": 39,
+          "current": 39
+        },
+        "session-3-visible-patient": {
+          "frameCount": 54,
+          "state": "ready",
+          "player": {
+            "x": -1,
+            "y": 0.01,
+            "z": 7.2
+          },
+          "patient": {
+            "id": "nw:entity:patient",
+            "type": "patient",
+            "position": {
+              "x": 6,
+              "y": 0,
+              "z": 7.2
+            },
+            "state": "idle",
+            "lastKnownPlayer": null
+          },
+          "renderer": {
+            "calls": 235,
+            "triangles": 56264,
+            "geometries": 359,
+            "textures": 77
+          },
+          "performance": {
+            "fixedMaxMs": 0,
+            "updateMaxMs": 60.09999999997672,
+            "frameDeltaMaxMs": 100,
+            "simulatedSeconds": 0,
+            "engine": {
+              "sampleCount": 9,
+              "capacity": 240,
+              "totalFrames": 9,
+              "totalSubsteps": 36,
+              "frameIntervalMs": {
+                "last": 516.6000000000058,
+                "mean": 1214.5375000000004,
+                "p50": 666.6000000000058,
+                "p95": 3816.5,
+                "max": 3816.5
+              },
+              "frameCpuMs": {
+                "last": 6.100000000093132,
+                "mean": 436.5,
+                "p50": 8.599999999976717,
+                "p95": 3803.79999999993,
+                "max": 3803.79999999993
+              },
+              "fixedMs": {
+                "last": 0,
+                "mean": 0,
+                "p50": 0,
+                "p95": 0,
+                "max": 0
+              },
+              "physicsMs": {
+                "last": 0.19999999995343387,
+                "mean": 0.511111111095589,
+                "p50": 0.30000000004656613,
+                "p95": 1.900000000023283,
+                "max": 1.900000000023283
+              },
+              "updateMs": {
+                "last": 3.300000000046566,
+                "mean": 13.077777777785538,
+                "p50": 1.599999999976717,
+                "p95": 60.09999999997672,
+                "max": 60.09999999997672
+              },
+              "renderMs": {
+                "last": 2.5,
+                "mean": 422.35555555556334,
+                "p50": 6.600000000093132,
+                "p95": 3743.5999999999767,
+                "max": 3743.5999999999767
+              },
+              "substeps": {
+                "last": 5,
+                "mean": 4,
+                "p50": 5,
+                "p95": 5,
+                "max": 5
+              }
+            }
+          }
+        },
+        "session-2-resources": {
+          "sessionId": 3,
+          "colliderCount": 225,
+          "renderer": {
+            "calls": 183,
+            "triangles": 125714,
+            "geometries": 359,
+            "textures": 77
+          },
+          "performance": {
+            "fixedMaxMs": 0,
+            "updateMaxMs": 60.09999999997672,
+            "frameDeltaMaxMs": 100,
+            "simulatedSeconds": 0,
+            "engine": {
+              "sampleCount": 14,
+              "capacity": 240,
+              "totalFrames": 14,
+              "totalSubsteps": 61,
+              "frameIntervalMs": {
+                "last": 166.6999999999971,
+                "mean": 898.684615384615,
+                "p50": 666.5999999999913,
+                "p95": 3816.5,
+                "max": 3816.5
+              },
+              "frameCpuMs": {
+                "last": 9.199999999953434,
+                "mean": 283.47142857143524,
+                "p50": 8.20000000006985,
+                "p95": 3803.79999999993,
+                "max": 3803.79999999993
+              },
+              "fixedMs": {
+                "last": 0,
+                "mean": 0,
+                "p50": 0,
+                "p95": 0,
+                "max": 0
+              },
+              "physicsMs": {
+                "last": 0.2999999999301508,
+                "mean": 0.4857142857092965,
+                "p50": 0.30000000004656613,
+                "p95": 1.900000000023283,
+                "max": 1.900000000023283
+              },
+              "updateMs": {
+                "last": 6.300000000046566,
+                "mean": 9.500000000008315,
+                "p50": 1.599999999976717,
+                "p95": 60.09999999997672,
+                "max": 60.09999999997672
+              },
+              "renderMs": {
+                "last": 2.5,
+                "mean": 273.11428571429235,
+                "p50": 6.099999999976717,
+                "p95": 3743.5999999999767,
+                "max": 3743.5999999999767
+              },
+              "substeps": {
+                "last": 5,
+                "mean": 4.357142857142857,
+                "p50": 5,
+                "p95": 5,
+                "max": 5
+              }
+            }
+          }
+        },
+        "session-2-listeners": {
+          "baseline": 39,
+          "current": 39
+        },
+        "session-4-visible-patient": {
+          "frameCount": 76,
+          "state": "ready",
+          "player": {
+            "x": -1,
+            "y": 0.01,
+            "z": 7.2
+          },
+          "patient": {
+            "id": "nw:entity:patient",
+            "type": "patient",
+            "position": {
+              "x": 6,
+              "y": 0,
+              "z": 7.2
+            },
+            "state": "idle",
+            "lastKnownPlayer": null
+          },
+          "renderer": {
+            "calls": 235,
+            "triangles": 56264,
+            "geometries": 359,
+            "textures": 77
+          },
+          "performance": {
+            "fixedMaxMs": 0,
+            "updateMaxMs": 19.200000000186265,
+            "frameDeltaMaxMs": 100,
+            "simulatedSeconds": 0,
+            "engine": {
+              "sampleCount": 11,
+              "capacity": 240,
+              "totalFrames": 11,
+              "totalSubsteps": 45,
+              "frameIntervalMs": {
+                "last": 1799.8999999999942,
+                "mean": 1409.9399999999994,
+                "p50": 116.69999999999709,
+                "p95": 9166.300000000003,
+                "max": 9166.300000000003
+              },
+              "frameCpuMs": {
+                "last": 8.300000000046566,
+                "mean": 841.5999999999873,
+                "p50": 8.699999999953434,
+                "p95": 9161.700000000186,
+                "max": 9161.700000000186
+              },
+              "fixedMs": {
+                "last": 0.10000000009313226,
+                "mean": 0.00909090909937566,
+                "p50": 0,
+                "p95": 0.10000000009313226,
+                "max": 0.10000000009313226
+              },
+              "physicsMs": {
+                "last": 0.30000000004656613,
+                "mean": 0.3999999999915334,
+                "p50": 0.30000000004656613,
+                "p95": 1,
+                "max": 1
+              },
+              "updateMs": {
+                "last": 5.7999999998137355,
+                "mean": 4.336363636359403,
+                "p50": 1.1999999999534339,
+                "p95": 19.200000000186265,
+                "max": 19.200000000186265
+              },
+              "renderMs": {
+                "last": 2.1000000000931323,
+                "mean": 836.82727272726,
+                "p50": 5.2999999998137355,
+                "p95": 9142.5,
+                "max": 9142.5
+              },
+              "substeps": {
+                "last": 5,
+                "mean": 4.090909090909091,
+                "p50": 5,
+                "p95": 5,
+                "max": 5
+              }
+            }
+          }
+        },
+        "session-3-resources": {
+          "sessionId": 4,
+          "colliderCount": 225,
+          "renderer": {
+            "calls": 183,
+            "triangles": 125714,
+            "geometries": 359,
+            "textures": 77
+          },
+          "performance": {
+            "fixedMaxMs": 0,
+            "updateMaxMs": 19.200000000186265,
+            "frameDeltaMaxMs": 100,
+            "simulatedSeconds": 0,
+            "engine": {
+              "sampleCount": 14,
+              "capacity": 240,
+              "totalFrames": 14,
+              "totalSubsteps": 60,
+              "frameIntervalMs": {
+                "last": 116.60000000000582,
+                "mean": 1184.5615384615387,
+                "p50": 116.69999999999709,
+                "p95": 9166.300000000003,
+                "max": 9166.300000000003
+              },
+              "frameCpuMs": {
+                "last": 10.5,
+                "mean": 663.5071428571329,
+                "p50": 8.699999999953434,
+                "p95": 9161.700000000186,
+                "max": 9161.700000000186
+              },
+              "fixedMs": {
+                "last": 0,
+                "mean": 0.007142857149509447,
+                "p50": 0,
+                "p95": 0.10000000009313226,
+                "max": 0.10000000009313226
+              },
+              "physicsMs": {
+                "last": 0.39999999990686774,
+                "mean": 0.39285714285714285,
+                "p50": 0.30000000004656613,
+                "p95": 1,
+                "max": 1
+              },
+              "updateMs": {
+                "last": 3.8999999999068677,
+                "mean": 3.8142857142624313,
+                "p50": 1.0999999998603016,
+                "p95": 19.200000000186265,
+                "max": 19.200000000186265
+              },
+              "renderMs": {
+                "last": 6.2000000001862645,
+                "mean": 659.2714285714319,
+                "p50": 6.2000000001862645,
+                "p95": 9142.5,
+                "max": 9142.5
+              },
+              "substeps": {
+                "last": 5,
+                "mean": 4.285714285714286,
+                "p50": 5,
+                "p95": 5,
+                "max": 5
+              }
+            }
+          }
+        },
+        "session-3-listeners": {
+          "baseline": 39,
+          "current": 39
+        }
+      }
+    },
+    {
+      "test": "a physical Patient approach captures after a response window and offers restart",
+      "status": "passed",
+      "durationMs": 51651,
+      "evidence": {}
+    }
+  ],
+  "limits": [
+    "The full23-test suite and634.83-second soak predateNW003 and are recorded separately.",
+    "Software shader warmup still produces cold render stalls; nativeGPUperformance is unverified."
+  ]
+}

@@ -28,4 +28,4 @@ Options use `--name=value`:
 
 Run with one browser process at a time. The Chromium path may be omitted when it is `/usr/bin/chromium`; this harness intentionally selects software WebGL for reproducible Linux CI diagnostics. Review the generated CPU profiles and native node trends before attributing a failure to an application leak.
 
-Audio disposal means the native context reaches `closed`, the application/backend/canvas/HUD are disposed, and restart reused one running context. It does not require the inspectable closed JavaScript context object to be immediately destroyed, nor every scheduled source to receive an `ended` callback after context closure.
+Audio disposal means the native context reaches `closed`, the application/backend/canvas/HUD are disposed, and restart preserves the initial context count while game audio stays running. The optional frontend is disposed too, because it owns a separate UI AudioContext. It does not require the inspectable closed JavaScript context object to be immediately destroyed, nor every scheduled source to receive an `ended` callback after context closure.

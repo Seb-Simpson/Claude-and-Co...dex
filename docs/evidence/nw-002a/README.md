@@ -56,3 +56,15 @@ node tests/performance/night-ward-soak.mjs --analyze=docs/evidence/nw-002a/soak-
 
 That command labels its output as an assertion replay. The primary recording above
 is a fresh live run, not a replay.
+
+## Newer frontend compatibility
+
+After NW-003 landed, three focused Chromium cases passed on that merged source:
+real title → New Game → loading → play → pause, three rendered-model restart
+cycles, and physical Patient capture. Each reset retained 225 colliders,
+359 geometries, 77 textures and 39 listeners (eight additional frontend listeners,
+with no increase across resets). See [nw003-compatibility.json](nw003-compatibility.json).
+Current Node tests pass 299 cases, with one optional pose-export generator skipped;
+typecheck and build pass. The full 23-test suite and 634.83-second soak above
+predate NW-003. Software shader warmup still stalls; this follow-up makes no
+newer-UI long-run or native-GPU performance claim.
