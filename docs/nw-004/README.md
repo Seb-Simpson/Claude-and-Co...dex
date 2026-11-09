@@ -16,6 +16,7 @@ and adapters have been implemented and verified.
    [Compatibility with Claude's published NW-004A handoff](CLAUDE-HANDOFF.md).
 6. [Implementation phases and acceptance matrix](PRODUCTION.md).
 7. [Implementation and verification report](IMPLEMENTATION.md).
+8. [Detailed Patient sequence, encounter API and acceptance](PATIENT-CHASE.md).
 
 The treatment precedes the implementation of chapter logic. Source-level proposals
 are explicitly distinguished from the contracts already installed in the game.

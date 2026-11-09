@@ -1,5 +1,13 @@
 # Fractured Ward integration handoff
 
+**Subsequent publication:** `475679d303993d9b192e73f4c5778953f455535c` on
+Claude's same environment branch withdraws the Fractured Ward expansion and
+proposes a focused story-driven ward layout. It is still a proposal, not an
+approved map or automatic revision of the chapter specification. See
+[PATIENT-CHASE.md](PATIENT-CHASE.md) for the current coordinate-independent chase
+brief and narrative decisions. The historical publication below explains the
+phase-one adapter compatibility; final room/route requirements await coordination.
+
 ## Observed publication, not a merge or map approval
 
 Latest fetch found `origin/feat/nw-004a-environment` at

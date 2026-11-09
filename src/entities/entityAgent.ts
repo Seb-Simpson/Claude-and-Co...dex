@@ -4,7 +4,8 @@ import type {
   PatrolRoute, PlayerNoiseEvent, PlayerProvider, Vec3,
 } from '../contracts';
 import type { CharacterBody, PhysicsAdapter } from '../physics';
-import { canHearNoise, canSeePlayer, isObserverSeenByPlayer } from './perception';
+import { canHearEnvironmentalSound, canHearNoise, canSeePlayer, isObserverSeenByPlayer } from './perception';
+import type { EnvironmentalSoundStimulus } from './environmentalSound';
 import type { EntityProfile } from './profiles';
 import { createStateMachine } from './stateMachine';
 
@@ -24,7 +25,7 @@ export interface EntityAgentOptions {
 }
 
 export interface EntityAgent {
-  fixedUpdate(frame: FrameContext, noises?: readonly PlayerNoiseEvent[]): void;
+  fixedUpdate(frame: FrameContext, noises?: readonly PlayerNoiseEvent[], sounds?: readonly EnvironmentalSoundStimulus[]): void;
   getSnapshot(): EntitySnapshot;
   witnessesEntry(): boolean;
   stop(reason?: ChaseEndedEvent['reason']): void;
@@ -51,6 +52,8 @@ export function createEntityAgent(options: EntityAgentOptions): EntityAgent {
   let detectionSeconds = 0;
   let lastSeenTime = -Infinity;
   let lastKnown: LastKnownPlayerPosition | null = null;
+  // A release chime is a place to investigate, not evidence of a player's identity/location.
+  let environmentalGoal: Vec3 | null = null;
   let chase: { id: string; started: number; playerId: string } | null = null;
   let chaseSequence = 0;
   let cooldownUntil = 0;
@@ -103,7 +106,9 @@ export function createEntityAgent(options: EntityAgentOptions): EntityAgent {
         chaseId: chase.id, entityId: spawn.entityId, playerId, position: copy(position()), timeSeconds: now,
       });
     }
-    machine.transition('pursue');
+    // A synchronous chase listener can settle/cancel this actor. Do not restore
+    // pursuit after that listener has revoked capture/movement authority.
+    if (!captureCommitted && !disposed) machine.transition('pursue');
   }
   function capture(playerId: string, targetPosition: Vec3): void {
     if (captureCommitted || !profile.canCapture) return;
@@ -183,6 +188,17 @@ export function createEntityAgent(options: EntityAgentOptions): EntityAgent {
       hasLineOfSight: (from, to) => physics.hasLineOfSight(from, to),
     })).sort((a, b) => b.timeSeconds - a.timeSeconds)[0];
   }
+  function environmentalHearing(sounds: readonly EnvironmentalSoundStimulus[]): EnvironmentalSoundStimulus | undefined {
+    let newest: EnvironmentalSoundStimulus | undefined;
+    for (const sound of sounds) {
+      if ((!newest || sound.timeSeconds > newest.timeSeconds) && canHearEnvironmentalSound({
+        observerPosition: position(), sound, config: profile, timeSeconds: now,
+        maxAgeSeconds: profile.hearingMaxAgeSeconds, occludedMultiplier: profile.hearingOcclusionMultiplier,
+        hasLineOfSight: (from, to) => physics.hasLineOfSight(from, to),
+      })) newest = sound;
+    }
+    return newest;
+  }
   function hidingApproach(): Vec3 | null {
     if (!witnessed) return null;
     if (witnessed.approach) return witnessed.approach;
@@ -198,7 +214,7 @@ export function createEntityAgent(options: EntityAgentOptions): EntityAgent {
   }
 
   return {
-    fixedUpdate(frame, noises = []) {
+    fixedUpdate(frame, noises = [], sounds = []) {
       if (disposed) return;
       if (!Number.isFinite(frame.deltaSeconds) || frame.deltaSeconds < 0 || !Number.isFinite(frame.elapsedSeconds)) {
         throw new Error('Invalid entity frame');
@@ -221,6 +237,7 @@ export function createEntityAgent(options: EntityAgentOptions): EntityAgent {
       }
       const seesPlayer = visible();
       if (seesPlayer) {
+        environmentalGoal = null;
         detectionSeconds += dt;
         lastSeenTime = now;
         lastKnown = { playerId: snapshot.id, position: copy(snapshot.position), timeSeconds: now, source: 'vision' };
@@ -229,10 +246,18 @@ export function createEntityAgent(options: EntityAgentOptions): EntityAgent {
         detectionSeconds = 0;
         const noise = hearing(noises);
         if (noise && !witnessed) {
+          environmentalGoal = null;
           lastKnown = { playerId: noise.playerId, position: copy(noise.position), timeSeconds: noise.timeSeconds, source: 'sound' };
           if (!chase) machine.transition('investigate');
+        } else if (!chase && !witnessed) {
+          const sound = environmentalHearing(sounds);
+          if (sound) {
+            environmentalGoal = copy(sound.position);
+            machine.transition('investigate');
+          }
         }
       }
+      if (captureCommitted || disposed) return;
       const observed = profile.observationRule === 'unobserved-only' && isObserverSeenByPlayer({
         observerPosition: position(), eyeHeight: profile.eyeHeight, player: snapshot,
         ...(options.playerEyeHeights ? { standingEyeHeight: options.playerEyeHeights.standing, crouchingEyeHeight: options.playerEyeHeights.crouching } : {}),
@@ -270,7 +295,7 @@ export function createEntityAgent(options: EntityAgentOptions): EntityAgent {
           if (machine.ageSeconds >= profile.lostTargetSeconds) machine.transition('search');
           break;
         case 'investigate': {
-          const target = witnessed ? hidingApproach() : lastKnown?.position;
+          const target = witnessed ? hidingApproach() : environmentalGoal ?? lastKnown?.position;
           if (target) {
             const reached = follow(target, profile.investigateSpeed);
             if (reached && !witnessed) machine.transition('search');
@@ -280,13 +305,15 @@ export function createEntityAgent(options: EntityAgentOptions): EntityAgent {
         }
         case 'search': {
           yaw += dt * 0.65;
-          if (lastKnown) {
+          const searchCenter = environmentalGoal ?? lastKnown?.position;
+          if (searchCenter) {
             const angle = searchIndex * Math.PI / 3;
             const offset = searchIndex === 0 ? 0 : profile.searchRadius;
-            const goal = { x: lastKnown.position.x + Math.sin(angle) * offset, y: lastKnown.position.y, z: lastKnown.position.z + Math.cos(angle) * offset };
+            const goal = { x: searchCenter.x + Math.sin(angle) * offset, y: searchCenter.y, z: searchCenter.z + Math.cos(angle) * offset };
             if (!navigation.isPositionValid(goal, profile.agent) || follow(goal, profile.searchSpeed)) searchIndex = (searchIndex + 1) % 7;
           }
           if (machine.ageSeconds >= profile.searchSeconds) {
+            environmentalGoal = null;
             endChase('escaped');
             machine.transition('return-to-patrol');
           }
@@ -322,8 +349,8 @@ export function createEntityAgent(options: EntityAgentOptions): EntityAgent {
     stop(reason = 'cancelled') {
       if (disposed) return;
       captureCommitted = true;
-      endChase(reason);
-      machine.transition('idle');
+      environmentalGoal = null;
+      try { endChase(reason); } finally { machine.transition('idle'); }
     },
     observeHiding(event) {
       if (disposed || event.playerId !== player.getSnapshot().id) return;
@@ -331,6 +358,7 @@ export function createEntityAgent(options: EntityAgentOptions): EntityAgent {
         const spot = options.hidingLocations?.find((value) => value.id === event.spotId);
         if (!spot) return;
         witnessed = { spot, playerId: event.playerId, expires: now + profile.hidingMemorySeconds, approach: null };
+        environmentalGoal = null;
         lastKnown = { playerId: event.playerId, position: copy(spot.playerPosition), source: 'witnessed-hiding', timeSeconds: now };
         // Witnessing the action is direct evidence, but capture still requires navigation and a grace/dwell.
         if (!chase && now >= cooldownUntil) startChase(event.playerId);
