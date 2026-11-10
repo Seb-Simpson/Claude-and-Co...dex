@@ -10,6 +10,11 @@ import { createInteractionSystem } from './interactions';
 import type { InteractionSystem } from './interactions';
 import { createGameplayHud } from './hud';
 import type { GameplayHud } from './hud';
+import { resolveOpeningBindings, openingPosition } from './opening/bindings';
+import { createOpeningInteractionAdapter, OPENING_INTERACTIONS } from './opening/adapter';
+import { createOpeningSequence } from './opening/controller';
+import type { OpeningPersistence, OpeningSequence } from './opening/controller';
+import type { InteractionOptions } from './interactions';
 
 export interface PlayerInputSource {
   readonly locked?: boolean;
@@ -30,6 +35,10 @@ export interface GameplayOptions {
   readonly attachControls?: boolean;
   readonly showHud?: boolean;
   readonly hasRequirement?: (id: string) => boolean;
+  readonly onNotification?: (message: string) => void;
+  readonly openingPersistence?: OpeningPersistence;
+  readonly initialDoorStates?: InteractionOptions['initialDoorStates'];
+  readonly handleInteraction?: InteractionOptions['handleInteraction'];
 }
 export interface GameplayRuntime extends ModuleInstance {
   readonly player: PlayerController;
@@ -37,6 +46,7 @@ export interface GameplayRuntime extends ModuleInstance {
   readonly interactions: InteractionSystem;
   readonly entities: EntitySystem;
   readonly presentation: EntityPresentation;
+  readonly opening?: OpeningSequence;
   /** Real camera/input lease for a host-driven cinematic. Actor safety remains director-owned. */
   acquireCinematicControl(): PlayerCameraControlLease | null;
   fixedUpdate(frame: FrameContext): void;
@@ -85,13 +95,20 @@ export function createGameplayRuntime(context: ModuleContext, options: GameplayO
       world, player, physics, events: context.events,
       witnesses: (spot) => entities?.witnessesFor(spot) ?? [],
       ...(options.hasRequirement === undefined ? {} : { hasRequirement: options.hasRequirement }),
+      ...(options.initialDoorStates === undefined ? {} : { initialDoorStates: options.initialDoorStates }),
+      ...(options.handleInteraction === undefined ? {} : { handleInteraction: options.handleInteraction }),
     });
     cleanup.push(() => interactions.dispose());
     cleanup.push(context.events.on('interaction:completed', (event) => {
       if (event.outcome === 'completed' && event.action === 'inspect') {
         const marker = world.interactables.find((value) => value.id === event.targetId);
-        hud?.notify(options.inspectionText?.(event.targetId) ?? marker?.prompt ?? 'Nothing useful here.');
-      } else if (event.outcome === 'blocked') hud?.notify(event.reason ?? 'The way is blocked.');
+        const message = options.inspectionText?.(event.targetId) ?? marker?.prompt ?? 'Nothing useful here.';
+        if (!message) return; // Content-owned inspections may already have provided specific feedback.
+        hud?.notify(message); options.onNotification?.(message);
+      } else if (event.outcome === 'blocked') {
+        const message = event.reason ?? 'The way is blocked.';
+        hud?.notify(message); options.onNotification?.(message);
+      }
     }));
     const captureSubscription = context.events.on('player:captured', (event) => {
       if (event.playerId === player.getSnapshot().id) player.setCaptured(true);
@@ -188,7 +205,7 @@ export function createGameplayRuntime(context: ModuleContext, options: GameplayO
           hidden: snapshot.hiding.state !== 'outside', prompt: player.controlsLocked ? null : interactions.getPrompt(),
         });
       },
-      notify(message) { hud?.notify(message); },
+      notify(message) { hud?.notify(message); options.onNotification?.(message); },
       dispose() {
         const errors = release();
         if (errors.length) throw new AggregateError(errors, 'NIGHT WARD gameplay cleanup failed');
@@ -206,9 +223,41 @@ export function createGameplayRuntime(context: ModuleContext, options: GameplayO
 export function createGameplayModule(options: GameplayOptions = {}): GameModule {
   return {
     id: 'night-ward:gameplay', kind: 'gameplay',
-    setup(context) {
+    async setup(context) {
       if (!context.world) return { dispose() {} };
-      return createGameplayRuntime(context, options);
+      const bindings = resolveOpeningBindings(context.world);
+      // Simulation-only hosts use the same core runtime without allocating browser presentation.
+      const document = context.engine.renderer.domElement?.ownerDocument;
+      if (!bindings || typeof document?.createElement !== 'function') return createGameplayRuntime(context, options);
+      const checkpoint = options.openingPersistence?.load() ?? null;
+      const adapter = createOpeningInteractionAdapter(context.world, bindings);
+      let opening: OpeningSequence | undefined;
+      let runtime: GameplayRuntime | undefined;
+      try {
+        runtime = createGameplayRuntime({ ...context, world: adapter.world }, { ...options, showHud: false, activeEntityTypes: [],
+          initialDoorStates: { [bindings['room-104-door'].doorId!]: checkpoint?.state.doorUnlocked ? 'closed' : 'locked',
+            [bindings['room-106-door'].doorId!]: 'locked' },
+          handleInteraction: (request, time) => opening?.handleInteraction(request, time) ?? true,
+          onNotification: message => opening?.notify(message),
+          inspectionText: id => Object.values(OPENING_INTERACTIONS).some(target => target === id) ? '' : options.inspectionText?.(id),
+        });
+        if (checkpoint?.milestone === 'station-approach') {
+          const destination = openingPosition(bindings['station-approach']);
+          if (!runtime.player.body.canOccupy(destination) || !runtime.physics.hasSupport(destination, runtime.player.body.radius)) {
+            throw new Error('Opening station checkpoint is obstructed or unsupported');
+          }
+          runtime.player.body.setPosition(destination);
+          runtime.player.update({ deltaSeconds: 0, elapsedSeconds: 0 });
+        }
+        opening = await createOpeningSequence({ ...context, world: adapter.world }, runtime, bindings, checkpoint,
+          options.openingPersistence ? cp => options.openingPersistence!.save(cp) : undefined);
+        const gameplay = runtime;
+        const sequence = opening;
+        return { ...gameplay, opening: sequence,
+          update(frame) { gameplay.update(frame); sequence.update(frame.deltaSeconds); },
+          dispose() { try { sequence.dispose(); } finally { try { gameplay.dispose(); } finally { adapter.dispose(); } } },
+        } satisfies GameplayRuntime;
+      } catch (error) { try { opening?.dispose(); } finally { try { runtime?.dispose(); } finally { adapter.dispose(); } } throw error; }
     },
   };
 }

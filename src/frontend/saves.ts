@@ -1,3 +1,6 @@
+import { validateOpeningCheckpoint } from '../gameplay/opening/checkpoint';
+import type { OpeningCheckpoint } from '../gameplay/opening/checkpoint';
+
 /**
  * The save slot behind "Continue".
  *
@@ -13,6 +16,7 @@ export interface SaveRecord {
   readonly playSeconds: number;
   readonly savedAt: number;
   readonly sessions: number;
+  readonly opening?: OpeningCheckpoint;
 }
 
 export const ROOM_104_CHECKPOINT = { id: 'nw:checkpoint:room-104-wake', label: 'Room 104 · Ward 4 West' } as const;
@@ -24,6 +28,7 @@ export interface SaveStore {
   begin(): SaveRecord;
   /** Add played time; records the session count on the first call of a session. */
   record(seconds: number, newSession: boolean): SaveRecord | null;
+  checkpoint(opening: OpeningCheckpoint): SaveRecord | null;
   clear(): void;
   readonly persistent: boolean;
 }
@@ -44,7 +49,12 @@ function valid(raw: unknown): SaveRecord | null {
   const r = raw as Partial<SaveRecord> | null;
   if (!r || r.version !== 1 || typeof r.checkpoint !== 'string' || typeof r.label !== 'string') return null;
   if (![r.playSeconds, r.savedAt, r.sessions].every((n) => typeof n === 'number' && Number.isFinite(n) && n >= 0)) return null;
-  return r as SaveRecord;
+  const opening = r.opening === undefined ? undefined : validateOpeningCheckpoint(r.opening);
+  // A malformed extension falls back to the original safe Room104 checkpoint.
+  const { opening: _opening, ...base } = r as SaveRecord;
+  if (r.opening !== undefined && !opening) return { ...base, checkpoint: ROOM_104_CHECKPOINT.id, label: ROOM_104_CHECKPOINT.label };
+  return { ...base, ...(opening ? { opening, checkpoint: `nw:checkpoint:${opening.milestone}`,
+    label: opening.milestone === 'station-approach' ? 'Nurses’ Station · West Ward' : 'Room 104 · Door released' } : {}) };
 }
 
 export function createSaveStore(storage?: Storage | null, now: () => number = Date.now): SaveStore {
@@ -75,6 +85,15 @@ export function createSaveStore(storage?: Storage | null, now: () => number = Da
         savedAt: now(),
         sessions: current.sessions + (newSession ? 1 : 0),
       };
+      write(next);
+      return next;
+    },
+    checkpoint(value) {
+      const opening = validateOpeningCheckpoint(value);
+      const current = read();
+      if (!opening || !current) return null;
+      const next: SaveRecord = { ...current, opening, checkpoint: `nw:checkpoint:${opening.milestone}`,
+        label: opening.milestone === 'station-approach' ? 'Nurses’ Station · West Ward' : 'Room 104 · Door released', savedAt: now() };
       write(next);
       return next;
     },
