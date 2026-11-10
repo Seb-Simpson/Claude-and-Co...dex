@@ -219,7 +219,7 @@ def linen_trolley():
         p.cyl('steel', 0.011, W - 0.06, (0, H - 0.015, sz * hz), axis='x', verts=10)
     for sx in (-1, 1):
         p.cyl('steel', 0.011, D - 0.06, (sx * hx, H - 0.015, 0), axis='z', verts=10)
-    p.tube('chrome', [(hx, 0.95, -0.17), (hx + 0.07, 0.97, -0.15), (hx + 0.07, 0.97, 0.15), (hx, 0.95, 0.17)], 0.012)
+    p.tube('chrome', [(hx, 0.95, -0.17), (hx + 0.022, 0.97, -0.15), (hx + 0.022, 0.97, 0.15), (hx, 0.95, 0.17)], 0.011)
     # Laundry: sheets and pillowcases at the bottom, blankets in the middle, gowns on top.
     folded_stack(p, ['linen'], -0.22, 0.17, 0.0, 0.38, 0.36, 9)
     folded_stack(p, ['pillowcase', 'linen'], 0.2, 0.17, 0.02, 0.36, 0.34, 7)
@@ -229,10 +229,10 @@ def linen_trolley():
     # One sheet half pulled out and hanging over the lower shelf's front edge.
     p.cloth('linen', (0.04, 0.42, D / 2 - 0.01), (1, 0, 0), (0, -1, 0), 0.32, 0.22, 6, 5, 0.008, 1.3, thickness=0.003)
     # The fitted cover: station side (local -z), both ends and the top; the front rolled up.
-    p.cloth('cover', (-W / 2 - 0.006, H + 0.004, -D / 2 - 0.008), (1, 0, 0), (0, -1, 0), W + 0.012, H - 0.17, 14, 12, 0.012, 0.7)
+    p.cloth('cover', (-W / 2 - 0.006, H - 0.006, -D / 2 - 0.008), (1, 0, 0), (0, -1, 0), W + 0.012, H - 0.18, 14, 12, 0.012, 0.7)
     for sx in (-1, 1):
-        p.cloth('cover', (sx * (W / 2 + 0.008), H + 0.004, -D / 2 - 0.006), (0, 0, 1), (0, -1, 0), D + 0.004, H - 0.2, 8, 12, 0.01, 2.1 + sx)
-    p.cloth('cover', (-W / 2 - 0.006, H + 0.008, -D / 2 - 0.008), (1, 0, 0), (0, 0, 1), W + 0.012, D - 0.08, 12, 6, 0.004, 3.3, sag=-0.012)
+        p.cloth('cover', (sx * (W / 2 + 0.008), H - 0.006, -D / 2 - 0.006), (0, 0, 1), (0, -1, 0), D + 0.004, H - 0.21, 8, 12, 0.01, 2.1 + sx)
+    p.cloth('cover', (-W / 2 - 0.006, H - 0.004, -D / 2 - 0.008), (1, 0, 0), (0, 0, 1), W + 0.012, D - 0.08, 12, 6, 0.003, 3.3, sag=-0.01)
     p.cyl('cover', 0.035, W - 0.02, (0, H - 0.035, D / 2 - 0.06), axis='x', verts=14)
     for sx in (-0.3, 0.3):
         p.box('cover', (0.025, 0.11, 0.08), (sx, H - 0.05, D / 2 - 0.05), bevel=0.008)

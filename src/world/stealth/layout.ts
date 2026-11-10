@@ -55,9 +55,9 @@ export const NURSE_EYE = 1.65;
 export const STATION_PROPS = {
   /** Linen trolley = the crouch-cover collider (STEALTH.screen). */
   trolley: { centre: STEALTH.screen.centre, size: STEALTH.screen.size },
-  /** Four-drawer filing cabinets on the back wall; B has a drawer left open (deeper box). */
-  cabinetA: { centre: v(-5.73, 0.66, -6.08), size: { x: 0.47, y: 1.32, z: 0.62 } },
-  cabinetB: { centre: v(-5.25, 0.66, -5.94), size: { x: 0.47, y: 1.32, z: 0.9 } },
+  /** Four-drawer filing cabinets on the back wall, depth including the drawer pulls; B has a drawer left open (deeper box). */
+  cabinetA: { centre: v(-5.73, 0.66, -6.06), size: { x: 0.47, y: 1.32, z: 0.66 } },
+  cabinetB: { centre: v(-5.25, 0.66, -5.915), size: { x: 0.47, y: 1.32, z: 0.95 } },
   /** Supply cupboard on the west wall, front facing +x, one door 22 degrees open. */
   cupboard: { centre: v(-6.405, 0.975, -5.2), size: { x: 0.63, y: 1.95, z: 0.9 } },
   /** Parked observations machine by the east wall. */

@@ -1,10 +1,11 @@
 import RAPIER from '@dimforge/rapier3d-compat';
-import { beforeAll, describe, expect, it } from 'vitest';
+import { mkdirSync, writeFileSync } from 'node:fs';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { ENTITY_PROFILES } from '../../../src/entities';
 import { createNavigationProvider, createPhysicsAdapter } from '../../../src/physics';
 import { createHospitalWorld } from '../../../src/world';
 import { ROOMS } from '../../../src/world/layout';
-import { EYE, NURSE_EYE, STEALTH } from '../../../src/world/stealth/layout';
+import { EYE, NURSE_EYE, STATION_PROPS, STEALTH } from '../../../src/world/stealth/layout';
 import { getNursesStationStealth } from '../../../src/world/stealth/nursesStation';
 
 /**
@@ -189,7 +190,80 @@ describe('Nurses’ Station stealth: hiding, lighting and geometry', () => {
   });
 });
 
-const record = (section: string, value: unknown): void => {
-  // Intentionally silent in tests; measurements are gathered by scripts/nw006a-measure (see docs).
-  void section; void value;
-};
+const measurements: Record<string, unknown> = {};
+const record = (section: string, value: unknown): void => { measurements[section] = value; };
+afterAll(() => {
+  if (!process.env.NW006A_REPORT) return;
+  mkdirSync('docs/nw-006a', { recursive: true });
+  writeFileSync('docs/nw-006a/measurements.json', `${JSON.stringify(measurements, null, 2)}\n`);
+});
+
+/** Her route as she walks it: a point every 0.25 m along each leg (waypoints alone miss what she passes). */
+function routeSamples(w: readonly { x: number; z: number }[]): { x: number; z: number }[] {
+  const out: { x: number; z: number }[] = [];
+  for (let i = 0; i < w.length; i++) {
+    const a = w[i]!;
+    const b = w[(i + 1) % w.length]!;
+    const n = Math.max(1, Math.ceil(dist(a, b) / 0.25));
+    for (let k = 0; k < n; k++) out.push({ x: a.x + (b.x - a.x) * k / n, z: a.z + (b.z - a.z) * k / n });
+  }
+  return out;
+}
+
+describe('Nurses’ Station stealth: along her whole route (sampled every 0.25 m)', () => {
+  it('hides a crouched player at the trolley from everywhere inside the station except the east gap', () => {
+    const f = fixture();
+    try {
+      const c = STEALTH.crouchCover;
+      const inside = routeSamples(STEALTH.patrolWaypoints).filter((p) => p.z < -1.6);
+      const seen = inside.filter((p) => f.physics.hasLineOfSight({ x: p.x, y: NURSE_EYE, z: p.z }, { x: c.x, y: EYE.crouching, z: c.z }));
+      const standing = inside.filter((p) => f.physics.hasLineOfSight({ x: p.x, y: NURSE_EYE, z: p.z }, { x: c.x, y: EYE.standing, z: c.z }));
+      record('crouchCoverRoute', { samplesInsideStation: inside.length, crouchedSeenFrom: seen.length, standingSeenFrom: standing.length, crouchedSeenMinX: Math.min(...seen.map((p) => p.x)) });
+      expect(inside.length).toBeGreaterThan(30);
+      // Every sample that sees a crouched player is at the east gap (east of the counter's end, x -1.3).
+      for (const p of seen) expect(p.x, JSON.stringify(p)).toBeGreaterThan(-1.3);
+      // Standing, she sees the player from most of the station.
+      expect(standing.length).toBeGreaterThan(inside.length / 2);
+    } finally { f.dispose(); }
+  });
+
+  it('second concealment: Room 105’s bed hiding is near the observation point, and the open floor beside it is not safe', () => {
+    const f = fixture();
+    try {
+      const s = getNursesStationStealth(f.h.world);
+      expect(s.hidingSecondary).toBe('nw:hiding:room-105-bed-b');
+      const spot = f.h.world.hidingLocations.find((h) => h.id === s.hidingSecondary)!;
+      expect(spot.type).toBe('bed');
+      for (const e of spot.exitCandidates) expect(f.physics.isPositionFree({ ...e.position, y: 0.003 }, PLAYER.radius, PLAYER.height), JSON.stringify(e.position)).toBe(true);
+      const at = s.concealment.position;
+      expect(dist(at, spot.exitCandidates[0]!.position)).toBeLessThan(0.05);
+      const path = f.navigation.findPath({ from: { ...s.observation.position, y: 0.003 }, to: { ...at, y: 0.003 }, agent: PLAYER });
+      expect(path?.reachesGoal).toBe(true);
+      let length = 0;
+      let prev = s.observation.position;
+      for (const w of path!.waypoints) { length += dist(prev, w); prev = w; }
+      // As she walks past the open door she can see the floor beside the bed: the player must hide, not just stand there.
+      const route = routeSamples(STEALTH.patrolWaypoints);
+      const seenFrom = route.filter((p) => dist(p, at) <= ENTITY_PROFILES.nurse.visionRange && f.physics.hasLineOfSight({ x: p.x, y: NURSE_EYE, z: p.z }, { x: at.x, y: EYE.standing, z: at.z }));
+      record('concealment105', { pathFromObservation: Number(length.toFixed(2)), routeSamplesSeeingOpenFloor: seenFrom.length });
+      expect(length).toBeLessThan(6);
+      expect(seenFrom.length).toBeGreaterThan(0);
+    } finally { f.dispose(); }
+  });
+
+  it('places a solid collider under every station prop, and keeps her legs and the locker exit clear of them', () => {
+    const f = fixture();
+    try {
+      for (const [name, p] of Object.entries(STATION_PROPS)) {
+        const match = f.h.world.colliders.find((c) => c.shape.type === 'box'
+          && Math.abs(c.pose.position.x - p.centre.x) < 0.01 && Math.abs(c.pose.position.y - p.centre.y) < 0.01 && Math.abs(c.pose.position.z - p.centre.z) < 0.01
+          && Math.abs(c.shape.halfExtents.x - p.size.x / 2) < 0.01 && Math.abs(c.shape.halfExtents.z - p.size.z / 2) < 0.01);
+        expect(match, name).toBeDefined();
+      }
+      // Her body clears every prop along her route.
+      for (const p of routeSamples(STEALTH.patrolWaypoints).filter((q) => q.z < -1.6)) {
+        expect(f.physics.isPositionFree({ x: p.x, y: 0.003, z: p.z }, NURSE.radius, NURSE.height), JSON.stringify(p)).toBe(true);
+      }
+    } finally { f.dispose(); }
+  });
+});

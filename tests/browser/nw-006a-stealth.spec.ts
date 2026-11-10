@@ -13,7 +13,7 @@ import { bootHospital, enterWard, positionPlayer, snapshot } from './application
 const OUT = process.env.NW006A_SHOTS;
 // Without --enable-unsafe-swiftshader this container's software renderer advances the simulation by
 // only ~0.05 s per real second, too slow for keyboard walking to finish (measured); this file only.
-test.use({ launchOptions: { executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE, args: ['--no-sandbox', '--enable-webgl', '--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] } });
+test.use({ launchOptions: { ...(process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE ? { executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE } : {}), args: ['--no-sandbox', '--enable-webgl', '--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] } });
 type V = { x: number; y: number; z: number };
 const VIEWS: readonly { name: string; at: V; look: V; crouch?: boolean }[] = [
   { name: '01-approach', at: { x: -9.6, y: 0, z: 0.2 }, look: { x: -4.0, y: 1.2, z: -1.6 } },
@@ -27,6 +27,7 @@ const VIEWS: readonly { name: string; at: V; look: V; crouch?: boolean }[] = [
   { name: '09-east-side', at: { x: -2.0, y: 0, z: -3.3 }, look: { x: -0.4, y: 0.9, z: -5.3 } },
   { name: '10-east-gap-entry', at: { x: -0.8, y: 0, z: -0.6 }, look: { x: -2.6, y: 1.0, z: -4.6 } },
   { name: '11-concealment-105', at: { x: -7.85, y: 0, z: -3.75 }, look: { x: -7.85, y: 0.3, z: -5.35 } },
+  { name: '13-glove-dispenser', at: { x: -0.8, y: 0, z: -2.9 }, look: { x: 0.12, y: 1.3, z: -1.82 } },
   { name: '12-exit-east', at: { x: 4.6, y: 0, z: 0.2 }, look: { x: 9.0, y: 1.3, z: 0.2 } },
 ];
 

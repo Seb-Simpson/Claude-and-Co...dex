@@ -2,7 +2,7 @@
   "walkedIntoStation": {
     "x": -3.4624365133886172,
     "y": 0.0029999985098838862,
-    "z": -4.580000000000003
+    "z": -4.700000000000003
   },
   "views": {
     "01-approach": {
@@ -115,6 +115,16 @@
       "calls": 57,
       "triangles": 148655
     },
+    "13-glove-dispenser": {
+      "player": {
+        "x": -0.8,
+        "y": 0.0029999985098838862,
+        "z": -2.9
+      },
+      "crouching": false,
+      "calls": 229,
+      "triangles": 158071
+    },
     "12-exit-east": {
       "player": {
         "x": 4.6,
@@ -133,60 +143,60 @@
     "textures": 98
   },
   "performance": {
-    "fixedMaxMs": 6.400000000372529,
-    "updateMaxMs": 16.399999999906868,
+    "fixedMaxMs": 5.600000000093132,
+    "updateMaxMs": 13.5,
     "frameDeltaMaxMs": 100,
-    "simulatedSeconds": 7.766666666666656,
+    "simulatedSeconds": 8.21666666666668,
     "engine": {
-      "sampleCount": 112,
+      "sampleCount": 118,
       "capacity": 240,
-      "totalFrames": 112,
-      "totalSubsteps": 495,
+      "totalFrames": 118,
+      "totalSubsteps": 522,
       "frameIntervalMs": {
-        "last": 1000,
-        "mean": 2179.492792792793,
-        "p50": 1750,
-        "p95": 6133.000000000007,
-        "max": 18299.300000000003
+        "last": 950,
+        "mean": 1950.4923076923078,
+        "p50": 1383.4000000000087,
+        "p95": 5699.799999999988,
+        "max": 19132.6
       },
       "frameCpuMs": {
-        "last": 6.599999999627471,
-        "mean": 188.98660714287377,
-        "p50": 6.599999999627471,
-        "p95": 21.299999999813735,
-        "max": 11310.299999999814
+        "last": 5.599999999976717,
+        "mean": 178.55508474576766,
+        "p50": 6.100000000093132,
+        "p95": 20.20000000006985,
+        "max": 12543.400000000023
       },
       "fixedMs": {
-        "last": 0.900000000372529,
-        "mean": 1.2857142857433896,
-        "p50": 0.8000000002793968,
-        "p95": 4.600000001024455,
-        "max": 7.299999999348074
+        "last": 1.1000000000931323,
+        "mean": 0.9813559321998382,
+        "p50": 0.7000000000698492,
+        "p95": 3.599999999976717,
+        "max": 7.099999999860302
       },
       "physicsMs": {
-        "last": 0.39999999990686774,
-        "mean": 0.758035714280725,
-        "p50": 0.40000000037252903,
-        "p95": 1.0000000009313226,
-        "max": 30.699999999720603
+        "last": 0.4999999998835847,
+        "mean": 0.7652542372924765,
+        "p50": 0.30000000004656613,
+        "p95": 1.0000000001164153,
+        "max": 43.5
       },
       "updateMs": {
-        "last": 0.8999999999068677,
-        "mean": 1.213392857150341,
-        "p50": 0.7000000001862645,
-        "p95": 4.400000000372529,
-        "max": 16.399999999906868
+        "last": 0.5,
+        "mean": 1.0245762711905844,
+        "p50": 0.5999999999767169,
+        "p95": 3,
+        "max": 13.5
       },
       "renderMs": {
-        "last": 4.2999999998137355,
-        "mean": 185.70535714284884,
-        "p50": 3.8999999999068677,
-        "p95": 15.199999999720603,
-        "max": 11305.799999999814
+        "last": 3.5,
+        "mean": 175.76525423728853,
+        "p50": 3.599999999976717,
+        "p95": 12.300000000046566,
+        "max": 12540.900000000023
       },
       "substeps": {
         "last": 5,
-        "mean": 4.419642857142857,
+        "mean": 4.423728813559322,
         "p50": 5,
         "p95": 5,
         "max": 5
@@ -194,5 +204,101 @@
     }
   },
   "colliders": 229,
-  "stationSet": "info NIGHT WARD: Nurses' Station set loaded (29328 triangles, 3 materials, 4 textures)"
+  "stationSet": "info NIGHT WARD: Nurses' Station set loaded (29328 triangles, 3 materials, 4 textures)",
+  "readability": {
+    "method": "sRGB-encoded luma over each full 1280x720 frame (SwiftShader); nearBlack = share of pixels below 0.04, clipped = above 0.98",
+    "views": {
+      "01-approach": {
+        "p5": 0.042,
+        "median": 0.153,
+        "p95": 0.303,
+        "nearBlack": 0.045,
+        "clipped": 0.0011
+      },
+      "02-observation": {
+        "p5": 0.02,
+        "median": 0.1,
+        "p95": 0.356,
+        "nearBlack": 0.178,
+        "clipped": 0.0011
+      },
+      "03-trolley-from-corridor": {
+        "p5": 0.024,
+        "median": 0.187,
+        "p95": 0.416,
+        "nearBlack": 0.123,
+        "clipped": 0.0003
+      },
+      "04-crouch-cover-standing": {
+        "p5": 0.038,
+        "median": 0.206,
+        "p95": 0.522,
+        "nearBlack": 0.059,
+        "clipped": 0.0029
+      },
+      "05-crouch-cover-crouched": {
+        "p5": 0.021,
+        "median": 0.183,
+        "p95": 0.457,
+        "nearBlack": 0.127,
+        "clipped": 0.0001
+      },
+      "06-trolley-station-side": {
+        "p5": 0.058,
+        "median": 0.21,
+        "p95": 0.485,
+        "nearBlack": 0.029,
+        "clipped": 0.0004
+      },
+      "07-records-corner": {
+        "p5": 0.058,
+        "median": 0.212,
+        "p95": 0.364,
+        "nearBlack": 0.021,
+        "clipped": 0.0
+      },
+      "08-back-desk": {
+        "p5": 0.045,
+        "median": 0.198,
+        "p95": 0.363,
+        "nearBlack": 0.046,
+        "clipped": 0.0
+      },
+      "09-east-side": {
+        "p5": 0.056,
+        "median": 0.15,
+        "p95": 0.238,
+        "nearBlack": 0.025,
+        "clipped": 0.0
+      },
+      "10-east-gap-entry": {
+        "p5": 0.028,
+        "median": 0.173,
+        "p95": 0.376,
+        "nearBlack": 0.107,
+        "clipped": 0.0006
+      },
+      "11-concealment-105": {
+        "p5": 0.079,
+        "median": 0.189,
+        "p95": 0.412,
+        "nearBlack": 0.007,
+        "clipped": 0.0
+      },
+      "12-exit-east": {
+        "p5": 0.064,
+        "median": 0.168,
+        "p95": 0.251,
+        "nearBlack": 0.025,
+        "clipped": 0.0
+      },
+      "13-glove-dispenser": {
+        "p5": 0.068,
+        "median": 0.201,
+        "p95": 0.406,
+        "nearBlack": 0.031,
+        "clipped": 0.0
+      }
+    }
+  }
 }
