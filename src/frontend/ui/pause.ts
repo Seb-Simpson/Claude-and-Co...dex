@@ -22,7 +22,7 @@ export function createPauseMenu(onAction: (action: PauseAction) => void, sound: 
   nav.update([
     { id: 'resume', label: 'Resume', description: 'Return to the ward. The mouse is captured again.' },
     { id: 'settings', label: 'Settings', description: 'Audio, controls, display and accessibility.' },
-    { id: 'restart', label: 'Restart Session', description: 'Wake in Room 104 again. Checkpoints within the ward are not recorded yet.' },
+    { id: 'restart', label: 'Restart Session', description: 'Return to your last checkpoint. Progress since then is lost.' },
     { id: 'menu', label: 'Return to Main Menu', description: 'End this session. Your checkpoint is kept.' },
   ]);
   const seal = el('div', { class: 'nw-pause__seal', 'aria-hidden': 'true' });

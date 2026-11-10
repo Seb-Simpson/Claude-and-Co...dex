@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>NIGHT WARD — NW-005B isolated opening fixture</title>
+    <link rel="icon" href="data:," />
+    <style>
+      #fixture-label { position:fixed;top:8px;left:12px;z-index:7;margin:0;pointer-events:none;color:#a0aaa1;font:10px/1.4 monospace;letter-spacing:.04em;text-shadow:0 1px 3px #000; }
+    </style>
+  </head>
+  <body>
+    <main id="app" aria-label="Synthetic opening gameplay test stage"></main>
+    <aside id="nw-frontend" aria-label="NIGHT WARD menus"></aside>
+    <div id="overlay" hidden><p id="status" role="status">Loading isolated opening fixture…</p></div>
+    <p id="fixture-label">NW-005B · isolated test geometry · not the hospital environment</p>
+    <script type="module" src="./room104-opening.ts"></script>
+  </body>
+</html>

@@ -65,6 +65,7 @@ export function createFrontend(options: FrontendOptions): Frontend {
   const { app, root, stage, settings } = options;
   const html = document.documentElement;
   const saves = options.saves ?? createSaveStore();
+  app.setOpeningPersistence?.({ load: () => saves.load()?.opening ?? null, save: value => { saves.checkpoint(value); } });
   const sound = createUiSound();
   const menuAudio = createMenuAudio();
   const menu = createMainMenu((a) => void onMenu(a), sound, {
@@ -203,7 +204,7 @@ export function createFrontend(options: FrontendOptions): Frontend {
     setMode('paused');
     // Render the frozen frame and read it back in the same task (the drawing buffer is still valid).
     app.redraw();
-    pause.show({ location: ROOM_104_CHECKPOINT.label, playSeconds: (saves.load()?.playSeconds ?? 0) + sessionSeconds, frame: canvas(), effects: settings.get().effects });
+    pause.show({ location: saves.load()?.label ?? ROOM_104_CHECKPOINT.label, playSeconds: (saves.load()?.playSeconds ?? 0) + sessionSeconds, frame: canvas(), effects: settings.get().effects });
     pause.focus('resume');
   }
 
@@ -239,7 +240,7 @@ export function createFrontend(options: FrontendOptions): Frontend {
     if (action === 'resume') resume();
     else if (action === 'settings') settingsPanel.open(() => pause.focus('settings'));
     else if (action === 'restart') {
-      if (await confirm.ask({ title: 'Restart this session?', body: 'You will wake in Room 104 again. Progress since then is lost.', confirm: 'Restart' })) {
+      if (await confirm.ask({ title: 'Restart this session?', body: 'Return to your last checkpoint? Progress since then is lost.', confirm: 'Restart' })) {
         saveProgress();
         pause.hide();
         void app.restart().catch(() => undefined);
