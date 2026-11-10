@@ -19,7 +19,7 @@ const MOODS: readonly (readonly [string, ZoneMood])[] = [
   ['treatment', { fog: 0.058, ambient: 0.24 }],
   ['waiting', { fog: 0.06, ambient: 0.24 }],
   // Fog kept moderate in corridors: the lit station 9 m away has to stay visible through it.
-  ['corridor', { fog: 0.05, ambient: 0.2 }],
+  ['corridor', { fog: 0.05, ambient: 0.13 }],
 ];
 
 const DEFAULT: ZoneMood = { fog: 0.06, ambient: 0.24 };

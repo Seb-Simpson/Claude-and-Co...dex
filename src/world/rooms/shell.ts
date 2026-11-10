@@ -166,9 +166,10 @@ export function buildShell(b: WorldBuilder): void {
 
   // ---- Corridor lighting ---------------------------------------------------------------------
   const corridorStates = [
-    // NW-005A: most of Wing A's tubes have failed. Outside 104 one stutters (what the player sees
-    // through the door on waking); the next working tube is over the station approach.
-    [-18.2, 'dying'], [-14.6, 'dead'], [-11.0, 'flicker'], [-7.4, 'dead'], [-3.8, 'steady'], [-0.2, 'dying'],
+    // NW-005A: Wing A's tubes have failed. Outside 104 one is dying: dark, with brief stutters of
+    // light (what the player sees through the door on waking). The only working tube is over the
+    // station approach, so the corridor between is real darkness with a lit place at its end.
+    [-18.2, 'dead'], [-14.6, 'dead'], [-11.0, 'dying'], [-7.4, 'dead'], [-3.8, 'steady'], [-0.2, 'dying'],
     [3.4, 'steady'], [7.0, 'dead'], [10.6, 'flicker'], [14.2, 'dead'],
   ] as const;
   // The one working tube of Wing A is over the station approach: brighter and with a longer reach,

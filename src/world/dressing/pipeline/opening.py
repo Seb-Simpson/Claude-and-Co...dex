@@ -474,18 +474,98 @@ def decay(Prop, P, ceil_mat, col):
     sharps-bin lid by the station, spilled pills, a single slipper from 104 in the corridor, and
     a dropped observation chart. Everything is overhead or flat: nothing needs a collider."""
     out = []
-    # The void: a black opening where the tile was (just below the set ceiling), its dirty edge,
-    # fibreglass insulation sagging out, two cables hanging into the corridor.
+    # The collapse (remodelled in the final polish: the insulation used to be one rounded box).
+    # A black opening where the tile was; the T-bar grid round it, one bar bent down; half the
+    # tile still hanging by an edge; mineral-wool insulation sagging through in a torn, lumpy
+    # drape; a strip of the polythene vapour barrier hanging; thin cables, one ending in a
+    # broken connector (the game puts an intermittent spark there).
+    import bmesh
+    import random
+    from mathutils import noise, Vector
+    rnd = random.Random(104)
     cx, cz = -9.4, -0.35
-    out.append(nw.box('ceiling_void', col, (0.6, 0.004, 0.6), (cx, CEIL_COR - 0.006, cz), mat=P['dark'], bevel=0.0))
+    top = CEIL_COR
+    out.append(nw.box('ceiling_void', col, (0.6, 0.004, 0.6), (cx, top - 0.006, cz), mat=P['dark'], bevel=0.0))
     p = Prop('ceiling_hole', cx, cz, 0.15, col=col)
-    for (sx, sz, ox, oz) in ((0.62, 0.025, 0, 0.3), (0.62, 0.025, 0, -0.3), (0.025, 0.62, 0.3, 0), (0.025, 0.62, -0.3, 0)):
-        p.box('steel', (sx, 0.02, sz), (ox, CEIL_COR - 0.01, oz), bevel=0.002)
-    p.box('insulation', (0.4, 0.14, 0.32), (0.05, CEIL_COR - 0.07, 0.04), rot=(0.25, 0, 0.1), bevel=0.05, segments=3)
-    p.tube('rubber', [(0.1, CEIL_COR, 0.05), (0.16, CEIL_COR - 0.4, 0.1), (0.1, CEIL_COR - 0.95, 0.12), (0.14, CEIL_COR - 1.1, 0.06)], 0.007)
-    p.tube('rubber', [(-0.12, CEIL_COR, -0.05), (-0.18, CEIL_COR - 0.3, -0.02), (-0.15, CEIL_COR - 0.62, -0.08)], 0.005)
-    p.box('steel', (0.03, 0.03, 0.05), (0.14, CEIL_COR - 1.12, 0.06), bevel=0.004)
+    for (sx, sz, ox, oz) in ((0.62, 0.022, 0, 0.3), (0.62, 0.022, 0, -0.3), (0.022, 0.62, -0.3, 0)):
+        p.box('enamel', (sx, 0.022, sz), (ox, top - 0.011, oz), bevel=0.002)
+    # The fourth bar has dropped at one end.
+    p.box('enamel', (0.022, 0.022, 0.62), (0.3, top - 0.075, 0.02), rot=(0.21, 0, 0), bevel=0.002)
+    p.tube('steel', [(0.3, top, -0.28), (0.3, top - 0.06, -0.27)], 0.0015, res=2)
+    # Thin cables: two grey twin-and-earth runs and one red fire-alarm cable.
+    p.tube('cable_grey', [(0.12, top, 0.1), (0.17, top - 0.35, 0.14), (0.1, top - 0.8, 0.16), (0.13, top - 1.02, 0.1)], 0.004, res=8)
+    p.tube('cable_grey', [(-0.16, top, -0.1), (-0.2, top - 0.25, -0.06), (-0.17, top - 0.52, -0.1)], 0.0035, res=8)
+    p.tube('red', [(0.02, top, -0.18), (0.05, top - 0.3, -0.2), (0.0, top - 0.7, -0.16)], 0.003, res=8)
+    p.box('white', (0.045, 0.02, 0.03), (0.13, top - 1.03, 0.1), rot=(0.3, 0, 0.4), bevel=0.004)
     out.append(p.finish())
+
+    def drape(name, mat, x0, x1, z0, z1, sag, nx, nz, lump, thickness, seed, taper=0.0):
+        """A sagging sheet hanging from the hole: deepest in the middle, noisy, with a ragged edge."""
+        bm = bmesh.new()
+        rows = []
+        for j in range(nz + 1):
+            v = j / nz
+            row = []
+            for i in range(nx + 1):
+                u = i / nx
+                edge = min(u, 1 - u, v, 1 - v) * 2          # 0 at the rim, 1 in the middle
+                bulge = math.sin(math.pi * u) ** 0.8 * math.sin(math.pi * v) ** 0.8
+                n = noise.noise(Vector((u * 3.1 + seed, v * 3.3, seed * 0.7)))
+                n2 = noise.noise(Vector((u * 9.0, v * 9.0 + seed, 1.3)))
+                y = top - 0.01 - sag * bulge * (0.75 + 0.45 * n) - lump * (0.5 + 0.5 * n2) * min(1.0, edge * 3)
+                jx = (rnd.random() - 0.5) * 0.02 * (1 - edge)
+                jz = (rnd.random() - 0.5) * 0.02 * (1 - edge)
+                w = 1 - taper * v
+                row.append(bm.verts.new(g(cx + (x0 + (x1 - x0) * u) * w + jx, y, cz + z0 + (z1 - z0) * v + jz)))
+            rows.append(row)
+        for j in range(nz):
+            for i in range(nx):
+                bm.faces.new((rows[j][i], rows[j][i + 1], rows[j + 1][i + 1], rows[j + 1][i]))
+        bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
+        ob = nw.mesh_object(name, bm, col, mat)
+        sol = ob.modifiers.new('solid', 'SOLIDIFY')
+        sol.thickness = thickness
+        nw.apply_all(ob)
+        nw.select_only([ob])
+        bpy.ops.object.shade_smooth()
+        return ob
+    # Mineral wool: two overlapping batts, one hanging lower than the other.
+    out.append(drape('insulation_a', P['insulation'], -0.24, 0.12, -0.2, 0.22, 0.2, 14, 14, 0.035, 0.05, 1.7))
+    out.append(drape('insulation_b', P['insulation'], -0.02, 0.26, -0.24, 0.06, 0.11, 12, 10, 0.03, 0.045, 5.2))
+
+    def hanging_sheet(name, mat, x, z, width, length, yaw, sway, seed):
+        """A torn strip hanging straight down from the grid, rippled, narrowing to a ragged end."""
+        bm = bmesh.new()
+        nx_, ny_ = 6, 14
+        rows = []
+        for j in range(ny_ + 1):
+            v = j / ny_
+            row = []
+            for i in range(nx_ + 1):
+                u = i / nx_ - 0.5
+                w = width * (1 - 0.55 * v ** 1.5) * (1 + 0.12 * noise.noise(Vector((v * 5, seed, 0))))
+                ripple = 0.03 * math.sin(u * 7 + v * 5 + seed) * v + sway * v * v
+                ragged = (rnd.random() * 0.05) if j == ny_ else 0.0
+                lx, lz = u * w, ripple
+                row.append(bm.verts.new(g(cx + x + lx * math.cos(yaw) - lz * math.sin(yaw), top - 0.01 - (length - ragged) * v, cz + z + lx * math.sin(yaw) + lz * math.cos(yaw))))
+            rows.append(row)
+        for j in range(ny_):
+            for i in range(nx_):
+                bm.faces.new((rows[j][i], rows[j][i + 1], rows[j + 1][i + 1], rows[j + 1][i]))
+        bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
+        ob = nw.mesh_object(name, bm, col, mat)
+        sol = ob.modifiers.new('solid', 'SOLIDIFY')
+        sol.thickness = 0.003
+        nw.apply_all(ob)
+        nw.select_only([ob])
+        bpy.ops.object.shade_smooth()
+        return ob
+    out.append(hanging_sheet('vapour_barrier', P['polythene'], -0.22, 0.18, 0.3, 0.55, 0.5, 0.06, 2.0))
+    out.append(hanging_sheet('foil_strip', P['foil'], 0.18, -0.22, 0.14, 0.3, -0.9, -0.04, 7.0))
+    # Half the tile still hangs from the grid by its long edge, sagging and water-stained.
+    half = nw.box('hanging_tile', col, (0.58, 0.014, 0.3), (cx - 0.02, top - 0.14, cz - 0.27), rot=(-1.15, 0, 0), mat=ceil_mat, bevel=0.002)
+    nw.world_uvs(half, 0.6)
+    out.append(half)
     # The fallen tile, in two pieces on the floor, face down and face up.
     t1 = nw.box('fallen_tile_a', col, (0.36, 0.012, 0.6), (cx - 0.25, 0.01, cz + 0.4), yaw=0.5, mat=ceil_mat, bevel=0.002)
     t2 = nw.box('fallen_tile_b', col, (0.26, 0.012, 0.45), (cx + 0.3, 0.012, cz + 0.15), yaw=-0.9, rot=(0.0, 0, 0.06), mat=ceil_mat, bevel=0.002)

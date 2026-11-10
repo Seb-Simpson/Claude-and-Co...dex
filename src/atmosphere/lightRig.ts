@@ -158,7 +158,9 @@ export class LightRig {
     const target = totalWeight > 0.01 ? 1 - litWeight / totalWeight : 0;
     this.darknessLevel += (target - this.darknessLevel) * Math.min(1, deltaSeconds * 2.5);
     this.fill.position.copy(camera);
-    this.fill.intensity = 0.22 + this.darknessLevel * 0.18;
+    // NW-005A: a weaker fill. It follows the camera, so a strong one lights everything near the
+    // player evenly and flattens the dark; this keeps the floor ahead readable and no more.
+    this.fill.intensity = 0.12 + this.darknessLevel * 0.16;
     for (const mesh of this.dirtyMeshes) if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
     this.dirtyMeshes.clear();
     this.assignPool(camera);
