@@ -5,6 +5,10 @@ import type { Vec3 } from '../../src/contracts';
 
 declare global { interface Window { nwOpeningEvidence?: unknown } }
 const real = process.env.NW005_REAL === '1';
+const softwareScale = process.env.NW005_SOFTWARE_SCALE === '1';
+async function scaleForSoftware(page: Page) {
+  if (softwareScale) await page.evaluate(() => (window.nightWardTest as Application).services()!.renderer.setPixelRatio(0.25));
+}
 const entry = real ? '/?test=1' : '/tests/browser/harness/room104-opening.html?test=1';
 const snap = (page: Page): Promise<ApplicationSnapshot> => page.evaluate(() => window.nightWardTest!.snapshot());
 const wait = { timeout: 40_000 };
@@ -16,6 +20,7 @@ async function boot(page: Page) {
   await page.goto(entry);
   await expect.poll(async () => (await snap(page)).state, { timeout: 120_000 }).toBe('ready');
   expect((await snap(page)).opening).toBeDefined();
+  await scaleForSoftware(page);
   await page.getByRole('button', { name: 'Enter ward', exact: true }).click();
   await expect.poll(async () => (await snap(page)).state, wait).toBe('playing');
   return errors;
@@ -71,7 +76,9 @@ test('awakening locks movement, pauses with settings, skips smoothly and hands b
   await page.keyboard.up('w');
   expect((await snap(page)).player!.position.x).toBeCloseTo(feet.x, 2);
   expect((await snap(page)).player!.position.z).toBeCloseTo(feet.z, 2);
+  await expect.poll(async () => (await snap(page)).state, wait).toBe('playing');
   await page.evaluate(() => document.exitPointerLock());
+  await expect.poll(async () => (await snap(page)).state, wait).toBe('paused');
   await expect.poll(async () => (await snap(page)).state, wait).toBe('paused');
   const paused = await snap(page);
   await page.waitForTimeout(700);
@@ -142,6 +149,7 @@ test('locked door, two one-shot Shaw cues, card reader, normal door, corridor an
   expect((await snap(page)).sessionId).toBe(before.sessionId + 1);
   expect((await snap(page)).colliderCount).toBe(before.colliderCount);
   expect((await snap(page)).opening!.state).toMatchObject({ awakened: true, cardAcquired: true, doorUnlocked: true, firstLinePlayed: true, secondLinePlayed: true });
+  await scaleForSoftware(page);
   await page.getByRole('button', { name: 'Enter ward', exact: true }).click();
   const point = data['station-approach']!.position;
   await page.evaluate((p: Vec3) => window.nightWardTest!.teleport(p), point);
@@ -170,6 +178,7 @@ test('saved station Continue, menu return, reload and New Game use the existing 
   await page.goto(`${entry}&menu=1`);
   await page.getByRole('button', { name: /^Continue/ }).click();
   await expect.poll(async () => (await snap(page)).state, { timeout: 120_000 }).toBe('ready');
+  await scaleForSoftware(page);
   await page.getByRole('button', { name: 'Enter ward', exact: true }).click();
   await expect.poll(async () => (await snap(page)).state, wait).toBe('playing');
   const restored = await snap(page);
@@ -177,7 +186,9 @@ test('saved station Continue, menu return, reload and New Game use the existing 
   expect(restored.opening!.cinematic).toBe(false);
   expect(restored.player!.position.x).toBeCloseTo(restored.opening!.anchors['station-approach']!.position.x, 2);
   await expect(page.locator('.nw-opening-ui__subtitle')).toBeHidden();
+  await expect.poll(async () => (await snap(page)).state, wait).toBe('playing');
   await page.evaluate(() => document.exitPointerLock());
+  await expect.poll(async () => (await snap(page)).state, wait).toBe('paused');
   await page.getByRole('button', { name: /^Return to Main Menu/ }).click();
   await page.getByRole('button', { name: 'Leave the ward', exact: true }).click();
   await expect(page.getByRole('button', { name: /^Continue/ })).toBeVisible();
@@ -189,8 +200,11 @@ test('saved station Continue, menu return, reload and New Game use the existing 
   await expect.poll(async () => (await snap(page)).state, { timeout: 120_000 }).toBe('ready');
   expect((await snap(page)).opening!.state.cardAcquired).toBe(true);
   expect((await snap(page)).colliderCount).toBe(restored.colliderCount);
+  await scaleForSoftware(page);
   await page.getByRole('button', { name: 'Enter ward', exact: true }).click();
+  await expect.poll(async () => (await snap(page)).state, wait).toBe('playing');
   await page.evaluate(() => document.exitPointerLock());
+  await expect.poll(async () => (await snap(page)).state, wait).toBe('paused');
   await page.getByRole('button', { name: /^Return to Main Menu/ }).click();
   await page.getByRole('button', { name: 'Leave the ward', exact: true }).click();
   await page.getByRole('button', { name: /^New Game/ }).click();

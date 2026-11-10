@@ -52,3 +52,17 @@ The draft is for integration review, not release approval. No automatic merge is
 | Menu/Continue/reload/NewGame, viewport, teardown | opening Chromium tests1–3; existing lifecycle tests |
 
 The source assets and geometry are not reviewed for Claude's coding quality; verification checks functional compatibility only.
+
+## Combined-browser performance boundary
+
+The hospital awakening also passed at the normal Low preset (saved full-resolution evidence: hospital/01-awake-low-quality.png and 02-intercom-low-quality.png). The full assisted route at that software-rendered resolution exceeded its original 240-second test deadline: only approximately 7 simulation seconds advanced. No claim of acceptable hardware frame rate follows from this run.
+
+For functional compatibility testing, `NW005_SOFTWARE_SCALE=1` explicitly sets test-only renderer pixel ratio 0.25. The combined route then passes through the card puzzle, both cues, physical door traversal,106/Nurse, retry and station handoff. Physics, collision and game clocks are unchanged. Images prefixed software-scale identify that reduced render resolution; DOM text remains native resolution. This is a test override, not a new shipping graphics preset or a performance fix. Real GPU performance/extended stability remain unverified.
+
+Command: `NW005_REAL=1 NW005_SOFTWARE_SCALE=1 PLAYWRIGHT_CHROMIUM_EXECUTABLE=/usr/bin/chromium npm run test:browser -- tests/browser/nw-005b-opening.spec.ts` in the separate combined checkout. The spec permits a longer total deadline for the multi-stage hospital route; per-action assertions remain in place.
+
+## Final combined functional results
+
+All three opening scenarios passed against NW-005A in the separate checkout: awakening and the full puzzle/corridor scenario passed together; the Continue/menu/reload/NewGame scenario passed in its isolated rerun (38.8s). The first menu attempt exposed a test race releasing pointer lock before asynchronous entry completed. The test now waits explicitly for playing and paused transitions. There was no production gameplay change for that race.
+
+Representative actual-hospital screenshots are under evidence/hospital. The unscaled Low awakening/intercom images and the explicitly prefixed software-scale puzzle/Nurse/handoff images are kept separate. No full unassisted playthrough or final voice/bed-camera approval is claimed.
