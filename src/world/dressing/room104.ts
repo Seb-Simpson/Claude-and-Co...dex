@@ -108,7 +108,20 @@ export async function loadRoom104Set(options: LoadRoom104Options = {}): Promise<
     doorLeaf.name = 'nw:room104-set:door-leaf';
   }
   const accessCard = take('access_card');
-  if (accessCard) accessCard.name = 'nw:opening:access-card-prop';
+  if (accessCard) {
+    accessCard.name = 'nw:opening:access-card-prop';
+    // The card shares the labels material with baked props (reader face, intercom badge). Those
+    // get the light map on UV channel 1; the card is a pickup with no light-map UVs, so on the
+    // shared material it sampled the map at nothing and rendered almost black. Its own material
+    // (same textures) takes the room's real light instead.
+    accessCard.traverse((o) => {
+      const mesh = o as Mesh;
+      if (!mesh.isMesh) return;
+      const own = (mesh.material as MeshStandardMaterial).clone();
+      own.name = 'opening_labels_card';
+      mesh.material = own;
+    });
+  }
   const materials = new Set<Material>();
   const textures = new Set<Texture>([lightmap]);
   const glow: MeshStandardMaterial[] = [];
@@ -136,6 +149,11 @@ export async function loadRoom104Set(options: LoadRoom104Options = {}): Promise<
           m.aoMapIntensity = 1;
           bakeLightIntoDirect(m);
         }
+        // The engine has no environment map, so fully metallic texels have nothing to reflect and
+        // render black (door plates, corner guards, bed frame). Scaling metalness lets the steel's
+        // own grey show under the ward's lights while keeping its highlights.
+        if (m.name === 'props_atlas' || m.name === 'doorleaf_atlas' || m.name === 'wheelchair_atlas') m.metalness = 0.4;
+        if (m.name === 'reader_led') { m.emissive.setRGB(1, 0.08, 0.05); m.emissiveIntensity = 1.6; }
         if (m.name === 'decals') {
           m.transparent = true;
           m.depthWrite = false;

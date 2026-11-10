@@ -39,7 +39,7 @@ scene = bpy.context.scene
 scene.render.engine = 'CYCLES'
 scene.cycles.device = 'CPU'
 
-TILED = {'floor_vinyl', 'wall_paint', 'wainscot', 'ceiling_tile', 'wood_rail', 'signage', 'decals', 'door_veneer', 'opening_labels', 'door_glass', 'corridor_labels'}
+TILED = {'floor_vinyl', 'wall_paint', 'wainscot', 'ceiling_tile', 'wood_rail', 'signage', 'decals', 'door_veneer', 'opening_labels', 'door_glass', 'corridor_labels', 'reader_led'}
 col = lambda n: bpy.data.collections[n]  # noqa: E731
 
 
@@ -73,7 +73,27 @@ nw.atlas_uvs([props_ob], margin=0.002)
 def bake_material_maps(ob, size, prefix, ao_into_albedo=False):
     """Bake albedo, ORM (G rough, B metal) and normal from the procedural materials onto UVMap."""
     albedo = nw.new_image(f'{prefix}_albedo', size)
+    # Cycles' diffuse-colour pass is black for fully metallic surfaces, which baked every steel and
+    # chrome part's base colour to black (and the engine has no environment map for them to reflect).
+    # Bake the colour with metalness off, then restore it for the metalness bake below.
+    metal_saved = []
+    seen = set()
+    for slot in ob.material_slots:
+        if slot.material.name in seen:
+            continue
+        seen.add(slot.material.name)
+        bsdf = next(n for n in slot.material.node_tree.nodes if n.type == 'BSDF_PRINCIPLED')
+        sock = bsdf.inputs['Metallic']
+        link = sock.links[0] if sock.links else None
+        metal_saved.append((slot.material.node_tree, sock, sock.default_value, link.from_socket if link else None))
+        if link:
+            slot.material.node_tree.links.remove(link)
+        sock.default_value = 0.0
     nw.bake([ob], albedo, 'DIFFUSE', 'UVMap', samples=1, pass_filter={'COLOR'})
+    for nt, sock, value, src in metal_saved:
+        sock.default_value = value
+        if src:
+            nt.links.new(src, sock)
     rough = nw.new_image(f'{prefix}_rough', size, non_color=True)
     nw.bake([ob], rough, 'ROUGHNESS', 'UVMap', samples=1)
     normal = nw.new_image(f'{prefix}_normal', size, non_color=True)
@@ -158,7 +178,7 @@ def area_light(name, pos, size, power, color, rot=(0, 0, 0)):
 
 
 cool = (0.86, 0.92, 1.0)
-area_light('L_r104', (-13.4, 2.72, 3.6), (1.15, 0.55), 60, cool)
+area_light('L_r104', (-13.4, 2.72, 3.6), (1.15, 0.55), 85, cool)
 # NW-005A: the game's corridor states: -18.2 dying, -14.6 and -7.4 dead, -11.0 flickering,
 # -3.8 working, -0.2 dying. Dead tubes bake no light.
 for x, p in ((-18.2, 10), (-11.0, 40), (-3.8, 50), (-0.2, 8)):

@@ -123,7 +123,7 @@ def wall_paint(out, n=1024):
     patch = smooth(0.45, 0.8, fbm(n, 2.4, 1, seed=13))
     # NW-005A: decades unpainted. Duller, nicotine-yellowed green, grime settled in vertical runs
     # (condensation down the walls) and darker toward the floor of each tile.
-    base = tint(patch * 0.75, lin((146, 154, 136)), lin((150, 136, 96)))
+    base = tint(patch * 0.45, lin((146, 154, 136)), lin((150, 136, 96)))
     runs = smooth(0.55, 0.85, fbm(n, 1.4, 4, 120, seed=14, aniso=(4.0, 0.25)))
     base *= (1 - 0.22 * runs[..., None])
     base *= (0.94 + 0.06 * stipple[..., None])
@@ -159,9 +159,9 @@ def ceiling_tile(out, n=512):
     pits = smooth(0.7, 0.86, fbm(n, 0.5, 80, seed=32))
     worm = smooth(0.48, 0.52, fbm(n, 2.4, 8, 40, seed=33))
     yell = smooth(0.5, 0.9, fbm(n, 3.0, 1, seed=34))
-    # NW-005A: older, nicotine-stained tiles with tide-marked water patches.
-    tide = smooth(0.62, 0.66, fbm(n, 2.8, 1, seed=35)) * 0.8 + smooth(0.66, 0.95, fbm(n, 2.8, 1, seed=35)) * 0.5
-    base = tint(np.clip(yell * 0.75 + tide, 0, 1), lin((190, 184, 166)), lin((150, 124, 80)))
+    # NW-005A: older, evenly nicotine-yellowed tiles. No blotches here: this texture is one tile,
+    # so any stain in it repeats on every tile of the ceiling. Water stains are decals instead.
+    base = tint(yell * 0.35 + 0.35, lin((196, 190, 172)), lin((168, 148, 106)))
     base *= (1 - 0.22 * pits[..., None] - 0.12 * worm[..., None])
     base *= (0.95 + 0.05 * fiss[..., None])
     # T-bar: 15 mm white enamel strip around the edge (wraps), with a dark gap line.

@@ -34,7 +34,7 @@ describe('Room 104 set asset', () => {
     expect(set.stats.triangles).toBeLessThan(110000);
     // One mesh per material: few draw calls for the whole room and corridor (NW-005A adds the
     // veneer, labels, door-leaf atlas and glass, the access card and the door leaf itself).
-    expect(set.stats.meshes).toBeLessThanOrEqual(16);
+    expect(set.stats.meshes).toBeLessThanOrEqual(17);
   });
 
   it('ships the furniture atlas, the tiling shell materials, signage and decals', () => {

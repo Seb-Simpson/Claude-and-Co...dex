@@ -153,7 +153,17 @@ def card_reader(Prop, labels, col):
     p.box('white', (0.035, CEIL_ROOM - (y + 0.07), 0.018), (0.0, (y + 0.07 + CEIL_ROOM) / 2, 0.009), bevel=0.003)
     ob = p.finish()
     face = label_quad('card_reader_face', col, labels, 0.072, 0.036, (x, y + 0.03, z + 0.0245), '+z', 'reader')
-    return [ob, face]
+    # Status LED: a real reader shows a steady red light when locked. It is the one small point of
+    # colour on this wall, which is how the player finds the reader in the dark (emissive in game).
+    led_mat = bpy.data.materials.new('reader_led')
+    led_mat.use_nodes = True
+    bsdf = next(n for n in led_mat.node_tree.nodes if n.type == 'BSDF_PRINCIPLED')
+    bsdf.inputs['Base Color'].default_value = (0.5, 0.02, 0.02, 1)
+    bsdf.inputs['Emission Color'].default_value = (1.0, 0.08, 0.05, 1)
+    bsdf.inputs['Emission Strength'].default_value = 1.5
+    led = nw.box('card_reader_led', col, (0.03, 0.006, 0.003), (x, y - 0.035, z + 0.0255), mat=led_mat, bevel=0.0)
+    nw.world_uvs(led, 1.0)
+    return [ob, face, led]
 
 
 def access_card(labels, col):
@@ -168,11 +178,12 @@ def access_card(labels, col):
     # 1 mm proud of the slab (0.1 mm z-fought at walking distance).
     face = label_quad('card_face', col, labels, 0.084, 0.052, (0, 0.0026, 0), 'y', 'card')
     parts.append(face)
-    pts = [(0.042, 0.002, 0.0), (0.12, 0.003, 0.03), (0.2, 0.003, -0.01), (0.22, 0.003, -0.09), (0.14, 0.003, -0.13), (0.05, 0.003, -0.09), (0.0, 0.003, -0.05)]
-    lan = nw.tube('card_lanyard', col, pts, 0.004, mat=labels, resolution=4)
+    pts = [(0.042, 0.004, 0.0), (0.13, 0.005, -0.04), (0.16, 0.005, -0.14), (0.06, 0.005, -0.22), (-0.08, 0.005, -0.2), (-0.15, 0.005, -0.1), (-0.12, 0.005, 0.0)]
+    # A pale grey ribbon: against the dark vinyl it is the line that leads the eye to the card.
+    lan = nw.tube('card_lanyard', col, pts, 0.006, mat=labels, resolution=6)
     if not lan.data.uv_layers:
         lan.data.uv_layers.new(name='UVMap')
-    _uv_point(lan, (0.12, 0.955))
+    _uv_point(lan, (0.03, 0.03))
     parts.append(lan)
     clip = nw.box('card_clip', col, (0.014, 0.003, 0.018), (0.046, 0.0025, 0), mat=labels, bevel=0.0005)
     _uv_point(clip, (0.6, 0.8))

@@ -683,13 +683,10 @@ def place_decals():
     # Drag marks: something heavy was pulled from 104 down the corridor toward the station.
     for i, (x, z, L, sp) in enumerate(((-11.0, 0.55, 2.4, 1.52), (-8.6, 0.35, 2.6, 1.6), (-6.1, 0.15, 2.4, 1.55), (-3.9, -0.1, 2.2, 1.66))):
         out.append(decal(f'drag_cor_{i}', 'wear', 0.7, L, (x, 0.0062 + i * 0.0002, z), 'y', spin=sp))
-    # The rot follows the skirting out of 104, along to 106, and reaches the ceiling above its door.
+    # The rot has only just reached the corridor: one patch on the skirting outside 104.
     out.append(decal('rot_cor_s2', 'rot', 1.0, 1.0, (-10.6, 0.6, Z_CS - 0.012), '-z', spin=0.8))
-    out.append(decal('rot_cor_s3', 'rot', 0.8, 0.8, (-8.9, 0.5, Z_CS - 0.012), '-z', spin=2.1))
-    out.append(decal('rot_cor_ceil', 'rot', 1.4, 1.4, (-12.0, CEIL_COR - 0.005, 0.7), '-y', spin=1.3))
-    # Ash handprints: low on the wall beside 106, and dragged along the station's counter front.
-    out.append(decal('hands_106', 'hands', 0.6, 0.6, (-6.95, 0.75, Z_CS - 0.012), '-z', spin=0.3))
-    out.append(decal('hands_counter', 'hands', 0.7, 0.7, (-2.6, 0.75, -1.565), '+z', spin=-0.2))
+    # Final polish: the corridor stays ambiguous. The ash handprints and the rot on the corridor
+    # ceiling are gone; one patch of rot by 104's door and old scratches by 106 remain.
     out.append(decal('scratches_106', 'scratches', 0.5, 0.5, (-8.35, 1.0, Z_CS - 0.012), '-z', spin=1.0))
     return out
 

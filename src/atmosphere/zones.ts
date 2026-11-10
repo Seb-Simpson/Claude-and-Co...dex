@@ -11,6 +11,9 @@ const MOODS: readonly (readonly [string, ZoneMood])[] = [
   // so the working tubes make pools with real darkness between them; the nurses' station stays the
   // brightest space (the lit island the player walks toward). The camera-following fill light
   // (lightRig) still keeps the floor in front of the player readable.
+  // The room the player wakes in is the calm before the corridor: enough light to look around and
+  // read what is in it. (Listed before 'patient-room': the first matching tag wins.)
+  ['player-start', { fog: 0.054, ambient: 0.3 }],
   ['patient-room', { fog: 0.064, ambient: 0.19 }],
   ['nurses-station', { fog: 0.05, ambient: 0.3 }],
   ['treatment', { fog: 0.058, ambient: 0.24 }],
