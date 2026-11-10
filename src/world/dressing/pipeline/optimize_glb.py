@@ -26,6 +26,7 @@ TARGETS = {  # image name prefix -> max size
     # NW-005A: low-frequency roughness of the tiling wall and floor (keeps the GLB under 9 MiB).
     'wall_paint_orm': 512,
     'floor_vinyl_orm': 512,
+    'floor_vinyl_normal': 512,
     'doorleaf_normal': 512,
 }
 
