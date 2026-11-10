@@ -1,14 +1,14 @@
 {
  "glb": "room104_set.glb",
- "bytes": 9205144,
- "triangles": 97632,
+ "bytes": 9155984,
+ "triangles": 100296,
  "meshes": {
-  "props": 87498,
+  "props": 90054,
   "wheelchair.001": 4096,
   "doorleaf": 2940,
   "access_card": 794,
   "set_floor_vinyl": 4,
-  "set_ceiling_tile": 220,
+  "set_ceiling_tile": 328,
   "set_wall_paint": 108,
   "set_wainscot": 20,
   "set_wood_rail": 1504,
@@ -42,6 +42,6 @@
  "atlas": 2048,
  "lightmap": "room104_lightmap.jpg",
  "lightmapSize": 2048,
- "lightmapBytes": 931224,
+ "lightmapBytes": 913381,
  "samples": 96
 }
