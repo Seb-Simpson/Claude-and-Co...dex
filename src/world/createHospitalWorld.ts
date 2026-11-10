@@ -6,6 +6,8 @@ import { declareActors, declareRooms, PLAYER_SPAWN } from './metadata';
 import { buildClinicalRooms } from './rooms/clinical';
 import { buildPatientRooms } from './rooms/patientRooms';
 import { buildServiceSpaces } from './rooms/service';
+import { buildStealthStation } from './rooms/stealthStation';
+import { addStealthMarkers } from './stealth/nursesStation';
 import { buildShell } from './rooms/shell';
 import { addOpeningMarkers, OPENING_BINDINGS } from './opening';
 
@@ -48,9 +50,11 @@ export function createHospitalWorld(options: CreateHospitalWorldOptions = {}): H
     buildShell(builder);
     buildPatientRooms(builder);
     buildClinicalRooms(builder);
+    buildStealthStation(builder);
     buildServiceSpaces(builder);
     declareActors(builder);
     addOpeningMarkers(builder);
+    addStealthMarkers(builder);
     builder.finalize();
   } catch (error) {
     builder.dispose();

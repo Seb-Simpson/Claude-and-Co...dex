@@ -1,0 +1,65 @@
+{
+  "entry": {
+    "player": {
+      "x": -4.2,
+      "y": 0.0029999985098838862,
+      "z": 0.2
+    },
+    "calls": 173,
+    "triangles": 157222
+  },
+  "observation": {
+    "player": {
+      "x": -9,
+      "y": 0,
+      "z": 0.45
+    },
+    "calls": 173,
+    "triangles": 157222
+  },
+  "observation-wide": {
+    "player": {
+      "x": -9,
+      "y": 0,
+      "z": 0.45
+    },
+    "calls": 313,
+    "triangles": 176282
+  },
+  "crouch-cover": {
+    "player": {
+      "x": -4.6,
+      "y": 0,
+      "z": -0.42
+    },
+    "calls": 293,
+    "triangles": 174324
+  },
+  "crouch-cover-screen": {
+    "player": {
+      "x": -4.6,
+      "y": 0,
+      "z": -0.42
+    },
+    "calls": 151,
+    "triangles": 154268
+  },
+  "station-counter": {
+    "player": {
+      "x": -5.002389220806284,
+      "y": 0.0029999985098838862,
+      "z": -0.3000763472789006
+    },
+    "calls": 209,
+    "triangles": 157374
+  },
+  "exit": {
+    "player": {
+      "x": 4.6,
+      "y": 0.0029999985098838862,
+      "z": 0.2
+    },
+    "calls": 210,
+    "triangles": 52690
+  }
+}

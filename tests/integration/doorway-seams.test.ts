@@ -38,7 +38,8 @@ describe('actual hospital doorway floor seams', () => {
   it.each(cases)('walks through an open doorway without sticking or gaining height: %j', (test) => {
     const f = fixture(test.x, test.y);
     try {
-      expect(f.hospital.world.colliders).toHaveLength(223);
+      // 224: +1 linen screen (NW-006A crouch cover, a deliberate collider; see tests/world/stealth).
+      expect(f.hospital.world.colliders).toHaveLength(224);
       const doorId = test.door ?? 'nw:door:room-103';
       expect(f.interactions.requestDoorOpen(doorId)).toBe(true);
       for (let tick = 0; tick < 75; tick += 1) {
