@@ -37,10 +37,10 @@ function afterPower(recordScene = true): ChapterState {
   ] as const) state = apply(state, { type: 'puzzle', command });
   return apply(state, { type: 'commit-checkpoint', id: 'chapter1.after-records-power', safe: true });
 }
-function beforePatient(recordScene = true): ChapterState {
+function beforeConfrontation(recordScene = true): ChapterState {
   let state = afterPower(recordScene);
   state = apply(state, { type: 'install-operating-handle' });
-  return apply(state, { type: 'commit-checkpoint', id: 'chapter1.before-patient', safe: true });
+  return apply(state, { type: 'commit-checkpoint', id: 'chapter1.before-confrontation', safe: true });
 }
 
 describe('Chapter One causal progression', () => {
@@ -73,22 +73,22 @@ describe('Chapter One causal progression', () => {
     expect(state.puzzle.releaseConfirmed).toBe(false);
     state = apply(state, { type: 'commit-checkpoint', id: 'chapter1.after-records-power', safe: true });
     state = apply(state, { type: 'install-operating-handle' });
-    state = apply(state, { type: 'commit-checkpoint', id: 'chapter1.before-patient', safe: true });
+    state = apply(state, { type: 'commit-checkpoint', id: 'chapter1.before-confrontation', safe: true });
     const release = applyChapterCommand(state, { type: 'confirm-release', safe: true });
     expect(release.effects.filter((effect) => effect.type === 'release-confirmed')).toHaveLength(1);
     expect(release.effects.some((effect) => effect.type === 'activate-entity')).toBe(false);
     state = release.state;
-    expect(state.activeScene?.id).toBe('c1.cine.patient-release');
+    expect(state.activeScene?.id).toBe('c1.cine.nurse-confrontation');
     const handoff = applyChapterCommand(state, { type: 'settle-scene', token: state.activeScene!.token, outcome: 'completed' });
-    expect(handoff.effects).toContainEqual({ type: 'activate-entity', entity: 'patient' });
+    expect(handoff.effects).toContainEqual({ type: 'activate-entity', entity: 'nurse' });
     state = handoff.state;
     expect(getChapterObjective(state)).toBe('stairwell');
-    // No active-chase requirement: a player who loses the Patient may still escape.
+    // No active-chase requirement: a player who loses the Nurse may still escape.
     state = apply(state, { type: 'reach-stair-landing', safe: true });
     state = scene(state, 'c1.cine.ending');
     expect(getChapterObjective(state)).toBe('complete');
     expect(state.completedScenes).toHaveLength(5);
-    expect(state.checkpoints).toEqual(['chapter1.start', 'chapter1.after-nurse', 'chapter1.after-records-power', 'chapter1.before-patient', 'chapter1.complete']);
+    expect(state.checkpoints).toEqual(['chapter1.start', 'chapter1.after-nurse', 'chapter1.after-records-power', 'chapter1.before-confrontation', 'chapter1.complete']);
     expect(state.atSafeBoundary).toBe('chapter1.complete');
     expect(canCommitChapterCheckpoint(state, 'chapter1.complete')).toBe(true);
   });
@@ -107,12 +107,12 @@ describe('Chapter One causal progression', () => {
 
   it('has equivalent completed and skipped scene commits, with both introductory survival choices', () => {
     expect(afterNurse('completed', 'hiding')).toEqual(afterNurse('skipped', 'quiet-route'));
-    const patientStart = apply(beforePatient(), { type: 'confirm-release', safe: true });
-    const token = patientStart.activeScene!.token;
-    expect(applyChapterCommand(patientStart, { type: 'settle-scene', token, outcome: 'completed' }))
-      .toEqual(applyChapterCommand(patientStart, { type: 'settle-scene', token, outcome: 'skipped' }));
+    const confrontationStart = apply(beforeConfrontation(), { type: 'confirm-release', safe: true });
+    const token = confrontationStart.activeScene!.token;
+    expect(applyChapterCommand(confrontationStart, { type: 'settle-scene', token, outcome: 'completed' }))
+      .toEqual(applyChapterCommand(confrontationStart, { type: 'settle-scene', token, outcome: 'skipped' }));
     for (const id of ['c1.cine.awakening', 'c1.cine.record', 'c1.cine.ending'] as const) {
-      let initial = id === 'c1.cine.awakening' ? createInitialChapterState() : id === 'c1.cine.record' ? afterPower(false) : beforePatient();
+      let initial = id === 'c1.cine.awakening' ? createInitialChapterState() : id === 'c1.cine.record' ? afterPower(false) : beforeConfrontation();
       if (id === 'c1.cine.ending') {
         initial = apply(initial, { type: 'confirm-release', safe: true });
         initial = apply(initial, { type: 'settle-scene', token: initial.activeScene!.token, outcome: 'skipped' });
@@ -123,7 +123,7 @@ describe('Chapter One causal progression', () => {
   });
 
   it('defers record camera playback without hiding its item, facts or physical release requirements', () => {
-    let state = beforePatient(false);
+    let state = beforeConfrontation(false);
     expect(state.completedScenes).not.toContain('c1.cine.record');
     expect(state.clues).toContain('withdrawal-record');
     expect(getAvailableChapterScenes(state)).toContain('c1.cine.record');
@@ -139,12 +139,12 @@ describe('Chapter One causal progression', () => {
   it('rejects out-of-order story inputs and unsafe boundaries with no mutation or effects', () => {
     const initial = createInitialChapterState();
     const commands: ChapterCommand[] = [
-      { type: 'request-scene', id: 'c1.cine.patient-release', safe: true },
+      { type: 'request-scene', id: 'c1.cine.nurse-confrontation', safe: true },
       { type: 'request-scene', id: 'c1.cine.ending', safe: true },
       { type: 'survive-nurse', method: 'hiding', contactBroken: true, atReviewDesk: true },
       { type: 'collect-operating-handle' }, { type: 'install-operating-handle' },
       { type: 'confirm-release', safe: true }, { type: 'reach-stair-landing', safe: true },
-      { type: 'commit-checkpoint', id: 'chapter1.before-patient', safe: true },
+      { type: 'commit-checkpoint', id: 'chapter1.before-confrontation', safe: true },
     ];
     for (const command of commands) {
       const result = applyChapterCommand(initial, command);
@@ -184,7 +184,7 @@ describe('Chapter One causal progression', () => {
   });
 
   it('dispatches irreversible release and scene activation at most once across interruption/retry', () => {
-    let state = beforePatient();
+    let state = beforeConfrontation();
     const emitted: ChapterResult['effects'][number][] = [];
     let result = applyChapterCommand(state, { type: 'confirm-release', safe: true });
     emitted.push(...result.effects);
@@ -192,13 +192,13 @@ describe('Chapter One causal progression', () => {
     state = apply(state, { type: 'settle-scene', token: state.activeScene!.token, outcome: 'interrupted' });
     result = applyChapterCommand(state, { type: 'confirm-release', safe: true });
     expect(result.effects).toEqual([]);
-    state = apply(state, { type: 'request-scene', id: 'c1.cine.patient-release', safe: true });
+    state = apply(state, { type: 'request-scene', id: 'c1.cine.nurse-confrontation', safe: true });
     result = applyChapterCommand(state, { type: 'settle-scene', token: state.activeScene!.token, outcome: 'skipped' });
     emitted.push(...result.effects);
     state = result.state;
     expect(applyChapterCommand(state, { type: 'settle-scene', token: state.nextSceneToken - 1, outcome: 'completed' }).effects).toEqual([]);
     expect(emitted.filter((effect) => effect.type === 'release-confirmed')).toHaveLength(1);
-    expect(emitted.filter((effect) => effect.type === 'activate-entity' && effect.entity === 'patient')).toHaveLength(1);
+    expect(emitted.filter((effect) => effect.type === 'activate-entity' && effect.entity === 'nurse')).toHaveLength(1);
   });
 
   it('is immutable and has bounded state under repeated inspections and notifications', () => {

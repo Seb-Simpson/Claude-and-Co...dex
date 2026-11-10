@@ -37,7 +37,7 @@ async function aim(page: Page, target: { x: number; y: number; z: number }): Pro
   await page.evaluate((t) => (window as unknown as { nightWardTest: { aimAt(p: unknown): void } }).nightWardTest.aimAt(t), target);
 }
 
-test('NW-005A: wake in Room 104, walk into the corridor, open 106; the opening set loads and renders', async ({ page }, testInfo) => {
+test('NW-005A: wake in Room 104, walk into the corridor, try locked 106; the integrated opening set loads and renders', async ({ page }, testInfo) => {
   test.setTimeout(900_000);
   const logs: string[] = [];
   const assets: string[] = [];
@@ -48,6 +48,8 @@ test('NW-005A: wake in Room 104, walk into the corridor, open 106; the opening s
   expect(logs.some((l) => l.includes('Room 104 visual set loaded'))).toBe(true);
   expect(logs.some((l) => l.includes('visual set unavailable'))).toBe(false);
   await enterWard(page);
+  await page.keyboard.press('Space');
+  await expect.poll(async () => (await snapshot(page)).opening!.state.awakened, { timeout: 120_000 }).toBe(true);
   const report: Record<string, unknown> = {};
 
   // 1. Spawn and camera orientation.
@@ -69,6 +71,23 @@ test('NW-005A: wake in Room 104, walk into the corridor, open 106; the opening s
   expect(wall.x).toBeGreaterThan(-15.32);
   report.westWallStop = wall;
 
+  // Integration now owns the lock; retain the environment sweep checks after real card use.
+  const anchors = (await snapshot(page)).opening!.anchors;
+  for (const key of ['access-card', 'card-reader'] as const) {
+    await positionPlayer(page, anchors[key]!.stand!, anchors[key]!.position);
+    await expect.poll(async () => (await snapshot(page)).prompt?.targetId).toBe(key === 'access-card' ? 'nw:opening:take-staff-card' : 'nw:opening:use-card-reader');
+    const begin = (await snapshot(page)).performance.simulatedSeconds;
+    await expect.poll(async () => (await snapshot(page)).performance.simulatedSeconds, { timeout: 120_000 }).toBeGreaterThan(begin + .6);
+    await page.keyboard.press('KeyE');
+    await expect.poll(async () => (await snapshot(page)).opening!.state[key === 'access-card' ? 'cardAcquired' : 'doorUnlocked']).toBe(true);
+  }
+  const door = anchors['room-104-door']!;
+  const toward = { x: door.stand!.x - door.position.x, z: door.stand!.z - door.position.z };
+  const length = Math.hypot(toward.x, toward.z);
+  await positionPlayer(page, { x: door.position.x + toward.x/length*1.55, y: door.stand!.y, z: door.position.z+toward.z/length*1.55 }, door.position);
+  await page.keyboard.press('KeyE');
+  await expect.poll(async () => (await snapshot(page)).doorStates['nw:door:room-104'], { timeout: 120_000 }).toBe('open');
+
   // 3. Walk out of Room 104 (through the open door) and along the corridor to the station.
   await positionPlayer(page, { x: -12.4, y: 0, z: 4.1 }, { x: -12.0, y: 1.2, z: 1.0 });
   await aim(page, { x: -12.0, y: 1.2, z: -1.0 });
@@ -83,14 +102,15 @@ test('NW-005A: wake in Room 104, walk into the corridor, open 106; the opening s
   expect(Math.abs(corridor.z)).toBeLessThan(1.4 - 0.27);
   report.alongCorridor = corridor;
 
-  // 4. Open the Room 106 door with E from its handle side.
+  // 4. The scripted Room106 handle responds, with its real collider remaining closed.
   await positionPlayer(page, { x: -8.05, y: 0, z: 0.55 }, { x: -7.6, y: 1.0, z: 1.48 });
   await page.waitForTimeout(400);
   const before = (await snapshot(page)).doorStates['nw:door:room-106'];
   const prompt = (await snapshot(page)).prompt;
   await page.keyboard.press('KeyE');
-  await expect.poll(async () => (await snapshot(page)).doorStates['nw:door:room-106'], { timeout: 120_000, intervals: [500, 1000] }).toBe('open');
-  report.room106 = { before, prompt: prompt?.text ?? null, after: 'open' };
+  await expect.poll(async () => (await snapshot(page)).opening!.state.room106Tried, { timeout: 120_000 }).toBe(true);
+  expect((await snapshot(page)).doorStates['nw:door:room-106']).toBe('locked');
+  report.room106 = { before, prompt: prompt?.text ?? null, after: 'locked' };
 
   // 5. Views and renderer cost.
   const views: Record<string, unknown> = {};

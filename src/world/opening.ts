@@ -2,6 +2,7 @@ import { Object3D } from 'three';
 import type { ObjectId, Vec3 } from '../contracts';
 import type { WorldBuilder } from './core/builder';
 import { ROOMS } from './layout';
+import { Z } from './layout';
 import { PLAYER_SPAWN } from './metadata';
 
 /**
@@ -24,6 +25,7 @@ import { PLAYER_SPAWN } from './metadata';
  * which the player can use the prop.
  */
 export type OpeningKey =
+  | 'awakening-eye'
   | 'player-spawn' | 'room-104-door' | 'card-reader' | 'access-card' | 'intercom-speaker'
   | 'room-106-door' | 'room-106-handle' | 'nurse-first-sight' | 'nurse-first-sight-view' | 'station-approach';
 
@@ -52,6 +54,9 @@ const FACE = { north: 0, south: Math.PI, east: -Math.PI / 2, west: Math.PI / 2 }
 const HANDLE_106_LOCAL = v(-1.0, 1.0, -0.0725);
 
 export const OPENING_BINDINGS: readonly OpeningBinding[] = [
+  { key: 'awakening-eye', id: 'nw:opening:awakening-eye', kind: 'camera', roomId: ROOMS.r104,
+    node: 'nw:opening:awakening-eye', position: v(-14.25, 1.08, Z.southBack - 1.05), yaw: 0, pitch: 1.1,
+    note: 'NW-005C reclined eye above the existing mattress; no bed or collider moved.' },
   {
     key: 'player-spawn', id: 'nw:opening:player-spawn', kind: 'pose', roomId: ROOMS.r104, node: 'nw:opening:player-spawn',
     position: { ...PLAYER_SPAWN.position }, yaw: PLAYER_SPAWN.yaw, pitch: 0,
@@ -119,6 +124,7 @@ export function addOpeningMarkers(b: WorldBuilder): void {
     }
     node.position.set(binding.position.x, binding.position.y, binding.position.z);
     if (binding.yaw !== undefined) node.rotation.y = binding.yaw;
+    if (binding.pitch !== undefined) node.rotation.set(binding.pitch, binding.yaw ?? 0, 0, 'YXZ');
     b.root.add(node);
   }
   const intercom = OPENING_BINDINGS.find((x) => x.key === 'intercom-speaker')!;

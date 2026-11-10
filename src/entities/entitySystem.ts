@@ -17,6 +17,7 @@ export interface EntitySystemOptions {
   readonly player: PlayerProvider;
   readonly events: GameEvents;
   readonly playerEyeHeights?: { readonly standing: number; readonly crouching: number };
+  readonly enabled?: () => boolean;
   readonly profiles?: Partial<Record<EntityType, Partial<EntityProfile>>>;
   readonly openNearbyDoor?: (position: Vec3, goal: Vec3) => boolean;
   readonly getDoorApproach?: (position: Vec3, goal: Vec3, localOnly?: boolean) => Vec3 | null;
@@ -38,7 +39,11 @@ export function createEntitySystem(options: EntitySystemOptions): EntitySystem {
   let pendingNoises: PlayerNoiseEvent[] = [];
   let disposed = false;
   let captureReported = false;
-  try {
+  let agentsCreated = false;
+  const enabled = (): boolean => options.enabled?.() ?? true;
+  function ensureAgents(): void {
+    if (agentsCreated || !enabled()) return;
+    agentsCreated = true;
     for (const spawn of world.entitySpawns) {
       if (spawn.type === 'reflection') continue;
       const route = world.patrolRoutes.find((value) => value.id === spawn.patrolRouteId);
@@ -51,8 +56,11 @@ export function createEntitySystem(options: EntitySystemOptions): EntitySystem {
         ...(options.getDoorApproach ? { getDoorApproach: options.getDoorApproach } : {}),
       }));
     }
+  }
+  try {
+    ensureAgents();
     unsubscribers.push(events.on('player:noise', (noise) => {
-      if (disposed || captureReported || pendingNoises.length >= 128) return;
+      if (disposed || !enabled() || captureReported || pendingNoises.length >= 128) return;
       // Snapshot data at publication so later producer mutation cannot reveal a moving player.
       pendingNoises.push({ ...noise, position: { ...noise.position } });
     }));
@@ -61,7 +69,7 @@ export function createEntitySystem(options: EntitySystemOptions): EntitySystem {
       for (const agent of agents) agent.observeHiding(event);
     }));
     unsubscribers.push(events.on('player:captured', (event) => {
-      if (event.playerId !== player.getSnapshot().id || captureReported) return;
+      if (!enabled() || event.playerId !== player.getSnapshot().id || captureReported) return;
       captureReported = true;
       pendingNoises = [];
       // Settle every pursuer immediately. Ticking stops after capture; leaving other
@@ -81,7 +89,8 @@ export function createEntitySystem(options: EntitySystemOptions): EntitySystem {
   return {
     reflections,
     fixedUpdate(frame) {
-      if (disposed) return;
+      if (disposed || !enabled()) { pendingNoises = []; return; }
+      ensureAgents();
       const noises = pendingNoises;
       pendingNoises = [];
       if (!captureReported) for (const agent of agents) {

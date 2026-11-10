@@ -8,7 +8,7 @@ export interface PatientEncounterOptions {
   readonly playerId?: string;
   readonly onMessage?: (message: string) => void;
   /** A registered presentation module already owns chase lighting and audio. */
-  readonly presentationProvided?: boolean;
+  readonly presentationProvided?: boolean | (() => boolean);
 }
 
 export interface PatientEncounter {
@@ -46,6 +46,7 @@ export function createPatientEncounter(options: PatientEncounterOptions): Patien
   let captured = false;
   let disposed = false;
 
+  const presented = (): boolean => typeof options.presentationProvided === 'function' ? options.presentationProvided() : Boolean(options.presentationProvided);
   const accepts = (playerId: string): boolean => options.playerId === undefined || options.playerId === playerId;
 
   function disconnect(pulse: Pulse): void {
@@ -128,7 +129,8 @@ export function createPatientEncounter(options: PatientEncounterOptions): Patien
   }
 
   function syncAudio(): void {
-    if (options.presentationProvided || disposed || captured || chases.size === 0) return;
+    if (disposed || captured || chases.size === 0) return;
+    if (presented()) { pendingCue = null; stopAll(true); return; }
     const context = audio.context;
     if (!context || context.state !== 'running') return;
     if (pendingCue) {
@@ -155,7 +157,7 @@ export function createPatientEncounter(options: PatientEncounterOptions): Patien
       const wasQuiet = chases.size === 0;
       chases.add(event.chaseId);
       if (wasQuiet) {
-        if (!options.presentationProvided) {
+        if (!presented()) {
           pendingCue = event;
           events.emit('atmosphere:lighting', {
             targetId: 'nw:lights:corridor-main', effect: 'flicker', durationSeconds: 1.6,

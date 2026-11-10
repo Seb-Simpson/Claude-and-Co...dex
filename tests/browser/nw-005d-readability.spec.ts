@@ -1,0 +1,40 @@
+import {expect,test} from '@playwright/test';
+import {writeFile} from 'node:fs/promises';
+import type {Application} from '../../src/integration/application';
+const snap=(page:import('@playwright/test').Page)=>page.evaluate(()=>window.nightWardTest!.snapshot());
+test('assisted visual inspection of final card, intercom, Nurse and rebuilt ceiling at shipping Low resolution',async({page},info)=>{
+ test.setTimeout(600_000);const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
+ page.on('console',m=>{if(m.type()==='error')errors.push(m.text());});
+ await page.addInitScript(()=>localStorage.setItem('night-ward:settings:v1',JSON.stringify({quality:'low',motion:'reduce',subtitles:true})));
+ await page.goto('/?test=1');await expect.poll(async()=>(await snap(page)).state,{timeout:150_000}).toBe('ready');
+ await page.getByRole('button',{name:'Enter ward',exact:true}).click();await expect.poll(async()=>(await snap(page)).state).toBe('playing');
+ await page.keyboard.press('Space');await expect.poll(async()=>(await snap(page)).opening!.state.awakened,{timeout:90_000}).toBe(true);
+ const a=(await snap(page)).opening!.anchors;
+ const pose=async(position:{x:number;y:number;z:number},target:{x:number;y:number;z:number})=>{
+  expect(await page.evaluate(({position,target})=>{const app=window.nightWardTest!;const moved=app.teleport(position);if(moved)app.aimAt(target);return moved;},{position,target})).toBe(true);
+  const before=(await snap(page)).frameCount;await expect.poll(async()=>(await snap(page)).frameCount,{timeout:90_000}).toBeGreaterThan(before+1);
+ };
+ await pose(a['player-spawn']!.position,a['access-card']!.position);
+ await expect(page.locator('.nw-opening-ui__prompt')).toContainText('Take');
+ await page.screenshot({path:info.outputPath('01-card-from-wake.png')});
+ await pose(a['access-card']!.stand!,a['access-card']!.position);await page.keyboard.press('e');
+ await expect.poll(async()=>(await snap(page)).opening!.state.cardAcquired,{timeout:90_000}).toBe(true);
+ await pose(a['card-reader']!.stand!,a['card-reader']!.position);
+ const time=(await snap(page)).performance.simulatedSeconds;
+ await expect.poll(async()=>(await snap(page)).performance.simulatedSeconds,{timeout:90_000}).toBeGreaterThan(time+.6);
+ await page.keyboard.press('e');await expect.poll(async()=>(await snap(page)).opening!.state.doorUnlocked,{timeout:90_000}).toBe(true);
+ await page.screenshot({path:info.outputPath('02-reader-and-intercom.png')});
+ const view=a['nurse-first-sight-view']!.position;
+ await pose({x:view.x,y:0.003,z:view.z},{...a['nurse-first-sight']!.position,y:1.4});
+ await expect.poll(async()=>(await snap(page)).opening!.state.sightingSeen,{timeout:90_000}).toBe(true);
+ await page.screenshot({path:info.outputPath('03-nurse-first-sight.png')});
+ // These are producer-authored inspection coordinates for the remodelled collapse, not progression triggers.
+ await pose({x:-10,y:0.003,z:0.2},{x:-9.4,y:2.72,z:-.35});
+ await page.screenshot({path:info.outputPath('04-ceiling-collapse.png')});
+ await pose({x:12,y:0.003,z:0},{x:19,y:1.5,z:0});
+ await page.screenshot({path:info.outputPath('05-east-ward-lighting.png')});
+ const rendering=await page.evaluate(()=>{const svc=(window.nightWardTest as Application).services()!,gl=svc.renderer.getContext(),ext=gl.getExtension('WEBGL_debug_renderer_info');return {pixelRatio:svc.renderer.getPixelRatio(),renderer:ext?String(gl.getParameter(ext.UNMASKED_RENDERER_WEBGL)):'unavailable'};});
+ expect(rendering.pixelRatio).toBe(.75);expect((await snap(page)).entities).toEqual([]);
+ await writeFile(info.outputPath('visual-inspection.json'),JSON.stringify({kind:'assisted visual QA; separate keyboard route proves playability without positioning shortcuts',rendering,final:await snap(page),errors},null,2));
+ expect(errors).toEqual([]);
+});

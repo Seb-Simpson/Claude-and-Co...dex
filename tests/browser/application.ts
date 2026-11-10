@@ -23,9 +23,9 @@ export async function bootHospital(page: Page): Promise<string[]> {
   const ready = await snapshot(page);
   expect(ready.worldId).toBe('nw:hospital:ward-4-west');
   expect(ready.colliderCount).toBeGreaterThanOrEqual(220);
-  expect(ready.entities.map(entity => entity.type)).toEqual(['patient']);
+  expect(ready.entities.map(entity => entity.type)).toEqual(ready.opening ? [] : ['patient']);
   await expect(page.locator('canvas')).toHaveCount(1);
-  await expect(page.locator('[data-night-ward-hud]')).toHaveCount(1);
+  await expect(page.locator(ready.opening ? '[data-night-ward-opening-ui]' : '[data-night-ward-hud]')).toHaveCount(1);
   return errors;
 }
 

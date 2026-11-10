@@ -1,15 +1,15 @@
 /** Isolated Chapter One logic, proposal v1. No live world, camera or save-slot adapter. */
 export const CHAPTER_SCHEMA_VERSION = 1 as const;
-export const CHAPTER_CONTENT_REVISION = 'c1.1' as const;
+export const CHAPTER_CONTENT_REVISION = 'c1.2-nurse' as const;
 
 export const CHAPTER_SCENES = [
   'c1.cine.awakening', 'c1.cine.nurse-reveal', 'c1.cine.record',
-  'c1.cine.patient-release', 'c1.cine.ending',
+  'c1.cine.nurse-confrontation', 'c1.cine.ending',
 ] as const;
 export type ChapterSceneId = typeof CHAPTER_SCENES[number];
 export const CHAPTER_CHECKPOINTS = [
   'chapter1.start', 'chapter1.after-nurse', 'chapter1.after-records-power',
-  'chapter1.before-patient', 'chapter1.complete',
+  'chapter1.before-confrontation', 'chapter1.complete',
 ] as const;
 export type ChapterCheckpointId = typeof CHAPTER_CHECKPOINTS[number];
 export const CHAPTER_CLUES = [
@@ -94,7 +94,7 @@ export type ChapterEffect =
   | { readonly type: 'scene-requested'; readonly scene: ActiveChapterScene }
   | { readonly type: 'scene-interrupted'; readonly scene: ActiveChapterScene }
   | { readonly type: 'checkpoint-committed'; readonly id: ChapterCheckpointId }
-  | { readonly type: 'activate-entity'; readonly entity: 'nurse' | 'patient' }
+  | { readonly type: 'activate-entity'; readonly entity: 'nurse' }
   | { readonly type: 'power-armed' }
   | { readonly type: 'release-confirmed' };
 export interface ChapterResult {

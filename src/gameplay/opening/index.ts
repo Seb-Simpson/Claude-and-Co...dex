@@ -1,0 +1,18 @@
+export { OPENING_KEYS, resolveOpeningBindings, openingPosition } from './bindings';
+export type { OpeningKey, OpeningAnchor, OpeningBindings } from './bindings';
+export { OPENING_INTERACTIONS, createOpeningInteractionAdapter } from './adapter';
+export { createOpeningState, reduceOpening, validateOpeningState } from './state';
+export type { OpeningState, OpeningCommand, OpeningEffect, OpeningResult } from './state';
+export { createOpeningCheckpoint, validateOpeningCheckpoint } from './checkpoint';
+export type { OpeningCheckpoint } from './checkpoint';
+export { createOpeningSequence } from './controller';
+export type { OpeningSequence, OpeningPersistence } from './controller';
+export { createOpeningUi } from './ui';
+export type { OpeningUi, OpeningUiState } from './ui';
+export { createOpeningAudio, OPENING_VOICES } from './audio';
+export type { OpeningAudio, OpeningVoiceId, OpeningSoundId } from './audio';
+export { createOpeningScene } from './scene';
+export type { OpeningScene, OpeningSceneOptions, OpeningFeedback } from './scene';
+
+export { createOnboardingGate, createOpeningAssistance } from './onboarding';
+export type { OnboardingGate, OnboardingPhase, SurvivalSkill } from './onboarding';

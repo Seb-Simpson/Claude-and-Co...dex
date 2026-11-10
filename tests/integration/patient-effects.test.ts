@@ -221,3 +221,15 @@ describe('Patient encounter atmosphere adapter', () => {
     expect(harness.audio.dispose).not.toHaveBeenCalled();
   });
 });
+
+it('recognizes presentation installed after session startup and retires its fallback audio without double effects', () => {
+  const events = createEventBus(), harness = audioHarness(); let provided = false;
+  const encounter = createPatientEncounter({events,audio:harness.audio,presentationProvided:()=>provided});
+  events.emit('chase:started',chase); expect(harness.oscillators).toHaveLength(2);
+  provided=true;encounter.update(frame);
+  expect(harness.oscillators.every(o=>o.stop.mock.calls.length===1 && o.disconnect.mock.calls.length===1)).toBe(true);
+  events.emit('chase:ended',{...chase,reason:'escaped'});
+  events.emit('chase:started',{...chase,chaseId:'later'});encounter.update(frame);
+  expect(harness.oscillators).toHaveLength(2);
+  encounter.dispose(); events.dispose();
+});

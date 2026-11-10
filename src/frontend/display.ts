@@ -19,7 +19,10 @@ export function attachDisplay(renderer: WebGLRenderer, container: HTMLElement, i
     const ratio = Math.min(window.devicePixelRatio || 1, QUALITY_PRESETS[preset].pixelRatio);
     if (Math.abs(renderer.getPixelRatio() - ratio) > 1e-3) {
       renderer.setPixelRatio(ratio);
-      renderer.setSize(Math.max(1, container.clientWidth), Math.max(1, container.clientHeight), false);
+    }
+    const width = Math.max(1, container.clientWidth), height = Math.max(1, container.clientHeight);
+    if (renderer.domElement.width !== Math.floor(width * ratio) || renderer.domElement.height !== Math.floor(height * ratio)) {
+      renderer.setSize(width, height, false);
     }
     onResize?.();
   };

@@ -89,7 +89,7 @@ function stateError(value: unknown): string | null {
   const awakened = scenes.includes('c1.cine.awakening');
   const nurseShown = scenes.includes('c1.cine.nurse-reveal');
   const recordShown = scenes.includes('c1.cine.record');
-  const patientShown = scenes.includes('c1.cine.patient-release');
+  const confrontationShown = scenes.includes('c1.cine.nurse-confrontation');
   const endingShown = scenes.includes('c1.cine.ending');
   if (awakened !== clues.includes('wristband')) return 'Awakening and wristband knowledge disagree.';
   if (!awakened && (value.stationReached || value.nurseSurvived || value.panelVisited || value.stairReached || clues.length > 0)) return 'Progress precedes awakening.';
@@ -101,7 +101,7 @@ function stateError(value: unknown): string | null {
   if (puzzle.handleLocation !== 'incident-pack' && (!value.nurseSurvived || !clues.includes('withdrawal-record') || !clues.includes('release-procedure'))) return 'Operating handle lacks its records discovery.';
   if (clues.includes('withdrawal-record') && puzzle.handleLocation === 'incident-pack') return 'Withdrawal record precedes operating-pack discovery.';
   if (recordShown && !clues.includes('withdrawal-record')) return 'Record cinematic lacks discovered evidence.';
-  if ((recordShown || patientShown || endingShown) && (!nurseShown || scenes.some((id, index) =>
+  if ((recordShown || confrontationShown || endingShown) && (!nurseShown || scenes.some((id, index) =>
     id !== 'c1.cine.awakening' && id !== 'c1.cine.nurse-reveal' && index < scenes.indexOf('c1.cine.nurse-reveal')))) return 'Later cinematic precedes the Nurse encounter.';
   if (endingShown && scenes.at(-1) !== 'c1.cine.ending') return 'Cinematic history continues beyond the chapter ending.';
   if (value.panelVisited && !value.nurseSurvived) return 'Panel visit precedes the introductory encounter.';
@@ -109,16 +109,16 @@ function stateError(value: unknown): string | null {
       puzzle.breaker !== 'ready' || puzzle.failedAttempts !== 0)) return 'Electrical controls changed before reaching the panel.';
   if (puzzle.busArmed && (!value.panelVisited || !value.nurseSurvived)) return 'Armed bus lacks its panel encounter.';
   if (puzzle.handleLocation === 'installed' && (!puzzle.busArmed || !checkpoints.includes('chapter1.after-records-power'))) return 'Installed handle lacks the prepared power checkpoint.';
-  if (puzzle.releaseConfirmed && !checkpoints.includes('chapter1.before-patient')) return 'Release precedes the safe Patient checkpoint.';
-  if (patientShown && !puzzle.releaseConfirmed) return 'Patient reveal precedes release.';
-  if (value.stairReached && (!puzzle.releaseConfirmed || !patientShown)) return 'Stair arrival precedes the Patient handoff.';
+  if (puzzle.releaseConfirmed && !checkpoints.includes('chapter1.before-confrontation')) return 'Release precedes the safe confrontation checkpoint.';
+  if (confrontationShown && !puzzle.releaseConfirmed) return 'Nurse confrontation precedes release.';
+  if (value.stairReached && (!puzzle.releaseConfirmed || !confrontationShown)) return 'Stair arrival precedes the Nurse handoff.';
   if (endingShown && !value.stairReached) return 'Ending precedes the safe stair landing.';
   if (value.viewedHintLevel > 0 && (!value.panelVisited || !clues.includes('release-procedure'))) return 'Hint precedes its exploration opportunity.';
   if (value.viewedHintLevel > 0 && puzzle.failedAttempts === 0 && (!clues.includes('panel-schematic') || !clues.includes('bridge-annotation'))) return 'Hint lacks explored clues or an evaluated failed attempt.';
   if (value.viewedHintLevel === 2 && puzzle.failedAttempts < 2) return 'Second hint precedes its failed attempts.';
   if (checkpoints.includes('chapter1.after-nurse') && !value.nurseSurvived) return 'Nurse checkpoint lacks survival.';
   if (checkpoints.includes('chapter1.after-records-power') && (!puzzle.busArmed || puzzle.handleLocation === 'incident-pack')) return 'Power checkpoint lacks records and reserve.';
-  if (checkpoints.includes('chapter1.before-patient') && puzzle.handleLocation !== 'installed') return 'Patient checkpoint lacks the operating handle.';
+  if (checkpoints.includes('chapter1.before-confrontation') && puzzle.handleLocation !== 'installed') return 'Confrontation checkpoint lacks the operating handle.';
   if (checkpoints.includes('chapter1.complete') !== endingShown) return 'Completion checkpoint and ending disagree.';
   if (!canCommitChapterCheckpoint(value as unknown as ChapterState, value.atSafeBoundary)) return 'State does not satisfy its safe checkpoint boundary.';
   return null;
