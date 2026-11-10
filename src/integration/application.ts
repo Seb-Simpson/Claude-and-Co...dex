@@ -1,4 +1,5 @@
 import { Vector3 } from 'three';
+import { gateHorrorModule } from './gatedHorror';
 import type { FrameContext, GameEventMap, GameModule } from '../contracts';
 import { createEngine, createNeutralScene } from '../engine';
 import type { Engine, EngineOptions } from '../engine';
@@ -199,6 +200,7 @@ export function createApplication(options: ApplicationOptions): Application {
     });
     events.on('player:captured', (event) => {
       if (attempt !== active || disposed || event.playerId !== active.runtime?.player.getSnapshot().id) return;
+      if (active.runtime?.opening?.onboarding.safe) return;
       setState('captured'); unlock();
     });
     for (const definition of options.modules) {
@@ -214,11 +216,11 @@ export function createApplication(options: ApplicationOptions): Application {
           if (result.player && 'physics' in result) active.runtime = result as GameplayRuntime;
           return result;
         } }));
-      } else if (definition.id === 'nw:horror:hospital-anomalies' && definition.kind === 'horror') registry.register(tracked({ ...definition, setup(context) {
-        // The authored opening owns its only sighting. Keep the autonomous sandbox scare
-        // director for classic worlds; preserve the separate hospital atmosphere module.
-        return active.runtime?.opening ? { dispose() {} } : definition.setup(context);
-      } }));
+      } else if (definition.id === 'nw:horror:hospital-anomalies' && definition.kind === 'horror') {
+        registry.register(tracked(gateHorrorModule(definition, () => !active.runtime?.opening?.onboarding.safe,
+          () => !active.runtime?.opening || active.runtime.opening.onboarding.phase === 'stealth-onboarding' || !active.runtime.opening.onboarding.safe,
+          () => active.runtime?.opening?.onboarding.markPresentationReady())));
+      }
       else registry.register(tracked(definition));
     }
     try {
@@ -239,7 +241,7 @@ export function createApplication(options: ApplicationOptions): Application {
       resumeAudio();
       if (active.runtime) {
         active.encounter = createPatientEncounter({ events, audio: engine.services.audio,
-          presentationProvided: Boolean(engine.services.scene.getObjectByName('nw:horror-layer')),
+          presentationProvided: () => Boolean(engine!.services.scene.getObjectByName('nw:horror-layer')),
           playerId: active.runtime.player.getSnapshot().id, onMessage: (message) => active.runtime?.notify(message) });
       }
       setState('ready');
@@ -345,7 +347,7 @@ export function createApplication(options: ApplicationOptions): Application {
           geometries: info?.memory.geometries ?? 0, textures: info?.memory.textures ?? 0 },
         audioState: engine?.services.audio.context?.state ?? 'locked', events: [...(attempt?.records ?? [])],
         doorStates, prompt: attempt?.runtime?.interactions.getPrompt() ?? null, error,
-        ...(attempt?.runtime?.opening ? { opening: { state: attempt.runtime.opening.state, cinematic: attempt.runtime.opening.cinematic,
+        ...(attempt?.runtime?.opening ? { opening: { phase: attempt.runtime.opening.onboarding.phase, state: attempt.runtime.opening.state, cinematic: attempt.runtime.opening.cinematic,
           anchors: attempt.runtime.opening.anchors(), camera: { x: engine!.services.camera.position.x,
             y: engine!.services.camera.position.y, z: engine!.services.camera.position.z } } } : {}),
         performance: { fixedMaxMs, updateMaxMs, frameDeltaMaxMs, simulatedSeconds,
@@ -370,6 +372,7 @@ export function createApplication(options: ApplicationOptions): Application {
     },
     captureForTest() {
       const active = attempt;
+      if (active?.runtime?.opening?.onboarding.safe) return;
       if (!active?.runtime) return;
       const snapshot = active.runtime.player.getSnapshot();
       active.events.emit('player:captured', { playerId: snapshot.id, entityId: 'nw:entity:patient', position: snapshot.position,

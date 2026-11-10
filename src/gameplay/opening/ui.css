@@ -84,3 +84,4 @@
   .nw-opening-ui__subtitle { background-color: #060807; }
   .nw-opening-ui__speaker { color: #d2dfd3; }
 }
+.nw-opening-ui__guidance { position:absolute; bottom:8%; left:50%; transform:translateX(-50%); font:400 .72rem var(--nw-mono,monospace); color:#c5c9bb; text-align:center; }

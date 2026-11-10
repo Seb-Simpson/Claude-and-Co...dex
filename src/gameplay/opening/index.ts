@@ -13,3 +13,6 @@ export { createOpeningAudio, OPENING_VOICES } from './audio';
 export type { OpeningAudio, OpeningVoiceId, OpeningSoundId } from './audio';
 export { createOpeningScene } from './scene';
 export type { OpeningScene, OpeningSceneOptions, OpeningFeedback } from './scene';
+
+export { createOnboardingGate, createOpeningAssistance } from './onboarding';
+export type { OnboardingGate, OnboardingPhase, SurvivalSkill } from './onboarding';

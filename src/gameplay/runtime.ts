@@ -13,6 +13,8 @@ import type { GameplayHud } from './hud';
 import { resolveOpeningBindings, openingPosition } from './opening/bindings';
 import { createOpeningInteractionAdapter, OPENING_INTERACTIONS } from './opening/adapter';
 import { createOpeningSequence } from './opening/controller';
+import { createOpeningState } from './opening/state';
+import { createOnboardingGate } from './opening/onboarding';
 import type { OpeningPersistence, OpeningSequence } from './opening/controller';
 import type { InteractionOptions } from './interactions';
 
@@ -23,6 +25,8 @@ export interface PlayerInputSource {
   dispose(): void;
 }
 export interface GameplayOptions {
+  readonly entitiesEnabled?: () => boolean;
+  readonly canCapture?: () => boolean;
   readonly activeEntityTypes?: readonly EntityType[];
   readonly onRestart?: () => void;
   readonly inspectionText?: (targetId: string) => string | undefined;
@@ -111,7 +115,7 @@ export function createGameplayRuntime(context: ModuleContext, options: GameplayO
       }
     }));
     const captureSubscription = context.events.on('player:captured', (event) => {
-      if (event.playerId === player.getSnapshot().id) player.setCaptured(true);
+      if (event.playerId === player.getSnapshot().id && (options.canCapture?.() ?? true)) player.setCaptured(true);
     });
     cleanup.push(captureSubscription);
     const doors = createDoorNavigationAdapter({
@@ -120,6 +124,7 @@ export function createGameplayRuntime(context: ModuleContext, options: GameplayO
     });
     entities = createEntitySystem({
       ...doors,
+      ...(options.entitiesEnabled ? { enabled: options.entitiesEnabled } : {}),
       world: options.activeEntityTypes ? { ...world, entitySpawns: world.entitySpawns.filter((spawn) => options.activeEntityTypes!.includes(spawn.type)) } : world,
       physics, navigation, player, events: context.events,
       playerEyeHeights: {
@@ -230,11 +235,13 @@ export function createGameplayModule(options: GameplayOptions = {}): GameModule 
       const document = context.engine.renderer.domElement?.ownerDocument;
       if (!bindings || typeof document?.createElement !== 'function') return createGameplayRuntime(context, options);
       const checkpoint = options.openingPersistence?.load() ?? null;
+      const gate = createOnboardingGate();
+      gate.sync(checkpoint?.state ?? createOpeningState(), checkpoint !== null);
       const adapter = createOpeningInteractionAdapter(context.world, bindings);
       let opening: OpeningSequence | undefined;
       let runtime: GameplayRuntime | undefined;
       try {
-        runtime = createGameplayRuntime({ ...context, world: adapter.world }, { ...options, showHud: false, activeEntityTypes: [],
+        runtime = createGameplayRuntime({ ...context, world: adapter.world }, { ...options, showHud: false, entitiesEnabled: () => !gate.safe, canCapture: () => !gate.safe,
           initialDoorStates: { [bindings['room-104-door'].doorId!]: checkpoint?.state.doorUnlocked ? 'closed' : 'locked',
             [bindings['room-106-door'].doorId!]: 'locked' },
           handleInteraction: (request, time) => opening?.handleInteraction(request, time) ?? true,
@@ -250,7 +257,7 @@ export function createGameplayModule(options: GameplayOptions = {}): GameModule 
           runtime.player.update({ deltaSeconds: 0, elapsedSeconds: 0 });
         }
         opening = await createOpeningSequence({ ...context, world: adapter.world }, runtime, bindings, checkpoint,
-          options.openingPersistence ? cp => options.openingPersistence!.save(cp) : undefined);
+          options.openingPersistence ? cp => options.openingPersistence!.save(cp) : undefined, gate);
         const gameplay = runtime;
         const sequence = opening;
         return { ...gameplay, opening: sequence,

@@ -14,6 +14,8 @@ import { createOpeningCheckpoint } from './checkpoint';
 import type { OpeningCheckpoint } from './checkpoint';
 import { createOpeningUi } from './ui';
 import { createOpeningAudio } from './audio';
+import { createOnboardingGate, createOpeningAssistance } from './onboarding';
+import type { OnboardingGate } from './onboarding';
 import { createOpeningScene } from './scene';
 
 export interface OpeningPersistence {
@@ -21,6 +23,7 @@ export interface OpeningPersistence {
   save(checkpoint: OpeningCheckpoint): void;
 }
 export interface OpeningSequence {
+  readonly onboarding: OnboardingGate;
   readonly state: OpeningState;
   readonly cinematic: boolean;
   anchors(): Readonly<Record<string, { position: { x: number; y: number; z: number }; stand?: { x: number; y: number; z: number }; target?: { x: number; y: number; z: number } }>>;
@@ -33,7 +36,7 @@ export interface OpeningSequence {
 }
 /** No new loop/controller: content consumes the existing runtime and exclusive camera transport. */
 export async function createOpeningSequence(context: ModuleContext, runtime: GameplayRuntime, bindings: OpeningBindings,
-  checkpoint: OpeningCheckpoint | null, save?: (checkpoint: OpeningCheckpoint) => void): Promise<OpeningSequence> {
+  checkpoint: OpeningCheckpoint | null, save?: (checkpoint: OpeningCheckpoint) => void, onboarding: OnboardingGate = createOnboardingGate()): Promise<OpeningSequence> {
   const world = context.world!;
   const document = context.engine.renderer.domElement.ownerDocument;
   const ui = createOpeningUi(document, settings, () => INTERACTION_BINDING.label);
@@ -45,6 +48,8 @@ export async function createOpeningSequence(context: ModuleContext, runtime: Gam
   } catch (error) { scene?.dispose(); ui.dispose(); throw error; }
   const presentation = scene;
   let state = checkpoint?.state ?? createOpeningState();
+  onboarding.sync(state, checkpoint !== null);
+  const assistance = createOpeningAssistance();
   let playing = false, started = state.awakened, disposed = false;
   let elapsed = 0, lastInteraction = -Infinity, exitSaved = checkpoint !== null;
   let pendingMilestone: 'room104-exit' | 'station-approach' | null = null;
@@ -82,7 +87,7 @@ export async function createOpeningSequence(context: ModuleContext, runtime: Gam
         case 'card-taken':
           presentation.setCardTaken(true); if (pickup) pickup.visible = false;
           ui.notify('Staff access card acquired.'); audio.effect('pickup'); break;
-        case 'reader-denied': presentation.feedback(effect); audio.effect('denied'); break;
+        case 'reader-denied': presentation.feedback(effect); audio.effect('denied'); ui.notify('Staff access card required.'); break;
         case 'reader-accepted': presentation.feedback(effect); audio.effect('accepted'); break;
         case 'station-handoff': pendingMilestone = 'station-approach'; break;
       }
@@ -104,6 +109,7 @@ export async function createOpeningSequence(context: ModuleContext, runtime: Gam
     const duration = settings.get().motion === 'reduce' ? 4 : 8;
     playback = cinematic.play({ id: 'nw005.cine.awakening', durationSeconds: duration, skipBlendSeconds: 0.35,
       camera: [{ atSeconds: 0, pose: first }, { atSeconds: duration * 0.25, pose: first },
+        { atSeconds: duration * 0.58, pose: { ...handoff, position: { ...first.position, y: handoff.position.y } } },
         { atSeconds: duration, pose: handoff }], cues: [] });
     audio.effect('wake');
   }
@@ -112,6 +118,7 @@ export async function createOpeningSequence(context: ModuleContext, runtime: Gam
   }
   document.addEventListener('keydown', key);
   return {
+    onboarding,
     get state() { return { ...state }; }, get cinematic() { return playback !== null || !started; },
     anchors() { return Object.fromEntries(Object.entries(bindings).map(([key, anchor]) => {
       const position = openingPosition(anchor);
@@ -140,7 +147,8 @@ export async function createOpeningSequence(context: ModuleContext, runtime: Gam
       if (!command && id !== OPENING_INTERACTIONS.intercom) return false;
       if (!playing || playback || !state.awakened || timeSeconds - lastInteraction < 0.55) return true;
       lastInteraction = timeSeconds;
-      if (command) dispatch(command);
+      if (command === 'use-reader' && state.doorUnlocked) { presentation.feedback('reader-accepted'); audio.effect('accepted'); }
+      else if (command) dispatch(command);
       else ui.notify('Ward intercom.');
       context.events.emit('interaction:completed', { ...request,
         outcome: command === 'try-locked-door' || command === 'try-106' || (command === 'use-reader' && !state.doorUnlocked) ? 'denied' : 'completed',
@@ -175,11 +183,19 @@ export async function createOpeningSequence(context: ModuleContext, runtime: Gam
         save?.(createOpeningCheckpoint(state, state.stationReached ? 'station-approach' : pendingMilestone));
         pendingMilestone = null;
       }
+      onboarding.sync(state, exitSaved);
+      const snapshot = runtime.player.getSnapshot();
+      if (snapshot.crouching) onboarding.recordSkill('crouch');
+      if (snapshot.hiding.state === 'hidden') onboarding.recordSkill('hide');
+      const hint = !playback && audio.idle ? assistance.update(delta, state) : null;
+      if (hint) ui.notify(hint);
       const prompt = runtime.interactions.getPrompt();
+      const crouchHint = prompt?.targetId === OPENING_INTERACTIONS.card && !snapshot.crouching
+        ? 'Ctrl / C — Crouch for a closer look' : null;
       const text = prompt?.targetId === OPENING_INTERACTIONS.card ? 'Take staff access card' :
         prompt?.targetId === bindings['room-104-door'].doorId && !state.doorUnlocked ? 'Try door' :
         prompt?.targetId === bindings['room-106-door'].doorId ? 'Try handle' : prompt?.text;
-      ui.update({ prompt: prompt && text ? { ...prompt, text } : null, playing, cinematic: playback !== null }, delta);
+      ui.update({ prompt: prompt && text ? { ...prompt, text } : null, playing, cinematic: playback !== null, guidance: crouchHint }, delta);
     },
     dispose() {
       if (disposed) return;

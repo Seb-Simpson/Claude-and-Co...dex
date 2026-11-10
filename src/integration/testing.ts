@@ -17,7 +17,7 @@ export interface ApplicationSnapshot {
   doorStates: Record<string, DoorState>;
   prompt: InteractionPrompt | null;
   error: string | null;
-  opening?: { state: OpeningState; cinematic: boolean;
+  opening?: { phase: import('../gameplay/opening/onboarding').OnboardingPhase; state: OpeningState; cinematic: boolean;
     camera: Vec3;
     anchors: Readonly<Record<string, { position: Vec3; stand?: Vec3; target?: Vec3 }>> };
   performance: {

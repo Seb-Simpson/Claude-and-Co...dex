@@ -4,6 +4,7 @@ import type { InteractionPrompt } from '../interactions';
 import './ui.css';
 
 export interface OpeningUiState {
+  readonly guidance?: string | null;
   readonly prompt: InteractionPrompt | null;
   readonly playing: boolean;
   readonly cinematic: boolean;
@@ -64,7 +65,8 @@ export function createOpeningUi(
   const skip = document.createElement('div');
   skip.className = 'nw-opening-ui__skip';
   skip.textContent = 'Space — Skip';
-  root.append(darkness, prompt, notification, subtitle, skip);
+  const guidance = document.createElement('div'); guidance.className = 'nw-opening-ui__guidance';
+  root.append(darkness, prompt, notification, subtitle, skip, guidance);
   document.body.append(root);
 
   let current: OpeningUiState = { prompt: null, playing: false, cinematic: false };
@@ -94,6 +96,8 @@ export function createOpeningUi(
     text(speaker, line?.speaker ? `${line.speaker} ` : '');
     text(words, line?.text ?? '');
     skip.hidden = !current.playing || !current.cinematic;
+    guidance.hidden = !current.playing || current.cinematic || !current.guidance || !!line?.text;
+    text(guidance, current.guidance ?? '');
   }
 
   const unsubscribe = settings.subscribe(render);
