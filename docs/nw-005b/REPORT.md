@@ -66,3 +66,7 @@ Command: `NW005_REAL=1 NW005_SOFTWARE_SCALE=1 PLAYWRIGHT_CHROMIUM_EXECUTABLE=/us
 All three opening scenarios passed against NW-005A in the separate checkout: awakening and the full puzzle/corridor scenario passed together; the Continue/menu/reload/NewGame scenario passed in its isolated rerun (38.8s). The first menu attempt exposed a test race releasing pointer lock before asynchronous entry completed. The test now waits explicitly for playing and paused transitions. There was no production gameplay change for that race.
 
 Representative actual-hospital screenshots are under evidence/hospital. The unscaled Low awakening/intercom images and the explicitly prefixed software-scale puzzle/Nurse/handoff images are kept separate. No full unassisted playthrough or final voice/bed-camera approval is claimed.
+
+## Existing-browser regression result
+
+`PLAYWRIGHT_CHROMIUM_EXECUTABLE=/usr/bin/chromium npm run test:browser -- tests/browser/foundation.spec.ts tests/browser/nw-004-systems.spec.ts`: **6 passed (2.2m)** on the independent branch. This verifies classic hospital startup/audio/resize, WebGL-loss cleanup, shared-camera input/noise suppression, pause/skip, repeated cinematic restarts/resource cleanup, rejection of unapproved voices and native audio-clock synchronization. Earlier development runs interrupted by live source edits/artifact contention were superseded by this clean sequential run.
