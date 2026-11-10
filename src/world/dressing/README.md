@@ -65,7 +65,7 @@ the pillow tell the rest.
 ## Pipeline (`pipeline/`)
 
 ```
-BLENDER_PY=/path/to/python-with-bpy ./pipeline/build_set.sh   # ~30 min on 4 CPU cores
+BLENDER_PY=/path/to/python-with-bpy ./pipeline/build_set.sh   # ~25 min on 4 CPU cores (NW-005A build)
 BLENDER_PY=... ./pipeline/build_set.sh --quick                # ~3 min, noisy bake, 1024 maps
 ```
 
@@ -108,6 +108,68 @@ shipped as a static asset.
   specular-only surface (there is no environment map).
 * **Bedding.** The cloth simulation lands most of the bedding in a heap beside the bed. That
   reads as "dragged off", but the sheet is not tucked on the mattress.
-* **Still procedural.** Door leaves and frames, the TV and monitor screens, the light panels, the
-  corridor props (wet-floor sign, west window and blinds) and the troffer at x −7.4, which
-  straddles the corridor boundary.
+* **Still procedural.** The TV and monitor screens, the light panels, the west window and blinds,
+  the room-number plaques and the hanging station sign (crisp canvas text), the nurses' station
+  interior (worktop, desk items, back wall), and the troffer at x −0.2, which straddles the set's
+  end.
+
+## NW-005A additions (the opening)
+
+The set now runs from the west window to the nurses' station (x −20 → −0.2). New Blender
+content lives in `pipeline/opening.py` and is called from `room104_set.py`:
+
+* **Door kit.** One beech-veneer fire-door leaf, built once in the door group's local frame and
+  reused by every corridor door. It has:
+  - stainless kick and push plates, lever handles on roses and a privacy turn;
+  - butt hinges and an overhead closer;
+  - a narrow vision panel of wired safety glass, matching the procedural panel so sightlines
+    through doors do not change.
+
+  It ships as the GLB node `doorleaf`. At runtime, `doors.ts` parents a clone into each door
+  group for doors 101–106 and 108, and hides only the procedural leaf meshes. The doors' rotation
+  and colliders are untouched.
+
+  Painted hardwood frames (linings, stops, 70 mm architraves on both faces, stainless corner
+  guards and threshold) replace the procedural frames. Each door has its own suppression box in
+  `regions.ts`.
+* **Room 104 props.** All of these positions are mirrored in `src/world/opening.ts`:
+  - the staff card reader (latch side, room face, with surface trunking);
+  - the ward intercom above the door;
+  - E. Shaw's staff access card on its lanyard, which ships as its own node,
+    `nw:opening:access-card-prop`, so gameplay can hide it on pickup;
+  - the bed's privacy curtain on its ceiling track.
+* **Corridor fixtures.** Smoke detectors, PA speakers, the station's STAFF ONLY sign and the
+  corridor clock (03:17).
+* **Corridor props, remodelled on their existing colliders.** The procedural visuals are
+  suppressed by boxes in `regions.ts`; the colliders are kept.
+  - The station counter's front: teal HPL panels with aluminium joints, a recessed plinth, a beech
+    bump rail and a solid-surface ledge carrying a bell, a pen on its chain, a visitors' book and a
+    "PLEASE WAIT HERE" tent card.
+  - The two visitors' chairs: beech arms, wipe-clean vinyl, one seat torn.
+  - Four sanitiser dispensers.
+  - The yellow A-frame "CAUTION WET FLOOR" sign.
+* **Corridor density without collision.** These are wall-mounted, overhead or flat on the floor,
+  so no colliders are added; Codex's `doorway-seams` test pins the count.
+  - patient-information whiteboards by the doors;
+  - glove-and-apron PPE stations by 104 and 106;
+  - a fire alarm call point and fire action notice;
+  - the ward notice board (night rota, "Re: 104 — do not discuss with relatives");
+  - a hand-hygiene poster and the visiting-hours sign;
+  - a CCTV dome over the station approach;
+  - loose papers, a nitrile glove, a medicine cup and a pen on the floor.
+
+  The print is in `textures.py → corridor_labels.jpg`.
+* **Decay pass.** All of these are flat, overhead or wall-mounted, so none needs a collider:
+  - the wall paint and ceiling tile textures are dingier;
+  - 27 more corridor decals;
+  - the ceiling collapse at x −9.4;
+  - debris: glass, pills, chart, slipper.
+
+  The bake's corridor lights match the game's states: x −14.6 and −7.4 are dead and bake no
+  light, x −18.2 is dying, and x −11.0 flickers.
+* **Textures.** `textures.py` adds `door_veneer` (a grain set) and `opening_labels.jpg`, which
+  holds the ID card, the reader face, the intercom badge and the station sign.
+* **Light.** The bake adds the corridor troffers at x −3.8 and −0.2, the station troffer and the
+  warm desk lamp. Light from the station falls over its counter into the corridor. Corners and
+  contact shadows are darker than before: the mapping changed from 0.45 + 0.55 to 0.3 + 0.7 for
+  light and 0.38 + 0.62 for occlusion.
