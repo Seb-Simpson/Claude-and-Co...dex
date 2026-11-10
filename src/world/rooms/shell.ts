@@ -171,7 +171,11 @@ export function buildShell(b: WorldBuilder): void {
     [-18.2, 'dying'], [-14.6, 'dead'], [-11.0, 'flicker'], [-7.4, 'dead'], [-3.8, 'steady'], [-0.2, 'dying'],
     [3.4, 'steady'], [7.0, 'dead'], [10.6, 'flicker'], [14.2, 'dead'],
   ] as const;
-  for (const [x, state] of corridorStates) troffer(b, ROOMS.corridor, x, 0, CEILING.corridor, state, ['nw:lights:corridor-main']);
+  // The one working tube of Wing A is over the station approach: brighter and with a longer reach,
+  // so its pool on the floor is what the player sees at the end of the dark corridor.
+  for (const [x, state] of corridorStates) {
+    troffer(b, ROOMS.corridor, x, 0, CEILING.corridor, state, ['nw:lights:corridor-main'], x === -3.8 ? { intensity: 9, distance: 9.5 } : {});
+  }
   for (const [z, state] of [[-9.0, 'dead'], [-4.6, 'flicker'], [0, 'steady'], [4.6, 'dying']] as const) {
     troffer(b, ROOMS.east, 19.5, z, CEILING.corridor, state, ['nw:lights:corridor-east'], { rotate: true });
   }
