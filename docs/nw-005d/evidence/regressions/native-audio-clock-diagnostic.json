@@ -1,0 +1,214 @@
+{
+  "probe": {
+    "fixture": "generated diagnostic sine tone; not a chapter voice",
+    "audioAdvanceSeconds": 2.0694784580498866,
+    "timelineSeconds": 2.0694784580498866,
+    "caption": "DIAGNOSTIC TONE — NOT A CHAPTER VOICE: Diagnostic clock segment two.",
+    "cameraDeltaX": 0.9,
+    "outputRms": 0.014769890945698172,
+    "stoppedFrameCount": 10,
+    "sampledFrameCount": 10,
+    "cameraIdentityPreserved": true,
+    "canvasIdentityPreserved": true,
+    "collidersBefore": 3,
+    "collidersAfter": 3,
+    "audioState": "running"
+  },
+  "before": {
+    "ready": true,
+    "disposed": false,
+    "generation": 1,
+    "frameCount": 10,
+    "canvasCount": 1,
+    "worldCount": 1,
+    "colliderCount": 3,
+    "bodyCount": 0,
+    "moduleSetups": 2,
+    "moduleDisposals": 0,
+    "locked": false,
+    "controlsLocked": false,
+    "position": {
+      "x": 0,
+      "y": 0.0029999985098838862,
+      "z": 3
+    },
+    "rotation": {
+      "yaw": 0,
+      "pitch": 0
+    },
+    "camera": {
+      "x": 0,
+      "y": 1.6529999985098838,
+      "z": 3
+    },
+    "phase": "idle",
+    "elapsedSeconds": 0,
+    "noiseCount": 0,
+    "noiseDuringControl": 0,
+    "previewCount": 0,
+    "audioState": "running",
+    "draws": 4,
+    "triangles": 48,
+    "pixelRatio": 0.75,
+    "outcomes": [],
+    "gpuResources": {
+      "geometries": 1,
+      "textures": 1,
+      "programs": 1
+    },
+    "performance": {
+      "sampleCount": 10,
+      "capacity": 240,
+      "totalFrames": 10,
+      "totalSubsteps": 35,
+      "frameIntervalMs": {
+        "last": 66.59999999999991,
+        "mean": 77.77755555555555,
+        "p50": 83.29999999999995,
+        "p95": 133.4000000000001,
+        "max": 133.4000000000001
+      },
+      "frameCpuMs": {
+        "last": 0.8000000007450581,
+        "mean": 8.579999999329448,
+        "p50": 1.7999999970197678,
+        "p95": 45.19999999925494,
+        "max": 45.19999999925494
+      },
+      "fixedMs": {
+        "last": 0.3999999985098839,
+        "mean": 1.3300000000745058,
+        "p50": 0.6000000014901161,
+        "p95": 6.5,
+        "max": 6.5
+      },
+      "physicsMs": {
+        "last": 0.10000000149011612,
+        "mean": 0.9200000002980232,
+        "p50": 0.10000000149011612,
+        "p95": 8.200000002980232,
+        "max": 8.200000002980232
+      },
+      "updateMs": {
+        "last": 0.10000000149011612,
+        "mean": 0.15,
+        "p50": 0.10000000149011612,
+        "p95": 0.3999999985098839,
+        "max": 0.3999999985098839
+      },
+      "renderMs": {
+        "last": 0.19999999925494194,
+        "mean": 6.099999999627471,
+        "p50": 0.4000000022351742,
+        "p95": 44.69999999925494,
+        "max": 44.69999999925494
+      },
+      "substeps": {
+        "last": 4,
+        "mean": 3.5,
+        "p50": 4,
+        "p95": 5,
+        "max": 5
+      }
+    }
+  },
+  "after": {
+    "ready": true,
+    "disposed": false,
+    "generation": 1,
+    "frameCount": 13,
+    "canvasCount": 1,
+    "worldCount": 1,
+    "colliderCount": 3,
+    "bodyCount": 0,
+    "moduleSetups": 2,
+    "moduleDisposals": 0,
+    "locked": false,
+    "controlsLocked": false,
+    "position": {
+      "x": 0,
+      "y": 0.0029999985098838862,
+      "z": 3
+    },
+    "rotation": {
+      "yaw": 0,
+      "pitch": 0
+    },
+    "camera": {
+      "x": 0,
+      "y": 1.6529999985098838,
+      "z": 3
+    },
+    "phase": "idle",
+    "elapsedSeconds": 0,
+    "noiseCount": 0,
+    "noiseDuringControl": 0,
+    "previewCount": 0,
+    "audioState": "running",
+    "draws": 4,
+    "triangles": 48,
+    "pixelRatio": 0.75,
+    "outcomes": [],
+    "gpuResources": {
+      "geometries": 1,
+      "textures": 1,
+      "programs": 1
+    },
+    "performance": {
+      "sampleCount": 3,
+      "capacity": 240,
+      "totalFrames": 3,
+      "totalSubsteps": 2,
+      "frameIntervalMs": {
+        "last": 16.700000000000273,
+        "mean": 16.700000000000045,
+        "p50": 16.699999999999818,
+        "p95": 16.700000000000273,
+        "max": 16.700000000000273
+      },
+      "frameCpuMs": {
+        "last": 0.5,
+        "mean": 0.433333333581686,
+        "p50": 0.5,
+        "p95": 0.6000000014901161,
+        "max": 0.6000000014901161
+      },
+      "fixedMs": {
+        "last": 0.10000000149011612,
+        "mean": 0.1333333340783914,
+        "p50": 0.10000000149011612,
+        "p95": 0.30000000074505806,
+        "max": 0.30000000074505806
+      },
+      "physicsMs": {
+        "last": 0.09999999776482582,
+        "mean": 0.06666666641831398,
+        "p50": 0.09999999776482582,
+        "p95": 0.10000000149011612,
+        "max": 0.10000000149011612
+      },
+      "updateMs": {
+        "last": 0.10000000149011612,
+        "mean": 0.06666666766007741,
+        "p50": 0.10000000149011612,
+        "p95": 0.10000000149011612,
+        "max": 0.10000000149011612
+      },
+      "renderMs": {
+        "last": 0.09999999776482582,
+        "mean": 0.13333333159486452,
+        "p50": 0.09999999776482582,
+        "p95": 0.19999999925494194,
+        "max": 0.19999999925494194
+      },
+      "substeps": {
+        "last": 1,
+        "mean": 0.6666666666666666,
+        "p50": 1,
+        "p95": 1,
+        "max": 1
+      }
+    }
+  },
+  "unrecordedChapterLinesRejected": 13
+}

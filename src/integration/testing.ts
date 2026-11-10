@@ -1,6 +1,7 @@
 import type { DoorState, EntitySnapshot, GameEventMap, PlayerSnapshot, Vec3 } from '../contracts';
 import type { InteractionPrompt } from '../gameplay';
 import type { EnginePerformanceSnapshot } from '../engine';
+import type { OpeningState } from '../gameplay/opening/state';
 export type ApplicationState = 'menu' | 'loading' | 'ready' | 'playing' | 'paused' | 'captured' | 'restarting' | 'error' | 'disposed';
 export interface ApplicationSnapshot {
   state: ApplicationState;
@@ -16,6 +17,9 @@ export interface ApplicationSnapshot {
   doorStates: Record<string, DoorState>;
   prompt: InteractionPrompt | null;
   error: string | null;
+  opening?: { phase: import('../gameplay/opening/onboarding').OnboardingPhase; state: OpeningState; cinematic: boolean;
+    camera: Vec3;
+    anchors: Readonly<Record<string, { position: Vec3; stand?: Vec3; target?: Vec3 }>> };
   performance: {
     fixedMaxMs: number; updateMaxMs: number; frameDeltaMaxMs: number;
     /** Gameplay simulation time in this attempt; excludes ready/captured frame work. */

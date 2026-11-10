@@ -1,0 +1,13 @@
+{
+  "command": "PLAYWRIGHT_PREVIEW=1 PLAYWRIGHT_CHROMIUM_EXECUTABLE=/usr/bin/chromium npm run test:browser -- tests/browser/foundation.spec.ts tests/browser/nw-005c-onboarding.spec.ts -g \"boots the renderer|context loss|literal normal\"",
+  "result": "3 passed (2.9m)",
+  "renderer": "Chromium ANGLE SwiftShader; shipping graphics settings, no software-scale override",
+  "resize": {
+    "buffer": [
+      800,
+      600
+    ],
+    "cameraAspect": 1.3333333333333333
+  },
+  "realGpu": "unverified"
+}

@@ -21,7 +21,7 @@ function boundary(id: ChapterCheckpointId): ChapterState {
     completedScenes: level === 0 ? [] : [
       'c1.cine.awakening', 'c1.cine.nurse-reveal',
       ...(level >= 2 ? ['c1.cine.record'] as const : []),
-      ...(level === 4 ? ['c1.cine.patient-release', 'c1.cine.ending'] as const : []),
+      ...(level === 4 ? ['c1.cine.nurse-confrontation', 'c1.cine.ending'] as const : []),
     ],
     activeScene: null, nextSceneToken: level === 0 ? 1 : level === 1 ? 3 : level === 4 ? 6 : 4,
     stationReached: level >= 1, nurseSurvived: level >= 1,
@@ -36,8 +36,8 @@ function boundary(id: ChapterCheckpointId): ChapterState {
   };
 }
 
-function envelope(state: unknown, checkpointId = 'chapter1.before-patient') {
-  return { schemaVersion: 1, contentRevision: 'c1.1', checkpointId, state };
+function envelope(state: unknown, checkpointId = 'chapter1.before-confrontation') {
+  return { schemaVersion: 1, contentRevision: 'c1.2-nurse', checkpointId, state };
 }
 
 describe('Chapter One core checkpoint codec', () => {
@@ -82,8 +82,8 @@ describe('Chapter One core checkpoint codec', () => {
     command({ type: 'commit-checkpoint', id: 'chapter1.after-records-power', safe: true });
     save('chapter1.after-records-power');
     command({ type: 'install-operating-handle' });
-    command({ type: 'commit-checkpoint', id: 'chapter1.before-patient', safe: true });
-    save('chapter1.before-patient');
+    command({ type: 'commit-checkpoint', id: 'chapter1.before-confrontation', safe: true });
+    save('chapter1.before-confrontation');
     command({ type: 'confirm-release', safe: true });
     expect(createChapterCoreCheckpoint(state).ok).toBe(false);
     settle();
@@ -103,7 +103,7 @@ describe('Chapter One core checkpoint codec', () => {
   });
 
   it('copies state, arrays and puzzle without retaining producer references', () => {
-    const source = boundary('chapter1.before-patient');
+    const source = boundary('chapter1.before-confrontation');
     const created = createChapterCoreCheckpoint(source);
     expect(created.ok).toBe(true);
     if (!created.ok) return;
@@ -135,7 +135,7 @@ describe('Chapter One core checkpoint codec', () => {
   });
 
   it('rejects unsupported envelope/state revisions and additional schema fields', () => {
-    const state = boundary('chapter1.before-patient');
+    const state = boundary('chapter1.before-confrontation');
     const valid = envelope(state);
     for (const invalid of [
       { ...valid, schemaVersion: 2 }, { ...valid, contentRevision: 'c1.2' },
@@ -147,9 +147,9 @@ describe('Chapter One core checkpoint codec', () => {
   });
 
   it('rejects active/mismatched/non-boundary state', () => {
-    const state = boundary('chapter1.before-patient');
+    const state = boundary('chapter1.before-confrontation');
     for (const invalid of [
-      { ...state, activeScene: { id: 'c1.cine.patient-release', token: 4 } },
+      { ...state, activeScene: { id: 'c1.cine.nurse-confrontation', token: 4 } },
       { ...state, atSafeBoundary: null },
       { ...state, atSafeBoundary: 'chapter1.after-records-power' },
     ]) expect(validateChapterCoreCheckpoint(envelope(invalid)).ok).toBe(false);
@@ -157,20 +157,20 @@ describe('Chapter One core checkpoint codec', () => {
   });
 
   it('rejects duplicate, missing, reordered and unknown stable identifiers', () => {
-    const state = boundary('chapter1.before-patient');
+    const state = boundary('chapter1.before-confrontation');
     for (const invalid of [
       { ...state, clues: [...state.clues, 'wristband'] },
       { ...state, clues: ['nonexistent'] },
       { ...state, completedScenes: [...state.completedScenes, 'c1.cine.record'] },
       { ...state, completedScenes: ['unknown'] },
-      { ...state, checkpoints: ['chapter1.start', 'chapter1.before-patient'] },
+      { ...state, checkpoints: ['chapter1.start', 'chapter1.before-confrontation'] },
       { ...state, checkpoints: [...state.checkpoints].reverse() },
-      { ...state, checkpoints: [...state.checkpoints, 'chapter1.before-patient'] },
+      { ...state, checkpoints: [...state.checkpoints, 'chapter1.before-confrontation'] },
     ]) expect(validateChapterCoreCheckpoint(envelope(invalid)).ok).toBe(false);
   });
 
   it('rejects impossible causal progress and contradictory electrical states', () => {
-    const state = boundary('chapter1.before-patient');
+    const state = boundary('chapter1.before-confrontation');
     for (const invalid of [
       { ...state, nurseSurvived: false },
       { ...state, stationReached: false },
@@ -197,7 +197,7 @@ describe('Chapter One core checkpoint codec', () => {
   });
 
   it('rejects invalid numeric fields, sparse arrays and accessor/prototype objects', () => {
-    const state = boundary('chapter1.before-patient');
+    const state = boundary('chapter1.before-confrontation');
     for (const nextSceneToken of [0, -1, NaN, Infinity, 1.5, Number.MAX_SAFE_INTEGER + 1, 2]) {
       expect(validateChapterCoreCheckpoint(envelope({ ...state, nextSceneToken })).ok).toBe(false);
     }

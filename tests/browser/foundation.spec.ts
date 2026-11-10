@@ -1,7 +1,8 @@
 import { expect, test } from '@playwright/test';
+import type { Application } from '../../src/integration/application';
 import { bootHospital, enterWard, snapshot } from './application';
 
-test.describe.configure({ timeout: 90_000 });
+test.describe.configure({ timeout: 120_000 });
 
 test('boots the renderer, Rapier and registered world, unlocks audio, and resizes the canvas', async ({ page }, testInfo) => {
   const errors = await bootHospital(page);
@@ -33,7 +34,8 @@ test('boots the renderer, Rapier and registered world, unlocks audio, and resize
       clientWidth: element.clientWidth,
       clientHeight: element.clientHeight,
     };
-  })).toEqual({ width: 800, height: 600, clientWidth: 800, clientHeight: 600 });
+  }), { timeout: 30_000 }).toEqual({ width: 800, height: 600, clientWidth: 800, clientHeight: 600 });
+  await expect.poll(() => page.evaluate(() => (window.nightWardTest as Application).services()!.camera.aspect), { timeout: 30_000 }).toBeCloseTo(800/600, 5);
   await page.screenshot({ path: testInfo.outputPath('foundation-resized.png') });
   expect(errors).toEqual([]);
 });

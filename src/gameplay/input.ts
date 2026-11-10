@@ -1,5 +1,8 @@
 import type { PlayerInput } from './player';
 
+/** One source for the actual binding and its prompt; settings currently have no remapping. */
+export const INTERACTION_BINDING = { code: 'KeyE', label: 'E' } as const;
+
 export interface BrowserInput {
   readonly locked: boolean;
   /** Clears held/toggled keys and ignores gameplay input while a camera lease owns control. */
@@ -23,7 +26,7 @@ export function createBrowserInput(options: BrowserInputOptions): BrowserInput {
   let crouchToggled = false;
   let disposed = false;
   let suppressed = false;
-  const keys = new Set(['KeyW', 'KeyA', 'KeyS', 'KeyD', 'ShiftLeft', 'ShiftRight', 'ControlLeft', 'ControlRight', 'KeyC', 'KeyE']);
+  const keys = new Set(['KeyW', 'KeyA', 'KeyS', 'KeyD', 'ShiftLeft', 'ShiftRight', 'ControlLeft', 'ControlRight', 'KeyC', INTERACTION_BINDING.code]);
   function locked(): boolean { return !disposed && !document.hidden && document.pointerLockElement === element; }
   function clear(): void { pressed.clear(); crouchToggled = false; }
   function onPointerLockChange(): void { if (!locked()) clear(); }
@@ -43,7 +46,7 @@ export function createBrowserInput(options: BrowserInputOptions): BrowserInput {
     if (event.repeat || pressed.has(event.code)) return;
     pressed.add(event.code);
     if (event.code === 'KeyC') crouchToggled = !crouchToggled;
-    if (event.code === 'KeyE') options.onInteract();
+    if (event.code === INTERACTION_BINDING.code) options.onInteract();
   }
   function onKeyUp(event: KeyboardEvent): void {
     if (locked() && keys.has(event.code)) event.preventDefault();

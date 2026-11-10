@@ -13,7 +13,7 @@ export const CHAPTER_CINEMATIC_CUES = [
   'c1.presentation.nurse-enters', 'c1.presentation.tray-distraction',
   'c1.presentation.receiver-lift', 'c1.presentation.receiver-lower',
   'c1.presentation.release-handle', 'c1.presentation.emergency-route',
-  'c1.presentation.egress-chime', 'c1.presentation.patient-emerges',
+  'c1.presentation.egress-chime', 'c1.presentation.nurse-approaches',
   'c1.presentation.stair-quiet', 'c1.presentation.reader-recognition',
   'c1.presentation.chapter-fade',
 ] as const;
@@ -22,7 +22,7 @@ export const CHAPTER_CINEMATIC_DURATIONS = {
   'c1.cine.awakening': 55,
   'c1.cine.nurse-reveal': 28,
   'c1.cine.record': 42,
-  'c1.cine.patient-release': 20,
+  'c1.cine.nurse-confrontation': 20,
   'c1.cine.ending': 38,
 } as const satisfies Readonly<Record<ChapterSceneId, number>>;
 
@@ -58,12 +58,12 @@ const TIMELINES = {
     { atSeconds: 33, kind: 'dialogue', id: 'c1.voice.protagonist.memory' },
     { atSeconds: 38, kind: 'animation', id: 'c1.presentation.receiver-lower' },
   ],
-  'c1.cine.patient-release': [
+  'c1.cine.nurse-confrontation': [
     { atSeconds: 0, kind: 'animation', id: 'c1.presentation.release-handle' },
     { atSeconds: 5, kind: 'environment', id: 'c1.presentation.emergency-route' },
     { atSeconds: 5, kind: 'sound', id: 'c1.presentation.egress-chime' },
     { atSeconds: 5, kind: 'dialogue', id: 'c1.voice.intercom.release' },
-    { atSeconds: 10, kind: 'animation', id: 'c1.presentation.patient-emerges' },
+    { atSeconds: 10, kind: 'animation', id: 'c1.presentation.nurse-approaches' },
   ],
   'c1.cine.ending': [
     { atSeconds: 0, kind: 'sound', id: 'c1.presentation.stair-quiet' },

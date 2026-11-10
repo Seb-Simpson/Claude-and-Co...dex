@@ -60,7 +60,15 @@ function corridorDressing(b: WorldBuilder): void {
   sign(b, 'PLEASE KEEP DOORS CLOSED AT NIGHT', SIGN_PAPER, 0.42, 0.16, new Matrix4().makeRotationZ(-0.04).setPosition(-9.9, 1.55, Z.corridorN + 0.014), { canvas: [512, 196] });
 
   // Battery emergency bulkheads: dim amber until the mains lighting fails around them.
-  for (const x of [-9.8, 4.6, 13.4]) emergencyLight(b, id, new Vector3(x, 2.45, Z.corridorN + 0.05), 0, { color: 0xffb060, intensity: 0.7, state: 'steady' });
+  // NW-005A: maintained emergency luminaires on failing batteries: a weak, sickly green-white with
+  // a buzz, instead of a steady warm amber (which made the dark corridor feel cosy).
+  for (const x of [-9.8, 4.6, 13.4]) emergencyLight(b, id, new Vector3(x, 2.45, Z.corridorN + 0.05), 0, { color: 0xa8d8a0, intensity: 0.45, state: 'buzz' });
+  // The broken connector on the cable hanging from the collapsed ceiling: an intermittent arc.
+  // 'dying' is dark with short bursts, which reads as sparking; it lights the hole from below.
+  b.fixture({
+    kind: 'lamp', state: 'dying', roomId: id, circuits: ['nw:lights:corridor-main'], position: new Vector3(-9.27, 1.62, -0.23),
+    color: 0xcfe2ff, intensity: 2.4, distance: 4.5, panel: { shape: 'small', matrix: new Matrix4().makeScale(0.25, 0.25, 0.25).setPosition(-9.27, 1.665, -0.23) }, halo: 0.22, haloOpacity: 0.5,
+  });
   // Long sight lines where a silhouette can be glimpsed far away (presentation only).
   b.sightlines.push(
     { id: 'nw:sightline:corridor-west', roomId: id, position: new Vector3(-19.2, 0, -0.75), yaw: -HALF_PI },

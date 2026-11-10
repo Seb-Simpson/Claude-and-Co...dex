@@ -1,0 +1,9 @@
+# Current narrative policy — NW-005D
+
+Nurse Shaw is Chapter 1's main antagonist. The Patient is reserved for a much later part of the game, potentially its final confrontation. This is casting policy, not a temporary onboarding toggle. Patient chase PR15 is excluded and must remain unmerged. Generic Patient assets, navigation, perception and chase infrastructure remain available to later development.
+
+The playable opening is: Room104 awakening → staff access card and reader → first corridor/106handle → distant nonlethal Shaw sighting → Nurses' Station handoff. Exactly two Shaw intercom lines play: “Patient one-zero-four. Please return to your bed.” on the first locked-door attempt; “Patient one-zero-four. You have not been authorised to leave.” on successful unlock. Card-first exploration may bypass the first request naturally. No extra spoken explanation or protagonist monologue is added.
+
+Room104 is safe. The player investigates the locked exit, discovers the visible staff card, uses its reader and leaves to find assistance. The lit station and signage motivate the corridor route. Shaw's sighting establishes a presence without a pursuit. Reaching the station remains safe; the next coordinated milestone will teach stealth, concealment and patrol observation before a dangerous Nurse encounter. This task does not build that section or promise an ending beyond it.
+
+The older NW-004 full-chapter treatment is withdrawn historical material. Current reusable chapter-library IDs refer to a future Nurse confrontation, never a Patient release/finale; these templates are not registered gameplay or newly implemented encounters. The core proposal revision changes to c1.2-nurse, so stale c1.1 proposal checkpoints cannot replay the withdrawn actor activation. The live opening save-slot format/card/door milestones remain unchanged.

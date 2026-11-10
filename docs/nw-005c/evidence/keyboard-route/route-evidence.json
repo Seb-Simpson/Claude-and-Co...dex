@@ -1,0 +1,383 @@
+{
+  "route": "normal game, keyboard and mouse input only, no positioning shortcuts",
+  "final": {
+    "state": "playing",
+    "sessionId": 1,
+    "worldId": "nw:hospital:ward-4-west",
+    "player": {
+      "id": "player",
+      "position": {
+        "x": -4.600647668399863,
+        "y": 0.0029999985098838862,
+        "z": 0.20050997597314146
+      },
+      "rotation": {
+        "yaw": 1.5699999999999996,
+        "pitch": 0
+      },
+      "velocity": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "movement": "idle",
+      "crouching": false,
+      "grounded": true,
+      "hiding": {
+        "state": "outside",
+        "spotId": null
+      },
+      "captured": false
+    },
+    "entities": [],
+    "colliderCount": 224,
+    "frameCount": 278,
+    "renderer": {
+      "calls": 185,
+      "triangles": 152150,
+      "geometries": 394,
+      "textures": 94
+    },
+    "audioState": "running",
+    "events": [
+      {
+        "type": "interaction:completed",
+        "payload": {
+          "playerId": "player",
+          "targetId": "nw:opening:take-staff-card",
+          "action": "inspect",
+          "outcome": "completed",
+          "position": {
+            "x": -12.569529258162802,
+            "y": 0.0029999985098838862,
+            "z": 3.7682457924435173
+          }
+        }
+      },
+      {
+        "type": "door:state",
+        "payload": {
+          "doorId": "nw:door:room-104",
+          "previous": "locked",
+          "current": "closed"
+        }
+      },
+      {
+        "type": "interaction:completed",
+        "payload": {
+          "playerId": "player",
+          "targetId": "nw:opening:use-card-reader",
+          "action": "inspect",
+          "outcome": "completed",
+          "position": {
+            "x": -12.835162109604083,
+            "y": 0.0029999985098838862,
+            "z": 2.2250101400382216
+          }
+        }
+      },
+      {
+        "type": "interaction:completed",
+        "payload": {
+          "playerId": "player",
+          "targetId": "nw:opening:use-card-reader",
+          "action": "inspect",
+          "outcome": "completed",
+          "position": {
+            "x": -12.835162109604083,
+            "y": 0.0029999985098838862,
+            "z": 2.2250101400382216
+          }
+        }
+      },
+      {
+        "type": "interaction:completed",
+        "payload": {
+          "playerId": "player",
+          "targetId": "nw:opening:use-card-reader",
+          "action": "inspect",
+          "outcome": "completed",
+          "position": {
+            "x": -12.835162109604083,
+            "y": 0.0029999985098838862,
+            "z": 2.2250101400382216
+          }
+        }
+      },
+      {
+        "type": "interaction:completed",
+        "payload": {
+          "playerId": "player",
+          "targetId": "nw:opening:use-card-reader",
+          "action": "inspect",
+          "outcome": "completed",
+          "position": {
+            "x": -12.835162109604083,
+            "y": 0.0029999985098838862,
+            "z": 2.2250101400382216
+          }
+        }
+      },
+      {
+        "type": "door:state",
+        "payload": {
+          "doorId": "nw:door:room-104",
+          "previous": "closed",
+          "current": "opening"
+        }
+      },
+      {
+        "type": "door:state",
+        "payload": {
+          "doorId": "nw:door:room-104",
+          "previous": "opening",
+          "current": "open"
+        }
+      },
+      {
+        "type": "interaction:completed",
+        "payload": {
+          "playerId": "player",
+          "targetId": "nw:door:room-104",
+          "action": "open",
+          "outcome": "completed",
+          "position": {
+            "x": -12.101376825455015,
+            "y": 0.0029999985098838862,
+            "z": 2.9252210539862267
+          }
+        }
+      },
+      {
+        "type": "interaction:completed",
+        "payload": {
+          "playerId": "player",
+          "targetId": "nw:door:room-106",
+          "action": "open",
+          "outcome": "denied",
+          "position": {
+            "x": -7.643947396422317,
+            "y": 0.0029999985098838862,
+            "z": 0.6013753642050232
+          }
+        }
+      },
+      {
+        "type": "player:captured",
+        "payload": {
+          "playerId": "player",
+          "entityId": "nw:entity:patient",
+          "position": {
+            "x": -4.600647668399863,
+            "y": 0.0029999985098838862,
+            "z": 0.20050997597314146
+          },
+          "timeSeconds": 0
+        }
+      }
+    ],
+    "doorStates": {
+      "nw:door:room-101": "closed",
+      "nw:door:room-103": "closed",
+      "nw:door:room-105": "open",
+      "nw:door:treatment": "closed",
+      "nw:door:room-107": "closed",
+      "nw:door:storage": "closed",
+      "nw:door:room-102": "open",
+      "nw:door:room-104": "open",
+      "nw:door:room-106": "locked",
+      "nw:door:room-108": "open",
+      "nw:door:room-110": "closed",
+      "nw:door:maintenance-west": "closed",
+      "nw:door:maintenance-east": "closed",
+      "nw:door:stairwell-b": "locked",
+      "nw:door:smoke-north": "open",
+      "nw:door:smoke-south": "open"
+    },
+    "prompt": null,
+    "error": null,
+    "opening": {
+      "phase": "stealth-onboarding",
+      "state": {
+        "version": 1,
+        "awakened": true,
+        "cardAcquired": true,
+        "doorUnlocked": true,
+        "firstLinePlayed": false,
+        "secondLinePlayed": true,
+        "room106Tried": true,
+        "sightingSeen": true,
+        "stationReached": true
+      },
+      "cinematic": false,
+      "anchors": {
+        "player-spawn": {
+          "position": {
+            "x": -12.4,
+            "y": 0,
+            "z": 4.1
+          }
+        },
+        "room-104-door": {
+          "position": {
+            "x": -12,
+            "y": 1.05,
+            "z": 1.475
+          },
+          "stand": {
+            "x": -12,
+            "y": 0,
+            "z": 2.3
+          }
+        },
+        "card-reader": {
+          "position": {
+            "x": -12.85,
+            "y": 1.15,
+            "z": 1.575
+          },
+          "stand": {
+            "x": -12.85,
+            "y": 0,
+            "z": 2.25
+          }
+        },
+        "access-card": {
+          "position": {
+            "x": -12.9,
+            "y": 0.006,
+            "z": 3.2
+          },
+          "stand": {
+            "x": -12.6,
+            "y": 0,
+            "z": 3.75
+          }
+        },
+        "intercom-speaker": {
+          "position": {
+            "x": -12,
+            "y": 2.42,
+            "z": 1.6
+          }
+        },
+        "room-106-door": {
+          "position": {
+            "x": -7.6,
+            "y": 1.05,
+            "z": 1.475
+          },
+          "stand": {
+            "x": -7.6,
+            "y": 0,
+            "z": 0.6
+          }
+        },
+        "room-106-handle": {
+          "position": {
+            "x": -8.05,
+            "y": 1,
+            "z": 1.4024999999999999
+          },
+          "stand": {
+            "x": -8.05,
+            "y": 0,
+            "z": 0.75
+          }
+        },
+        "nurse-first-sight": {
+          "position": {
+            "x": -1.2,
+            "y": 0,
+            "z": 0
+          }
+        },
+        "nurse-first-sight-view": {
+          "position": {
+            "x": -12,
+            "y": 1.6,
+            "z": 0.55
+          },
+          "target": {
+            "x": -1.2,
+            "y": 1.5,
+            "z": 0
+          }
+        },
+        "station-approach": {
+          "position": {
+            "x": -4.2,
+            "y": 0,
+            "z": 0.2
+          }
+        }
+      },
+      "camera": {
+        "x": -4.600647668399863,
+        "y": 1.6529999985098838,
+        "z": 0.20050997597314146
+      }
+    },
+    "performance": {
+      "fixedMaxMs": 28.800000000745058,
+      "updateMaxMs": 39.19999999925494,
+      "frameDeltaMaxMs": 100,
+      "simulatedSeconds": 21.683333333333355,
+      "engine": {
+        "sampleCount": 240,
+        "capacity": 240,
+        "totalFrames": 278,
+        "totalSubsteps": 1331,
+        "frameIntervalMs": {
+          "last": 783.2999999999884,
+          "mean": 673.0287500000001,
+          "p50": 700,
+          "p95": 1416.5999999999767,
+          "max": 2116.6999999999825
+        },
+        "frameCpuMs": {
+          "last": 10.199999999254942,
+          "mean": 16.733750000021733,
+          "p50": 6.200000002980232,
+          "p95": 38.80000000074506,
+          "max": 1847.8999999985099
+        },
+        "fixedMs": {
+          "last": 0.7999999970197678,
+          "mean": 1.0650000001924733,
+          "p50": 0.6999999955296516,
+          "p95": 2.6999999955296516,
+          "max": 29.400000002235174
+        },
+        "physicsMs": {
+          "last": 0.10000000149011612,
+          "mean": 0.41374999990997213,
+          "p50": 0.30000000074505806,
+          "p95": 0.8000000007450581,
+          "max": 6.199999999254942
+        },
+        "updateMs": {
+          "last": 0.5,
+          "mean": 1.4524999999906867,
+          "p50": 0.6999999992549419,
+          "p95": 3.5,
+          "max": 39.19999999925494
+        },
+        "renderMs": {
+          "last": 8.800000000745058,
+          "mean": 13.785416666589056,
+          "p50": 3.800000000745058,
+          "p95": 34,
+          "max": 1844.199999999255
+        },
+        "substeps": {
+          "last": 5,
+          "mean": 4.895833333333333,
+          "p50": 5,
+          "p95": 5,
+          "max": 5
+        }
+      }
+    }
+  }
+}

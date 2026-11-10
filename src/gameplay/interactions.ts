@@ -23,6 +23,9 @@ export interface InteractionOptions {
   readonly events: GameEvents;
   readonly hasRequirement?: (id: string) => boolean;
   readonly witnesses?: (spot: HidingLocation) => readonly string[];
+  /** Trusted content hook, invoked only after the shared range/LOS/action validation. */
+  readonly handleInteraction?: (request: InteractionRequest, timeSeconds: number) => boolean;
+  readonly initialDoorStates?: Readonly<Record<string, 'closed' | 'open' | 'locked'>>;
 }
 export interface InteractionSystem {
   readonly hiding: HidingSystem;
@@ -32,6 +35,8 @@ export interface InteractionSystem {
   getDoorState(id: string): DoorState | undefined;
   /** Trusted actor automation; caller verifies its own proximity and perception. */
   requestDoorOpen(id: string): boolean;
+  /** Lock/unlock a fully closed door. Never moves a live door or bypasses collision. */
+  setDoorLocked(id: string, locked: boolean): boolean;
   dispose(): void;
 }
 
@@ -185,7 +190,7 @@ export function createInteractionSystem(options: InteractionOptions): Interactio
   function getPrompt(): InteractionPrompt | null {
     if (disposed) return null;
     const snapshot = player.getSnapshot();
-    if (snapshot.captured) return null;
+    if (snapshot.captured || player.controlsLocked) return null;
     if (snapshot.hiding.state !== 'outside') {
       const spot = world.hidingLocations.find((candidate) => candidate.id === snapshot.hiding.spotId);
       if (!spot) return null;
@@ -205,6 +210,7 @@ export function createInteractionSystem(options: InteractionOptions): Interactio
       emitResult(request, 'denied', 'Target or action is not currently available in view');
       return;
     }
+    if (options.handleInteraction?.(request, timeSeconds)) return;
     if (!prompt.available) {
       emitResult(request, 'denied', prompt.reason ?? 'Unavailable');
       return;
@@ -247,7 +253,22 @@ export function createInteractionSystem(options: InteractionOptions): Interactio
         state: marker.initialState, pending: null,
       };
       doors.set(marker.id, door);
-      setVisual(door, doorPose(door, progress));
+      const initial = options.initialDoorStates?.[marker.id];
+      if (initial) {
+        const nextProgress = initial === 'open' ? 1 : 0;
+        const delta = matrixFor(doorPose(door, nextProgress)).multiply(door.initialInverse);
+        const poses = door.colliderMatrices.map(({ id, matrix }) => {
+          const moved = delta.clone().multiply(matrix);
+          const position = new Vector3(), rotation = new Quaternion();
+          moved.decompose(position, rotation, new Vector3());
+          return { id, pose: { position, rotation } };
+        });
+        if (!physics.trySetColliderPoses(poses)) throw new Error(`Opening door pose obstructed: ${marker.id}`);
+        door.progress = nextProgress;
+        door.desiredOpen = nextProgress === 1;
+        door.state = initial;
+      }
+      setVisual(door, doorPose(door, door.progress));
     }
   } catch (error) {
     unsubscribe();
@@ -316,6 +337,12 @@ export function createInteractionSystem(options: InteractionOptions): Interactio
       }
     },
     getDoorState(id) { return doors.get(id)?.state; },
+    setDoorLocked(id, locked) {
+      const door = doors.get(id);
+      if (disposed || !door || door.progress !== 0 || !['closed', 'locked'].includes(door.state) || door.pending) return false;
+      setDoorState(door, locked ? 'locked' : 'closed');
+      return true;
+    },
     requestDoorOpen(id) {
       if (disposed) return false;
       const door = doors.get(id);

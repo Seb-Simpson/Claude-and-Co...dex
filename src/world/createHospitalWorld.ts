@@ -7,6 +7,7 @@ import { buildClinicalRooms } from './rooms/clinical';
 import { buildPatientRooms } from './rooms/patientRooms';
 import { buildServiceSpaces } from './rooms/service';
 import { buildShell } from './rooms/shell';
+import { addOpeningMarkers, OPENING_BINDINGS } from './opening';
 
 export interface CreateHospitalWorldOptions {
   /** Deterministic seed for clutter placement and procedural textures. */
@@ -49,6 +50,7 @@ export function createHospitalWorld(options: CreateHospitalWorldOptions = {}): H
     buildClinicalRooms(builder);
     buildServiceSpaces(builder);
     declareActors(builder);
+    addOpeningMarkers(builder);
     builder.finalize();
   } catch (error) {
     builder.dispose();
@@ -77,6 +79,7 @@ export function createHospitalWorld(options: CreateHospitalWorldOptions = {}): H
     sharedMaterials: [],
     reflectiveSurfaces: builder.reflectiveSurfaces,
     sightlines: builder.sightlines,
+    opening: OPENING_BINDINGS,
   };
   attachExtras(builder.root, extras);
   builder.root.updateMatrixWorld(true);

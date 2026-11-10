@@ -158,7 +158,9 @@ function room102(b: WorldBuilder): void {
 function room104(b: WorldBuilder): void {
   const id = ROOMS.r104;
   roomPlaque(b, '104', DOORS.r104, 'south', -0.95);
-  troffer(b, id, -13.4, 3.6, CEILING.room, 'flicker', [], { intensity: 4 });
+  // NW-005A: Room 104's own tube works (a faint buzz, no flicker): the room is safe to look round.
+  // The unease starts at the door, where the corridor tube outside stutters.
+  troffer(b, id, -13.4, 3.6, CEILING.room, 'buzz', [], { intensity: 4.6 });
   hospitalBed(b, { x: -14.25, z: Z.southBack - 1.05, yaw: Math.PI }, id, 'unmade');
   headwall(b, { x: -14.25, z: Z.southBack, yaw: Math.PI });
   bedsideCabinet(b, { x: -15.2, z: 5.95, yaw: Math.PI }, id, { drawerOut: true });
