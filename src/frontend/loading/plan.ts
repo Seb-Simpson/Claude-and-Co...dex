@@ -2,6 +2,7 @@ import type { ApplicationProgress } from '../../integration/application';
 import { type PreloadEntry, preloadAll } from '../../assets/preload';
 import { entityModelPreloads } from '../../horror/entities/model/assets';
 import { room104Preloads } from '../../world/dressing/room104';
+import { stationPreloads } from '../../world/dressing/station';
 import { LoadingTracker } from './tracker';
 
 /**
@@ -26,7 +27,7 @@ export interface LoadingPlan {
 
 export function createLoadingPlan(moduleIds: readonly string[], options: { includeEngine: boolean; downloads?: readonly PreloadEntry[] }): LoadingPlan {
   const tracker = new LoadingTracker();
-  const downloads = options.downloads ?? [...room104Preloads(), ...entityModelPreloads()];
+  const downloads = options.downloads ?? [...room104Preloads(), ...stationPreloads(), ...entityModelPreloads()];
   const totalBytes = downloads.reduce((s, d) => s + d.bytes, 0);
   // Downloads: 55% of the bar, split by size, so each byte counts the same.
   for (const d of downloads) tracker.addBytes(`file:${d.url}`, d.label, 55 * (d.bytes / Math.max(1, totalBytes)), d.bytes);

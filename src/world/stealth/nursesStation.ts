@@ -24,15 +24,22 @@ export interface NursesStationStealth {
   readonly entry: StealthPoint;
   /** Safe observation point: watch the nurse from here; she cannot see the player beyond 7 m. */
   readonly observation: StealthPoint;
-  /** Crouch-learning location: stand here and crouch, and the linen screen hides you from the station. */
+  /** Crouch-learning location: stand here and crouch, and the covered linen trolley hides you from the station. */
   readonly crouchCover: StealthPoint;
-  /** The linen screen collider (the node sits at its centre). */
+  /** The linen trolley collider (the node sits at its centre; node name kept as `screen` for compatibility). */
   readonly screen: StealthPoint;
   /** Nurse patrol waypoints, in route order (the existing route nw:route:station-round). */
   readonly patrolWaypoints: readonly StealthPoint[];
   readonly patrolRouteId: ObjectId;
   /** Primary hiding location: the staff locker inside the station. */
   readonly hidingPrimary: ObjectId;
+  /**
+   * Second, optional concealment: the under-bed hiding in Room 105 (door already open), next to the
+   * observation point. The room's open floor is visible from the corridor; only the hiding conceals.
+   */
+  readonly hidingSecondary: ObjectId;
+  /** Approach point for that hiding (inside Room 105, beside the bed). */
+  readonly concealment: StealthPoint;
   /** Stealth route exit toward the next Chapter 1 section. */
   readonly exit: StealthPoint;
   /** Doors on the route (the treatment door, which the route passes). */
@@ -54,9 +61,10 @@ export function addStealthMarkers(b: WorldBuilder): void {
   };
   add('entry', STEALTH.entry, ROOMS.corridor, 'Player entry from the corridor approach.');
   add('observation', STEALTH.observation, ROOMS.corridor, 'Safe observation point, west of the station, looking east through the open counter.');
-  add('crouch-cover', STEALTH.crouchCover, ROOMS.corridor, 'Stand here and crouch: the linen screen hides you from most of the station.');
-  add('screen', STEALTH.screen.centre, ROOMS.corridor, 'Linen screen, 1.2 m high. A deliberate collider.', { size: STEALTH.screen.size });
+  add('crouch-cover', STEALTH.crouchCover, ROOMS.corridor, 'Stand here and crouch: the linen trolley hides you from the station\u2019s west and centre (not from the east gap).');
+  add('screen', STEALTH.screen.centre, ROOMS.corridor, 'Covered linen trolley, 1.2 m high (the cover faces the station). A deliberate collider.', { size: STEALTH.screen.size });
   STEALTH.patrolWaypoints.forEach((p, i) => add(`patrol-${i}`, p, ROOMS.nurses, `Nurse patrol waypoint ${i} (route nw:route:station-round).`, { index: i }));
+  add('concealment', STEALTH.concealment, ROOMS.r105, 'Room 105, beside bed B: slide under it (nw:hiding:room-105-bed-b) when she turns onto the corridor.', { hidingId: STEALTH.hidingSecondary });
   add('exit', STEALTH.exit, ROOMS.corridor, 'Stealth route exit toward the next Chapter 1 section.');
   // Emitters: the trolley on the nurse's route (sounds ahead of her) and the station intercom.
   const before = b.soundEmitters.length;
@@ -82,6 +90,8 @@ export function getNursesStationStealth(world: HospitalWorld): NursesStationStea
     patrolWaypoints: patrol,
     patrolRouteId: 'nw:route:station-round',
     hidingPrimary: STEALTH.hidingPrimary,
+    hidingSecondary: STEALTH.hidingSecondary,
+    concealment: find('concealment'),
     exit: find('exit'),
     doorIds: STEALTH.doors,
     emitterIds: world.root.userData.nwStealthEmitters ?? [],

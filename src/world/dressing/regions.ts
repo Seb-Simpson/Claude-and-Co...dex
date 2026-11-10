@@ -65,3 +65,17 @@ export const PROTOTYPE_REGIONS = {
 } as const;
 
 export const PROTOTYPE_SUPPRESSION: readonly Box3[] = Object.values(PROTOTYPE_REGIONS);
+
+/**
+ * NW-006A: where the Nurses' Station set (dressing/station.ts) replaces the procedural stand-ins
+ * in rooms/stealthStation.ts. Applied only when that set loads, independently of the Room 104 set.
+ * Each box holds only stand-in pieces (never colliders, which stay).
+ */
+export const STATION_REGIONS = {
+  trolley: box([-5.07, -0.02, -1.27], [-4.13, 1.23, -0.73]),
+  cabinets: box([-5.99, -0.02, -6.4], [-5.0, 1.33, -5.75]),
+  cupboard: box([-6.73, -0.02, -5.66], [-6.26, 1.96, -4.74]),
+  obsMachine: box([-0.68, -0.02, -5.56], [-0.16, 1.22, -5.04]),
+} as const;
+
+export const STATION_SUPPRESSION: readonly Box3[] = Object.values(STATION_REGIONS);
