@@ -1,0 +1,14 @@
+{
+  "worldCommit": "8e879de237de2200ff022f387383111af8b96a30",
+  "source": "separate detached checkout; environment source not committed to gameplay branch",
+  "unit": "506 passed, 1 skipped; typecheck and build passed",
+  "browser": "all 3 scenarios passed across runs; 2 together, menu scenario separately after correcting test transition race",
+  "renderer": "Chromium ANGLE SwiftShader; NW005_SOFTWARE_SCALE=1 uses test-only pixel ratio 0.25",
+  "limitations": [
+    "Unscaled full route exceeded original 240-second deadline",
+    "Final British voice recordings missing",
+    "Approved bed-eye anchor missing",
+    "No authored Nurse retreat route",
+    "Hardware GPU performance unverified"
+  ]
+}

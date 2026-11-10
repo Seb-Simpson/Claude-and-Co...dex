@@ -1,0 +1,86 @@
+/* Scoped to gameplay; the NW-003B menu retains all its existing styles and assets. */
+.nw-opening-ui {
+  position: fixed;
+  inset: 0;
+  z-index: 6;
+  pointer-events: none;
+  color: #e1ddd0;
+  font-family: var(--nw-cond, 'Barlow Condensed', 'Arial Narrow', sans-serif);
+  text-shadow: 0 1px 2px #000, 0 2px 6px #000, 0 0 14px #000;
+}
+.nw-opening-ui [hidden] { display: none !important; }
+.nw-opening-ui__darkness { position: absolute; inset: 0; background: #000; }
+.nw-opening-ui__prompt {
+  position: absolute;
+  left: 50%;
+  bottom: max(4.4%, 22px);
+  transform: translateX(-50%);
+  max-width: min(85vw, 28rem);
+  padding: .4rem 1.35rem .5rem;
+  text-align: center;
+  font-size: .95rem;
+  line-height: 1.3;
+  letter-spacing: .055em;
+  background: url('./assets/ink-strip.svg') center / 100% 100% no-repeat;
+}
+.nw-opening-ui__key {
+  color: #b8c4b8;
+  font: 500 .68rem/1.2 var(--nw-mono, 'IBM Plex Mono', monospace);
+  letter-spacing: .02em;
+}
+.nw-opening-ui__prompt[data-available='false'] { color: #cbc6b7; }
+.nw-opening-ui__subtitle {
+  position: absolute;
+  left: 50%;
+  bottom: max(10%, 64px);
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: min(85vw, 44rem);
+  box-sizing: border-box;
+  padding: .7rem 1.65rem .8rem;
+  text-align: center;
+  background: url('./assets/ink-strip.svg') center / 100% 100% no-repeat;
+}
+.nw-opening-ui__speaker {
+  display: block;
+  margin-bottom: .25rem;
+  color: #a9b7aa;
+  font: 400 .61rem/1.2 var(--nw-mono, 'IBM Plex Mono', monospace);
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+.nw-opening-ui__words {
+  font-size: clamp(1rem, 1.6vw, 1.2rem);
+  font-weight: 400;
+  line-height: 1.35;
+  letter-spacing: .035em;
+}
+.nw-opening-ui__notification {
+  position: absolute;
+  left: max(3.8%, 22px);
+  bottom: max(18%, 115px);
+  max-width: min(28rem, 75vw);
+  padding: .25rem 0 .8rem;
+  color: #c7c6b8;
+  font: 500 1.05rem/1.4 var(--nw-serif, 'Cormorant Garamond', Georgia, serif);
+  letter-spacing: .035em;
+  background: url('./assets/worn-rule.svg') left bottom / 152px 7px no-repeat;
+}
+.nw-opening-ui__skip {
+  position: absolute;
+  right: max(3.5%, 20px);
+  bottom: max(4.4%, 22px);
+  color: #b0afa3;
+  font: 400 .61rem/1.3 var(--nw-mono, 'IBM Plex Mono', monospace);
+  letter-spacing: .06em;
+}
+@media (max-height: 540px) {
+  .nw-opening-ui__subtitle { bottom: 16%; padding: .4rem 1.25rem .5rem; }
+  .nw-opening-ui__speaker { font-size: .57rem; }
+  .nw-opening-ui__words { font-size: 1rem; }
+  .nw-opening-ui__notification { bottom: 26%; }
+}
+@media (prefers-contrast: more) {
+  .nw-opening-ui__subtitle { background-color: #060807; }
+  .nw-opening-ui__speaker { color: #d2dfd3; }
+}

@@ -1,0 +1,7 @@
+{
+  "kind": "isolated synthetic fixture; not hospital visual acceptance",
+  "mainBase": "e36a3a3161ccba2a508d0406a453eca619f15549",
+  "command": "PLAYWRIGHT_CHROMIUM_EXECUTABLE=/usr/bin/chromium npm run test:browser -- tests/browser/nw-005b-opening.spec.ts",
+  "result": "3 passed (1.4m)",
+  "renderer": "Chromium ANGLE SwiftShader, low quality, 1280x720 and 1024x640"
+}

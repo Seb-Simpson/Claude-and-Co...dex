@@ -1,0 +1,10 @@
+{
+  "revision": 1,
+  "recordingStatus": "temporary",
+  "source": "Original synthetic speech generated locally with FFmpeg's installed Flite SLT voice; no external service or paid API",
+  "approval": "Not final voice acting. Synthetic US-accent timing stand-ins; replace with directed British Nurse Shaw performances before release.",
+  "files": [
+    { "cueId": "nw005.voice.shaw.return-to-bed", "file": "shaw-return-to-bed.temporary.wav", "seconds": 3.48 },
+    { "cueId": "nw005.voice.shaw.not-authorised", "file": "shaw-not-authorised.temporary.wav", "seconds": 3.8300226757369615 }
+  ]
+}
