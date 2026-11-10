@@ -1,8 +1,9 @@
 import type { GameModule, ModuleContext } from '../contracts';
 import { createHospitalWorld } from './createHospitalWorld';
 import { dressDoors, type DressedDoors } from './dressing/doors';
-import { PROTOTYPE_SUPPRESSION } from './dressing/regions';
+import { PROTOTYPE_SUPPRESSION, STATION_SUPPRESSION } from './dressing/regions';
 import { loadRoom104Set, type Room104Set } from './dressing/room104';
+import { loadStationSet, type StationSet } from './dressing/station';
 
 /** `?nwSet=procedural` keeps the procedural Room 104 and west corridor (for comparisons). */
 function proceduralSetRequested(): boolean {
@@ -27,14 +28,22 @@ export default {
   kind: 'world',
   async setup(context: ModuleContext) {
     let set: Room104Set | null = null;
+    let station: StationSet | null = null;
     if (!proceduralSetRequested() && typeof document !== 'undefined') {
-      try {
-        set = await loadRoom104Set({ maxAnisotropy: context.engine.renderer.capabilities.getMaxAnisotropy() });
-      } catch (error) {
-        console.warn('NIGHT WARD: Room 104 visual set unavailable, using the procedural room:', error instanceof Error ? error.message : error);
-      }
+      const maxAnisotropy = context.engine.renderer.capabilities.getMaxAnisotropy();
+      // NW-006A: the Nurses' Station set loads alongside; each set falls back on its own.
+      const [room, nurses] = await Promise.allSettled([loadRoom104Set({ maxAnisotropy }), loadStationSet({ maxAnisotropy })]);
+      if (room.status === 'fulfilled') set = room.value;
+      else console.warn('NIGHT WARD: Room 104 visual set unavailable, using the procedural room:', room.reason instanceof Error ? room.reason.message : room.reason);
+      if (nurses.status === 'fulfilled') station = nurses.value;
+      else console.warn('NIGHT WARD: Nurses\u2019 Station set unavailable, using the procedural stand-ins:', nurses.reason instanceof Error ? nurses.reason.message : nurses.reason);
     }
-    const build = createHospitalWorld(set ? { suppressVisuals: PROTOTYPE_SUPPRESSION } : {});
+    const suppressVisuals = [...(set ? PROTOTYPE_SUPPRESSION : []), ...(station ? STATION_SUPPRESSION : [])];
+    const build = createHospitalWorld(suppressVisuals.length ? { suppressVisuals } : {});
+    if (station) {
+      build.world.root.add(station.root);
+      console.info(`NIGHT WARD: Nurses' Station set loaded (${station.stats.triangles} triangles, ${station.stats.materials} materials, ${station.stats.textures} textures)`);
+    }
     let swapped: { group: { children: { visible: boolean }[] }; hidden: { visible: boolean }[] } | null = null;
     let doors: DressedDoors | null = null;
     if (set) {
@@ -53,11 +62,12 @@ export default {
     }
     return {
       world: build.world,
-      update(frame) { set?.update(frame.deltaSeconds); },
+      update(frame) { set?.update(frame.deltaSeconds); station?.update(frame.deltaSeconds); },
       dispose() {
         if (swapped) for (const c of swapped.hidden) c.visible = true;
         doors?.restore();
         set?.dispose();
+        station?.dispose();
         build.dispose();
       },
     };

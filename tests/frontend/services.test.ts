@@ -163,7 +163,7 @@ describe('loading tracker', () => {
   it('plans the real stages: downloads by manifest size, engine, every module and shaders', () => {
     const plan = createLoadingPlan(['nw:world:hospital', 'night-ward:gameplay'], { includeEngine: true });
     const ids = plan.tracker.snapshot().tasks.map((t) => t.id);
-    expect(ids.filter((i) => i.startsWith('file:'))).toHaveLength(7); // 5 entity models + set + light map
+    expect(ids.filter((i) => i.startsWith('file:'))).toHaveLength(8); // 5 entity models + Room 104 set + light map + NW-006A station set
     expect(ids).toEqual(expect.arrayContaining(['engine:renderer', 'module:nw:world:hospital', 'module:night-ward:gameplay', 'shaders:scene']));
     expect(plan.tracker.snapshot().totalBytes).toBeGreaterThan(10 * 1024 * 1024);
     plan.onProgress({ stage: 'module', id: 'nw:world:hospital', state: 'done' });

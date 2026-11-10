@@ -1,0 +1,66 @@
+{
+  "cover": [
+    {
+      "waypoint": "patrol-0",
+      "standingSeen": true,
+      "crouchedSeen": false
+    },
+    {
+      "waypoint": "patrol-1",
+      "standingSeen": true,
+      "crouchedSeen": false
+    },
+    {
+      "waypoint": "patrol-2",
+      "standingSeen": true,
+      "crouchedSeen": true
+    },
+    {
+      "waypoint": "patrol-8",
+      "standingSeen": true,
+      "crouchedSeen": true
+    },
+    {
+      "waypoint": "patrol-9",
+      "standingSeen": true,
+      "crouchedSeen": false
+    }
+  ],
+  "observation": [
+    {
+      "waypoint": "patrol-0",
+      "distance": 7.39340922714278,
+      "nurseSeesPlayer": false
+    },
+    {
+      "waypoint": "patrol-1",
+      "distance": 9.212627204006466,
+      "nurseSeesPlayer": false
+    },
+    {
+      "waypoint": "patrol-2",
+      "distance": 8.97566153550812,
+      "nurseSeesPlayer": true
+    },
+    {
+      "waypoint": "patrol-8",
+      "distance": 8.97566153550812,
+      "nurseSeesPlayer": true
+    },
+    {
+      "waypoint": "patrol-9",
+      "distance": 9.212627204006466,
+      "nurseSeesPlayer": false
+    }
+  ],
+  "crouchCoverRoute": {
+    "samplesInsideStation": 47,
+    "crouchedSeenFrom": 14,
+    "standingSeenFrom": 47,
+    "crouchedSeenMinX": -0.8
+  },
+  "concealment105": {
+    "pathFromObservation": 4.53,
+    "routeSamplesSeeingOpenFloor": 14
+  }
+}

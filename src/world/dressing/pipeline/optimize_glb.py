@@ -28,6 +28,9 @@ TARGETS = {  # image name prefix -> max size
     'floor_vinyl_orm': 512,
     'floor_vinyl_normal': 512,
     'doorleaf_normal': 512,
+    # NW-006A Nurses' Station set: low-frequency roughness/metal and normal detail.
+    'station_orm': 512,
+    'station_normal': 512,
 }
 
 
