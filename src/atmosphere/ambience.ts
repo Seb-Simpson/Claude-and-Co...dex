@@ -36,6 +36,8 @@ const EMITTER_CUES: Record<SoundEmitter['kind'], readonly CueId[]> = {
   distant: ['nw:settle', 'nw:distant-door', 'nw:distant-steps'],
   trolley: ['nw:trolley', 'nw:wheel-creak'],
   door: ['nw:distant-door', 'nw:distant-steps'],
+  // NW-005A: the ward intercom keys up on its own now and then (a breath of static, no voice).
+  intercom: ['nw:static'],
 };
 
 export class Ambience {

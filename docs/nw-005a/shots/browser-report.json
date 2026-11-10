@@ -1,0 +1,149 @@
+{
+  "spawn": {
+    "x": -12.4,
+    "y": 0.0029999985098838862,
+    "z": 4.1
+  },
+  "westWallStop": {
+    "x": -15.242110879352767,
+    "y": 0.0029999985098838862,
+    "z": 3.7
+  },
+  "outOfRoom104": {
+    "x": -12.217749433115245,
+    "y": 0.0029999985098838862,
+    "z": 0.3092802197992237
+  },
+  "alongCorridor": {
+    "x": -4.34947098017375,
+    "y": 0.0029999985098838862,
+    "z": 0.1507771044928203
+  },
+  "room106": {
+    "before": "closed",
+    "prompt": "Open door",
+    "after": "open"
+  },
+  "views": {
+    "01-wake-door": {
+      "calls": 194,
+      "triangles": 179230
+    },
+    "02-room-104-bed": {
+      "calls": 72,
+      "triangles": 140840
+    },
+    "03-card-reader-intercom": {
+      "calls": 142,
+      "triangles": 161704
+    },
+    "04-access-card": {
+      "calls": 76,
+      "triangles": 146718
+    },
+    "04b-card-from-wake": {
+      "calls": 107,
+      "triangles": 164628
+    },
+    "05-step-out-east": {
+      "calls": 352,
+      "triangles": 183600
+    },
+    "06-corridor-west": {
+      "calls": 132,
+      "triangles": 160990
+    },
+    "07-room-106-door": {
+      "calls": 162,
+      "triangles": 159564
+    },
+    "08-doors-103-105": {
+      "calls": 356,
+      "triangles": 190142
+    },
+    "09-station-approach": {
+      "calls": 311,
+      "triangles": 169012
+    },
+    "10-station-counter": {
+      "calls": 200,
+      "triangles": 161328
+    },
+    "12-wet-floor-sign": {
+      "calls": 93,
+      "triangles": 161334
+    },
+    "11-back-to-104": {
+      "calls": 188,
+      "triangles": 178718
+    }
+  },
+  "renderer": {
+    "calls": 188,
+    "triangles": 178718,
+    "geometries": 390,
+    "textures": 94
+  },
+  "performance": {
+    "fixedMaxMs": 7.2999999998137355,
+    "updateMaxMs": 30.5,
+    "frameDeltaMaxMs": 100,
+    "simulatedSeconds": 11.416666666666835,
+    "engine": {
+      "sampleCount": 157,
+      "capacity": 240,
+      "totalFrames": 157,
+      "totalSubsteps": 710,
+      "frameIntervalMs": {
+        "last": 2349.9000000000233,
+        "mean": 2289.545512820513,
+        "p50": 2050,
+        "p95": 5349.700000000012,
+        "max": 14182.7
+      },
+      "frameCpuMs": {
+        "last": 12.700000000186265,
+        "mean": 151.01656050961108,
+        "p50": 9.400000000372529,
+        "p95": 24.700000000186265,
+        "max": 9338.599999999627
+      },
+      "fixedMs": {
+        "last": 1.200000001117587,
+        "mean": 2.2082802547130047,
+        "p50": 1.800000000745058,
+        "p95": 5.099999998696148,
+        "max": 9.900000000372529
+      },
+      "physicsMs": {
+        "last": 0.4999999990686774,
+        "mean": 0.5726114650595056,
+        "p50": 0.40000000037252903,
+        "p95": 0.9000000013038516,
+        "max": 17.299999999813735
+      },
+      "updateMs": {
+        "last": 7.7999999998137355,
+        "mean": 4.079617834383041,
+        "p50": 1.900000000372529,
+        "p95": 13,
+        "max": 30.5
+      },
+      "renderMs": {
+        "last": 3.1000000005587935,
+        "mean": 144.11273885353404,
+        "p50": 4,
+        "p95": 12.099999999627471,
+        "max": 9308
+      },
+      "substeps": {
+        "last": 5,
+        "mean": 4.522292993630574,
+        "p50": 5,
+        "p95": 5,
+        "max": 5
+      }
+    }
+  },
+  "colliders": 225
+}

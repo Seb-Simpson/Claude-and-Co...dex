@@ -39,7 +39,7 @@ scene = bpy.context.scene
 scene.render.engine = 'CYCLES'
 scene.cycles.device = 'CPU'
 
-TILED = {'floor_vinyl', 'wall_paint', 'wainscot', 'ceiling_tile', 'wood_rail', 'signage', 'decals'}
+TILED = {'floor_vinyl', 'wall_paint', 'wainscot', 'ceiling_tile', 'wood_rail', 'signage', 'decals', 'door_veneer', 'opening_labels', 'door_glass', 'corridor_labels', 'reader_led'}
 col = lambda n: bpy.data.collections[n]  # noqa: E731
 
 
@@ -73,7 +73,27 @@ nw.atlas_uvs([props_ob], margin=0.002)
 def bake_material_maps(ob, size, prefix, ao_into_albedo=False):
     """Bake albedo, ORM (G rough, B metal) and normal from the procedural materials onto UVMap."""
     albedo = nw.new_image(f'{prefix}_albedo', size)
+    # Cycles' diffuse-colour pass is black for fully metallic surfaces, which baked every steel and
+    # chrome part's base colour to black (and the engine has no environment map for them to reflect).
+    # Bake the colour with metalness off, then restore it for the metalness bake below.
+    metal_saved = []
+    seen = set()
+    for slot in ob.material_slots:
+        if slot.material.name in seen:
+            continue
+        seen.add(slot.material.name)
+        bsdf = next(n for n in slot.material.node_tree.nodes if n.type == 'BSDF_PRINCIPLED')
+        sock = bsdf.inputs['Metallic']
+        link = sock.links[0] if sock.links else None
+        metal_saved.append((slot.material.node_tree, sock, sock.default_value, link.from_socket if link else None))
+        if link:
+            slot.material.node_tree.links.remove(link)
+        sock.default_value = 0.0
     nw.bake([ob], albedo, 'DIFFUSE', 'UVMap', samples=1, pass_filter={'COLOR'})
+    for nt, sock, value, src in metal_saved:
+        sock.default_value = value
+        if src:
+            nt.links.new(src, sock)
     rough = nw.new_image(f'{prefix}_rough', size, non_color=True)
     nw.bake([ob], rough, 'ROUGHNESS', 'UVMap', samples=1)
     normal = nw.new_image(f'{prefix}_normal', size, non_color=True)
@@ -131,6 +151,15 @@ nw.atlas_uvs([wc], margin=0.003)
 wc_maps = bake_material_maps(wc, 512 if QUICK else 1024, 'wheelchair', ao_into_albedo=True)
 print('NW_BAKE wheelchair done')
 
+# NW-005A door leaf: hardware gets its own small atlas (AO in the colour: the leaf moves, so it
+# cannot use the static light map); the veneer slabs and the wired glass keep their materials.
+dl_hw = bpy.data.objects['doorleaf_hardware']
+for uv in list(dl_hw.data.uv_layers):
+    dl_hw.data.uv_layers.remove(uv)
+nw.atlas_uvs([dl_hw], margin=0.004)
+dl_maps = bake_material_maps(dl_hw, 512 if QUICK else 1024, 'doorleaf', ao_into_albedo=True)
+print('NW_BAKE door leaf done')
+
 # ---------------------------------------------------------------------------------------------
 # 2. Light / occlusion map over the whole static set.
 
@@ -149,9 +178,21 @@ def area_light(name, pos, size, power, color, rot=(0, 0, 0)):
 
 
 cool = (0.86, 0.92, 1.0)
-area_light('L_r104', (-13.4, 2.72, 3.6), (1.15, 0.55), 70, cool)
-for x, p in ((-18.2, 30), (-11.0, 55), (-7.4, 25)):
+area_light('L_r104', (-13.4, 2.72, 3.6), (1.15, 0.55), 85, cool)
+# NW-005A: the game's corridor states: -18.2 dying, -14.6 and -7.4 dead, -11.0 flickering,
+# -3.8 working, -0.2 dying. Dead tubes bake no light.
+for x, p in ((-11.0, 12), (-3.8, 60), (-0.2, 8)):
     area_light(f'L_cor_{x}', (x, 2.67, 0), (1.15, 0.55), p, cool)
+# NW-005A: the station is the lit island at the end of the corridor: its troffer and the desk lamp
+# (warm) spill over the counter into the corridor.
+area_light('L_station', (-4.6, 2.67, -3.9), (1.15, 0.55), 70, cool)
+lamp = bpy.data.lights.new('L_lamp', 'POINT')
+lamp.energy = 22
+lamp.color = (1.0, 0.76, 0.48)
+lamp.shadow_soft_size = 0.08
+lamp_ob = bpy.data.objects.new('L_lamp', lamp)
+scene.collection.objects.link(lamp_ob)
+lamp_ob.location = g(-1.55, 1.0, -2.0)
 area_light('L_window', (-19.9, 1.5, 0), (1.6, 1.2), 90, (0.55, 0.65, 0.95), rot=(0, math.pi / 2, 0))
 world = scene.world
 world.use_nodes = True
@@ -193,7 +234,8 @@ a = np.array(ao.pixels[:]).reshape(-1, 4)[:, 0]
 covered = i > 1e-5
 ref = np.percentile(i[covered], 97) if covered.any() else 1.0
 light = np.clip(i / ref, 0, 1) ** 0.5
-lm = np.clip((0.45 + 0.55 * light) * (0.45 + 0.55 * a), 0, 1)
+# NW-005A: deeper falloff away from the fixtures and darker contact shadows (was 0.45 + 0.55 each).
+lm = np.clip((0.2 + 0.8 * light) * (0.34 + 0.66 * a), 0, 1)
 lm_img = nw.new_image('room104_lightmap', LIGHTMAP, non_color=True)
 px = np.ones((LIGHTMAP * LIGHTMAP, 4))
 px[:, 0] = px[:, 1] = px[:, 2] = lm
@@ -213,6 +255,11 @@ props_ob.data.materials.append(props_mat)
 wc_mat = nw.image_material('wheelchair_atlas', wc_maps['albedo'], wc_maps['normal'], wc_maps['orm'])
 wc.data.materials.clear()
 wc.data.materials.append(wc_mat)
+dl_mat = nw.image_material('doorleaf_atlas', dl_maps['albedo'], dl_maps['normal'], dl_maps['orm'])
+dl_hw.data.materials.clear()
+dl_hw.data.materials.append(dl_mat)
+leaf = nw.join([dl_hw, bpy.data.objects['doorleaf_veneer'], bpy.data.objects['doorleaf_glass']], 'doorleaf')
+card = bpy.data.objects['access_card']
 
 # Join the tiled shell by material: one mesh (and draw call) per material.
 by_mat = {}
@@ -220,7 +267,7 @@ for o in tiled_objs + decal_objs:
     nw.select_only([o])
     bpy.ops.object.transform_apply(location=True, rotation=True, scale=True)
     by_mat.setdefault(o.material_slots[0].material.name, []).append(o)
-exported = [props_ob, wc]
+exported = [props_ob, wc, leaf, card]
 for mname, objs in by_mat.items():
     exported.append(nw.join(objs, f'set_{mname}') if len(objs) > 1 else objs[0])
     exported[-1].name = f'set_{mname}'
@@ -249,6 +296,7 @@ for o in exported:
 manifest = {
     'glb': 'room104_set.glb', 'bytes': os.path.getsize(glb), 'triangles': sum(tri.values()), 'meshes': tri,
     'materials': sorted({s.material.name for o in exported for s in o.material_slots if s.material}),
+    'nodes': {'doorleaf': 'door leaf, door-group frame (hinge at origin, leaf along +x)', 'access_card': 'pickup, world position'},
     'atlas': ATLAS, 'lightmap': 'room104_lightmap.jpg', 'lightmapSize': LIGHTMAP, 'lightmapBytes': os.path.getsize(lm_path), 'samples': SAMPLES,
 }
 json.dump(manifest, open(os.path.join(OUT, 'room104_set.json'), 'w'), indent=1)

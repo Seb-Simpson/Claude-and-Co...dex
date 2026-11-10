@@ -1,5 +1,6 @@
 import type { GameModule, ModuleContext } from '../contracts';
 import { createHospitalWorld } from './createHospitalWorld';
+import { dressDoors, type DressedDoors } from './dressing/doors';
 import { PROTOTYPE_SUPPRESSION } from './dressing/regions';
 import { loadRoom104Set, type Room104Set } from './dressing/room104';
 
@@ -35,6 +36,7 @@ export default {
     }
     const build = createHospitalWorld(set ? { suppressVisuals: PROTOTYPE_SUPPRESSION } : {});
     let swapped: { group: { children: { visible: boolean }[] }; hidden: { visible: boolean }[] } | null = null;
+    let doors: DressedDoors | null = null;
     if (set) {
       build.world.root.add(set.root);
       // The wheelchair is a creep anomaly (the horror module moves its group): dress the group.
@@ -45,6 +47,8 @@ export default {
         group.add(set.wheelchair);
         swapped = { group, hidden };
       }
+      // NW-005A: the Blender door leaf inside each corridor door group (gameplay still animates them).
+      if (set.doorLeaf) doors = dressDoors(build.world, set.doorLeaf);
       console.info(`NIGHT WARD: Room 104 visual set loaded (${set.stats.triangles} triangles, ${set.stats.materials} materials, ${set.stats.textures} textures)`);
     }
     return {
@@ -52,6 +56,7 @@ export default {
       update(frame) { set?.update(frame.deltaSeconds); },
       dispose() {
         if (swapped) for (const c of swapped.hidden) c.visible = true;
+        doors?.restore();
         set?.dispose();
         build.dispose();
       },
