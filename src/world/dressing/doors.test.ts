@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { Box3, type Mesh, Texture, Vector3 } from 'three';
+import { Box3, type Mesh, type MeshStandardMaterial, Texture, Vector3 } from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { beforeAll, describe, expect, it, vi } from 'vitest';
 import { createHospitalWorld } from '../createHospitalWorld';
@@ -87,5 +87,33 @@ describe('door kit', () => {
     const want = OPENING_BINDINGS.find((b) => b.key === 'access-card')!.position;
     expect(Math.hypot(c.x - want.x, c.z - want.z)).toBeLessThan(0.15);
     expect(c.y).toBeLessThan(0.02);
+  });
+
+  it('lights the access card with the room, not the baked light map (it has no light-map UVs)', () => {
+    const card = set.root.getObjectByName('nw:opening:access-card-prop')!;
+    const meshes: Mesh[] = [];
+    card.traverse((o) => { if ((o as Mesh).isMesh) meshes.push(o as Mesh); });
+    expect(meshes.length).toBeGreaterThan(0);
+    for (const mesh of meshes) {
+      const m = mesh.material as MeshStandardMaterial;
+      expect(mesh.geometry.getAttribute('uv1')).toBeUndefined();
+      expect(m.aoMap).toBeNull();
+      expect(m.name).toBe('opening_labels_card');
+    }
+    // The baked props that share its texture sheet still take the light map.
+    let shared: MeshStandardMaterial | null = null;
+    set.root.traverse((o) => { const m = (o as Mesh).material as MeshStandardMaterial | undefined; if (m?.name === 'opening_labels') shared = m; });
+    expect(shared).not.toBeNull();
+    expect(shared!.aoMap).toBeTruthy();
+  });
+
+  it('shows the card reader\u2019s status LED as a small emissive point and keeps metals from rendering black', () => {
+    const byName = new Map<string, MeshStandardMaterial>();
+    set.root.traverse((o) => { const m = (o as Mesh).material as MeshStandardMaterial | undefined; if (m?.name) byName.set(m.name, m); });
+    const led = byName.get('reader_led')!;
+    expect(led).toBeDefined();
+    expect(led.emissiveIntensity).toBeGreaterThan(1);
+    expect(led.emissive.r).toBeGreaterThan(led.emissive.g * 5);
+    expect(byName.get('props_atlas')!.metalness).toBeLessThan(0.5);
   });
 });

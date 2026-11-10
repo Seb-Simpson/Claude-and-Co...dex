@@ -45,6 +45,8 @@ export class LightRig {
   private darknessLevel = 0;
   private readonly runtimes: FixtureRuntime[];
   private readonly lit: FixtureRuntime[];
+  /** Distance multiplier per lit fixture when choosing which fixtures get a real light. */
+  private readonly poolWeight: readonly number[];
   private readonly overrides = new Map<string, LightOverride>();
   private readonly dirtyMeshes = new Set<InstancedMesh>();
   private readonly tmpColor = new Color();
@@ -62,6 +64,14 @@ export class LightRig {
     this.nextDisturbance = this.interval[0] * 0.6 + this.random() * 10;
     this.runtimes = extras.fixtures.map((fixture) => ({ fixture, seed: seedFromId(fixture.id), poppedUntil: 0, brightness: 1 }));
     this.lit = this.runtimes.filter((r) => r.fixture.intensity > 0 && r.fixture.state !== 'dead');
+    // NW-005A: corridors and the nurses' station are what the player sees down a long sightline;
+    // lamps in closed rooms to either side are hidden behind walls but used to take the pool's
+    // slots because they are nearer. Sightline lamps count as nearer than they are, so the lit
+    // station at the end of the corridor reaches the floor ahead of the player.
+    const sightline = new Set(extras.rooms.filter((room) => room.tags.includes('corridor') || room.tags.includes('nurses-station')).map((room) => room.id));
+    // Brighter lamps also outrank faint ones (a monitor's glow lights 2 m; a ceiling tube lights a
+    // corridor), so a pool slot goes where it changes what the player sees.
+    this.poolWeight = this.lit.map((r) => (sightline.has(r.fixture.roomId) ? 0.5 : 1) / Math.min(1.5, Math.max(0.5, r.fixture.intensity / 5.5)));
     const size = Math.min(options.poolSize ?? 10, Math.max(1, this.lit.length));
     for (let i = 0; i < size; i++) {
       const light = new PointLight(0xffffff, 0, 6, 2);
@@ -148,7 +158,9 @@ export class LightRig {
     const target = totalWeight > 0.01 ? 1 - litWeight / totalWeight : 0;
     this.darknessLevel += (target - this.darknessLevel) * Math.min(1, deltaSeconds * 2.5);
     this.fill.position.copy(camera);
-    this.fill.intensity = 0.22 + this.darknessLevel * 0.18;
+    // NW-005A: a weaker fill. It follows the camera, so a strong one lights everything near the
+    // player evenly and flattens the dark; this keeps the floor ahead readable and no more.
+    this.fill.intensity = 0.12 + this.darknessLevel * 0.16;
     for (const mesh of this.dirtyMeshes) if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
     this.dirtyMeshes.clear();
     this.assignPool(camera);
@@ -183,7 +195,7 @@ export class LightRig {
   private assignPool(camera: Vector3): void {
     const n = this.lights.length;
     if (n === 0) return;
-    const distances = this.lit.map((r) => r.fixture.position.distanceTo(camera));
+    const distances = this.lit.map((r, i) => r.fixture.position.distanceTo(camera) * this.poolWeight[i]!);
     const order = nearestIndices(distances, n + 1);
     const cutoff = order.length > n ? distances[order[n]!]! : Infinity;
     for (let i = 0; i < n; i++) {
