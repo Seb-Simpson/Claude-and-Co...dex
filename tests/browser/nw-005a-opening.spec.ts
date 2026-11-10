@@ -14,12 +14,14 @@ const VIEWS: readonly { name: string; at: { x: number; y: number; z: number }; l
   { name: '02-room-104-bed', at: { x: -12.2, y: 0, z: 2.4 }, look: { x: -14.3, y: 0.85, z: 5.4 } },
   { name: '03-card-reader-intercom', at: { x: -12.3, y: 0, z: 3.0 }, look: { x: -12.5, y: 1.6, z: 1.55 } },
   { name: '04-access-card', at: { x: -12.6, y: 0, z: 3.75 }, look: { x: -12.9, y: 0.0, z: 3.2 } },
+  { name: '04b-card-from-wake', at: { x: -12.4, y: 0, z: 4.1 }, look: { x: -12.9, y: 0.3, z: 3.0 } },
   { name: '05-step-out-east', at: { x: -12.0, y: 0, z: 0.5 }, look: { x: -1.2, y: 1.45, z: 0.0 } },
   { name: '06-corridor-west', at: { x: -11.0, y: 0, z: 0.0 }, look: { x: -19.6, y: 1.3, z: 0.0 } },
   { name: '07-room-106-door', at: { x: -8.6, y: 0, z: -0.4 }, look: { x: -7.8, y: 1.1, z: 1.4 } },
   { name: '08-doors-103-105', at: { x: -13.6, y: 0, z: 0.6 }, look: { x: -9.0, y: 1.2, z: -1.4 } },
   { name: '09-station-approach', at: { x: -8.0, y: 0, z: 0.2 }, look: { x: -3.0, y: 1.2, z: -2.4 } },
   { name: '10-station-counter', at: { x: -5.0, y: 0, z: 0.4 }, look: { x: -3.2, y: 1.1, z: -3.2 } },
+  { name: '12-wet-floor-sign', at: { x: -8.0, y: 0, z: 1.1 }, look: { x: -8.85, y: 0.35, z: 0.5 } },
   { name: '11-back-to-104', at: { x: -4.0, y: 0, z: 0.3 }, look: { x: -14.0, y: 1.3, z: 0.6 } },
 ];
 
