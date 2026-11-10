@@ -34,3 +34,9 @@ describe('authored survival onboarding', () => {
     expect(hints.update(500, unlock())).toBeNull();
   });
 });
+
+it('casts only Nurse Shaw in Chapter One even after onboarding permission', async () => {
+  const {CHAPTER_ONE_ENTITY_TYPES} = await import('../../src/gameplay/opening/onboarding');
+  expect([...CHAPTER_ONE_ENTITY_TYPES]).toEqual(['nurse']);
+  expect(CHAPTER_ONE_ENTITY_TYPES.includes('patient' as never)).toBe(false);
+});

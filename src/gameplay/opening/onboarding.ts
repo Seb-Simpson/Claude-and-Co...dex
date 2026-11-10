@@ -1,3 +1,5 @@
+/** Permanent chapter casting policy; the Patient remains available to later-game systems only. */
+export const CHAPTER_ONE_ENTITY_TYPES = ['nurse'] as const;
 import type { OpeningState } from './state';
 export type OnboardingPhase = 'awakening' | 'room-104' | 'corridor' | 'stealth-onboarding' | 'active-play';
 export type SurvivalSkill = 'crouch' | 'hide' | 'observe-patrol';

@@ -1,3 +1,5 @@
+> **Historical NW-004 proposal — superseded by NW-005D.** This is retained development history, not current Chapter 1 canon or an implementation brief. Nurse Shaw is Chapter 1’s antagonist; the Patient is reserved for much later. The Patient climax below is withdrawn. See [current opening policy](../nw-005d/NARRATIVE.md).
+
 # Chapter One interface proposal — revision 1
 
 **Status: proposed; cross-owner acceptance pending.** This document is the

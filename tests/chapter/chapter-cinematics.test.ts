@@ -73,7 +73,7 @@ describe('Chapter One cinematic templates', () => {
     expect(() => createChapterCinematicDefinition('c1.cine.record', [])).toThrow(/camera path/);
     expect(() => createChapterCinematicDefinition('c1.cine.record', path(30))).toThrow(/complete cinematic/);
     expect(() => createChapterCinematicDefinition('c1.cine.record', path(42), { cueTimes: { 'c1.voice.archive.withdrawal': 12 } })).toThrow(/overlap/);
-    expect(() => createChapterCinematicDefinition('c1.cine.record', path(42), { cueTimes: { 'c1.presentation.patient-emerges': 10 } })).toThrow(/does not belong/);
+    expect(() => createChapterCinematicDefinition('c1.cine.record', path(42), { cueTimes: { 'c1.presentation.nurse-approaches': 10 } })).toThrow(/does not belong/);
   });
 
   it('allows approved recording substitutions and editorial retiming without changing exact dialogue text', () => {

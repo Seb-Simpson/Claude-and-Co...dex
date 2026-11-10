@@ -42,7 +42,6 @@ function fixture() {
     doors: Object.fromEntries(doors.map(d => [d.id.split(':').at(-1), d.id])),
     actors: {
       nurse: { entityId: 'test:nurse', routeId: 'test:route:nurse', stageAnchor: 'nurse-stage', introductionZone: 'nurse-introduction-zone' },
-      patient: { entityId: 'test:patient', routeId: 'test:route:patient', stageAnchor: 'patient-stage', introductionZone: 'patient-introduction-zone' },
     },
     cameras: Object.fromEntries(CHAPTER_SCENES.map(k => [k, { status: 'approved', asset: `test-only:${k}`,
       startAnchor: 'awakening-start', handoffAnchor: 'awakening-handoff' }])),
@@ -62,7 +61,7 @@ describe('Fractured Ward chapter binding preflight', () => {
       expect.objectContaining({ path: 'rooms.records' }),
       expect.objectContaining({ path: 'rooms.electrical' }),
       expect.objectContaining({ path: 'triggers.chase-route-b' }),
-      expect.objectContaining({ path: 'anchors.checkpoint-before-patient' }),
+      expect.objectContaining({ path: 'anchors.checkpoint-before-confrontation' }),
       expect.objectContaining({ path: 'voices.c1.voice.intercom.awakening' }),
       expect.objectContaining({ path: 'cameras.c1.cine.ending' }),
     ]));
@@ -108,13 +107,13 @@ describe('Fractured Ward chapter binding preflight', () => {
         'c1.voice.archive.withdrawal': { status: 'temporary', asset: 'test-only:temp' },
         'c1.voice.intercom.recognition': { status: 'approved', asset: null },
       },
-      cameras: { ...bindings.cameras, 'c1.cine.patient-release': {
-        ...bindings.cameras['c1.cine.patient-release']!, status: 'recorded',
+      cameras: { ...bindings.cameras, 'c1.cine.nurse-confrontation': {
+        ...bindings.cameras['c1.cine.nurse-confrontation']!, status: 'recorded',
       } },
     });
     expect(report.metadataComplete).toBe(false);
     expect(report.issues.map(i => i.path)).toEqual(expect.arrayContaining([
-      'voices.c1.voice.archive.withdrawal', 'voices.c1.voice.intercom.recognition', 'cameras.c1.cine.patient-release',
+      'voices.c1.voice.archive.withdrawal', 'voices.c1.voice.intercom.recognition', 'cameras.c1.cine.nurse-confrontation',
     ]));
   });
 

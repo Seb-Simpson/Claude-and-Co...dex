@@ -34,3 +34,16 @@ it('keeps authored spawns dormant, ignores provocative noise/capture, then activ
     expect(game.entities.getSnapshots()[0]!.state).toBe('investigate');
   } finally { game.dispose(); expect(physics.colliders.len()).toBe(0); events.dispose(); physics.free(); f.dispose(); }
 });
+
+it('uses a permanent Nurse-only chapter selection while keeping the Patient available to later-game runtimes', async () => {
+  const {CHAPTER_ONE_ENTITY_TYPES}=await import('../../src/gameplay/opening/onboarding');
+  const f=createOpeningFixture(), events=createEventBus(), physics=new RAPIER.World({x:0,y:-9.81,z:0});
+  const world:HospitalWorld={...f.world,entitySpawns:[
+    {id:'nurse-spawn',entityId:'nurse',type:'nurse',position:{x:8,y:.005,z:-1},yaw:0},
+    {id:'patient-spawn',entityId:'patient',type:'patient',position:{x:10,y:.005,z:-1},yaw:0},
+  ]};
+  const engine={physics,scene:new Scene(),camera:new PerspectiveCamera(70,1,.05,100),renderer:{domElement:{}},audio:{context:null}} as unknown as EngineServices;
+  const runtime=createGameplayRuntime({world,engine,events,player:null},{attachControls:false,showHud:false,activeEntityTypes:CHAPTER_ONE_ENTITY_TYPES});
+  try {expect(runtime.entities.getSnapshots().map(e=>e.type)).toEqual(['nurse']);expect(world.entitySpawns.map(e=>e.type)).toEqual(['nurse','patient']);}
+  finally{runtime.dispose();events.dispose();physics.free();f.dispose();}
+});

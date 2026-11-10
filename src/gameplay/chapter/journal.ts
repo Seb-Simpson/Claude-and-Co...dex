@@ -37,7 +37,7 @@ const ENTRIES: Readonly<Record<ChapterClueId, Omit<ChapterJournalEntry, 'id'>>> 
   'panel-schematic': { title: 'Reserve distribution', text: 'RESERVE CAPACITY: 1\nWARD: 1\nLIFT: 2\nEGRESS: 1\nOBSERVATION BRIDGE: +1 while bridged. Selectors are safe to change. RESET restores a tripped breaker; ENGAGE evaluates the selected load.' },
   'bridge-annotation': { title: '2012 bridge annotation', text: 'Observation remained bridged after isolation. Isolate that link before applying the one-unit reserve to another branch. Successful egress engagement arms the supply; the local mechanical release is a separate action.' },
   'nurse-note': { title: 'A patient’s note', text: 'Count her footsteps instead of calling for her. Keep doors quiet. The night nurse follows the last sound.' },
-  'patient-chart': { title: 'Daniel Reed', text: 'Observation patient. The egress chime causes agitation and following behaviour. Maintain clear access when the emergency transfer releases observation bays.' },
+  'patient-chart': { title: 'Archived observation chart', text: 'An older observation chart. Its clinical notes do not explain the current admission.' },
 };
 
 const HINTS = [

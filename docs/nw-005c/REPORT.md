@@ -1,3 +1,5 @@
+> Continued by [NW-005D](../nw-005d/REPORT.md): pinned final environment, Nurse-only Chapter One casting and fresh test evidence. This document records the earlier NW-005C delivery.
+
 # NW-005C delivery report
 
 ## Scope and assembly

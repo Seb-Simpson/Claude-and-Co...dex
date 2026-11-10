@@ -18,22 +18,22 @@ export const CHAPTER_INTERACTIONS = [
 export const CHAPTER_TRIGGERS = [
   'station-entry', 'nurse-introduction-zone', 'review-safe-boundary',
   'records-safe-inspection', 'panel-approach', 'release-safe-boundary',
-  'patient-introduction-zone', 'chase-route-a', 'chase-route-b', 'stair-safe-landing',
+  'nurse-confrontation-zone', 'chase-route-a', 'chase-route-b', 'stair-safe-landing',
 ] as const;
 export const CHAPTER_ANCHORS = [
   'checkpoint-start', 'checkpoint-after-nurse', 'checkpoint-after-records-power',
-  'checkpoint-before-patient', 'checkpoint-complete',
+  'checkpoint-before-confrontation', 'checkpoint-complete',
   'awakening-start', 'awakening-ceiling', 'awakening-fixture', 'awakening-monitor',
   'awakening-wristband', 'awakening-door', 'awakening-handoff',
   'nurse-camera-start', 'nurse-ledger', 'nurse-emergence', 'nurse-diversion', 'nurse-handoff',
   'record-camera-start', 'record-identity', 'record-receiver', 'record-handoff',
-  'patient-camera-start', 'patient-release-door', 'patient-emergence', 'patient-handoff',
+  'confrontation-camera-start', 'confrontation-door', 'nurse-approach', 'confrontation-handoff',
   'ending-camera-start', 'ending-reader', 'ending-lower-stair', 'ending-handoff',
-  'nurse-stage', 'patient-stage', 'egress-chime',
+  'nurse-stage', 'confrontation-stage', 'egress-chime',
 ] as const;
 export const CHAPTER_LIGHTING = [
   'c1.light.awakening', 'c1.light.night-shift', 'c1.light.records',
-  'c1.light.reserve-armed', 'c1.light.patient-release', 'c1.light.chase',
+  'c1.light.reserve-armed', 'c1.light.nurse-confrontation', 'c1.light.chase',
   'c1.light.recovery', 'c1.light.stair-recognition',
 ] as const;
 export const CHAPTER_VOICE_CUES = [
@@ -84,7 +84,7 @@ export interface ChapterEnvironmentBindings {
   readonly triggers: Bindings<ChapterTriggerKey>;
   readonly anchors: Bindings<ChapterAnchorKey>;
   readonly doors: Bindings<'stair-barrier' | 'observation-bay' | 'service-boundary'>;
-  readonly actors: Readonly<Partial<Record<'nurse' | 'patient', ChapterActorBinding>>>;
+  readonly actors: Readonly<Partial<Record<'nurse', ChapterActorBinding>>>;
   readonly cameras: Readonly<Partial<Record<ChapterSceneId, ChapterCameraBinding>>>;
   readonly voices: Readonly<Partial<Record<ChapterVoiceCueId, ChapterAssetBinding>>>;
   /** Maps semantic event names to authored atmosphere profile IDs. */
@@ -158,7 +158,7 @@ export function validateChapterBindings(world: HospitalWorld, bindings: ChapterE
       if (name && (ids.get(name) ?? 0) > 1) issue(`${category}.${key}`, 'Published world binding is ambiguous.');
     }
   }
-  for (const type of ['nurse', 'patient'] as const) {
+  for (const type of ['nurse'] as const) {
     const binding = bindings.actors[type];
     const path = `actors.${type}`;
     if (!binding) { issue(path, 'Missing actor binding.'); continue; }

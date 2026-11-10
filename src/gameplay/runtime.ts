@@ -13,6 +13,7 @@ import type { GameplayHud } from './hud';
 import { resolveOpeningBindings, openingPosition } from './opening/bindings';
 import { createOpeningInteractionAdapter, OPENING_INTERACTIONS } from './opening/adapter';
 import { createOpeningSequence } from './opening/controller';
+import { CHAPTER_ONE_ENTITY_TYPES } from './opening/onboarding';
 import { createOpeningState } from './opening/state';
 import { createOnboardingGate } from './opening/onboarding';
 import type { OpeningPersistence, OpeningSequence } from './opening/controller';
@@ -241,7 +242,7 @@ export function createGameplayModule(options: GameplayOptions = {}): GameModule 
       let opening: OpeningSequence | undefined;
       let runtime: GameplayRuntime | undefined;
       try {
-        runtime = createGameplayRuntime({ ...context, world: adapter.world }, { ...options, showHud: false, entitiesEnabled: () => !gate.safe, canCapture: () => !gate.safe,
+        runtime = createGameplayRuntime({ ...context, world: adapter.world }, { ...options, showHud: false, activeEntityTypes: CHAPTER_ONE_ENTITY_TYPES, entitiesEnabled: () => !gate.safe, canCapture: () => !gate.safe,
           initialDoorStates: { [bindings['room-104-door'].doorId!]: checkpoint?.state.doorUnlocked ? 'closed' : 'locked',
             [bindings['room-106-door'].doorId!]: 'locked' },
           handleInteraction: (request, time) => opening?.handleInteraction(request, time) ?? true,

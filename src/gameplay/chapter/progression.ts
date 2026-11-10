@@ -56,7 +56,7 @@ export function canCommitChapterCheckpoint(state: ChapterState, id: ChapterCheck
     case 'chapter1.after-records-power':
       return state.nurseSurvived && has(state, 'withdrawal-record') && state.puzzle.busArmed &&
         state.puzzle.handleLocation === 'held' && !state.puzzle.releaseConfirmed;
-    case 'chapter1.before-patient':
+    case 'chapter1.before-confrontation':
       return state.nurseSurvived && state.puzzle.busArmed && state.puzzle.handleLocation === 'installed' && !state.puzzle.releaseConfirmed;
     case 'chapter1.complete':
       return state.stairReached && state.puzzle.releaseConfirmed && sceneDone(state, 'c1.cine.ending');
@@ -70,8 +70,8 @@ export function getAvailableChapterScenes(state: ChapterState): readonly Chapter
   if (!sceneDone(state, 'c1.cine.nurse-reveal') && state.stationReached && has(state, 'night-ledger') &&
       has(state, 'current-intake') && has(state, 'unanswered-call')) scenes.push('c1.cine.nurse-reveal');
   if (!sceneDone(state, 'c1.cine.record') && has(state, 'withdrawal-record')) scenes.push('c1.cine.record');
-  if (!sceneDone(state, 'c1.cine.patient-release') && state.puzzle.releaseConfirmed) scenes.push('c1.cine.patient-release');
-  if (state.stairReached && sceneDone(state, 'c1.cine.patient-release')) scenes.push('c1.cine.ending');
+  if (!sceneDone(state, 'c1.cine.nurse-confrontation') && state.puzzle.releaseConfirmed) scenes.push('c1.cine.nurse-confrontation');
+  if (state.stairReached && sceneDone(state, 'c1.cine.nurse-confrontation')) scenes.push('c1.cine.ending');
   return scenes;
 }
 
@@ -131,7 +131,7 @@ export function applyChapterCommand(previous: ChapterState, command: ChapterComm
       state = { ...state, completedScenes: [...state.completedScenes, active.id] };
       if (active.id === 'c1.cine.awakening') state = addClues(state, 'wristband');
       if (active.id === 'c1.cine.nurse-reveal') effects.push({ type: 'activate-entity', entity: 'nurse' });
-      if (active.id === 'c1.cine.patient-release') effects.push({ type: 'activate-entity', entity: 'patient' });
+      if (active.id === 'c1.cine.nurse-confrontation') effects.push({ type: 'activate-entity', entity: 'nurse' });
       if (active.id === 'c1.cine.ending') {
         state = { ...state, checkpoints: [...state.checkpoints, 'chapter1.complete'], atSafeBoundary: 'chapter1.complete' };
         effects.push({ type: 'checkpoint-committed', id: 'chapter1.complete' });
@@ -180,19 +180,19 @@ export function applyChapterCommand(previous: ChapterState, command: ChapterComm
     }
     case 'confirm-release': {
       if (previous.puzzle.releaseConfirmed) return unchanged();
-      if (!command.safe || !previous.checkpoints.includes('chapter1.before-patient') || !previous.puzzle.busArmed || previous.puzzle.handleLocation !== 'installed') {
-        return reject('Release requires the handle, armed supply and safe pre-Patient checkpoint');
+      if (!command.safe || !previous.checkpoints.includes('chapter1.before-confrontation') || !previous.puzzle.busArmed || previous.puzzle.handleLocation !== 'installed') {
+        return reject('Release requires the handle, armed supply and safe pre-confrontation checkpoint');
       }
       state = { ...state, puzzle: { ...state.puzzle, releaseConfirmed: true } };
       effects.push({ type: 'release-confirmed' });
-      const started = beginScene(state, 'c1.cine.patient-release');
+      const started = beginScene(state, 'c1.cine.nurse-confrontation');
       state = started.state;
       effects.push({ type: 'scene-requested', scene: started.scene });
       break;
     }
     case 'reach-stair-landing':
       if (previous.stairReached) return unchanged();
-      if (!command.safe || !previous.puzzle.releaseConfirmed || !sceneDone(previous, 'c1.cine.patient-release')) return reject('Reach the released stair landing after the Patient handoff');
+      if (!command.safe || !previous.puzzle.releaseConfirmed || !sceneDone(previous, 'c1.cine.nurse-confrontation')) return reject('Reach the released stair landing after the Nurse handoff');
       state = { ...state, stairReached: true };
       break;
     case 'read-hint': {

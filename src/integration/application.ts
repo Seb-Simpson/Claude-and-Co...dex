@@ -239,7 +239,7 @@ export function createApplication(options: ApplicationOptions): Application {
       }
       if (look) active.runtime?.player.setLookSensitivity(look[0], look[1]);
       resumeAudio();
-      if (active.runtime) {
+      if (active.runtime && !active.runtime.opening) {
         active.encounter = createPatientEncounter({ events, audio: engine.services.audio,
           presentationProvided: () => Boolean(engine!.services.scene.getObjectByName('nw:horror-layer')),
           playerId: active.runtime.player.getSnapshot().id, onMessage: (message) => active.runtime?.notify(message) });
@@ -375,7 +375,7 @@ export function createApplication(options: ApplicationOptions): Application {
       if (active?.runtime?.opening?.onboarding.safe) return;
       if (!active?.runtime) return;
       const snapshot = active.runtime.player.getSnapshot();
-      active.events.emit('player:captured', { playerId: snapshot.id, entityId: 'nw:entity:patient', position: snapshot.position,
+      active.events.emit('player:captured', { playerId: snapshot.id, entityId: active.runtime.entities.getSnapshots()[0]?.id ?? (active.runtime.opening ? 'nw:entity:nurse' : 'nw:entity:patient'), position: snapshot.position,
         timeSeconds: 0 });
     },
     dispose() {
