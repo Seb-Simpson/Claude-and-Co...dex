@@ -6,7 +6,7 @@ import { declareActors, declareRooms, PLAYER_SPAWN } from './metadata';
 import { buildClinicalRooms } from './rooms/clinical';
 import { buildPatientRooms } from './rooms/patientRooms';
 import { buildServiceSpaces } from './rooms/service';
-import { buildStealthStation } from './rooms/stealthStation';
+import { addStationPractical, buildStealthStation } from './rooms/stealthStation';
 import { addStealthMarkers } from './stealth/nursesStation';
 import { buildShell } from './rooms/shell';
 import { addOpeningMarkers, OPENING_BINDINGS } from './opening';
@@ -55,6 +55,8 @@ export function createHospitalWorld(options: CreateHospitalWorldOptions = {}): H
     declareActors(builder);
     addOpeningMarkers(builder);
     addStealthMarkers(builder);
+    // NW-007B: last, so its lamp takes the next fixture number and no existing id shifts.
+    addStationPractical(builder);
     builder.finalize();
   } catch (error) {
     builder.dispose();

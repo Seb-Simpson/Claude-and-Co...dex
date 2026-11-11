@@ -11,12 +11,15 @@ export type CueId =
   | 'nw:pipe-knock' | 'nw:distant-door' | 'nw:drip' | 'nw:trolley' | 'nw:lift-chime' | 'nw:lift-doors' | 'nw:metal-creak'
   | 'nw:settle' | 'nw:light-pop' | 'nw:static' | 'nw:curtain' | 'nw:vent-breath' | 'nw:monitor-beep' | 'nw:flatline'
   | 'nw:wheel-creak' | 'nw:brownout'
-  | 'nw:chase-stinger' | 'nw:heartbeat' | 'nw:reveal' | 'nw:power-down' | 'nw:power-up' | 'nw:presence-out' | 'nw:distant-steps';
+  | 'nw:chase-stinger' | 'nw:heartbeat' | 'nw:reveal' | 'nw:power-down' | 'nw:power-up' | 'nw:presence-out' | 'nw:distant-steps'
+  // NW-007B: Nurse Shaw and the station (docs/NW-007B.md, "Audio cues").
+  | 'nw:shaw-steps' | 'nw:shaw-keys' | 'nw:shaw-rustle' | 'nw:call-panel' | 'nw:paper' | 'nw:station-hum' | 'nw:capture';
 
 export const CUE_IDS: readonly CueId[] = [
   'nw:pipe-knock', 'nw:distant-door', 'nw:drip', 'nw:trolley', 'nw:lift-chime', 'nw:lift-doors', 'nw:metal-creak', 'nw:settle',
   'nw:light-pop', 'nw:static', 'nw:curtain', 'nw:vent-breath', 'nw:monitor-beep', 'nw:flatline', 'nw:wheel-creak', 'nw:brownout',
   'nw:chase-stinger', 'nw:heartbeat', 'nw:reveal', 'nw:power-down', 'nw:power-up', 'nw:presence-out', 'nw:distant-steps',
+  'nw:shaw-steps', 'nw:shaw-keys', 'nw:shaw-rustle', 'nw:call-panel', 'nw:paper', 'nw:station-hum', 'nw:capture',
 ];
 
 export interface PlayOptions {
@@ -493,6 +496,154 @@ export class Ambience {
           noiseBurst(at, 0.05, filt('lowpass', 500), vol * 0.12);
         }
         end = t + count * pace + 0.4;
+        break;
+      }
+      // ---- NW-007B: Nurse Shaw and the station. All positional when a position is given; levels are
+      // deliberately low (the player should strain to hear her before seeing her).
+      case 'nw:shaw-steps': {
+        // A ward sister's heels on vinyl, approaching: `duration` seconds of steps (default 5),
+        // one every ~0.62 s (her patrol pace), each a little louder, keys now and then.
+        const dur = options.duration ?? 5;
+        const pace = 0.6 + this.random() * 0.06;
+        const count = Math.max(2, Math.round(dur / pace));
+        for (let i = 0; i < count; i++) {
+          const at = t + i * pace * (0.96 + this.random() * 0.08);
+          const near = 0.45 + 0.55 * (i / Math.max(1, count - 1));
+          noiseBurst(at, 0.022, filt('highpass', 2600), vol * 0.32 * near);
+          noiseBurst(at + 0.004, 0.06, filt('bandpass', 1650, 6), vol * 0.22 * near);
+          const o = osc('sine', 95);
+          o.frequency.exponentialRampToValueAtTime(48, at + 0.08);
+          const g = ctx.createGain();
+          env(g, vol * 0.1 * near, 0.003, 0.09, at);
+          o.connect(g).connect(out);
+          o.start(at); o.stop(at + 0.16);
+          if (this.random() < 0.3) for (let k = 0; k < 3; k++) {
+            const ko = osc('sine', 3000 + this.random() * 2400);
+            const kg = ctx.createGain();
+            env(kg, vol * 0.012 * near, 0.002, 0.12, at + 0.05 + k * 0.03);
+            ko.connect(kg).connect(out);
+            ko.start(at + 0.05 + k * 0.03); ko.stop(at + 0.25 + k * 0.03);
+          }
+        }
+        end = t + count * pace + 0.3;
+        break;
+      }
+      case 'nw:shaw-keys': {
+        // The chatelaine: a small ring of keys settling against each other.
+        const n = 5 + Math.floor(this.random() * 5);
+        let at = t;
+        for (let i = 0; i < n; i++) {
+          const o = osc('sine', 2800 + this.random() * 2800);
+          const g = ctx.createGain();
+          env(g, vol * 0.03, 0.002, 0.18 + this.random() * 0.2, at);
+          o.connect(g).connect(out);
+          o.start(at); o.stop(at + 0.45);
+          noiseBurst(at, 0.01, filt('highpass', 5000), vol * 0.05);
+          at += 0.03 + this.random() * 0.09;
+        }
+        end = at + 0.5;
+        break;
+      }
+      case 'nw:shaw-rustle': {
+        // Starched cotton moving: a short, dry swish (turning, reaching, bending to listen).
+        const dur = 0.35 + this.random() * 0.25;
+        const src = this.noiseSource(ctx, true);
+        const f = filt('bandpass', 3400, 0.9);
+        f.frequency.linearRampToValueAtTime(2400, t + dur);
+        const g = ctx.createGain();
+        g.gain.setValueAtTime(0.0001, t);
+        g.gain.linearRampToValueAtTime(vol * 0.05, t + dur * 0.35);
+        g.gain.linearRampToValueAtTime(0.0001, t + dur);
+        src.connect(f).connect(g).connect(out);
+        src.start(t); src.stop(t + dur + 0.05);
+        stops.push(() => src.stop());
+        end = t + dur + 0.1;
+        break;
+      }
+      case 'nw:call-panel': {
+        // Nurse-call master station: the key click, the call tone acknowledged, a lower reset bip.
+        noiseBurst(t, 0.012, filt('bandpass', 2400, 3), vol * 0.12);
+        for (const [f0, at, len] of [[880, t + 0.05, 0.16], [660, t + 0.24, 0.22], [440, t + 0.75, 0.09]] as const) {
+          const o = osc('square', f0);
+          const lp = filt('lowpass', 1800);
+          const g = ctx.createGain();
+          g.gain.setValueAtTime(0.0001, at);
+          g.gain.linearRampToValueAtTime(vol * 0.025, at + 0.01);
+          g.gain.setValueAtTime(vol * 0.025, at + len - 0.02);
+          g.gain.linearRampToValueAtTime(0.0001, at + len);
+          o.connect(lp).connect(g).connect(out);
+          o.start(at); o.stop(at + len + 0.02);
+        }
+        end = t + 1;
+        break;
+      }
+      case 'nw:paper': {
+        // A page turned in a folder: a rising crisp swish and a soft settle.
+        const dur = 0.4;
+        const src = this.noiseSource(ctx, true);
+        const f = filt('bandpass', 1900, 1.4);
+        f.frequency.exponentialRampToValueAtTime(5200, t + dur * 0.7);
+        const g = ctx.createGain();
+        g.gain.setValueAtTime(0.0001, t);
+        g.gain.linearRampToValueAtTime(vol * 0.06, t + 0.12);
+        g.gain.linearRampToValueAtTime(0.0001, t + dur);
+        src.connect(f).connect(g).connect(out);
+        src.start(t); src.stop(t + dur + 0.05);
+        stops.push(() => src.stop());
+        noiseBurst(t + dur, 0.05, filt('lowpass', 900), vol * 0.04);
+        end = t + dur + 0.2;
+        break;
+      }
+      case 'nw:station-hum': {
+        // Loopable bed for the station (use loop: true): mains hum and a tired monitor fan. Each
+        // repeat overlaps the next by 0.6 s, so the loop is seamless at any `duration`.
+        const dur = (options.duration ?? 4) + 0.6;
+        const g = ctx.createGain();
+        g.gain.setValueAtTime(0.0001, t);
+        g.gain.linearRampToValueAtTime(vol * 0.025, t + 0.3);
+        g.gain.setValueAtTime(vol * 0.025, t + dur - 0.3);
+        g.gain.linearRampToValueAtTime(0.0001, t + dur);
+        g.connect(out);
+        for (const [f0, a0] of [[100, 1], [50, 0.6], [150, 0.25]] as const) {
+          const o = osc('sine', f0);
+          const og = ctx.createGain();
+          og.gain.value = a0;
+          o.connect(og).connect(g);
+          o.start(t); o.stop(t + dur + 0.05);
+        }
+        const fan = this.noiseSource(ctx, true);
+        const fg = ctx.createGain();
+        fg.gain.value = 0.6;
+        fan.connect(filt('lowpass', 520)).connect(fg).connect(g);
+        fan.start(t); fan.stop(t + dur + 0.05);
+        stops.push(() => fan.stop());
+        end = t + dur + 0.1;
+        break;
+      }
+      case 'nw:capture': {
+        // Restrained capture accent: a low push, a breath drawn in close, one cold glassy tone.
+        // Short (1.6 s) and well under the chase stinger; the scare is the image, not the volume.
+        const boom = osc('sine', 55);
+        boom.frequency.exponentialRampToValueAtTime(30, t + 0.6);
+        const bg = ctx.createGain();
+        env(bg, vol * 0.3, 0.02, 0.7);
+        boom.connect(bg).connect(out);
+        boom.start(t); boom.stop(t + 0.9);
+        const breath = this.noiseSource(ctx, true);
+        const bf = filt('bandpass', 1200, 0.8);
+        const bgn = ctx.createGain();
+        bgn.gain.setValueAtTime(0.0001, t);
+        bgn.gain.linearRampToValueAtTime(vol * 0.07, t + 0.45);
+        bgn.gain.linearRampToValueAtTime(0.0001, t + 0.9);
+        breath.connect(bf).connect(bgn).connect(out);
+        breath.start(t); breath.stop(t + 1);
+        stops.push(() => breath.stop());
+        const tone = osc('sine', 1568);
+        const tg = ctx.createGain();
+        env(tg, vol * 0.035, 0.05, 1.3, t + 0.15);
+        tone.connect(tg).connect(out);
+        tone.start(t + 0.15); tone.stop(t + 1.6);
+        end = t + 1.7;
         break;
       }
       case 'nw:brownout': {
