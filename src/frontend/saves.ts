@@ -20,6 +20,11 @@ export interface SaveRecord {
 }
 
 export const ROOM_104_CHECKPOINT = { id: 'nw:checkpoint:room-104-wake', label: 'Room 104 · Ward 4 West' } as const;
+function openingLabel(opening: OpeningCheckpoint): string {
+  if (opening.station?.phase === 'complete') return 'West Ward · Station cleared';
+  if (opening.station) return 'Nurses’ Station · Shaw’s round';
+  return opening.milestone === 'station-approach' ? 'Nurses’ Station · West Ward' : 'Room 104 · Door released';
+}
 const KEY = 'night-ward:save:v1';
 
 export interface SaveStore {
@@ -54,7 +59,7 @@ function valid(raw: unknown): SaveRecord | null {
   const { opening: _opening, ...base } = r as SaveRecord;
   if (r.opening !== undefined && !opening) return { ...base, checkpoint: ROOM_104_CHECKPOINT.id, label: ROOM_104_CHECKPOINT.label };
   return { ...base, ...(opening ? { opening, checkpoint: `nw:checkpoint:${opening.milestone}`,
-    label: opening.milestone === 'station-approach' ? 'Nurses’ Station · West Ward' : 'Room 104 · Door released' } : {}) };
+    label: openingLabel(opening) } : {}) };
 }
 
 export function createSaveStore(storage?: Storage | null, now: () => number = Date.now): SaveStore {
@@ -93,7 +98,7 @@ export function createSaveStore(storage?: Storage | null, now: () => number = Da
       const current = read();
       if (!opening || !current) return null;
       const next: SaveRecord = { ...current, opening, checkpoint: `nw:checkpoint:${opening.milestone}`,
-        label: opening.milestone === 'station-approach' ? 'Nurses’ Station · West Ward' : 'Room 104 · Door released', savedAt: now() };
+        label: openingLabel(opening), savedAt: now() };
       write(next);
       return next;
     },

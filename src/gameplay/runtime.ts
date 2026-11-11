@@ -1,4 +1,7 @@
-import type { EntityType, FrameContext, GameModule, ModuleContext, ModuleInstance } from '../contracts';
+import {resolveStationBindings} from './encounters/stationBindings';
+import {createStationEncounter} from './encounters/nursesStation';
+import type {StationEncounter} from './encounters/nursesStation';
+import type { EntityType, FrameContext, GameModule, ModuleContext, ModuleInstance, NavigationProvider, HidingLocation } from '../contracts';
 import { createPhysicsAdapter, createNavigationProvider } from '../physics';
 import type { PhysicsAdapter, NavigationOptions } from '../physics';
 import { createEntitySystem, createEntityPresentation, createDoorNavigationAdapter, ENTITY_PROFILES } from '../entities';
@@ -26,6 +29,7 @@ export interface PlayerInputSource {
   dispose(): void;
 }
 export interface GameplayOptions {
+  readonly additionalWitnesses?: (spot: HidingLocation) => readonly string[];
   readonly entitiesEnabled?: () => boolean;
   readonly canCapture?: () => boolean;
   readonly activeEntityTypes?: readonly EntityType[];
@@ -46,6 +50,8 @@ export interface GameplayOptions {
   readonly handleInteraction?: InteractionOptions['handleInteraction'];
 }
 export interface GameplayRuntime extends ModuleInstance {
+  readonly navigation: NavigationProvider;
+  readonly station?: StationEncounter;
   readonly player: PlayerController;
   readonly physics: PhysicsAdapter;
   readonly interactions: InteractionSystem;
@@ -98,7 +104,7 @@ export function createGameplayRuntime(context: ModuleContext, options: GameplayO
     let entities: EntitySystem | undefined;
     const interactions = createInteractionSystem({
       world, player, physics, events: context.events,
-      witnesses: (spot) => entities?.witnessesFor(spot) ?? [],
+      witnesses: (spot) => [...(entities?.witnessesFor(spot) ?? []),...(options.additionalWitnesses?.(spot) ?? [])],
       ...(options.hasRequirement === undefined ? {} : { hasRequirement: options.hasRequirement }),
       ...(options.initialDoorStates === undefined ? {} : { initialDoorStates: options.initialDoorStates }),
       ...(options.handleInteraction === undefined ? {} : { handleInteraction: options.handleInteraction }),
@@ -187,7 +193,7 @@ export function createGameplayRuntime(context: ModuleContext, options: GameplayO
       cleanup.push(() => hud!.dispose());
     }
     const runtime: GameplayRuntime = {
-      player, physics, interactions, entities, presentation, acquireCinematicControl,
+      player, physics, navigation, interactions, entities, presentation, acquireCinematicControl,
       fixedUpdate(frame) {
         if (disposed) return;
         const requested = input?.read() ?? idleInput;
@@ -235,37 +241,53 @@ export function createGameplayModule(options: GameplayOptions = {}): GameModule 
       // Simulation-only hosts use the same core runtime without allocating browser presentation.
       const document = context.engine.renderer.domElement?.ownerDocument;
       if (!bindings || typeof document?.createElement !== 'function') return createGameplayRuntime(context, options);
+      const stationBindings = resolveStationBindings(context.world);
       const checkpoint = options.openingPersistence?.load() ?? null;
       const gate = createOnboardingGate();
       gate.sync(checkpoint?.state ?? createOpeningState(), checkpoint !== null);
       const adapter = createOpeningInteractionAdapter(context.world, bindings);
+      let station: StationEncounter | undefined;
       let opening: OpeningSequence | undefined;
       let runtime: GameplayRuntime | undefined;
       try {
-        runtime = createGameplayRuntime({ ...context, world: adapter.world }, { ...options, showHud: false, activeEntityTypes: CHAPTER_ONE_ENTITY_TYPES, entitiesEnabled: () => !gate.safe, canCapture: () => !gate.safe,
+        runtime = createGameplayRuntime({ ...context, world: adapter.world }, { ...options, showHud: false, activeEntityTypes: CHAPTER_ONE_ENTITY_TYPES, entitiesEnabled: () => !stationBindings && !gate.safe, canCapture: () => station?.canCapture ?? !gate.safe,
+          additionalWitnesses: () => station?.witnesses() ?? [],
           initialDoorStates: { [bindings['room-104-door'].doorId!]: checkpoint?.state.doorUnlocked ? 'closed' : 'locked',
             [bindings['room-106-door'].doorId!]: 'locked' },
           handleInteraction: (request, time) => opening?.handleInteraction(request, time) ?? true,
           onNotification: message => opening?.notify(message),
           inspectionText: id => Object.values(OPENING_INTERACTIONS).some(target => target === id) ? '' : options.inspectionText?.(id),
         });
-        if (checkpoint?.milestone === 'station-approach') {
-          const destination = openingPosition(bindings['station-approach']);
+        if (checkpoint?.station || checkpoint?.milestone === 'station-approach') {
+          const destination = checkpoint.station && stationBindings
+            ? checkpoint.station.phase === 'complete' ? stationBindings.exit : stationBindings.observation
+            : openingPosition(bindings['station-approach']);
           if (!runtime.player.body.canOccupy(destination) || !runtime.physics.hasSupport(destination, runtime.player.body.radius)) {
             throw new Error('Opening station checkpoint is obstructed or unsupported');
           }
           runtime.player.body.setPosition(destination);
+          if (stationBindings) runtime.player.setViewRotation({yaw:Math.atan2(-stationBindings.axis.x,-stationBindings.axis.z),pitch:0});
           runtime.player.update({ deltaSeconds: 0, elapsedSeconds: 0 });
         }
         opening = await createOpeningSequence({ ...context, world: adapter.world }, runtime, bindings, checkpoint,
-          options.openingPersistence ? cp => options.openingPersistence!.save(cp) : undefined, gate);
+          options.openingPersistence ? cp => options.openingPersistence!.save(cp) : undefined, gate, options.onRestart);
+        if (stationBindings) {
+          const sequence = opening;
+          station = createStationEncounter({world:adapter.world,bindings:stationBindings,
+            physics:runtime.physics,navigation:runtime.navigation,player:runtime.player,
+            interactions:runtime.interactions,events:context.events,
+            ...(checkpoint?.station ? {checkpoint:checkpoint.station} : {}),
+            eligible:()=>sequence.state.awakened && sequence.state.doorUnlocked && !sequence.cinematic,
+            present:pose=>sequence.directNurse(pose),save:cp=>sequence.saveStation(cp),notify:m=>sequence.notify(m)});
+        }
         const gameplay = runtime;
         const sequence = opening;
-        return { ...gameplay, opening: sequence,
+        return { ...gameplay, opening: sequence, ...(station ? {station} : {}),
+          fixedUpdate(frame) {gameplay.fixedUpdate(frame); station?.fixedUpdate(frame);},
           update(frame) { gameplay.update(frame); sequence.update(frame.deltaSeconds); },
-          dispose() { try { sequence.dispose(); } finally { try { gameplay.dispose(); } finally { adapter.dispose(); } } },
+          dispose() { try { station?.dispose(); } finally {try { sequence.dispose(); } finally { try { gameplay.dispose(); } finally { adapter.dispose(); } }} },
         } satisfies GameplayRuntime;
-      } catch (error) { try { opening?.dispose(); } finally { try { runtime?.dispose(); } finally { adapter.dispose(); } } throw error; }
+      } catch (error) { try {station?.dispose();} finally {try { opening?.dispose(); } finally { try { runtime?.dispose(); } finally { adapter.dispose(); } }} throw error; }
     },
   };
 }

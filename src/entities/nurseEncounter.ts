@@ -4,7 +4,7 @@ import type {
 } from '../contracts';
 import type { PhysicsAdapter } from '../physics';
 import { createEntityAgent } from './entityAgent';
-import type { EntityAgent } from './entityAgent';
+import type { EntityAgent, EntityDirective } from './entityAgent';
 import { resolveEntityProfile } from './profiles';
 import type { EntityProfile } from './profiles';
 
@@ -31,6 +31,8 @@ export interface NurseDoorPolicy {
 }
 
 export interface NurseEncounterOptions {
+  readonly perceptionEnabled?: () => boolean;
+  readonly captureEnabled?: () => boolean;
   readonly spawn: EntitySpawnPoint;
   readonly route?: PatrolRoute;
   readonly hidingLocations?: readonly HidingLocation[];
@@ -46,6 +48,8 @@ export interface NurseEncounterOptions {
 }
 
 export interface NurseEncounter {
+  setDirective(directive: EntityDirective | null): void;
+  getYaw(): number;
   readonly phase: NurseEncounterPhase;
   /** Stage only an inactive actor. No body is allocated until activation. */
   stage(pose?: SpawnPose): void;
@@ -91,6 +95,7 @@ export function createNurseEncounter(options: NurseEncounterOptions): NurseEncou
   let agent: EntityAgent | null = null;
   let pendingNoises: PlayerNoiseEvent[] = [];
   let captured = false;
+  let authored = false;
   let activation = 0;
   let time = 0;
   let stepDistance = 0;
@@ -146,11 +151,11 @@ export function createNurseEncounter(options: NurseEncounterOptions): NurseEncou
 
   try {
     unsubscribers.push(options.events.on('player:noise', (noise) => {
-      if (phase !== 'active' || captured || pendingNoises.length >= 128) return;
+      if (phase !== 'active' || captured || options.perceptionEnabled?.() === false || pendingNoises.length >= 128) return;
       pendingNoises.push({ ...noise, position: copy(noise.position) });
     }));
     unsubscribers.push(options.events.on('hiding:state', (event) => {
-      if (phase !== 'active' || captured || !agent) return;
+      if (phase !== 'active' || captured || !agent || options.perceptionEnabled?.() === false) return;
       const outerTick = ticking;
       ticking = true;
       try { agent.observeHiding(event); } finally {
@@ -178,6 +183,8 @@ export function createNurseEncounter(options: NurseEncounterOptions): NurseEncou
 
   return {
     get phase() { return phase; },
+    setDirective(directive) { if (directive || authored) pendingNoises = []; authored = directive !== null; agent?.setDirective(directive); },
+    getYaw: () => agent?.getYaw() ?? placement.yaw,
     stage(pose = initial) {
       assertUsable();
       if (ticking || releasing) throw new Error('Cannot stage Nurse inside an active lifecycle callback');
@@ -212,6 +219,8 @@ export function createNurseEncounter(options: NurseEncounterOptions): NurseEncou
       agent = createEntityAgent({
         spawn: copySpawn(placement), profile, physics: options.physics, navigation: options.navigation,
         player: options.player, events,
+        ...(options.perceptionEnabled ? {perceptionEnabled: options.perceptionEnabled} : {}),
+        ...(options.captureEnabled ? {captureEnabled: options.captureEnabled} : {}),
         ...(route ? { route } : {}),
         ...(options.hidingLocations ? { hidingLocations: options.hidingLocations } : {}),
         ...(options.playerEyeHeights ? { playerEyeHeights: options.playerEyeHeights } : {}),

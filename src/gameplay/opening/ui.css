@@ -85,3 +85,12 @@
   .nw-opening-ui__speaker { color: #d2dfd3; }
 }
 .nw-opening-ui__guidance { position:absolute; bottom:8%; left:50%; transform:translateX(-50%); font:400 .72rem var(--nw-mono,monospace); color:#c5c9bb; text-align:center; }
+.nw-opening-ui__capture {
+  position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:2rem; pointer-events:auto; background:#030506f5; animation:nw-opening-capture-in .8s ease both;
+}
+.nw-opening-ui__capture h2 { font:400 clamp(2rem,5vw,3.5rem)/1.1 var(--nw-serif,Georgia,serif); letter-spacing:.07em; margin:0; }
+.nw-opening-ui__capture button { color:#c9c8b9; background:transparent url('./assets/worn-rule.svg') center bottom/100% 7px no-repeat; border:0; padding:1rem 1.5rem; cursor:pointer; font:400 .85rem var(--nw-mono,monospace); letter-spacing:.05em; }
+.nw-opening-ui__capture button:focus-visible { outline:1px solid #bac6ae; outline-offset:6px; }
+@keyframes nw-opening-capture-in {from {opacity:0} to {opacity:1}}
+@media(prefers-reduced-motion:reduce) {.nw-opening-ui__capture {animation-duration:.01s}}

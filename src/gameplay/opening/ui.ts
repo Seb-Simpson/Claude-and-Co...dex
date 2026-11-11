@@ -11,6 +11,7 @@ export interface OpeningUiState {
 }
 
 export interface OpeningUi {
+  capture(onRestart?: () => void): void;
   update(state: OpeningUiState, deltaSeconds: number): void;
   notify(text: string): void;
   subtitle(line: DialogueSubtitle | null): void;
@@ -66,7 +67,19 @@ export function createOpeningUi(
   skip.className = 'nw-opening-ui__skip';
   skip.textContent = 'Space — Skip';
   const guidance = document.createElement('div'); guidance.className = 'nw-opening-ui__guidance';
-  root.append(darkness, prompt, notification, subtitle, skip, guidance);
+  const capture = document.createElement('section');
+  capture.className = 'nw-opening-ui__capture'; capture.hidden = true;
+  capture.setAttribute('role','dialog'); capture.setAttribute('aria-modal','true');
+  capture.setAttribute('aria-labelledby','nw-opening-capture-title');
+  const captureTitle = document.createElement('h2'); captureTitle.id = 'nw-opening-capture-title';
+  captureTitle.textContent = 'You were found';
+  const restart = document.createElement('button'); restart.type = 'button';
+  restart.textContent = 'Restart from checkpoint';
+  let restartAction: (() => void) | undefined;
+  const retry = () => { if (!restartAction || restart.disabled) return; restart.disabled = true; restartAction(); };
+  restart.addEventListener('click',retry);
+  capture.append(captureTitle,restart);
+  root.append(darkness, prompt, notification, subtitle, skip, guidance, capture);
   document.body.append(root);
 
   let current: OpeningUiState = { prompt: null, playing: false, cinematic: false };
@@ -104,6 +117,12 @@ export function createOpeningUi(
   render();
 
   return {
+    capture(onRestart) {
+      if (disposed || !capture.hidden) return;
+      current = {...current,playing:false}; restartAction = onRestart;
+      capture.hidden = false; restart.hidden = !onRestart; render();
+      if(onRestart) restart.focus({preventScroll:true});
+    },
     update(state, deltaSeconds) {
       if (disposed) return;
       current = state;
@@ -130,6 +149,7 @@ export function createOpeningUi(
     dispose() {
       if (disposed) return;
       disposed = true;
+      restart.removeEventListener('click',retry);
       unsubscribe();
       root.remove();
     },

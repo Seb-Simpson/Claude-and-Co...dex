@@ -1,3 +1,5 @@
+> Continued by [NW-006B](../nw-006b/REPORT.md), which adds the directed first Nurse encounter. This document records the earlier protected opening milestone.
+
 # NW-005D — final opening integration
 
 ## Scope and provenance

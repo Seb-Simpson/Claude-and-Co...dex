@@ -8,7 +8,15 @@ import { canHearNoise, canSeePlayer, isObserverSeenByPlayer } from './perception
 import type { EntityProfile } from './profiles';
 import { createStateMachine } from './stateMachine';
 
+/** Temporary story authority over the same capsule/navigation. Null restores autonomous perception. */
+export interface EntityDirective {
+  readonly target: Vec3 | null;
+  readonly speed: number;
+  readonly yaw?: number;
+}
 export interface EntityAgentOptions {
+  readonly perceptionEnabled?: () => boolean;
+  readonly captureEnabled?: () => boolean;
   readonly spawn: EntitySpawnPoint;
   readonly profile: EntityProfile;
   readonly route?: PatrolRoute;
@@ -24,6 +32,8 @@ export interface EntityAgentOptions {
 }
 
 export interface EntityAgent {
+  setDirective(directive: EntityDirective | null): void;
+  getYaw(): number;
   fixedUpdate(frame: FrameContext, noises?: readonly PlayerNoiseEvent[]): void;
   getSnapshot(): EntitySnapshot;
   witnessesEntry(): boolean;
@@ -44,6 +54,7 @@ export function createEntityAgent(options: EntityAgentOptions): EntityAgent {
     position: spawn.position, radius: profile.agent.radius, height: profile.agent.height,
   });
   let disposed = false;
+  let directive: EntityDirective | null = null;
   let now = 0;
   let yaw = spawn.yaw;
   let grounded = false;
@@ -79,6 +90,7 @@ export function createEntityAgent(options: EntityAgentOptions): EntityAgent {
   function position(): Vec3 { return body.getPosition(); }
   function forward(): Vec3 { return { x: -Math.sin(yaw), y: 0, z: -Math.cos(yaw) }; }
   function visible(): boolean {
+    if (directive || options.perceptionEnabled?.() === false) return false;
     return canSeePlayer({
       observerPosition: position(), observerForward: forward(), eyeHeight: profile.eyeHeight,
       player: player.getSnapshot(), config: profile,
@@ -106,7 +118,7 @@ export function createEntityAgent(options: EntityAgentOptions): EntityAgent {
     machine.transition('pursue');
   }
   function capture(playerId: string, targetPosition: Vec3): void {
-    if (captureCommitted || !profile.canCapture) return;
+    if (captureCommitted || !profile.canCapture || options.captureEnabled?.() === false) return;
     captureCommitted = true;
     try {
       events.emit('player:captured', {
@@ -198,6 +210,23 @@ export function createEntityAgent(options: EntityAgentOptions): EntityAgent {
   }
 
   return {
+    getYaw: () => yaw,
+    setDirective(next) {
+      if (next && (!Number.isFinite(next.speed) || next.speed < 0 ||
+          (next.yaw !== undefined && !Number.isFinite(next.yaw)) ||
+          (next.target && ![next.target.x,next.target.y,next.target.z].every(Number.isFinite)))) throw new Error('Invalid entity directive');
+      if (disposed) return;
+      const changed = Boolean(next) !== Boolean(directive);
+      directive = next ? {...next, target: next.target ? copy(next.target) : null} : null;
+      if (changed) {
+        endChase('cancelled');
+        detectionSeconds = 0; lastSeenTime = -Infinity; lastKnown = null; witnessed = null; captureDwell = 0;
+        waypoints = []; pathGoal = null; replanAt = -Infinity;
+        routeIndex = options.route?.points.reduce((nearest, point, i, points) =>
+          distance(position(), point) < distance(position(), points[nearest]!) ? i : nearest, 0) ?? 0;
+        machine.transition('idle');
+      }
+    },
     fixedUpdate(frame, noises = []) {
       if (disposed) return;
       if (!Number.isFinite(frame.deltaSeconds) || frame.deltaSeconds < 0 || !Number.isFinite(frame.elapsedSeconds)) {
@@ -210,6 +239,19 @@ export function createEntityAgent(options: EntityAgentOptions): EntityAgent {
       if (snapshot.captured || captureCommitted) {
         endChase(snapshot.captured ? 'captured' : 'cancelled');
         machine.transition('idle');
+        return;
+      }
+      if (directive) {
+        verticalSpeed = grounded ? -0.4 : Math.max(-12, verticalSpeed - 9.81 * dt);
+        bodyMovedThisTick = false;
+        const moving = directive.target && distance(position(), directive.target) >= 0.22;
+        machine.transition(moving ? 'patrol' : 'idle');
+        if (directive.target) move(directive.target, directive.speed, dt, true);
+        if (!bodyMovedThisTick) grounded = body.move({x:0,y:verticalSpeed*dt,z:0}).grounded;
+        if (!moving && directive.yaw !== undefined) {
+          const turn = Math.atan2(Math.sin(directive.yaw-yaw),Math.cos(directive.yaw-yaw));
+          yaw += Math.max(-dt*1.8,Math.min(dt*1.8,turn));
+        }
         return;
       }
       if (witnessed && now > witnessed.expires) {
@@ -227,7 +269,7 @@ export function createEntityAgent(options: EntityAgentOptions): EntityAgent {
         if (detectionSeconds >= profile.detectionSeconds && now >= cooldownUntil) startChase(snapshot.id);
       } else {
         detectionSeconds = 0;
-        const noise = hearing(noises);
+        const noise = options.perceptionEnabled?.() === false ? undefined : hearing(noises);
         if (noise && !witnessed) {
           lastKnown = { playerId: noise.playerId, position: copy(noise.position), timeSeconds: noise.timeSeconds, source: 'sound' };
           if (!chase) machine.transition('investigate');
@@ -300,13 +342,13 @@ export function createEntityAgent(options: EntityAgentOptions): EntityAgent {
       }
       // Keep collision/floor support even while idle or waiting for a path.
       if (!bodyMovedThisTick && allowedToMove) grounded = body.move({ x: 0, y: verticalSpeed * dt, z: 0 }).grounded;
-      let canCapture = seesPlayer && machine.state === 'pursue' && distance(position(), snapshot.position) <= profile.captureRange;
+      let canCapture = options.captureEnabled?.() !== false && seesPlayer && machine.state === 'pursue' && distance(position(), snapshot.position) <= profile.captureRange;
       let capturePosition = snapshot.position;
       if (witnessed && chase && snapshot.hiding.spotId === witnessed.spot.id && snapshot.hiding.state !== 'outside') {
         const approach = hidingApproach();
         const eye = { ...position(), y: position().y + profile.eyeHeight };
         const concealedEye = { ...witnessed.spot.playerPosition, y: witnessed.spot.playerPosition.y + 0.7 };
-        canCapture = Boolean(approach && distance(position(), approach) < 0.4 &&
+        canCapture = options.captureEnabled?.() !== false && Boolean(approach && distance(position(), approach) < 0.4 &&
           distance(position(), witnessed.spot.playerPosition) <= profile.hidingInspectionRange &&
           physics.hasLineOfSight(eye, concealedEye, witnessed.spot.colliderIds));
         capturePosition = witnessed.spot.playerPosition;
@@ -326,6 +368,7 @@ export function createEntityAgent(options: EntityAgentOptions): EntityAgent {
       machine.transition('idle');
     },
     observeHiding(event) {
+      if (directive || options.perceptionEnabled?.() === false) return;
       if (disposed || event.playerId !== player.getSnapshot().id) return;
       if (event.current === 'entering' && event.witnessedBy.includes(spawn.entityId)) {
         const spot = options.hidingLocations?.find((value) => value.id === event.spotId);

@@ -1,0 +1,8 @@
+{
+  "source": "uninterrupted Playwright normal-game recording",
+  "originalDurationSeconds": 538.04,
+  "reviewDurationSeconds": 538.0,
+  "reviewFramesPerSecond": 8,
+  "encoding": "VP9; no cuts or speed changes; silent browser recording",
+  "rendering": "test-only pixel ratio0.25; SwiftShader; not a hardware benchmark"
+}

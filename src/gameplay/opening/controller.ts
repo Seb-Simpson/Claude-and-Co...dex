@@ -1,3 +1,5 @@
+import type {StationActorPose} from '../encounters/nursesStation';
+import type {StationCheckpoint} from '../encounters/checkpoint';
 import { Euler, Quaternion, Vector3 } from 'three';
 import type { InteractionRequest, ModuleContext } from '../../contracts';
 import { settings } from '../../settings/settings';
@@ -23,6 +25,8 @@ export interface OpeningPersistence {
   save(checkpoint: OpeningCheckpoint): void;
 }
 export interface OpeningSequence {
+  directNurse(pose: StationActorPose): void;
+  saveStation(checkpoint: StationCheckpoint): void;
   readonly onboarding: OnboardingGate;
   readonly state: OpeningState;
   readonly cinematic: boolean;
@@ -36,7 +40,7 @@ export interface OpeningSequence {
 }
 /** No new loop/controller: content consumes the existing runtime and exclusive camera transport. */
 export async function createOpeningSequence(context: ModuleContext, runtime: GameplayRuntime, bindings: OpeningBindings,
-  checkpoint: OpeningCheckpoint | null, save?: (checkpoint: OpeningCheckpoint) => void, onboarding: OnboardingGate = createOnboardingGate()): Promise<OpeningSequence> {
+  checkpoint: OpeningCheckpoint | null, save?: (checkpoint: OpeningCheckpoint) => void, onboarding: OnboardingGate = createOnboardingGate(), onRestart?: () => void): Promise<OpeningSequence> {
   const world = context.world!;
   const document = context.engine.renderer.domElement.ownerDocument;
   const ui = createOpeningUi(document, settings, () => INTERACTION_BINDING.label);
@@ -47,6 +51,8 @@ export async function createOpeningSequence(context: ModuleContext, runtime: Gam
     audio = await createOpeningAudio(context.engine.audio, line => ui.subtitle(line));
   } catch (error) { scene?.dispose(); ui.dispose(); throw error; }
   const presentation = scene;
+  let stationCheckpoint = checkpoint?.station;
+  let pendingStationCheckpoint: StationCheckpoint | null = null;
   let state = checkpoint?.state ?? createOpeningState();
   onboarding.sync(state, checkpoint !== null);
   const assistance = createOpeningAssistance();
@@ -117,8 +123,18 @@ export async function createOpeningSequence(context: ModuleContext, runtime: Gam
     if (playing && playback && event.code === 'Space' && !event.repeat) { event.preventDefault(); playback.skip(); }
   }
   document.addEventListener('keydown', key);
+  const offCapture = context.events.on('player:captured', event => {
+    const player=runtime.player.getSnapshot();
+    if(event.playerId===player.id && player.captured) {audio.pause();ui.capture(onRestart);}
+  });
   return {
     onboarding,
+    directNurse: pose => presentation.directNurse(pose),
+    saveStation(cp) {
+      if(cp.phase==='complete' && !state.stationReached) dispatch('reach-station');
+      stationCheckpoint = cp;
+      pendingStationCheckpoint = cp;
+    },
     get state() { return { ...state }; }, get cinematic() { return playback !== null || !started; },
     anchors() { return Object.fromEntries(Object.entries(bindings).map(([key, anchor]) => {
       const position = openingPosition(anchor);
@@ -180,8 +196,12 @@ export async function createOpeningSequence(context: ModuleContext, runtime: Gam
         }
       }
       if (pendingMilestone && audio.idle) {
-        save?.(createOpeningCheckpoint(state, state.stationReached ? 'station-approach' : pendingMilestone));
+        save?.({...createOpeningCheckpoint(state, state.stationReached ? 'station-approach' : pendingMilestone),...(stationCheckpoint?{station:stationCheckpoint}:{})});
         pendingMilestone = null;
+      }
+      if (pendingStationCheckpoint && audio.idle) {
+        save?.({...createOpeningCheckpoint(state,state.stationReached?'station-approach':'room104-exit'),station:pendingStationCheckpoint});
+        pendingStationCheckpoint=null;
       }
       onboarding.sync(state, exitSaved);
       const snapshot = runtime.player.getSnapshot();
@@ -200,6 +220,7 @@ export async function createOpeningSequence(context: ModuleContext, runtime: Gam
     dispose() {
       if (disposed) return;
       disposed = true; document.removeEventListener('keydown', key);
+      offCapture();
       try { cinematic.dispose(); } finally { try { audio.dispose(); } finally { try { presentation.dispose(); } finally { ui.dispose(); } } }
     },
   };
