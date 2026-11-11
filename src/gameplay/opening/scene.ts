@@ -1,3 +1,4 @@
+import type {StationActorPose} from '../encounters/nursesStation';
 import {
   BoxGeometry, BufferAttribute, Color, DoubleSide, Group, Mesh, MeshBasicMaterial, MeshStandardMaterial,
   Object3D, PerspectiveCamera, PlaneGeometry, Quaternion, Vector3,
@@ -14,6 +15,7 @@ import type { OpeningBindings } from './bindings';
 
 export type OpeningFeedback = 'handle-104' | 'handle-106' | 'reader-denied' | 'reader-accepted';
 export interface OpeningScene {
+  directNurse(pose: StationActorPose): void;
   setCardTaken(value: boolean): void;
   feedback(id: OpeningFeedback): void;
   update(deltaSeconds: number, playerPosition: Vec3, camera: PerspectiveCamera, unlocked: boolean): { sawNurse: boolean; atStation: boolean };
@@ -117,6 +119,8 @@ export async function createOpeningScene(world: HospitalWorld, bindings: Opening
   world.root.add(owned);
   const resources: { dispose(): void }[] = [];
   let disposed = false;
+  const retainNurse = Boolean(world.root.getObjectByName('nw:stealth:observation'));
+  let directed = false;
   let seen = false;
   let withdrawn = false;
   let observedSeconds = 0;
@@ -171,6 +175,14 @@ export async function createOpeningScene(world: HospitalWorld, bindings: Opening
     const nursePoint = new Vector3();
     const screenRight = new Vector3();
     return {
+      directNurse(pose) {
+        directed = true;
+        nurse.object.visible = true;
+        nurse.object.position.copy(owned.worldToLocal(new Vector3().copy(pose.actor.position)));
+        nurse.object.quaternion.copy(owned.getWorldQuaternion(new Quaternion()).invert()).multiply(new Quaternion().setFromAxisAngle(new Vector3(0,1,0),pose.yaw));
+        nurse.forceState(pose.checkingPanel ? 'observe' : null);
+        nurse.update(pose.deltaSeconds,{behaviour:pose.actor.state,speed:pose.speed,observed:false});
+      },
       setCardTaken(value) { if (!disposed && card) card.visible = value ? false : cardVisible; },
       feedback(id) {
         if (disposed) return;
@@ -190,13 +202,13 @@ export async function createOpeningScene(world: HospitalWorld, bindings: Opening
         if (readerUntil > 0 && elapsed >= readerUntil) { indicatorMaterial.color.set(0x75653d); readerUntil = 0; }
         camera.updateWorldMatrix(true, false);
         eye.copy(camera.getWorldPosition(eye));
-        target.copy(openingPosition(bindings['nurse-first-sight'])); target.y += 1.35;
+        nurse.object.getWorldPosition(target); target.y += 1.35;
         projected.copy(target).project(camera);
         const visible = !withdrawn && projected.z > -1 && projected.z < 1 && Math.abs(projected.x) < 0.95 && Math.abs(projected.y) < 0.95 && physics.hasLineOfSight(eye, target);
         // Keep her staged if *any* of the silhouette could still be visible. A central sight ray
         // alone would incorrectly retire her at a doorway corner or just inside the screen edge.
         let silhouetteVisible = visible;
-        if (!withdrawn && unlocked && !silhouetteVisible) {
+        if (!retainNurse && !withdrawn && unlocked && !silhouetteVisible) {
           screenRight.setFromMatrixColumn(camera.matrixWorld, 0).normalize();
           for (const [height, offset] of [[0.15, 0], [0.9, -0.32], [0.9, 0.32], [1.75, -0.22], [1.75, 0.22]]) {
             nursePoint.copy(target).addScaledVector(screenRight, offset!); nursePoint.y += height! - 1.35;
@@ -213,15 +225,15 @@ export async function createOpeningScene(world: HospitalWorld, bindings: Opening
         const atStation = unlocked && Math.hypot(playerPosition.x - station.x, playerPosition.z - station.z) <= 1.3 && Math.abs(playerPosition.y - station.y) < 1;
         // Removal is allowed only while outside the player's view or behind a physical occluder.
         // An inattentive player can miss this sighting entirely; no forced turn or camera grab.
-        if (!withdrawn && unlocked && !silhouetteVisible && ((seen && observedSeconds >= 1.5) || atStation)) withdrawn = true;
-        nurse.object.visible = !withdrawn;
-        if (!withdrawn) nurse.update(step, { behaviour: 'idle', speed: 0, observed: visible });
+        if (!retainNurse && !withdrawn && unlocked && !silhouetteVisible && ((seen && observedSeconds >= 1.5) || atStation)) withdrawn = true;
+        if (!directed) nurse.object.visible = !withdrawn;
+        if (!directed && !withdrawn) nurse.update(step, { behaviour: 'idle', speed: 0, observed: visible });
         return { sawNurse, atStation };
       },
       restore(state) {
         if (disposed) return;
         seen = state.sightingSeen;
-        withdrawn = state.sightingSeen || state.stationReached;
+        withdrawn = !retainNurse && (state.sightingSeen || state.stationReached);
         nurse.object.visible = !withdrawn;
         observedSeconds = 0;
       },

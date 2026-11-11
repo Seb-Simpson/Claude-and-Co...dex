@@ -200,7 +200,7 @@ export function createApplication(options: ApplicationOptions): Application {
     });
     events.on('player:captured', (event) => {
       if (attempt !== active || disposed || event.playerId !== active.runtime?.player.getSnapshot().id) return;
-      if (active.runtime?.opening?.onboarding.safe) return;
+      if (active.runtime?.station ? !active.runtime.station.canCapture : active.runtime?.opening?.onboarding.safe) return;
       setState('captured'); unlock();
     });
     for (const definition of options.modules) {
@@ -218,7 +218,7 @@ export function createApplication(options: ApplicationOptions): Application {
         } }));
       } else if (definition.id === 'nw:horror:hospital-anomalies' && definition.kind === 'horror') {
         registry.register(tracked(gateHorrorModule(definition, () => !active.runtime?.opening?.onboarding.safe,
-          () => !active.runtime?.opening || active.runtime.opening.onboarding.phase === 'stealth-onboarding' || !active.runtime.opening.onboarding.safe,
+          () => !active.runtime?.station && (!active.runtime?.opening || active.runtime.opening.onboarding.phase === 'stealth-onboarding' || !active.runtime.opening.onboarding.safe),
           () => active.runtime?.opening?.onboarding.markPresentationReady())));
       }
       else registry.register(tracked(definition));
@@ -347,6 +347,7 @@ export function createApplication(options: ApplicationOptions): Application {
           geometries: info?.memory.geometries ?? 0, textures: info?.memory.textures ?? 0 },
         audioState: engine?.services.audio.context?.state ?? 'locked', events: [...(attempt?.records ?? [])],
         doorStates, prompt: attempt?.runtime?.interactions.getPrompt() ?? null, error,
+        ...(attempt?.runtime?.station ? {station:attempt.runtime.station.snapshot()} : {}),
         ...(attempt?.runtime?.opening ? { opening: { phase: attempt.runtime.opening.onboarding.phase, state: attempt.runtime.opening.state, cinematic: attempt.runtime.opening.cinematic,
           anchors: attempt.runtime.opening.anchors(), camera: { x: engine!.services.camera.position.x,
             y: engine!.services.camera.position.y, z: engine!.services.camera.position.z } } } : {}),
@@ -372,7 +373,7 @@ export function createApplication(options: ApplicationOptions): Application {
     },
     captureForTest() {
       const active = attempt;
-      if (active?.runtime?.opening?.onboarding.safe) return;
+      if (active?.runtime?.station ? !active.runtime.station.canCapture : active?.runtime?.opening?.onboarding.safe) return;
       if (!active?.runtime) return;
       const snapshot = active.runtime.player.getSnapshot();
       active.events.emit('player:captured', { playerId: snapshot.id, entityId: active.runtime.entities.getSnapshots()[0]?.id ?? (active.runtime.opening ? 'nw:entity:nurse' : 'nw:entity:patient'), position: snapshot.position,

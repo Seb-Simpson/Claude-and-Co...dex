@@ -4,6 +4,7 @@ import type { EnginePerformanceSnapshot } from '../engine';
 import type { OpeningState } from '../gameplay/opening/state';
 export type ApplicationState = 'menu' | 'loading' | 'ready' | 'playing' | 'paused' | 'captured' | 'restarting' | 'error' | 'disposed';
 export interface ApplicationSnapshot {
+  station?: import('../gameplay/encounters/nursesStation').StationSnapshot;
   state: ApplicationState;
   sessionId: number;
   worldId: string | null;
