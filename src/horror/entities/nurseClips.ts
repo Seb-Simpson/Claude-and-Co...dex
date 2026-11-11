@@ -147,8 +147,9 @@ export const shawInvestigate: PoseFn = (c) => {
 };
 
 /**
- * Capture (one-shot, 1.4 s, holds the last pose): she steps in place, leans in and both hands
- * come up and forward to shoulder height, head tilting down toward the player. No translation.
+ * Capture (one-shot, 1.4 s, holds the last pose): she steps in place, leans in a little and both
+ * hands come up and forward to shoulder height; her face stays level with the player's eyes, head
+ * tipped to one side. No translation.
  */
 export const shawCapture: PoseFn = (c) => {
   const t = c.stateTime;
@@ -158,8 +159,10 @@ export const shawCapture: PoseFn = (c) => {
     thighR: [0.3 * k, 0, 0], shinR: [-0.25 * k, 0, 0], footR: [-0.05 * k, 0, 0],
     thighL: [-0.12 * k, 0, 0], shinL: [-0.18 * k, 0, 0],
     hipsOffset: [0, -0.05 * k, 0],
-    spine: [-0.18 * lean, 0, 0], chest: [-0.12 * lean, 0, 0],
-    neck: [-0.15 * lean, 0, 0.1 * lean], head: [-0.22 * lean, 0, 0.25 * lean],
+    // Lean in a little, but keep the face level with the player's eyes (she looks AT you), with
+    // the head tipped slightly to one side.
+    spine: [-0.1 * lean, 0, 0], chest: [-0.05 * lean, 0, 0],
+    neck: [0.06 * lean, 0, 0.1 * lean], head: [0.1 * lean, 0, 0.22 * lean],
     upperArmL: [1.25 * k, 0, 0.05], upperArmR: [1.32 * k, 0, -0.05],
     forearmL: [0.35 * k, 0, 0], forearmR: [0.28 * k, 0, 0],
     handL: [-0.25 * k, 0, 0.15], handR: [-0.25 * k, 0, -0.15],

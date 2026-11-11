@@ -79,7 +79,9 @@ nw.push(body, (hx * 1.1, -0.1, 1.745), 0.06, (0, 1, 0), 0.008)
 nw.displace(body, 0.002, 0.03, name='pores')
 nw.apply_all(body)
 
-skin = nw.mat_skin('nurse_skin', (0.26, 0.235, 0.21), (0.17, 0.14, 0.13), rough=0.5, sss=0.2)
+# NW-007B: pale, waxy skin (was a dark grey-brown 0.26 that read as a dark mass at the capture
+# distance and as a corpse from afar). Still bloodless; the blindfold now reads against it.
+skin = nw.mat_skin('nurse_skin', (0.5, 0.465, 0.42), (0.37, 0.32, 0.3), rough=0.5, sss=0.2)
 stocking = nw.mat_simple('stocking', (0.02, 0.018, 0.018), rough=0.55)
 shoe = nw.mat_simple('shoe', (0.008, 0.007, 0.007), rough=0.18)
 hair = nw.mat_hair('hair', (0.035, 0.028, 0.022))

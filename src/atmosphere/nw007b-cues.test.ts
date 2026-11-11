@@ -46,7 +46,7 @@ function fakeContext() {
 
 const peakOf = (cue: CueId, volume = 0.6): number => {
   const f = fakeContext();
-  const ambience = new Ambience(() => f.ctx, () => 0.5);
+  const ambience = new Ambience(() => f.ctx, [], () => 0.5);
   ambience.play('nw:pipe-knock', { volume: 0 }); // initialise (room tone gains are not part of the cue)
   f.gains.length = 0;
   expect(ambience.play(cue, { volume, position: { x: -3, y: 1, z: -5 } }), cue).toBe(true);
@@ -61,7 +61,7 @@ describe('NW-007B Nurse and station cues', () => {
   it('synthesizes each cue through a positional panner and stops every source it starts', () => {
     for (const cue of NEW_CUES) {
       const f = fakeContext();
-      const ambience = new Ambience(() => f.ctx, () => 0.5);
+      const ambience = new Ambience(() => f.ctx, [], () => 0.5);
       ambience.play('nw:pipe-knock', { volume: 0 });
       const before = { ...f.counts };
       expect(ambience.play(cue, { volume: 0.6, position: { x: 1, y: 1, z: 1 } }), cue).toBe(true);
@@ -84,7 +84,7 @@ describe('NW-007B Nurse and station cues', () => {
 
   it('loops the station hum without gaps (each repeat overlaps the next)', () => {
     const f = fakeContext();
-    const ambience = new Ambience(() => f.ctx, () => 0.5);
+    const ambience = new Ambience(() => f.ctx, [], () => 0.5);
     ambience.play('nw:pipe-knock', { volume: 0 });
     ambience.loop('hum', 'nw:station-hum', { volume: 0.5, duration: 4, position: { x: -3, y: 1, z: -4 } });
     ambience.stopLoop('hum');
