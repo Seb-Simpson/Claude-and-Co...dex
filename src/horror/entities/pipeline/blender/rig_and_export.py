@@ -53,7 +53,7 @@ RIGS = {
         budget=dict(body=9000, garment=2600, small=200), roughness=0.55, texture=1024, hair_keep=3),
     'nurse': dict(joints=sym({
         'hips': (0, 0, 0.96), 'spine': (0, 0, 1.08), 'chest': (0, -0.005, 1.22), 'neck': (0, -0.015, 1.53), 'head': (-0.06, -0.04, 1.72), 'headEnd': (-0.06, -0.03, 1.9),
-        'shoulderL': (0.08, -0.01, 1.46), 'upperArmL': (0.16, 0, 1.43), 'forearmL': (0.19, 0.02, 1.18), 'handL': (0.05, -0.15, 1.0), 'handEndL': (0.0, -0.18, 0.94),
+        'shoulderL': (0.08, -0.01, 1.46), 'upperArmL': (0.16, 0, 1.43), 'forearmL': (0.215, 0.025, 1.19), 'handL': (0.065, -0.21, 1.02), 'handEndL': (0.015, -0.24, 0.96),
         'thighL': (0.08, 0, 0.92), 'shinL': (0.085, -0.02, 0.5), 'footL': (0.085, 0.01, 0.075), 'toeL': (0.085, -0.15, 0.03)}),
         contacts=[('footL', (0.085, 0.05, 0.0)), ('footL', (0.085, -0.15, 0.0)), ('footR', (-0.085, 0.05, 0.0)), ('footR', (-0.085, -0.15, 0.0))],
         budget=dict(body=7800, garment=1500, small=160), roughness=0.62, texture=1024, hair_keep=1),
@@ -161,6 +161,12 @@ def bone_set(o):
         return ['head', 'neck'] if 'hair' in n else ['head']
     if 'shroud' in n:
         return ['head', 'neck', 'chest', 'shoulderL', 'shoulderR', 'upperArmL', 'upperArmR']
+    # NW-007B: the Nurse's hip accessories (chatelaine rings, keys, pocket) hang from the hips; with
+    # all joints they took forearm weights from the clasped hands and lifted with them.
+    if ENTITY == 'nurse' and n.startswith(('torus', 'cylinder', 'grid')) and kind(o) == 'small':
+        centre = sum((v.co for v in o.data.vertices), Vector()) / max(1, len(o.data.vertices))
+        # The apron bib sits on the chest; the tie and the keys hang at the hips.
+        return ['spine', 'chest'] if centre.z > 1.15 else ['hips', 'spine', 'thighL', 'thighR']
     if n.startswith(('skirt', 'grid', 'rag')) and kind(o) != 'small':
         if ENTITY == 'watcher' and n.startswith('grid'):
             return ['hips', 'spine', 'thighL', 'thighR', 'shinL', 'shinR']
@@ -200,8 +206,16 @@ for h in highs:
     bones = bone_set(h)
     groups = {b: low.vertex_groups.new(name=b) for b in JOINTS}
     segs = {b: segment(b) for b in bones}
+    ARM = ('shoulder', 'upperArm', 'forearm', 'hand')
+    def on_surface(v, b):
+        # NW-007B (Nurse only): forearms and hands may not own anything hugging the torso below the
+        # chest (dress, apron), so those stay with the trunk when the arms lift.
+        if ENTITY != 'nurse' or not b.startswith(ARM):
+            return True
+        return not (b.startswith(('forearm', 'hand')) and v.co.z < J['chest'].z and
+                    min(dist_to_seg(v.co, *segment(t)) for t in ('hips', 'spine')) < 0.145)
     for v in low.data.vertices:
-        ds = sorted(((dist_to_seg(v.co, *segs[b]), b) for b in bones))[:3]
+        ds = sorted(((dist_to_seg(v.co, *segs[b]), b) for b in bones if on_surface(v, b)))[:3]
         ws = [(1.0 / (d + 0.004) ** 4, b) for d, b in ds]
         total = sum(w for w, _ in ws)
         for w, b in ws:
