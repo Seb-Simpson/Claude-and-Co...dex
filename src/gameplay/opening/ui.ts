@@ -11,9 +11,10 @@ export interface OpeningUiState {
 }
 
 export interface OpeningUi {
-  capture(onRestart?: () => void): void;
+  capture(onRestart?: () => void,delayed?:boolean): void;
+  captureReady():void;
   update(state: OpeningUiState, deltaSeconds: number): void;
-  notify(text: string): void;
+  notify(text: string,seconds?:number): void;
   subtitle(line: DialogueSubtitle | null): void;
   setDarkness(opacity: number): void;
   dispose(): void;
@@ -73,12 +74,14 @@ export function createOpeningUi(
   capture.setAttribute('aria-labelledby','nw-opening-capture-title');
   const captureTitle = document.createElement('h2'); captureTitle.id = 'nw-opening-capture-title';
   captureTitle.textContent = 'You were found';
+  const captureCredit=document.createElement('p');captureCredit.className='nw-opening-ui__capture-credit';captureCredit.textContent='Nurse Shaw · West Ward';
+  const captureSkip=document.createElement('span');captureSkip.className='nw-opening-ui__capture-skip';captureSkip.textContent='Space — Continue';
   const restart = document.createElement('button'); restart.type = 'button';
   restart.textContent = 'Restart from checkpoint';
   let restartAction: (() => void) | undefined;
   const retry = () => { if (!restartAction || restart.disabled) return; restart.disabled = true; restartAction(); };
   restart.addEventListener('click',retry);
-  capture.append(captureTitle,restart);
+  capture.append(captureCredit,captureTitle,restart,captureSkip);
   root.append(darkness, prompt, notification, subtitle, skip, guidance, capture);
   document.body.append(root);
 
@@ -117,12 +120,13 @@ export function createOpeningUi(
   render();
 
   return {
-    capture(onRestart) {
+    capture(onRestart,delayed=false) {
       if (disposed || !capture.hidden) return;
       current = {...current,playing:false}; restartAction = onRestart;
-      capture.hidden = false; restart.hidden = !onRestart; render();
-      if(onRestart) restart.focus({preventScroll:true});
+      capture.hidden = false; restart.hidden = !onRestart; restart.disabled=delayed;captureSkip.hidden=!delayed;capture.dataset.phase=delayed?'scare':'retry'; render();
+      if(onRestart&&!delayed) restart.focus({preventScroll:true});
     },
+    captureReady(){if(disposed||capture.hidden)return;restart.disabled=false;captureSkip.hidden=true;capture.dataset.phase='retry';if(restartAction)restart.focus({preventScroll:true});},
     update(state, deltaSeconds) {
       if (disposed) return;
       current = state;
@@ -131,10 +135,10 @@ export function createOpeningUi(
       }
       render();
     },
-    notify(text) {
+    notify(text,seconds=3.2) {
       if (disposed) return;
       notificationText = text;
-      notificationRemaining = 3.2;
+      notificationRemaining = Math.max(1,Math.min(12,seconds));
       render();
     },
     subtitle(value) {

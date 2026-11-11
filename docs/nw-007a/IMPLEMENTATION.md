@@ -46,20 +46,12 @@ Existing `preloadOne`, `preloadAll`, `takePreloaded`, `clearPreloaded` and `prel
 
 `checkingPanel` currently requests the existing `observe` visual state. No bespoke clipboard, paperwork or call-panel clip is claimed. A future optional animation adapter should preserve ownership of navigation/capture/progression and fall back to existing locomotion/observation; exact new cues, phase IDs and animation completion policy follow the shared contract; exact new animation clips await actual asset manifests. This documents the existing boundary, not a newly agreed NW-007 animation contract.
 
-## Remaining NW-007 work
+## Cinematic/director implementation
 
-At the Phase 1 verification point, the following are not yet complete: quiet-opening redesign, Narrative Director, Experience Coordinator, shared six-scene progression, new awakening/walking presentation, Nurse-specific capture presentation, and their new browser acceptance suite. The existing Encounter Director and cinematic transport are preserved for extension under the supplied Revision 1 contract. Existing voice recordings remain temporary; no Claude animation names/paths have been invented.
+The six-scene implementation now follows the supplied Revision 1 contract. [DIRECTORS.md](DIRECTORS.md) documents actual scene triggers, ownership, cancellation, checkpoint migration, animation metadata/hooks, movement and capture behavior. The old early corridor sighting is removed; the same physical Nurse is activated at an unseen point only after the register discovery. The existing Encounter Director and autonomous AI are preserved.
 
-A future director diagram and animation-hook contract will document the final agreed implementation. The current baseline sequence remains:
+The stationary-reader browser test exposed a real authored-work-stance obstruction. The director now uses a nearby clear observation stance after a narrowly bounded physical stall, without teleporting or disabling collision; optional contact animation is gated by `contactReady`. A real-geometry unit test protects that case. Entering a hiding spot while witnessed remains dangerous; that legitimate capture behavior was retained rather than weakened to satisfy a bot route.
 
-```mermaid
-stateDiagram-v2
-    [*] --> waiting
-    waiting --> introduction: opening eligibility + semantic observation
-    introduction --> tension: navigated entrance + panel action
-    tension --> stealth: safe learning opportunity
-    stealth --> escape: player crosses authored exit
-    escape --> complete: settle pursuit + save milestone
-```
+New camera/movement/capture features use the existing camera transport, input lease, settings and mixer. No extra renderer, loop or AudioContext is created. GPU textures and shared ImageBitmap backing stores are released by their asset owner; existing skeleton disposal remains in use.
 
-This diagram documents the preserved NW-006B behavior, not the pending six-scene NW-007 design.
+Final public-game QA is in progress. Overall NW-007 acceptance still requires the specified independent human playtest. Bespoke NW-007B hand/panel/record/capture clips and final voice performances are pending; current animation states and the two explicitly temporary recordings remain operational fallbacks. No new asset path or clip name was invented.

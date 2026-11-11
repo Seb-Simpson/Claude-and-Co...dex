@@ -4,7 +4,7 @@ import { createDialoguePlayer } from '../chapter/dialogue';
 import type { DialogueCue, DialoguePlayback, DialogueSubtitle, DialogueVoice } from '../chapter/dialogue';
 
 export type OpeningVoiceId = 'nw005.voice.shaw.return-to-bed' | 'nw005.voice.shaw.not-authorised';
-export type OpeningSoundId = 'locked' | 'pickup' | 'denied' | 'accepted' | 'footsteps' | 'wake';
+export type OpeningSoundId = 'locked' | 'pickup' | 'denied' | 'accepted' | 'footsteps' | 'wake' | 'step' | 'capture' | 'call';
 
 function temporary(id: OpeningVoiceId, text: string, durationSeconds: number, assetUrl: string): DialogueCue {
   return { id, speaker: 'Nurse Shaw · intercom', text, durationSeconds, assetUrl,
@@ -26,7 +26,7 @@ export interface OpeningAudio {
   readonly idle: boolean;
   /** Serial speech channel: a quick unlock cannot interrupt the first line. */
   queue(id: OpeningVoiceId): void;
-  effect(id: OpeningSoundId): void;
+  effect(id: OpeningSoundId,strength?:number): void;
   /** Called by the existing host loop only. Never creates timers/listeners/another AudioContext. */
   update(deltaSeconds: number): void;
   pause(): void;
@@ -162,9 +162,9 @@ export async function createOpeningAudio(
   }
   function stopEffects(): void { for (const stop of [...effects]) stop(); }
 
-  function effect(id: OpeningSoundId): void {
+  function effect(id: OpeningSoundId,strength=1): void {
     const context = audio.context;
-    if (disposed || paused || !context || context.state !== 'running') return;
+    if (disposed || (paused&&id!=='capture') || !context || context.state !== 'running') return;
     // Even very fast repeated reader use has a fixed bound on live voices/nodes.
     const now = context.currentTime;
     function tone(frequency: number, delay: number, duration: number, level: number, noisy = false): void {
@@ -188,7 +188,7 @@ export async function createOpeningAudio(
       const start = now + delay;
       gain.gain.setValueAtTime(0, now);
       gain.gain.setValueAtTime(0, start);
-      gain.gain.linearRampToValueAtTime(level, start + 0.008);
+      gain.gain.linearRampToValueAtTime(level*Math.min(1,Math.max(0,strength)), start + 0.008);
       gain.gain.exponentialRampToValueAtTime(0.0001, start + duration);
       let done = false;
       const stop = (): void => {
@@ -205,6 +205,9 @@ export async function createOpeningAudio(
     else if (id === 'denied') { tone(175, 0, 0.12, 0.035); tone(145, 0.13, 0.12, 0.03); }
     else if (id === 'accepted') { tone(740, 0, 0.12, 0.035); tone(980, 0.14, 0.14, 0.03); tone(90, 0.3, 0.09, 0.045, true); }
     else if (id === 'footsteps') for (let i = 0; i < 4; i++) tone(75, i * 0.85, 0.16, 0.022 + i * 0.002, true);
+    else if (id === 'step') tone(95,0,.11,.013,true);
+    else if (id === 'call') {tone(630,0,.13,.014);tone(520,.18,.18,.010);}
+    else if (id === 'capture') {tone(80,0,.42,.028,true);tone(65,.14,.5,.022);}
     else if (id === 'wake') { tone(560, 0.3, 0.09, 0.009); tone(560, 1.4, 0.09, 0.009); tone(90, 0, 2, 0.005, true); }
   }
   return {

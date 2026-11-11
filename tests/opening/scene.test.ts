@@ -1,3 +1,4 @@
+import {canStageUnseen} from '../../src/gameplay/encounters/staging';
 import { describe, expect, it, vi } from 'vitest';
 import { BoxGeometry, Group, Mesh, MeshStandardMaterial, Object3D, PerspectiveCamera, Vector3 } from 'three';
 import type { HospitalWorld } from '../../src/contracts';
@@ -36,57 +37,32 @@ function fixture() {
 }
 
 describe('opening scene presentation', () => {
-  it('stages the existing nurse before corridor entry; requires proximity, FOV, LOS and unlock for the sighting', async () => {
-    const f = fixture();
-    const scene = await createOpeningScene(f.world, f.bindings, { hasLineOfSight: f.hasLineOfSight }, { loadNurse: async () => f.nurse });
-    expect(f.nurse.object.visible).toBe(true);
-    expect(f.nurse.object.position.toArray()).toEqual([0, 0, -10]);
-    expect(scene.update(0.1, { x: 0, y: 0, z: 0 }, f.camera, false).sawNurse).toBe(false);
-    expect(scene.update(0.1, { x: 0, y: 0, z: 4 }, f.camera, true).sawNurse).toBe(false);
+  it('keeps the corridor empty for slow exploration regardless of unlock, view or proximity', async () => {
+    const f=fixture(),scene=await createOpeningScene(f.world,f.bindings,{hasLineOfSight:f.hasLineOfSight},{loadNurse:async()=>f.nurse});
+    for(let i=0;i<600;i++)expect(scene.update(.1,{x:0,y:0,z:0},f.camera,true)).toEqual({sawNurse:false,atStation:false});
+    expect(f.nurse.object.visible).toBe(false);scene.dispose();
+  });
+  it('shows one directed actor continuously rather than retiring it when the player looks away', async () => {
+    const f=fixture(),scene=await createOpeningScene(f.world,f.bindings,{hasLineOfSight:f.hasLineOfSight},{loadNurse:async()=>f.nurse});
+    const actor={id:'shaw',type:'nurse' as const,position:{x:0,y:0,z:-10},state:'idle' as const,lastKnownPlayer:null};
+    scene.directNurse({actor,deltaSeconds:.1,yaw:0,speed:0,checkingPanel:true,visible:true});
+    expect(scene.update(.1,{x:0,y:0,z:0},f.camera,true).sawNurse).toBe(true);
+    f.camera.rotation.y=Math.PI;f.camera.updateMatrixWorld(true);
+    scene.update(.1,{x:0,y:0,z:0},f.camera,true);expect(f.nurse.object.visible).toBe(true);
+    expect(f.nurse.forceState).toHaveBeenCalledWith('observe');scene.dispose();
+  });
+  it('refuses staging a partly visible silhouette at an occluded doorway corner', () => {
+    const f=fixture();f.hasLineOfSight.mockImplementation((_eye,point)=>point.y>1.5);
+    expect(canStageUnseen(f.camera,{hasLineOfSight:f.hasLineOfSight},{x:0,y:0,z:-10})).toBe(false);
     f.hasLineOfSight.mockReturnValue(false);
-    expect(scene.update(0.1, { x: 0, y: 0, z: 0 }, f.camera, true).sawNurse).toBe(false);
-    f.hasLineOfSight.mockReturnValue(true);
-    f.camera.rotation.y = Math.PI; f.camera.updateMatrixWorld(true);
-    expect(scene.update(0.1, { x: 0, y: 0, z: 0 }, f.camera, true).sawNurse).toBe(false);
-    f.camera.rotation.y = 0; f.camera.updateMatrixWorld(true);
-    expect(scene.update(0.1, { x: 0, y: 0, z: 0 }, f.camera, true).sawNurse).toBe(true);
-    expect(scene.update(0.1, { x: 0, y: 0, z: 0 }, f.camera, true).sawNurse).toBe(false);
-    scene.dispose();
+    expect(canStageUnseen(f.camera,{hasLineOfSight:f.hasLineOfSight},{x:0,y:0,z:-10})).toBe(true);
+    expect(canStageUnseen(f.camera,{hasLineOfSight:f.hasLineOfSight},{x:0,y:0,z:-1})).toBe(false);
   });
-
-  it('never removes the nurse while observed; retires the brief sighting only after looking away', async () => {
-    const f = fixture();
-    const scene = await createOpeningScene(f.world, f.bindings, { hasLineOfSight: f.hasLineOfSight }, { loadNurse: async () => f.nurse });
-    for (let i = 0; i < 30; i++) scene.update(0.1, { x: 0, y: 0, z: 0 }, f.camera, true);
-    expect(f.nurse.object.visible).toBe(true);
-    f.camera.rotation.y = Math.PI; f.camera.updateMatrixWorld(true);
-    scene.update(0.1, { x: 0, y: 0, z: 0 }, f.camera, true);
-    expect(f.nurse.object.visible).toBe(false);
-    scene.dispose();
-  });
-
-  it('keeps a partly visible silhouette at a doorway corner even when its centre is occluded', async () => {
-    const f = fixture();
-    const scene = await createOpeningScene(f.world, f.bindings, { hasLineOfSight: f.hasLineOfSight }, { loadNurse: async () => f.nurse });
-    for (let i = 0; i < 20; i++) scene.update(0.1, { x: 0, y: 0, z: 0 }, f.camera, true);
-    f.hasLineOfSight.mockImplementation((_eye, point) => point.y > 1.5);
-    scene.update(0.1, { x: 0, y: 0, z: 0 }, f.camera, true);
-    expect(f.nurse.object.visible).toBe(true);
-    f.hasLineOfSight.mockReturnValue(false);
-    scene.update(0.1, { x: 0, y: 0, z: 0 }, f.camera, true);
-    expect(f.nurse.object.visible).toBe(false);
-    scene.dispose();
-  });
-
-  it('allows the station handoff even when the player misses the nurse and restores one-shot state', async () => {
-    const f = fixture();
-    const scene = await createOpeningScene(f.world, f.bindings, { hasLineOfSight: f.hasLineOfSight }, { loadNurse: async () => f.nurse });
-    expect(scene.update(0.1, { x: 0, y: 0, z: -7 }, f.camera, false).atStation).toBe(false);
-    expect(scene.update(0.1, { x: 0, y: 0, z: -7 }, f.camera, true).atStation).toBe(true);
-    scene.restore({ sightingSeen: true, stationReached: false });
-    expect(f.nurse.object.visible).toBe(false);
-    expect(scene.update(0.1, { x: 0, y: 0, z: 0 }, f.camera, true).sawNurse).toBe(false);
-    scene.dispose();
+  it('does not complete a story merely from station proximity and restores one-shot presentation flags', async () => {
+    const f=fixture(),scene=await createOpeningScene(f.world,f.bindings,{hasLineOfSight:f.hasLineOfSight},{loadNurse:async()=>f.nurse});
+    expect(scene.update(.1,{x:0,y:0,z:-7},f.camera,true).atStation).toBe(false);
+    scene.restore({sightingSeen:true,stationReached:true});
+    expect(f.nurse.object.visible).toBe(false);scene.dispose();
   });
 
   it('hides the physical card and restores all owned resources exactly once', async () => {

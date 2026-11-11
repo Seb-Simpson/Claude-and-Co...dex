@@ -1,3 +1,4 @@
+import {disposeOwnedTextures} from '../../../assets/disposeTextures';
 import {readAssetBytes} from '../../../assets/preload';
 import type { AnimationClip, Group, Material, Mesh, Texture } from 'three';
 import { GLTFLoader, type GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js';
@@ -79,7 +80,7 @@ export function disposeScene(scene: Group): void {
     for (const value of Object.values(m)) if (value && (value as Texture).isTexture) textures.add(value as Texture);
     m.dispose();
   }
-  for (const t of textures) t.dispose();
+  disposeOwnedTextures(textures);
 }
 
 /**

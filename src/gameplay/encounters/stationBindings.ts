@@ -1,5 +1,6 @@
 import { Euler, Quaternion, Vector3 } from 'three';
 import type { Bounds3, HospitalWorld, Vec3 } from '../../contracts';
+import {getHospitalExtras} from '../../world/extras';
 import { getNursesStationStealth } from '../../world/stealth/nursesStation';
 
 /** Small integration adapter over Claude's published contract; no duplicated hospital coordinates. */
@@ -36,9 +37,10 @@ export function resolveStationBindings(world: HospitalWorld) {
   const length = Math.hypot(axis.x,axis.z); axis.x/=length;axis.z/=length;
   const progress = (p: Vec3) => (p.x-observation.x)*axis.x+(p.z-observation.z)*axis.z;
   return {
+    lightingTarget:getHospitalExtras(world)?.fixtures.find(f=>f.roomId===spawn.roomId)?.id,
     ...data, observation, exit, checkingYaw, entry:point(data.entry.node), crouchCover:point(data.crouchCover.node),
     concealment:point(data.concealment.node), patrol, spawn, route, axis, progress,
-    initial:point('nw:opening:nurse-first-sight'),
+    initial:{...(patrol[5] ?? spawn.position)},
     initialYaw:new Euler().setFromQuaternion(world.root.getObjectByName('nw:opening:nurse-first-sight')!.getWorldQuaternion(new Quaternion()),'YXZ').y,
     /** Union of authored rooms and the corridor encounter leg, not a player movement barrier. */
     contains(p: Vec3) {

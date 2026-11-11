@@ -1,0 +1,47 @@
+import {test,expect} from '@playwright/test';
+import type {Application} from '../../src/integration/application';
+const snap=(page:import('@playwright/test').Page)=>page.evaluate(()=>window.nightWardTest!.snapshot());
+test.use({launchOptions:{...(process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE?{executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE}:{}),args:['--no-sandbox','--enable-webgl','--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']}});
+test('production discovery fixture: empty corridor, physical record range, clue-gated unseen entrance and pause ownership',async({page},info)=>{
+ test.setTimeout(360_000);
+ await page.addInitScript(()=>{
+  localStorage.setItem('night-ward:settings:v1',JSON.stringify({quality:'low',motion:'reduce',subtitles:true}));
+  localStorage.setItem('night-ward:save:v1',JSON.stringify({version:1,checkpoint:'nw:checkpoint:room104-exit',label:'Ward 104',playSeconds:20,savedAt:1,sessions:1,
+   opening:{version:1,milestone:'room104-exit',state:{version:1,awakened:true,cardAcquired:true,doorUnlocked:true,firstLinePlayed:true,secondLinePlayed:true,room106Tried:false,sightingSeen:false,stationReached:false}}}));
+ });
+ const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
+ await page.goto('/?test=1&menu=1');await page.getByRole('button',{name:/^Continue/}).click();
+ await expect.poll(async()=>(await snap(page)).state,{timeout:150_000}).toBe('ready');
+ if(process.env.NW005_SOFTWARE_SCALE==='1')await page.evaluate(()=>(window.nightWardTest as Application).services()!.renderer.setPixelRatio(.25));
+ await page.getByRole('button',{name:'Enter ward',exact:true}).click();await expect.poll(async()=>(await snap(page)).state).toBe('playing');
+ const locations=(await snap(page)).station!.locations;expect(locations.recordStand).toBeDefined();expect(locations.record).toBeDefined();
+ const before=await snap(page);expect(before.station!.active).toBe(false);
+ await page.evaluate(p=>window.nightWardTest!.teleport(p),locations.observation);
+ await page.evaluate(p=>window.nightWardTest!.aimAt(p),locations.record!);
+ const farTime=(await snap(page)).performance.simulatedSeconds;
+ await page.keyboard.press('e');
+ await expect.poll(async()=>(await snap(page)).performance.simulatedSeconds,{timeout:60_000}).toBeGreaterThan(farTime+.3);
+ expect((await snap(page)).station!.active).toBe(false);
+ await expect.poll(async()=>(await snap(page)).opening!.narrative?.scene).toBe('empty-corridor');
+ expect((await snap(page)).prompt?.targetId).not.toBe('nw:opening:station-record');
+ expect(await page.evaluate(()=>(window.nightWardTest as Application).services()!.scene.getObjectByName('nw:opening:nurse-sighting')!.visible)).toBe(false);
+ const placed=await page.evaluate(p=>window.nightWardTest!.teleport(p),locations.recordStand!);expect(placed).toBe(true);
+ await page.evaluate(p=>window.nightWardTest!.aimAt(p),locations.record!);
+ await expect.poll(async()=>(await snap(page)).opening!.narrative?.scene).toBe('station-discovery');
+ await expect(page.locator('.nw-opening-ui__prompt')).toContainText('night register',{timeout:50_000});
+ const t=(await snap(page)).performance.simulatedSeconds;
+ await expect.poll(async()=>(await snap(page)).performance.simulatedSeconds,{timeout:60_000}).toBeGreaterThan(t+.7);
+ await page.keyboard.press('e');await expect(page.locator('.nw-opening-ui__notification')).toContainText('1998');
+ await expect.poll(async()=>(await snap(page)).station!.phase,{timeout:60_000}).toBe('introduction');
+ const introduction=await snap(page);expect(introduction.station!.canCapture).toBe(false);expect(introduction.station!.actor.lastKnownPlayer).toBeNull();
+ expect(introduction.opening!.narrative?.checkpoint.step).toBe(4);
+ expect(introduction.opening!.narrative?.owners).toEqual([{owner:'encounter:shaw',resources:['nurse','dialogue']}]);
+ await page.screenshot({path:info.outputPath('01-night-register.png')});
+ await page.evaluate(()=>document.exitPointerLock());await expect.poll(async()=>(await snap(page)).state).toBe('paused');
+ const paused=(await snap(page)).station;await page.waitForTimeout(500);expect((await snap(page)).station).toEqual(paused);
+ await page.getByRole('button',{name:/^Resume/}).click();await expect.poll(async()=>(await snap(page)).state).toBe('playing');
+ const start=(await snap(page)).station!.actor.position;
+ await expect.poll(async()=>{const p=(await snap(page)).station!.actor.position;return Math.hypot(p.x-start.x,p.z-start.z)},{timeout:90_000}).toBeGreaterThan(.4);
+ expect((await snap(page)).player!.captured).toBe(false);expect(errors).toEqual([]);
+ await info.attach('discovery.json',{body:JSON.stringify({before,introduction,after:await snap(page),errors},null,2),contentType:'application/json'});
+});

@@ -1,3 +1,4 @@
+import {disposeOwnedTextures} from '../../assets/disposeTextures';
 import {
   type Group, type Material, type Mesh, type MeshStandardMaterial, NoColorSpace, type Object3D, type Texture, TextureLoader,
 } from 'three';
@@ -196,7 +197,7 @@ export async function loadRoom104Set(options: LoadRoom104Options = {}): Promise<
         o.traverse((c) => { const mesh = c as Mesh; if (mesh.isMesh) mesh.geometry.dispose(); });
       }
       for (const m of materials) m.dispose();
-      for (const t of textures) t.dispose();
+      disposeOwnedTextures(textures);
     },
   };
 }

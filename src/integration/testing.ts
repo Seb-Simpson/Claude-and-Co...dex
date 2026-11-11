@@ -18,7 +18,7 @@ export interface ApplicationSnapshot {
   doorStates: Record<string, DoorState>;
   prompt: InteractionPrompt | null;
   error: string | null;
-  opening?: { phase: import('../gameplay/opening/onboarding').OnboardingPhase; state: OpeningState; cinematic: boolean;
+  opening?: { narrative?:{scene:import('../gameplay/directors/narrative').OpeningSceneId;checkpoint:import('../gameplay/directors/narrative').NarrativeCheckpoint;owners:ReturnType<import('../gameplay/directors/experience').ExperienceCoordinator['snapshot']>}; phase: import('../gameplay/opening/onboarding').OnboardingPhase; state: OpeningState; cinematic: boolean;
     camera: Vec3;
     anchors: Readonly<Record<string, { position: Vec3; stand?: Vec3; target?: Vec3 }>> };
   performance: {

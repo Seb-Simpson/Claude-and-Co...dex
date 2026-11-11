@@ -2,7 +2,7 @@
 
 ## Scope
 
-**Phase 1 verified; remaining NW-007 implementation in progress.** The authoritative Shared Design Contract Revision 1 has now been supplied. The six-scene/director/presentation work will continue on this same branch after the verified restart fix; no Claude assets are required to begin that work.
+**Core NW-007A systems are implemented; final revised-route verification is in progress.** The authoritative Shared Design Contract Revision 1 is supplied and implemented. Phase 1 was fixed, verified and committed before the cinematic expansion. The final results below distinguish those baseline proofs from verification of the redesigned sequence.
 
 Baseline: `0097264bf07a21b22ca7b5b1ac14ddaff951a046` (PR #21, containing PRs #19/#20). Branch: `feat/nw-007a-cinematic-gameplay`. Draft targets `feat/nw-006b-nurse-stealth`. No merge and no PR #15 integration.
 
@@ -44,7 +44,7 @@ Ready-state snapshots can precede the next rendered world frame (some therefore 
 
 ## Limitations
 
-- Remaining NW-007 phases are in progress using the now-supplied shared contract. Quiet opening, six new scenes, Narrative Director/Experience Coordinator, new awakening/head-bob and new capture scare/UI are not claimed.
+- Quiet exploration, clue-gated six-scene progression, directors/coordinator, eased awakening, reduced-motion walking and captured presentation are now implemented; revised browser acceptance is in progress. See DIRECTORS.md for exact behavior.
 - Existing Room 104 voice assets are temporary. No new animation/audio asset path or clip name was invented.
 - Chromium uses ANGLE SwiftShader; there is no real GPU (`/dev/dri` unavailable). Most functional routes reduce only renderer pixel ratio to 0.25 via the QA bridge; game input, fixed-step simulation, physics, navigation and AI clocks remain real. Real-GPU performance and the historic laptop lag report remain unverified.
 - No independent human playtest has occurred. Browser recordings, when present, are silent automation evidence.
@@ -56,3 +56,11 @@ Ready-state snapshots can precede the next rendered world frame (some therefore 
 See [PLAY.md](PLAY.md). Use the normal root route, New Game/Continue, Enter ward; no harness required.
 
 Continue this same branch/PR under Shared Design Contract Revision 1; extend the existing Encounter Director/cinematic transport using its agreed scenes and ownership. Claude's pending assets should be bound through documented optional semantic hooks once their actual names and manifests exist. Do not merge automatically.
+
+## Revised sequence QA (in progress)
+
+- Current full suite before the final clearance case: **581 unit tests passed, 1 existing optional test skipped**; typecheck and production build passed. Subsequent real-geometry work-stance regression: **16 station tests passed**. Awakening clearance against actual hospital colliders: **1 passed**. Final combined counts will be recorded after verification.
+- New production discovery fixture: **passed (31 seconds)**. It verifies quiet exploration, real range/LOS, readable register, clue-gated unseen entrance, owned channels, pause/resume and physical movement. This fixture uses diagnostic placement explicitly; it is separate from the input-only walkthrough.
+- The first revised input-only run exposed a real obstruction: the stationary reader blocked the preferred panel stance. The run was interrupted; it does not count as passed. The actual director now supports a nearby clear noncontact inspection stance, protected by a real-physics regression.
+- A later bot run hid under the 105 bed while visibly followed and was captured with `lastKnownPlayer.source='witnessed-hiding'`. This is expected gameplay, not an omniscience fix. The walkthrough now verifies recovery from that witnessed mistake, while a separate unseen-entry case verifies fair concealment.
+- Final full route, five retries with the new capture flow, unseen hiding and retained browser regressions are running. No independent human playtest or hardware-GPU measurement is claimed.

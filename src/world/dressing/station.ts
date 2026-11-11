@@ -1,3 +1,4 @@
+import {disposeOwnedTextures} from '../../assets/disposeTextures';
 import { type Group, type Material, type Mesh, type MeshStandardMaterial, type Object3D, type Texture } from 'three';
 import { type GLTF, GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { type PreloadEntry, readAssetBytes } from '../../assets/preload';
@@ -97,7 +98,7 @@ export async function loadStationSet(options: LoadStationSetOptions = {}): Promi
       root.removeFromParent();
       root.traverse((c) => { const mesh = c as Mesh; if (mesh.isMesh) mesh.geometry.dispose(); });
       for (const m of materials) m.dispose();
-      for (const t of textures) t.dispose();
+      disposeOwnedTextures(textures);
     },
   };
 }

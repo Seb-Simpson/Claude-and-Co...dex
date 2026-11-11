@@ -125,6 +125,20 @@ test('five real Nurse captures and UI retries preserve canonical assets, saved c
  expect(fresh.opening!.state.cardAcquired).toBe(false);expect(fresh.opening!.state.doorUnlocked).toBe(false);
  expect(freshView[2]!.visible).toBe(true);expect(freshView.every(n=>n.count===1)).toBe(true);
  expect(fresh.station!.phase).toBe('waiting');expect(fresh.entities).toEqual([]);
+ await page.getByRole('button',{name:'Enter ward',exact:true}).click();
+ await expect.poll(async()=>(await snap(page)).state,wait).toBe('playing');
+ await expect(page.locator('.nw-opening-ui__skip')).toBeVisible(wait);await page.keyboard.press('Space');
+ await expect.poll(async()=>(await snap(page)).opening!.state.awakened,wait).toBe(true);
+ const frame=(await snap(page)).frameCount;await expect.poll(async()=>(await snap(page)).frameCount,wait).toBeGreaterThan(frame+1);
+ await page.screenshot({path:info.outputPath('03-room104-after-five-retries.png')});
+ // A visible prop alone is insufficient: the reset card must remain usable through real input.
+ await page.keyboard.up('w');const neutral=(await snap(page)).performance.simulatedSeconds;
+ await expect.poll(async()=>(await snap(page)).performance.simulatedSeconds,wait).toBeGreaterThan(neutral+.5);
+ const card=(await snap(page)).opening!.anchors['access-card']!;
+ await walk(page,card.stand!);await page.keyboard.press('c');
+ await expect.poll(async()=>(await snap(page)).player!.crouching,wait).toBe(true);
+ await look(page,card.position);await expect(page.locator('.nw-opening-ui__prompt')).toContainText('Take',wait);
+ await page.keyboard.press('e');await expect.poll(async()=>(await snap(page)).opening!.state.cardAcquired,wait).toBe(true);
  expect(errors).toEqual([]);expect(blocked).toBe(0);
  await writeFile(info.outputPath('five-retries.json'),JSON.stringify({baseline,initial,attempts,fresh,freshView,blocked,errors},null,2));
 });
