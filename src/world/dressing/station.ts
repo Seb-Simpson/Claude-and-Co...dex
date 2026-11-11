@@ -1,6 +1,6 @@
 import { type Group, type Material, type Mesh, type MeshStandardMaterial, type Object3D, type Texture } from 'three';
 import { type GLTF, GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import { type PreloadEntry, takePreloaded } from '../../assets/preload';
+import { type PreloadEntry, readAssetBytes } from '../../assets/preload';
 import stationManifest from './assets/station_set.json';
 
 /**
@@ -36,8 +36,7 @@ export interface LoadStationSetOptions {
 export async function loadStationSet(options: LoadStationSetOptions = {}): Promise<StationSet> {
   const url = options.url ?? STATION_SET_URL;
   const load = options.loadGltf ?? ((u: string) => {
-    const buffer = takePreloaded(u);
-    return buffer ? new GLTFLoader().parseAsync(buffer, '') : new GLTFLoader().loadAsync(u);
+    return readAssetBytes(u).then(buffer=>new GLTFLoader().parseAsync(buffer, ''));
   });
   const timeout = options.timeoutMs ?? 20000;
   const gltf = await new Promise<GLTF>((resolve, reject) => {

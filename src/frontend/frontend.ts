@@ -1,3 +1,4 @@
+import {clearPreloaded} from '../assets/preload';
 import { outputLevel } from '../audio/mixer';
 import { SUBTITLE_EVENT, type SubtitleLine } from '../audio/subtitles';
 import type { Application, ApplicationProgress } from '../integration/application';
@@ -345,6 +346,7 @@ export function createFrontend(options: FrontendOptions): Frontend {
     dispose() {
       if (disposed) return;
       disposed = true;
+      clearPreloaded();
       unsubscribePlan?.();
       unsubscribeSettings();
       motionQuery?.removeEventListener?.('change', onMotion);
