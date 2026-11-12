@@ -5,13 +5,15 @@ import { clone as cloneSkinned } from 'three/examples/jsm/utils/SkeletonUtils.js
 import type { EntityBehaviourState } from '../../../contracts';
 import { type FootstepEvent, resolveVisualState, type VisualState } from '../animator';
 import type { JointName } from '../rig';
-import type { BodiedEntityType, EntityVisual, EntityVisualInput } from '../visual';
+import { NURSE_CLIPS } from '../nurseClips';
+import type { BodiedEntityType, EntityVisual, EntityVisualInput, PlayClipOptions } from '../visual';
 import type { ClipManifest, LoadedModel } from './library';
 
 /** Which clip plays for each presentation state, per entity. */
 export const CLIP_FOR_STATE: Readonly<Record<BodiedEntityType, Readonly<Record<VisualState, string>>>> = {
   patient: { idle: 'idle', walk: 'walk', alert: 'alert', run: 'run', search: 'search', observe: 'observe', lost: 'lost', listen: 'alert', stand: 'idle' },
-  nurse: { idle: 'idle', walk: 'walk', alert: 'alert', run: 'run', search: 'search', observe: 'listen', lost: 'search', listen: 'listen', stand: 'idle' },
+  // NW-007B: searching reads as a careful investigation (falls back to the old 'search' clip on older GLBs).
+  nurse: { idle: 'idle', walk: 'walk', alert: 'alert', run: 'run', search: 'investigate', observe: 'listen', lost: 'investigate', listen: 'listen', stand: 'idle' },
   crawler: { idle: 'idle', walk: 'walk', alert: 'alert', run: 'run', search: 'search', observe: 'idle', lost: 'search', listen: 'alert', stand: 'idle' },
   watcher: { idle: 'pose0', walk: 'walk', alert: 'pose0', run: 'walk', search: 'pose0', observe: 'pose0', lost: 'pose0', listen: 'pose0', stand: 'pose0' },
 };
@@ -88,6 +90,8 @@ export function createModelVisual(type: BodiedEntityType, model: LoadedModel, op
   const lunge = options.lunge ?? (type === 'patient' ? 0.55 : type === 'crawler' ? 0.35 : 0.2);
 
   let current: { state: VisualState; clip: ClipState } | null = null;
+  /** NW-007B: an authored clip that overrides state-driven playback until cleared. */
+  let authored: ClipState | null = null;
   let forced: VisualState | null = null;
   let behaviour: EntityBehaviourState | null = null;
   let behaviourTime = 0;
@@ -103,9 +107,18 @@ export function createModelVisual(type: BodiedEntityType, model: LoadedModel, op
     return type === 'watcher' && name === 'pose0' ? `pose${variant}` : name;
   };
 
+  /** A clip by name, else its documented fallback (nurseClips.ts), else the older clip for that state. */
+  const resolveClip = (name: string): ClipState | undefined => {
+    const direct = clips.get(name);
+    if (direct) return direct;
+    if (name === 'investigate') return clips.get('search');
+    const spec = type === 'nurse' ? NURSE_CLIPS.find((c) => c.name === name) : undefined;
+    return spec ? clips.get(CLIP_FOR_STATE[type][spec.fallback]) : undefined;
+  };
+
   const play = (state: VisualState): void => {
     const name = clipName(state);
-    const next = clips.get(name) ?? clips.get(CLIP_FOR_STATE[type].idle) ?? [...clips.values()][0];
+    const next = resolveClip(name) ?? clips.get(CLIP_FOR_STATE[type].idle) ?? [...clips.values()][0];
     if (!next || (current && current.clip === next)) {
       if (current) current.state = state;
       return;
@@ -149,7 +162,7 @@ export function createModelVisual(type: BodiedEntityType, model: LoadedModel, op
       const state = forced ?? resolveVisualState(type, input.behaviour, input.speed, {
         previous: current?.state ?? 'idle', behaviourTime, stillTime, nearDoor: input.nearDoor ?? false,
       });
-      play(state);
+      if (!authored) play(state);
       if (!current) return [];
       const active = current.clip;
       // Gait clips play at the rate that matches gameplay speed; the pursuit opens with a lunge.
@@ -176,6 +189,36 @@ export function createModelVisual(type: BodiedEntityType, model: LoadedModel, op
       }
       active.lastTime = t;
       return events;
+    },
+    playClip(name: string | null, options: PlayClipOptions = {}): boolean {
+      if (disposed) return false;
+      if (name === null) {
+        // Hand back to state-driven playback; the next update cross-fades from the authored clip.
+        authored = null;
+        return true;
+      }
+      const direct = clips.get(name);
+      const next = direct ?? resolveClip(name);
+      if (!next) return false;
+      if (authored === next && !options.restart) return direct !== undefined;
+      next.action.reset();
+      next.action.enabled = true;
+      next.action.setEffectiveWeight(1);
+      next.action.setEffectiveTimeScale(1);
+      next.action.time = 0;
+      next.lastTime = 0;
+      next.action.play();
+      const fade = options.fade ?? 0.45;
+      if (current && current.clip !== next && fade > 0) next.action.crossFadeFrom(current.clip.action, fade, true);
+      else if (current && current.clip !== next) current.clip.action.stop();
+      authored = next;
+      current = { state: current?.state ?? 'idle', clip: next };
+      return direct !== undefined;
+    },
+    get clip() {
+      if (!authored) return null;
+      const { manifest, action } = authored;
+      return { name: manifest.name, time: action.time, duration: manifest.duration, finished: !manifest.loop && action.time >= manifest.duration - 1e-3 };
     },
     forceState(state, nextVariant) {
       forced = state;

@@ -13,6 +13,7 @@ import { type AnimationProfile, blendPoses, type PoseContext, type PoseFn, type 
 import { CRAWLER_ANIMATION, CRAWLER_CONTACTS, CRAWLER_DIMS, crawlerParts } from '../crawler';
 import { CRAWLER_MATERIALS, createMaterialSet, NURSE_MATERIALS, PATIENT_MATERIALS, WATCHER_MATERIALS } from '../materials';
 import { NURSE_ANIMATION, NURSE_DIMS, nurseParts } from '../nurse';
+import { NURSE_CLIPS } from '../nurseClips';
 import { PATIENT_ANIMATION, PATIENT_DIMS, patientParts, TAU, wobble } from '../patient';
 import { type BodyDims, createRig, JOINTS, type Pose, type RigPart } from '../rig';
 import { WATCHER_ANIMATION, WATCHER_DIMS, WATCHER_POSES, watcherParts } from '../watcher';
@@ -31,6 +32,8 @@ interface ClipSpec {
   readonly cycles: number;
   readonly variant?: number;
   readonly timeScale?: number;
+  /** NW-007B: the clip's own pose function (overrides the state's). */
+  readonly pose?: PoseFn;
 }
 
 interface EntitySpec {
@@ -80,8 +83,11 @@ const ENTITIES: Record<string, EntitySpec> = {
   nurse: {
     profile: NURSE_ANIMATION, dims: NURSE_DIMS, parts: () => nurseParts(), materials: NURSE_MATERIALS,
     clips: [
-      timedClip('idle', 'idle', 8),
-      gaitClip('walk', 'walk', 1.05, 0.9, 2),
+      // NW-007B authored clips (idle and walk replace the old ones under the same names).
+      ...NURSE_CLIPS.map((c): ClipSpec => ({
+        name: c.name, state: c.gait ? (c.name === 'walk' ? 'walk' : 'search') : c.fallback, duration: c.duration, loop: c.loop,
+        speed: c.gait?.speed ?? 0, gait: c.gait ? 1 : 0, cycles: c.gait?.cycles ?? 0, pose: c.pose,
+      })),
       timedClip('listen', 'listen', 6),
       timedClip('alert', 'alert', 0.6, false),
       gaitClip('run', 'run', 2.0, 3.4, 2),
@@ -115,7 +121,7 @@ const ENTITIES: Record<string, EntitySpec> = {
 function sample(entity: EntitySpec, clip: ClipSpec) {
   const materials = createMaterialSet(entity.materials);
   const rig = createRig('sample', entity.dims, entity.parts(), materials.materials, entity === ENTITIES.crawler ? CRAWLER_CONTACTS : undefined);
-  const fn = entity.poses?.[clip.state] ?? entity.profile.poses[clip.state];
+  const fn = clip.pose ?? entity.poses?.[clip.state] ?? entity.profile.poses[clip.state];
   const frames = Math.max(2, Math.round(clip.duration * FPS) + (clip.loop ? 0 : 1));
   const ctx = (t: number): PoseContext => ({
     time: t, phase: clip.cycles > 0 ? ((t / clip.duration) * clip.cycles) % 1 : 0,
@@ -153,7 +159,8 @@ function sample(entity: EntitySpec, clip: ClipSpec) {
 
 it.skipIf(!process.env.NW_POSE_OUT)('samples entity animation clips for the Blender pipeline', () => {
   const result: Record<string, unknown> = { fps: FPS, joints: JOINTS, entities: {} };
-  for (const [name, entity] of Object.entries(ENTITIES)) {
+  // NW_POSE_ENTITY=nurse samples one entity only (rebuild just that model).
+  for (const [name, entity] of Object.entries(ENTITIES).filter(([n]) => !process.env.NW_POSE_ENTITY || n === process.env.NW_POSE_ENTITY)) {
     (result.entities as Record<string, unknown>)[name] = { clips: entity.clips.map((c) => sample(entity, c)) };
   }
   writeFileSync(process.env.NW_POSE_OUT!, JSON.stringify(result));

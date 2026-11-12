@@ -62,5 +62,15 @@
   "concealment105": {
     "pathFromObservation": 4.53,
     "routeSamplesSeeingOpenFloor": 14
+  },
+  "stationActions": {
+    "reach": {
+      "panel": 0.5707889277132137,
+      "records": 0.5099999999999998
+    }
+  },
+  "panelVsLocker": {
+    "lockerApproachAngleDeg": 136,
+    "halfFovDeg": 49.5
   }
 }

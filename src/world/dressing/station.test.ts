@@ -4,7 +4,7 @@ import { Box3, type Mesh, type MeshStandardMaterial, Vector3 } from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { beforeAll, describe, expect, it, vi } from 'vitest';
 import { createHospitalWorld } from '../createHospitalWorld';
-import { STATION_PROPS } from '../stealth/layout';
+import { STATION_INTERACTIONS, STATION_PROPS } from '../stealth/layout';
 import { PROTOTYPE_SUPPRESSION, STATION_REGIONS, STATION_SUPPRESSION } from './regions';
 import { loadStationSet, STATION_SET_NODES, STATION_SET_URL, type StationSet } from './station';
 import manifest from './assets/station_set.json';
@@ -29,12 +29,12 @@ const boxOf = (p: { centre: { x: number; y: number; z: number }; size: { x: numb
   new Box3(new Vector3(p.centre.x - p.size.x / 2, p.centre.y - p.size.y / 2, p.centre.z - p.size.z / 2), new Vector3(p.centre.x + p.size.x / 2, p.centre.y + p.size.y / 2, p.centre.z + p.size.z / 2));
 
 describe('Nurses’ Station set (Blender)', () => {
-  it('stays inside its budget: under 40k triangles, 2 MiB, three materials', () => {
+  it('stays inside its budget: under 40k triangles, 2 MiB, five materials', () => {
     expect(set.stats.triangles).toBeLessThan(40_000);
     expect(set.stats.triangles).toBe(manifest.triangles);
     expect(statSync(PATH).size).toBe(manifest.bytes);
     expect(manifest.bytes).toBeLessThan(2 * 1024 * 1024);
-    expect(set.stats.materials).toBe(3);
+    expect(set.stats.materials).toBe(5);
   });
 
   it('ships every named prop node', () => {
@@ -64,6 +64,20 @@ describe('Nurses’ Station set (Blender)', () => {
     expect(art.max.y).toBeLessThan(STATION_PROPS.trolley.size.y + 0.015);
     expect(art.max.y).toBeGreaterThan(STATION_PROPS.trolley.size.y - 0.02);
     expect(art.min.y).toBeGreaterThanOrEqual(-0.001);
+  });
+
+  it('puts the lit Room 104 lamp, the console display and the record where the staging bindings say', () => {
+    const near = (name: string, p: { x: number; y: number; z: number }, tol: number) => {
+      const c = bounds(name).getCenter(new Vector3());
+      expect(Math.hypot(c.x - p.x, c.y - p.y, c.z - p.z), name).toBeLessThan(tol);
+    };
+    near('station_call_led', STATION_INTERACTIONS.panel.lookAt, 0.02);
+    near('station_call_lcd', STATION_INTERACTIONS.panel.target, 0.06);
+    // The printed record cover lies on the record target (the print node also holds the faceplate,
+    // so check that its bounds include both).
+    const print = bounds('station_print').expandByScalar(0.01);
+    expect(print.containsPoint(new Vector3(STATION_INTERACTIONS.records.target.x, STATION_INTERACTIONS.records.target.y, STATION_INTERACTIONS.records.target.z))).toBe(true);
+    expect(print.containsPoint(new Vector3(STATION_INTERACTIONS.panel.lookAt.x, STATION_INTERACTIONS.panel.lookAt.y, -6.364))).toBe(true);
   });
 
   it('lights the Room 104 call lamp and keeps the contact shadows transparent', () => {

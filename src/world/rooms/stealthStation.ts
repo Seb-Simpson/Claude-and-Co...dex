@@ -1,6 +1,8 @@
+import { Matrix4, Vector3 } from 'three';
 import type { WorldBuilder } from '../core/builder';
+import { cylinder } from '../core/geometry';
 import { ROOMS } from '../layout';
-import { STATION_PROPS } from '../stealth/layout';
+import { STATION_PRACTICAL, STATION_PROPS } from '../stealth/layout';
 
 /**
  * NW-006A: colliders and procedural stand-ins for the Nurses' Station set.
@@ -45,4 +47,25 @@ function trolley(b: WorldBuilder): void {
   b.block('curtain', centre.x, 0.68, centre.z - size.z / 2 - 0.004, size.x + 0.01, 1.04, 0.008, 0, { tint: [0.6, 0.85, 0.85] });
   b.block('curtain', centre.x, size.y - 0.004, centre.z - 0.03, size.x + 0.01, 0.008, size.z - 0.06, 0, { tint: [0.6, 0.85, 0.85] });
   b.solid(centre.x, centre.y, centre.z, size.x, size.y, size.z, { roomId: ROOMS.corridor, kind: 'prop' });
+}
+
+/**
+ * NW-007B: a torch dropped on the floor in front of the staff lockers, still on. Its low, cool pool
+ * of light on the locker doors is what draws the eye to the hiding place: no marker, no prompt.
+ * Visual and light only (no collider: it is a 22 cm torch on the floor). Built LAST in the world,
+ * so its fixture takes the next lamp number and no existing fixture id or flicker seed changes.
+ */
+export function addStationPractical(b: WorldBuilder): void {
+  const { torch, light } = STATION_PRACTICAL;
+  const yaw = Math.atan2(torch.aim.x - torch.at.x, torch.aim.z - torch.at.z);
+  const along = new Matrix4().makeRotationY(yaw).multiply(new Matrix4().makeRotationX(Math.PI / 2));
+  const place = (offset: number): Matrix4 => new Matrix4().makeTranslation(torch.at.x + Math.sin(yaw) * offset, 0.022, torch.at.z + Math.cos(yaw) * offset).multiply(along);
+  b.add('rubber', cylinder(0.017, 0.017, 0.16, 10), place(-0.03), { tint: 0.6 });
+  b.add('chrome', cylinder(0.024, 0.019, 0.05, 12), place(0.07));
+  b.fixture({
+    kind: 'lamp', state: 'steady', roomId: ROOMS.nurses, circuits: ['nw:lights:station-torch'],
+    position: new Vector3(light.x, light.y, light.z), color: 0xdfe8ff, intensity: 0.9, distance: 2.6,
+    panel: { shape: 'small', matrix: new Matrix4().makeTranslation(torch.at.x + Math.sin(yaw) * 0.097, 0.024, torch.at.z + Math.cos(yaw) * 0.097).multiply(new Matrix4().makeScale(0.35, 0.35, 0.35)) },
+    halo: 0.22, haloOpacity: 0.22,
+  });
 }

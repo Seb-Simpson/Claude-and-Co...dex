@@ -2,7 +2,7 @@ import { Object3D } from 'three';
 import type { HospitalWorld, ObjectId, Vec3 } from '../../contracts';
 import type { WorldBuilder } from '../core/builder';
 import { ROOMS } from '../layout';
-import { STEALTH } from './layout';
+import { STATION_INTERACTIONS, STEALTH } from './layout';
 
 /**
  * NW-006A: stable scene bindings for the Nurses' Station stealth space.
@@ -66,6 +66,26 @@ export function addStealthMarkers(b: WorldBuilder): void {
   STEALTH.patrolWaypoints.forEach((p, i) => add(`patrol-${i}`, p, ROOMS.nurses, `Nurse patrol waypoint ${i} (route nw:route:station-round).`, { index: i }));
   add('concealment', STEALTH.concealment, ROOMS.r105, 'Room 105, beside bed B: slide under it (nw:hiding:room-105-bed-b) when she turns onto the corridor.', { hidingId: STEALTH.hidingSecondary });
   add('exit', STEALTH.exit, ROOMS.corridor, 'Stealth route exit toward the next Chapter 1 section.');
+  // NW-007B: where Nurse Shaw performs her station actions, and the props they involve.
+  for (const [key, it] of Object.entries(STATION_INTERACTIONS)) {
+    const node = new Object3D();
+    node.name = `nw:station:nurse-${key}`;
+    node.position.set(it.stand.x, it.stand.y, it.stand.z);
+    node.rotation.y = it.yaw;
+    node.userData.nwStation = { key, roomId: ROOMS.nurses, clip: it.clip, yaw: it.yaw, target: { ...it.target }, lookAt: { ...it.lookAt } };
+    b.root.add(node);
+  }
+  for (const [name, p, note] of [
+    ['nw:station:call-console', STATION_INTERACTIONS.panel.target, 'Nurse-call master station (reset key) on the back desk.'],
+    ['nw:station:call-lamp-104', STATION_INTERACTIONS.panel.lookAt, 'Annunciator lamp for Room 104, lit (art node station_call_led).'],
+    ['nw:station:record-104', STATION_INTERACTIONS.records.target, 'Room 104 observation record on the back desk (art in station_print / station_paperwork).'],
+  ] as const) {
+    const node = new Object3D();
+    node.name = name;
+    node.position.set(p.x, p.y, p.z);
+    node.userData.nwStation = { key: name.slice('nw:station:'.length), roomId: ROOMS.nurses, note };
+    b.root.add(node);
+  }
   // Emitters: the trolley on the nurse's route (sounds ahead of her) and the station intercom.
   const before = b.soundEmitters.length;
   b.emitter('trolley', ROOMS.nurses, -1.6, 0.9, -5.2);
@@ -95,5 +115,44 @@ export function getNursesStationStealth(world: HospitalWorld): NursesStationStea
     exit: find('exit'),
     doorIds: STEALTH.doors,
     emitterIds: world.root.userData.nwStealthEmitters ?? [],
+  };
+}
+
+/** NW-007B: one authored station action for Nurse Shaw. */
+export interface StationAction {
+  readonly node: string;
+  readonly stand: Vec3;
+  /** Gameplay yaw convention: 0 = facing -Z. */
+  readonly yaw: number;
+  readonly clip: string;
+  readonly target: Vec3;
+  readonly lookAt: Vec3;
+}
+
+export interface StationStaging {
+  readonly panel: StationAction;
+  readonly records: StationAction;
+  /** Prop nodes: the console reset key, the lit Room 104 lamp, the Room 104 record. */
+  readonly callConsole: Vec3;
+  readonly callLamp104: Vec3;
+  readonly record104: Vec3;
+}
+
+/** Typed accessor over the NW-007B staging nodes. Throws if one is missing. */
+export function getStationStaging(world: HospitalWorld): StationStaging {
+  const at = (name: string) => {
+    const node = world.root.getObjectByName(name);
+    if (!node) throw new Error(`Missing station binding ${name}`);
+    return node;
+  };
+  const action = (key: 'panel' | 'records'): StationAction => {
+    const node = at(`nw:station:nurse-${key}`);
+    const d = node.userData.nwStation as { clip: string; yaw: number; target: Vec3; lookAt: Vec3 };
+    return { node: node.name, stand: { x: node.position.x, y: node.position.y, z: node.position.z }, yaw: d.yaw, clip: d.clip, target: d.target, lookAt: d.lookAt };
+  };
+  const point = (name: string): Vec3 => { const p = at(name).position; return { x: p.x, y: p.y, z: p.z }; };
+  return {
+    panel: action('panel'), records: action('records'),
+    callConsole: point('nw:station:call-console'), callLamp104: point('nw:station:call-lamp-104'), record104: point('nw:station:record-104'),
   };
 }

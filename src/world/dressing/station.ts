@@ -16,6 +16,8 @@ export const STATION_SET_URL = new URL('./assets/station_set.glb', import.meta.u
 export const STATION_SET_NODES = [
   'station_linen_trolley', 'station_cabinet_a', 'station_cabinet_b', 'station_supply_cupboard', 'station_annunciator',
   'station_obs_machine', 'station_glove_dispenser', 'station_paperwork', 'station_call_led', 'station_contact_shadows',
+  // NW-007B: readable print (annunciator faceplate, Room 104 record, keypad) and the console display.
+  'station_print', 'station_call_lcd',
 ] as const;
 
 export interface StationSet {
@@ -70,6 +72,9 @@ export async function loadStationSet(options: LoadStationSetOptions = {}): Promi
       // No environment map: let the steel's own grey show (same treatment as the Room 104 set).
       if (m.name === 'station_atlas') m.metalness = 0.4;
       if (m.name === 'call_led') { m.emissive.setRGB(1, 0.08, 0.04); m.emissiveIntensity = 1.4; leds.push(m); }
+      // NW-007B: the console display glows faintly (never enough to light the desk).
+      if (m.name === 'station_lcd') { m.emissive.setRGB(1, 1, 1); m.emissiveIntensity = 0.9; m.roughness = 0.3; }
+      if (m.name === 'station_labels') m.metalness = 0;
       if (m.name === 'station_contact_shadow') {
         m.transparent = true;
         m.depthWrite = false;
