@@ -78,10 +78,10 @@ dist/assets/crawler-BQpvZLcf.glb                                1,146.10 kB
 dist/assets/watcher-CJf9k_Xr.glb                                1,179.56 kB
 dist/assets/station_set-Se4UI-zy.glb                            1,446.92 kB
 dist/assets/patient-DM73rwxX.glb                                1,694.33 kB
-dist/assets/nurse-BmQwgn_s.glb                                  1,843.04 kB
+dist/assets/nurse-BMH3agWN.glb                                  1,739.52 kB
 dist/assets/room104_set-CE76PD4i.glb                            9,155.98 kB
 dist/assets/index-GQ1e8r22.css                                     35.37 kB │ gzip:   8.50 kB
-dist/assets/index-B9zwFaEA.js                                     519.26 kB │ gzip: 173.78 kB
+dist/assets/index-Bff4CTBJ.js                                     519.26 kB │ gzip: 173.78 kB
 dist/assets/three-B3PHROnm.js                                     590.60 kB │ gzip: 151.48 kB
 dist/assets/rapier-DBjBuyhF.js                                  2,237.38 kB │ gzip: 830.44 kB
 
@@ -89,4 +89,4 @@ dist/assets/rapier-DBjBuyhF.js                                  2,237.38 kB │ 
 - Using dynamic import() to code-split the application
 - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
 - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
-✓ built in 3.31s
+✓ built in 2.85s

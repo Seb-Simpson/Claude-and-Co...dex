@@ -18,9 +18,9 @@ B's approaching-steps cue is a multi-step sound, not a single foot contact. Do n
 
 B's original staging browser spec deliberately adds an isolated evidence actor and hides the gameplay visual. It remains useful asset/staging coverage, but cannot count as the integrated director walkthrough. New coverage must inspect the actual sole gameplay Nurse.
 
-## Release blocker
+## Head-export release blocker and explicit repair pin
 
-At the initial pin `dbebd30`, B's report explicitly says the blindfold/cap/hair are displaced from the face and the face/neck albedo is streaked. The initial six-scenario browser batch independently reproduced these defects. Evidence in `evidence/pre-repair/` and `evidence/director-fixture/` is explicitly historical. At 15:56 UTC the current PR head check found Claude's new repair `ec4ed99`; the just-started public regression batch was cancelled (no completed scenarios counted) before changing production source. The repair merged cleanly and is being independently reverified. This integration imports the producer's targeted fix; it does not author character geometry or expand into NW-008. Keep the PR draft.
+At the initial pin `dbebd30`, B's report explicitly says the blindfold/cap/hair are displaced from the face and the face/neck albedo is streaked. The initial six-scenario browser batch independently reproduced these defects. Evidence in `evidence/pre-repair/` and `evidence/director-fixture/` is explicitly historical. At 15:56 UTC the current PR head check found Claude's new repair `ec4ed99`; the just-started public regression batch was cancelled (no completed scenarios counted) before changing production source. The repair merged cleanly. New integrated rest/look/panel/capture head renders and geometry regressions independently verify the specific original defect repaired; final human/artistic acceptance remains pending. This integration imports the producer's targeted fix; it does not author character geometry or expand into NW-008. Keep the PR draft.
 
 ## Preserved systems
 
