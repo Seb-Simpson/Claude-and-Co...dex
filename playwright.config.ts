@@ -18,7 +18,7 @@ export default defineConfig({
     trace: 'retain-on-failure',
     launchOptions: {
       ...(executablePath ? { executablePath } : {}),
-      args: ['--no-sandbox', '--enable-webgl', '--use-gl=angle', '--use-angle=swiftshader'],
+      args: ['--no-sandbox', '--enable-webgl', '--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'],
     },
   },
   webServer: {

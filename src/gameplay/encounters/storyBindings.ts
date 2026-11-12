@@ -6,7 +6,7 @@ import {ENTITY_PROFILES} from '../../entities/profiles';
 export const STATION_RECORD_ID='nw:opening:station-record';
 /** Optional NW007B nodes win; existing embedded artwork supplies a usable baseline. */
 export function stationRecordPoint(world:HospitalWorld):Vector3|null {
-  const explicit=world.root.getObjectByName('nw:cinematic:station-record');
+  const explicit=world.root.getObjectByName('nw:station:record-104')??world.root.getObjectByName('nw:cinematic:station-record');
   if(explicit)return explicit.getWorldPosition(new Vector3());
   const papers=world.root.getObjectByName('station_paperwork') as Mesh|undefined;
   const entry=world.root.getObjectByName('nw:stealth:entry');
@@ -29,12 +29,19 @@ export function stationRecordPoint(world:HospitalWorld):Vector3|null {
   return count?centre.divideScalar(count):closest;
 }
 export function stationChoreography(world:HospitalWorld,b:StationBindings,nav:NavigationProvider) {
-  const point=(id:string,fallback:Vec3)=>world.root.getObjectByName(id)?.getWorldPosition(new Vector3())??new Vector3().copy(fallback);
+  // NW-007B's published names take precedence; no import from its unmerged branch.
+  const aliases:Readonly<Record<string,string>>={
+    'nw:cinematic:shaw-panel-target':'nw:station:call-lamp-104',
+    'nw:cinematic:shaw-panel-stand':'nw:station:nurse-panel',
+    'nw:cinematic:shaw-record-stand':'nw:station:nurse-records',
+  };
+  const binding=(id:string)=>world.root.getObjectByName(aliases[id]??id)??world.root.getObjectByName(id);
+  const point=(id:string,fallback:Vec3)=>binding(id)?.getWorldPosition(new Vector3())??new Vector3().copy(fallback);
   const panel=world.root.getObjectByName('station_annunciator');
   const panelLook=point('nw:cinematic:shaw-panel-target',panel?new Box3().setFromObject(panel).getCenter(new Vector3()):b.patrol[0]!);
   const recordLook=stationRecordPoint(world)??new Vector3().copy(b.patrol[1]!);
   function stand(name:string,target:Vec3,near:Vec3):Vec3 {
-    const explicit=world.root.getObjectByName(name)?.getWorldPosition(new Vector3());
+    const explicit=binding(name)?.getWorldPosition(new Vector3());
     if(explicit && nav.isPositionValid(explicit,ENTITY_PROFILES.nurse.agent))return {...explicit};
     const direction=new Vector3().subVectors(near,target).setY(0).normalize();
     for(const offset of [1.1,1.4,1.7]){

@@ -111,3 +111,75 @@ The same engine camera uses the existing cinematic transport. Full awakening las
 Footsteps use actual grounded travel/noise intensity and the existing SFX mixer. Capture changes no body position or narrative state: bounded focus (no more than 0.42 rad yaw / 2° FOV), quiet cloth/tension cue, short fade and focused retry. Reduced Motion removes focus movement; Space/Escape advances to retry. A captured hidden pose that cannot lease the camera still receives retry. The player stays captured until a fresh attempt is built.
 
 The Phase 1 byte store owns immutable source bytes, never scenes. Every attempt parses fresh objects. Canonical Room 104/station/card are mandatory; missing critical assets give the existing error path rather than obsolete procedural gameplay. This is the safe critical-loading fallback. Optional new animations fall back to existing states. Texture owners dispose GPU maps and close shared ImageBitmap backing stores once; model instances dispose skeleton bone textures; audio voices/listeners/leases are scoped and released. No new animation loop, camera, renderer or AudioContext is created.
+
+## Published NW-007B handoff (read-only inspection)
+
+Claude's draft PR #22 is now available at environment/assets commit
+`dbebd306dbe52e9f7142873995b7935ae83a502b` on
+`claude/nw-007b-cinematic-assets`. It has **not** been merged or cherry-picked here.
+The adapter accepts its actual named nodes before the legacy optional aliases above:
+
+| Published NW-007B node | Consumer |
+| --- | --- |
+| `nw:station:record-104` | Physical clue interaction target. |
+| `nw:station:call-lamp-104` | Panel observation/look target. |
+| `nw:station:nurse-panel` | Navigation work stance. |
+| `nw:station:nurse-records` | Navigation records stance. |
+
+These are resolved in world space. Their coordinates are not copied into gameplay.
+A transformed-parent unit fixture verifies precedence and coordinate handling. This
+prepares the naming boundary; it does **not** certify the combined NW-007C build.
+
+NW-007C integration steps:
+
+1. Integrate the separately reviewed A/B branches, resolving only actual loader/lifecycle
+   overlaps. Preserve the canonical byte-source and owner-disposal fixes. Do not restore
+   the procedural browser fallback.
+2. Read B's `getStationStaging(world)` / `nwStation` metadata for exact yaw, contact target
+   and look target. Check the supplied work stances against the physical capsule and player.
+3. Feed the producer's `NURSE_CLIPS` metadata through the validation boundary. B publishes
+   `EntityVisual.playClip(name, options)` and live `visual.clip` state. Use the supplied
+   `panel_check` (one-shot, five seconds) and `records_read` (loop) only at valid contact
+   stances. Extend the authored hold from its current fallback duration to the verified clip
+   duration/completion; end loops explicitly. Never await a missing clip indefinitely.
+4. Preserve live getters when wrapping the model visual; forwarding `clip` through an
+   object spread would snapshot the readout. The optional scene adapter must forward it
+   dynamically. Keep navigation authoritative and one physical/visual Nurse.
+5. B's documented sound IDs include `nw:shaw-steps`, `nw:shaw-keys`, `nw:shaw-rustle`,
+   `nw:call-panel`, `nw:paper`, `nw:station-hum`, `nw:capture`. Bind cues to the supplied
+   timings and existing mixer; cancel on pause/retry/disposal. Current A uses installed
+   baseline cues and therefore compiles/runs without those assets.
+6. Re-run normal-game introduction, both hides, actual detection, five retries, capture
+   skip/reduced motion and resource checks against the combined assets. Review the
+   producer-documented pending close-up character presentation work; no new character
+   geometry is authored in A. Final voice performance and independent human review remain
+   explicit acceptance dependencies.
+
+The semantic naming shim is implemented here. New clip playback, producer action timings,
+new audio and final capture staging remain NW-007C integration work; they are not silently
+represented as active in this baseline-compatible branch.
+
+## Public gameplay APIs added/extended
+
+- `createNarrativeDirector(saved?: NarrativeCheckpoint, changed?: () => void): NarrativeDirector`;
+  `commit(beat)`, `has(beat)`, `checkpoint()`, `scene`, `nurseEligible`.
+- `validateNarrativeCheckpoint(raw: unknown): NarrativeCheckpoint | null` and
+  `migrateNarrative(awakened, exited, station?, found?): NarrativeCheckpoint`.
+- `createExperienceCoordinator(): ExperienceCoordinator`; `acquire(owner, resources)`,
+  `cancel(owner?)`, `snapshot()`, `dispose()`. A lease exposes `owner`, `signal`, `release()`.
+- `emitAuthoredCue(events: GameEvents, cue: AuthoredCue): void` maps typed authored sound,
+  light and environmental requests onto existing foundation events.
+- Existing `createStationEncounter(options): StationEncounter` now accepts optional
+  `coordinator` and `canStage(position)`; its `present` callback receives semantic
+  `StationActorPose.action`, `visible`, `contactReady` along with authoritative actor/yaw/speed.
+- `resolveNurseAnimations(rows, clips, hasBinding)` validates producer metadata and returns
+  `accepted` / `rejected` optional categories, without loading assets.
+- `awakeningPath(first, last, yaw, reduced): CinematicDefinition` and
+  `createCapturePresentation(options): CapturePresentation` reuse the existing transport.
+- Existing `createGameplayModule(options)` / `createGameplayRuntime(options)` remain the
+  integration entry points; `openingScene` provides optional `loadNurse` and `onNurseAction`.
+  Existing player camera-control acquisition accepts optional purpose `'gameplay' | 'capture'`.
+
+Contracts, `main.ts`, the registry and Blender source files remain unchanged. The small
+world/model loader edits are the necessary shared environment lifecycle fix, not environment
+redesign or visual asset authoring.

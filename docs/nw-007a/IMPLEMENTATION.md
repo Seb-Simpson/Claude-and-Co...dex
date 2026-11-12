@@ -6,9 +6,9 @@ This branch starts at the requested PR #21 commit `0097264bf07a21b22ca7b5b1ac14d
 
 The baseline already has the normal frontend/menu/loading/settings path, one application/engine/render loop, Rapier movement and interactions, Room 104's access-card state reducer, two one-shot Shaw lines, a cinematic transport with a real player-control lease, milestone saves, and the four-phase station Encounter Director. The Nurse uses existing navigation, vision, sound, hiding witnesses, pursuit/search and recovery. The trolley, staff locker and Room 105 bed are existing environment/gameplay integration. Chapter One casting excludes the Patient.
 
-The baseline retains the early static corridor sighting, the previous awakening staging, the four-phase encounter and its existing capture UI. Those are not the requested NW-007 redesign and are not represented as completed here.
+The audited baseline retained an early static corridor sighting, mechanical awakening and basic capture UI. This branch replaces those behaviors while extending its four-phase encounter and reusing its real AI.
 
-The authoritative NW-007 Shared Design Contract Revision 1 has now been supplied. The restart fix below was completed and verified first. The remaining six-scene/director/presentation work is continuing on this same branch, using existing assets and documenting optional semantic hooks for Claude.
+The authoritative NW-007 Shared Design Contract Revision 1 has now been supplied. The restart fix below was completed and verified first. The six-scene/director/presentation work continues on this same branch, using existing assets and documented optional semantic hooks for Claude.
 
 ## Phase 1: canonical environment and asset lifetime
 
@@ -44,7 +44,7 @@ Existing `preloadOne`, `preloadAll`, `takePreloaded`, `clearPreloaded` and `prel
 
 `StationActorPose` in `src/gameplay/encounters/nursesStation.ts` is the current typed gameplay-to-presentation boundary: `deltaSeconds`, `actor: EntitySnapshot`, `yaw`, `speed`, and `checkingPanel`. `StationOptions.present(pose)` feeds `OpeningScene.directNurse(pose)` in `src/gameplay/opening/scene.ts`. It moves/animates the one existing visual from the authoritative actor pose; presentation cannot teleport the physical actor, detect the player, capture them or commit narrative progression.
 
-`checkingPanel` currently requests the existing `observe` visual state. No bespoke clipboard, paperwork or call-panel clip is claimed. A future optional animation adapter should preserve ownership of navigation/capture/progression and fall back to existing locomotion/observation; exact new cues, phase IDs and animation completion policy follow the shared contract; exact new animation clips await actual asset manifests. This documents the existing boundary, not a newly agreed NW-007 animation contract.
+`checkingPanel` currently requests the existing `observe` visual state. No bespoke clipboard, paperwork or call-panel clip is claimed. A future optional animation adapter should preserve ownership of navigation/capture/progression and fall back to existing locomotion/observation; exact new cues, phase IDs and animation completion policy follow the shared contract; the optional animation contract is documented in DIRECTORS.md. Published NW-007B interfaces are inspected separately without importing the asset branch.
 
 ## Cinematic/director implementation
 
@@ -54,4 +54,4 @@ The stationary-reader browser test exposed a real authored-work-stance obstructi
 
 New camera/movement/capture features use the existing camera transport, input lease, settings and mixer. No extra renderer, loop or AudioContext is created. GPU textures and shared ImageBitmap backing stores are released by their asset owner; existing skeleton disposal remains in use.
 
-Final public-game QA is in progress. Overall NW-007 acceptance still requires the specified independent human playtest. Bespoke NW-007B hand/panel/record/capture clips and final voice performances are pending; current animation states and the two explicitly temporary recordings remain operational fallbacks. No new asset path or clip name was invented.
+Final public-game QA is in progress. Overall NW-007 acceptance still requires the specified independent human playtest. NW-007B hand/panel/record/capture clips are published separately in PR #22 and await NW-007C integration; final voice performances remain pending; current animation states and the two explicitly temporary recordings remain operational fallbacks. No new asset path or clip name was invented.

@@ -1,0 +1,58 @@
+
+> night-ward@0.0.0 test:browser
+> playwright test tests/browser/nw-006b-encounter.spec.ts -g input-only normal game|autonomous stealth: real sprint
+
+[WebServer] (node:814) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 2 tests using 1 worker
+
+(node:834) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 tests/browser/nw-006b-encounter.spec.ts:57:1 › input-only normal game:104 puzzle, authored station introduction, cover,105 bed, autonomous stealth and exit checkpoint (12.0m)
+(node:1900) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  2 tests/browser/nw-006b-encounter.spec.ts:195:1 › autonomous stealth: real sprint sound is investigated but unseen Room105 bed entry conceals the player (3.2m)
+
+
+  1) tests/browser/nw-006b-encounter.spec.ts:57:1 › input-only normal game:104 puzzle, authored station introduction, cover,105 bed, autonomous stealth and exit checkpoint 
+
+    Error: expect(received).toBeGreaterThan(expected)
+
+    Expected: > 7
+    Received:   7
+
+    Call Log:
+    - Timeout 120000ms exceeded while waiting on the predicate
+
+      48 |   await expect.poll(async () => (await snap(page)).performance.simulatedSeconds, wait).toBeGreaterThan(now + .6);
+      49 |   await page.keyboard.press('e');
+    > 50 |   await expect.poll(async () => (await snap(page)).events.filter(e => e.type === 'interaction:completed').length, wait).toBeGreaterThan(count);
+         |                                                                                                                         ^
+      51 | }
+      52 |
+      53 | test.use({video:'on',launchOptions:{...(process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE?{executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE}:{}),args:['--no-sandbox','--enable-webgl','--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']}});
+        at interact (/workspace/night-ward/tests/browser/nw-006b-encounter.spec.ts:50:121)
+        at /workspace/night-ward/tests/browser/nw-006b-encounter.spec.ts:106:55
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/nw-006b-encounter-input-on-c7c14-stealth-and-exit-checkpoint/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/nw-006b-encounter-input-on-c7c14-stealth-and-exit-checkpoint/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/nw-006b-encounter-input-on-c7c14-stealth-and-exit-checkpoint/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/nw-006b-encounter-input-on-c7c14-stealth-and-exit-checkpoint/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/nw-006b-encounter-input-on-c7c14-stealth-and-exit-checkpoint/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    tests/browser/nw-006b-encounter.spec.ts:57:1 › input-only normal game:104 puzzle, authored station introduction, cover,105 bed, autonomous stealth and exit checkpoint 
+  1 passed (15.3m)
