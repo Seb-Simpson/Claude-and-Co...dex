@@ -39,9 +39,17 @@ The Narrative Director owns ordered discovery/milestones. The Encounter Director
 
 The same physical actor/capsule walks through actual geometry. Animation does not translate her. Safe phases disable perception/capture without globally disabling later AI. Autonomous stealth retains actual vision/sound investigation, directional trolley cover, staff locker, Room 105 bed and witnessed-entry memory. No Patient is enabled; no later chase is added.
 
-## Verification in progress
+## Verification
 
-Final repaired-model browser results and representative screenshots/recording will be recorded here when the runs finish. This document does not count unfinished cases as passing.
+The repaired-model asset/reliability batch completed: **7 passed in 21.2 minutes**. The 15-case public regression batch is still running; no unfinished case is counted as passed.
+
+```sh
+NW007B_HEAD=/tmp/nw007c-head-repaired NW005_SOFTWARE_SCALE=1 PLAYWRIGHT_CHROMIUM_EXECUTABLE=/usr/bin/chromium npm run test:browser -- tests/browser/nw-007c-integration.spec.ts tests/browser/nw-007b-staging.spec.ts tests/browser/nw-007b-head.spec.ts tests/browser/nw-007a-reliability.spec.ts tests/browser/nw-007a-scenes.spec.ts
+```
+
+Passed: later-request canonical-world failure/retry regression; five real AI captures/public retries followed by New Game; fresh-page Continue/New Game; ordered discovery, physical clue range and unseen staging/pause ownership; four head-pose renders; all fourteen B staging views; the **sole actual gameplay Nurse** performing panel, records and listening with timed audio, paused clip clock, real locker concealment and autonomous handoff.
+
+[Batch log](evidence/repaired-assets/run.log) · [Actual actor/state/contacts/sound](evidence/repaired-assets/director/integrated.json) · [Five retry snapshots](evidence/repaired-assets/retries/five-retries.json).
 
 Commands already completed after importing the repair:
 
@@ -59,7 +67,7 @@ The initial six-case Chromium batch passed in 18.3 minutes on the **old** B asse
 
 The initial close-ups independently confirmed the displaced face covering/cap/hair and streaked face/neck. The repaired asset was then independently rendered through the integrated game/model library in rest, look-around, panel and capture poses, and inspected. The covering/cap/hair now follow the head; the prior striped face/neck bake is absent in these views. The 10 imported geometry/rig regression tests pass as well. The **specific original export/bake defect is verified repaired on `ec4ed99`**; this is not final artistic or human acceptance of the stylised model. The isolated head renderer creates a temporary preview actor and hides the gameplay visual; the separate C fixture verifies the sole actual director actor.
 
-Actual director-driven pre-repair close-ups also show hands hovering short of the work props. At the cue sampling instants, nearest strongly right-hand-weighted skinned vertex distances to published target points were panel **24.0 cm** and record **15.9 cm**. These point samples do not represent whole-clip contact, and wrist positions are not fingertips. Integration does not silently solve this by changing producer coordinates, adding unreviewed IK or deforming the character. Final repaired-asset contact evidence and remaining staging issues will be reported separately.
+Actual director-driven pre-repair close-ups also show hands hovering short of the work props. At the cue sampling instants, nearest strongly right-hand-weighted skinned vertex distances to published target points were panel **24.0 cm** and record **15.9 cm**. These point samples do not represent whole-clip contact, and wrist positions are not fingertips. Integration does not silently solve this by changing producer coordinates, adding unreviewed IK or deforming the character. The repaired asset retains the same issue: nearest weighted-hand point samples are panel **24.0 cm**, record **16.0 cm** (261 strongly right-hand-weighted vertices evaluated). See the actual actor close-ups below. Correcting producer animation/staging alignment remains necessary before claiming convincing physical contact.
 
 No real GPU or independent human playtest is available in this environment. `/dev/dri` is absent. Chromium uses SwiftShader; ordinary Low-quality screenshots and reduced rendering-scale functional runs must be distinguished. No hardware frame-rate, human usability or atmospheric acceptance is claimed.
 
@@ -78,3 +86,16 @@ The completed five-cycle test uses actual Nurse perception/capture and the publi
 | 5 | 230 | 332 | 193,799 | 303 | 85 |
 
 Each attempt has fresh object identities and one canonical room/station/card/Nurse, no active authored clip/hum on ready, no remaining cinematic voices/loop schedulers, and one canvas. Later asset requests were deliberately blocked, but **zero requests** were attempted because the canonical bytes remained owned. No page errors. This bounded sampled renderer inventory is evidence against attempt accumulation; it is not a full GPU/heap leak certification or a real-hardware frame-time benchmark.
+
+
+## Independent visual evidence (repaired pin)
+
+- [Head rest](evidence/repaired-assets/head/game_rest.png), [head capture](evidence/repaired-assets/head/game_capture_43.png), [head turn](evidence/repaired-assets/head/game_look_around_46.png): in-game model-library/renderer preview, independently rerun and inspected, not a claim of an input-only capture close-up.
+- [Actual panel action](evidence/repaired-assets/director/01-actual-panel.png), [native-Low panel close-up](evidence/repaired-assets/director/01-panel-close.png), [native-Low record close-up](evidence/repaired-assets/director/02-record-close.png): the sole director-driven actor. The diagnostic close-ups freeze gameplay and reposition **only the player/camera**, hiding pause chrome for inspection. They do not pose or move Shaw.
+- [Locker illumination](evidence/repaired-assets/staging/11-torch-by-lockers.png), [trolley view](evidence/repaired-assets/staging/10-crouched-at-trolley.png), [capture asset pose](evidence/repaired-assets/staging/14-capture.png): producer staging spec rerun on the integrated build; these isolated previews are distinct from the full input-only walkthrough.
+
+Final Nurse GLB SHA-256: `dcd42fc80654f2b5b9ab271a48aa09ccec381f445609302aabddf2f03e0582ac`.
+
+Final actual-actor fixture's last engine sampling window (208 frames, capacity 240): fixed work p95 **3.9 ms**, physics p95 **0.8 ms**, update p95 **1.7 ms**, render submission p95 **37.5 ms**. Software-rendered frame interval p95 **999.9 ms**; this is visibly slow and **not a hardware performance pass**. The sample includes pause/native-resolution diagnostic redraws, not a steady hardware benchmark. Whole-fixture fixed/update peaks were **52.0 / 42.4 ms**; renderer inventory after exploring diagnostic views was 402 geometries / 99 textures versus the same-view retry inventory above. Visibility/lazy uploads mean counts across different views are not a valid leak comparison. No claim of complete heap/GPU leak certification.
+
+The opening's two existing intercom recordings remain explicitly temporary `.temporary.wav` assets. B's station/heel/cloth/key/paper/capture sounds are original procedural synthesis through the existing mixer; this integration adds no paid service or final voice acting. Event timing and settings/cancellation are automated checks; subjective audibility, mix, animation weight and foot sliding on real hardware still need human playtesting.

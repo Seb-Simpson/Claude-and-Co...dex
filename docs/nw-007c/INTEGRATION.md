@@ -31,6 +31,13 @@ The presentation owns those Shaw-specific cues. `Ambience.stopCue` cancels activ
 
 Only A's narrative/encounter milestones are saved. No mixer, clip time, audio node, transient target memory or rendered object enters storage. New Game/Continue/Retry keep A's canonical byte-source and transactional world factory. No procedural-world fallback is restored.
 
+## Integration APIs
+
+- `createNursePresentation(visual, events, stationPoint)` exports `read()`, `present(pose)`, `cancel()` and `dispose()`. It owns the existing visual's authored clip and Shaw cues, never the actor transform or navigation.
+- `StationOptions.performance?` supplies live actual-clip feedback; `cancelPresentation?` is invoked when its coordinator lease aborts. `OpeningSequence.cancelNurse()` forwards that cancellation to the one scene presentation owner.
+- `EntityDirective.arriveDistance?` applies only to an explicitly requested precise final arrival; existing navigation/perception defaults are unchanged.
+- `CapturePresentation.progress` feeds the existing opening UI fade on the simulation clock; it is not persisted.
+
 ## Read-only verification interfaces
 
 - `OpeningSequence.nursePerformance()` / QA snapshot `opening.nurse`: actual requested/playing clip, time, duration, completion, availability, contact readiness, right/left wrist positions, foot-contact and action-sound counters, logical hum state.
