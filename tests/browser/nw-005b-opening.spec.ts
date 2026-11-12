@@ -140,8 +140,9 @@ test('locked door, two one-shot Shaw cues, card reader, normal door, corridor an
     window.nightWardTest!.teleport({ x: view.x, y: 0.005, z: view.z });
     window.nightWardTest!.aimAt(target);
   }, { view, target: { ...data['nurse-first-sight']!.position, y: data['nurse-first-sight']!.position.y + 1.35 } });
-  await expect.poll(async () => (await snap(page)).opening!.state.sightingSeen, wait).toBe(true);
-  await page.screenshot({ path: info.outputPath('04-nurse-sighting.png') });
+  expect((await snap(page)).opening!.state.sightingSeen).toBe(false);
+  expect((await snap(page)).station?.phase??'waiting').toBe('waiting');
+  await page.screenshot({ path: info.outputPath('04-empty-corridor.png') });
   // Retry the exit checkpoint: possession and one-shots remain, no second awakening.
   const before = await snap(page);
   await page.evaluate(() => window.nightWardTest!.restart());
@@ -153,7 +154,8 @@ test('locked door, two one-shot Shaw cues, card reader, normal door, corridor an
   await page.getByRole('button', { name: 'Enter ward', exact: true }).click();
   const point = data['station-approach']!.position;
   await page.evaluate((p: Vec3) => window.nightWardTest!.teleport(p), point);
-  await expect.poll(async () => (await snap(page)).opening!.state.stationReached, wait).toBe(true);
+  await expect.poll(async () => (await snap(page)).opening!.narrative?.scene,wait).toBe('station-discovery');
+  expect((await snap(page)).opening!.state.stationReached).toBe(true);
   await page.screenshot({ path: info.outputPath('05-station-handoff.png') });
   const evidence = await snap(page);
   await info.attach('opening-runtime-snapshot.json', { body: JSON.stringify(evidence, null, 2), contentType: 'application/json' });

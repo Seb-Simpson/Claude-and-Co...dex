@@ -55,7 +55,7 @@ export interface PlayerController extends PlayerProvider {
   readonly body: CharacterBody;
   readonly controlsLocked: boolean;
   /** Exclusive cinematic camera ownership; collision remains active at the existing feet pose. */
-  acquireCameraControl(): PlayerCameraControlLease | null;
+  acquireCameraControl(purpose?:'gameplay'|'capture'): PlayerCameraControlLease | null;
   fixedUpdate(frame: FrameContext, input: PlayerInput): void;
   update(frame: FrameContext): void;
   look(deltaX: number, deltaY: number): void;
@@ -79,6 +79,7 @@ export interface PlayerCameraControlLease {
 }
 
 export interface PlayerControllerOptions {
+  headMotion?:()=>boolean;
   id?: string;
   camera: PerspectiveCamera;
   body: CharacterBody;
@@ -120,7 +121,7 @@ export function createPlayerController(options: PlayerControllerOptions): Player
   let hidingState: HidingState = 'outside';
   let hidingSpotId: string | null = null;
   let hidingPose: Pose | null = null;
-  let distanceSinceFootstep = 0;
+  let distanceSinceFootstep = 0, strideDistance=0, bob=0;
   let movement: PlayerSnapshot['movement'] = 'idle';
   let disposed = false;
   let control: AbortController | null = null;
@@ -154,8 +155,8 @@ export function createPlayerController(options: PlayerControllerOptions): Player
   return {
     body,
     get controlsLocked() { return control !== null; },
-    acquireCameraControl() {
-      if (disposed || control || captured || hidingState !== 'outside') return null;
+    acquireCameraControl(purpose='gameplay') {
+      if (disposed || control || (captured && purpose!=='capture') || (!captured && purpose==='capture') || hidingState !== 'outside') return null;
       const lease = new AbortController();
       control = lease;
       resetVelocity();
@@ -163,7 +164,7 @@ export function createPlayerController(options: PlayerControllerOptions): Player
       return {
         signal: lease.signal,
         handoff(pose) {
-          if (control !== lease || disposed || captured || hidingState !== 'outside' || !pose?.position || !pose.rotation) return false;
+          if (control !== lease || disposed || (captured && purpose!=='capture') || (!captured && purpose==='capture') || hidingState !== 'outside' || !pose?.position || !pose.rotation) return false;
           const p = pose.position;
           const q = pose.rotation;
           if (![p.x, p.y, p.z, q.x, q.y, q.z, q.w].every(Number.isFinite) ||
@@ -233,7 +234,7 @@ export function createPlayerController(options: PlayerControllerOptions): Player
       const travelled = Math.hypot(result.position.x - previous.x, result.position.z - previous.z);
       movement = crouching ? 'crouching' : travelled < 0.0001 ? 'idle' : input.sprint ? 'sprinting' : 'walking';
       if (grounded && travelled > 0.0001) {
-        distanceSinceFootstep += travelled;
+        distanceSinceFootstep += travelled;strideDistance+=travelled;
         if (distanceSinceFootstep >= config.footstepDistance) {
           distanceSinceFootstep %= config.footstepDistance;
           events.emit('player:noise', {
@@ -279,7 +280,10 @@ export function createPlayerController(options: PlayerControllerOptions): Player
         camera.quaternion.slerp(normalRotation, blend);
       } else {
         const position = body.getPosition();
-        camera.position.set(position.x, position.y + eyeHeight, position.z);
+        const moving=grounded&&!captured&&movement==='walking'||grounded&&!captured&&movement==='sprinting';
+        const desired=options.headMotion?.()&&moving ? -.008*(.5-.5*Math.cos(strideDistance*Math.PI*2/config.footstepDistance)) : 0;
+        bob=options.headMotion?.()?bob+(desired-bob)*(1-Math.exp(-12*dt)):0;
+        camera.position.set(position.x, position.y + eyeHeight + bob, position.z);
         camera.quaternion.copy(normalRotation);
       }
       camera.updateMatrixWorld();

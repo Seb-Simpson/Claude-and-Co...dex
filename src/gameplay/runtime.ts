@@ -1,3 +1,4 @@
+import {STATION_RECORD_ID} from './encounters/storyBindings';
 import {resolveStationBindings} from './encounters/stationBindings';
 import {createStationEncounter} from './encounters/nursesStation';
 import type {StationEncounter} from './encounters/nursesStation';
@@ -29,6 +30,7 @@ export interface PlayerInputSource {
   dispose(): void;
 }
 export interface GameplayOptions {
+  readonly openingScene?:import('./opening/scene').OpeningSceneOptions;
   readonly additionalWitnesses?: (spot: HidingLocation) => readonly string[];
   readonly entitiesEnabled?: () => boolean;
   readonly canCapture?: () => boolean;
@@ -59,7 +61,7 @@ export interface GameplayRuntime extends ModuleInstance {
   readonly presentation: EntityPresentation;
   readonly opening?: OpeningSequence;
   /** Real camera/input lease for a host-driven cinematic. Actor safety remains director-owned. */
-  acquireCinematicControl(): PlayerCameraControlLease | null;
+  acquireCinematicControl(purpose?:'gameplay'|'capture'): PlayerCameraControlLease | null;
   fixedUpdate(frame: FrameContext): void;
   update(frame: FrameContext): void;
   notify(message: string): void;
@@ -96,6 +98,7 @@ export function createGameplayRuntime(context: ModuleContext, options: GameplayO
     cleanup.push(() => body.dispose());
     const player = createPlayerController({
       ...(options.playerId === undefined ? {} : { id: options.playerId }),
+      headMotion:()=>context.engine.renderer.domElement?.ownerDocument?.documentElement?.classList?.contains('nw-reduce-motion')===false,
       camera: context.engine.camera, body, spawn: world.playerSpawn, events: context.events,
       ...(options.playerConfig === undefined ? {} : { config: options.playerConfig }),
     });
@@ -152,9 +155,9 @@ export function createGameplayRuntime(context: ModuleContext, options: GameplayO
     }));
     let awaitNeutralInput = false;
     let activeControl: PlayerCameraControlLease | null = null;
-    function acquireCinematicControl(): PlayerCameraControlLease | null {
+    function acquireCinematicControl(purpose:'gameplay'|'capture'='gameplay'): PlayerCameraControlLease | null {
       if (disposed) return null;
-      const lease = player.acquireCameraControl();
+      const lease = player.acquireCameraControl(purpose);
       if (!lease) return null;
       pendingInteraction = false;
       try { input?.setSuppressed?.(true); }
@@ -256,12 +259,12 @@ export function createGameplayModule(options: GameplayOptions = {}): GameModule 
             [bindings['room-106-door'].doorId!]: 'locked' },
           handleInteraction: (request, time) => opening?.handleInteraction(request, time) ?? true,
           onNotification: message => opening?.notify(message),
-          inspectionText: id => Object.values(OPENING_INTERACTIONS).some(target => target === id) ? '' : options.inspectionText?.(id),
+          inspectionText: id => (Object.values(OPENING_INTERACTIONS).some(target => target === id)||id===STATION_RECORD_ID) ? '' : options.inspectionText?.(id),
         });
-        if (checkpoint?.station || checkpoint?.milestone === 'station-approach') {
+        if (checkpoint && (checkpoint.station || checkpoint.milestone === 'station-approach' || (checkpoint.narrative?.step??0)>=3)) {
           const destination = checkpoint.station && stationBindings
             ? checkpoint.station.phase === 'complete' ? stationBindings.exit : stationBindings.observation
-            : openingPosition(bindings['station-approach']);
+            : stationBindings && (checkpoint.narrative?.step??0)>=3 ? stationBindings.observation : openingPosition(bindings['station-approach']);
           if (!runtime.player.body.canOccupy(destination) || !runtime.physics.hasSupport(destination, runtime.player.body.radius)) {
             throw new Error('Opening station checkpoint is obstructed or unsupported');
           }
@@ -270,14 +273,15 @@ export function createGameplayModule(options: GameplayOptions = {}): GameModule 
           runtime.player.update({ deltaSeconds: 0, elapsedSeconds: 0 });
         }
         opening = await createOpeningSequence({ ...context, world: adapter.world }, runtime, bindings, checkpoint,
-          options.openingPersistence ? cp => options.openingPersistence!.save(cp) : undefined, gate, options.onRestart);
+          options.openingPersistence ? cp => options.openingPersistence!.save(cp) : undefined, gate, options.onRestart,options.openingScene);
         if (stationBindings) {
           const sequence = opening;
           station = createStationEncounter({world:adapter.world,bindings:stationBindings,
             physics:runtime.physics,navigation:runtime.navigation,player:runtime.player,
             interactions:runtime.interactions,events:context.events,
             ...(checkpoint?.station ? {checkpoint:checkpoint.station} : {}),
-            eligible:()=>sequence.state.awakened && sequence.state.doorUnlocked && !sequence.cinematic,
+            eligible:()=>sequence.state.awakened && sequence.state.doorUnlocked && !sequence.cinematic && sequence.narrative.nurseEligible,
+            coordinator:sequence.coordinator,canStage:p=>sequence.canStageNurse(p),
             present:pose=>sequence.directNurse(pose),save:cp=>sequence.saveStation(cp),notify:m=>sequence.notify(m)});
         }
         const gameplay = runtime;

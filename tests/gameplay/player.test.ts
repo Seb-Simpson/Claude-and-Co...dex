@@ -17,7 +17,7 @@ const cleanups: (() => void)[] = [];
 beforeAll(async () => { await RAPIER.init(); });
 afterEach(() => { cleanups.splice(0).reverse().forEach((dispose) => dispose()); });
 
-function fixture(extra: ColliderDefinition[] = [], config?: Partial<PlayerConfig>) {
+function fixture(extra: ColliderDefinition[] = [], config?: Partial<PlayerConfig>, headMotion?:()=>boolean) {
   const world = new RAPIER.World({ x: 0, y: -9.81, z: 0 });
   const physics = createPhysicsAdapter(world, [floor, ...extra]);
   const camera = new PerspectiveCamera();
@@ -26,7 +26,7 @@ function fixture(extra: ColliderDefinition[] = [], config?: Partial<PlayerConfig
   events.on('player:noise', (event) => noises.push(event));
   const body = physics.createCharacter({ position: { x: 0, y: 0.03, z: 0 }, radius: 0.28, height: 1.8 });
   const player = createPlayerController({
-    body, camera, events, spawn: { position: { x: 0, y: 0.03, z: 0 }, yaw: 0 },
+    ...(headMotion?{headMotion}:{}),body, camera, events, spawn: { position: { x: 0, y: 0.03, z: 0 }, yaw: 0 },
     ...(config ? { config } : {}),
   });
   let elapsedSeconds = 0;
@@ -153,4 +153,23 @@ describe('first-person movement', () => {
     f.advance(2, { ...idle, forward: 1 });
     expect(f.noises).toHaveLength(count);
   });
+});
+
+it('permits a capture-only presentation lease after capture without restoring movement or reviving the player',()=>{
+ const f=fixture();expect(f.player.acquireCameraControl('capture')).toBeNull();
+ f.player.setCaptured(true);const lease=f.player.acquireCameraControl('capture')!;expect(lease).not.toBeNull();
+ const before=f.player.getSnapshot().position;f.advance(.2,{...idle,forward:1,sprint:true});
+ expect(f.player.getSnapshot().position).toEqual(before);
+ const feet=f.body.getPosition();expect(lease.handoff({position:{x:feet.x,y:feet.y+1.65,z:feet.z},rotation:identity})).toBe(true);
+ lease.release();expect(f.player.getSnapshot().captured).toBe(true);expect(f.player.controlsLocked).toBe(false);
+ expect(f.player.acquireCameraControl()).toBeNull();
+});
+
+it('presents small walking motion only when enabled; reduced motion changes neither collision nor view rotation',()=>{
+ let enabled=true;const f=fixture([],undefined,()=>enabled);f.advance(.25,{...idle,forward:1});
+ const eye=f.camera.position.y-f.player.getSnapshot().position.y;
+ expect(eye).toBeLessThan(1.65);expect(eye).toBeGreaterThan(1.64);
+ const velocity=f.player.getSnapshot().velocity;enabled=false;f.advance(1/60,{...idle,forward:1});
+ expect(f.camera.position.y-f.player.getSnapshot().position.y).toBeCloseTo(1.65,8);
+ expect(f.player.getSnapshot().velocity).toEqual(velocity);expect(f.camera.rotation.z).toBeCloseTo(0,10);
 });

@@ -9,6 +9,7 @@ export interface CinematicPose {
   readonly fov: number;
 }
 export interface CinematicKeyframe {
+  readonly easing?: 'smooth';
   readonly atSeconds: number;
   readonly pose: CinematicPose;
 }
@@ -87,7 +88,8 @@ export function validateCinematicDefinition(input: CinematicDefinition): Cinemat
   const camera = input.camera.map((frame) => {
     if (!frame || !Number.isFinite(frame.atSeconds) || frame.atSeconds < 0 || frame.atSeconds <= previous || frame.atSeconds > input.durationSeconds) throw new Error('Camera keyframes must be strictly ordered within the cinematic');
     previous = frame.atSeconds;
-    return { atSeconds: frame.atSeconds, pose: copyPose(frame.pose) };
+    if(frame.easing!==undefined&&frame.easing!=='smooth')throw new Error('Invalid camera easing');
+    return { atSeconds: frame.atSeconds, pose: copyPose(frame.pose), ...(frame.easing?{easing:frame.easing}:{}) };
   });
   if (camera[0]!.atSeconds !== 0 || camera[camera.length - 1]!.atSeconds !== input.durationSeconds) throw new Error('Camera path must cover the complete cinematic');
   const blend = input.skipBlendSeconds ?? 0.25;
@@ -221,7 +223,8 @@ export function createCinematicPlayer(options: CinematicPlayerOptions): Cinemati
           if (next <= 0) { writePose(definition.camera[0]!.pose); return; }
           const end = definition.camera[next]!;
           const begin = definition.camera[next - 1]!;
-          interpolate(begin.pose, end.pose, (elapsed - begin.atSeconds) / (end.atSeconds - begin.atSeconds));
+          const linear=(elapsed-begin.atSeconds)/(end.atSeconds-begin.atSeconds);
+          interpolate(begin.pose,end.pose,end.easing==='smooth'?linear*linear*(3-2*linear):linear);
         };
         const advanceTo = (time: number): void => {
           const line = voice;

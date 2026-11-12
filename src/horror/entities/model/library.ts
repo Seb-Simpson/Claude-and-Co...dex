@@ -1,3 +1,5 @@
+import {disposeOwnedTextures} from '../../../assets/disposeTextures';
+import {readAssetBytes} from '../../../assets/preload';
 import type { AnimationClip, Group, Material, Mesh, Texture } from 'three';
 import { GLTFLoader, type GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import type { JointName } from '../rig';
@@ -62,7 +64,7 @@ const withTimeout = <T>(promise: Promise<T>, ms: number, what: string): Promise<
     promise.then((v) => { clearTimeout(timer); resolve(v); }, (e: unknown) => { clearTimeout(timer); reject(e); });
   });
 
-const defaultLoad: GltfLoad = (url) => new GLTFLoader().loadAsync(url);
+const defaultLoad: GltfLoad = async (url) => new GLTFLoader().parseAsync(await readAssetBytes(url), '');
 
 /** Free every GPU-side resource reachable from a loaded scene. */
 export function disposeScene(scene: Group): void {
@@ -78,7 +80,7 @@ export function disposeScene(scene: Group): void {
     for (const value of Object.values(m)) if (value && (value as Texture).isTexture) textures.add(value as Texture);
     m.dispose();
   }
-  for (const t of textures) t.dispose();
+  disposeOwnedTextures(textures);
 }
 
 /**

@@ -1,5 +1,5 @@
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import { type PreloadEntry, takePreloaded } from '../../../assets/preload';
+import { type PreloadEntry, readAssetBytes } from '../../../assets/preload';
 import manifest from '../assets/manifest.json';
 import { type EntityModelManifest, loadModelLibrary, type ModelEntity, type ModelLibrary } from './library';
 
@@ -30,10 +30,7 @@ export async function loadEntityModels(): Promise<ModelLibrary> {
     return await loadModelLibrary({
       urls: MODEL_URLS, manifests: MODEL_MANIFESTS,
       // Bytes the loading screen already streamed are parsed from memory (no second download).
-      load: (url) => {
-        const buffer = takePreloaded(url);
-        return buffer ? loader.parseAsync(buffer, '') : loader.loadAsync(url);
-      },
+      load: async (url) => loader.parseAsync(await readAssetBytes(url), ''),
     });
   } catch (error) {
     const reason = error instanceof Error ? error.message : String(error);

@@ -348,7 +348,7 @@ export function createApplication(options: ApplicationOptions): Application {
         audioState: engine?.services.audio.context?.state ?? 'locked', events: [...(attempt?.records ?? [])],
         doorStates, prompt: attempt?.runtime?.interactions.getPrompt() ?? null, error,
         ...(attempt?.runtime?.station ? {station:attempt.runtime.station.snapshot()} : {}),
-        ...(attempt?.runtime?.opening ? { opening: { phase: attempt.runtime.opening.onboarding.phase, state: attempt.runtime.opening.state, cinematic: attempt.runtime.opening.cinematic,
+        ...(attempt?.runtime?.opening ? { opening: { narrative:{scene:attempt.runtime.opening.narrative.scene,checkpoint:attempt.runtime.opening.narrative.checkpoint(),owners:attempt.runtime.opening.coordinator.snapshot()},phase: attempt.runtime.opening.onboarding.phase, state: attempt.runtime.opening.state, cinematic: attempt.runtime.opening.cinematic,
           anchors: attempt.runtime.opening.anchors(), camera: { x: engine!.services.camera.position.x,
             y: engine!.services.camera.position.y, z: engine!.services.camera.position.z } } } : {}),
         performance: { fixedMaxMs, updateMaxMs, frameDeltaMaxMs, simulatedSeconds,

@@ -1,3 +1,5 @@
+import {createExperienceCoordinator} from '../../src/gameplay/directors/experience';
+import type {StationOptions} from '../../src/gameplay/encounters/nursesStation';
 import RAPIER from '@dimforge/rapier3d-compat';
 import {Scene,PerspectiveCamera} from 'three';
 import {beforeAll,describe,it,expect} from 'vitest';
@@ -10,7 +12,7 @@ import type {StationCheckpoint} from '../../src/gameplay/encounters/checkpoint';
 import {resolveStationBindings} from '../../src/gameplay/encounters/stationBindings';
 import {createEventBus} from '../../src/integration/events';
 beforeAll(async()=>{await RAPIER.init()});
-function fixture(checkpoint?:StationCheckpoint){
+function fixture(checkpoint?:StationCheckpoint,policy:Partial<Pick<StationOptions,'canStage'|'coordinator'>>={}){
  const hospital=createHospitalWorld({textures:false}),world=hospital.world,events=createEventBus();
  const physics=new RAPIER.World({x:0,y:-9.81,z:0});
  const engine={physics,scene:new Scene(),camera:new PerspectiveCamera(70,1,.05,100),renderer:{domElement:{}},audio:{context:null}} as unknown as EngineServices;
@@ -18,7 +20,7 @@ function fixture(checkpoint?:StationCheckpoint){
  const b=resolveStationBindings(world)!;const saved:StationCheckpoint[]=[],messages:string[]=[],poses:StationActorPose[]=[],captures:string[]=[],chases:string[]=[];
  events.on('player:captured',e=>captures.push(e.entityId));events.on('chase:started',e=>chases.push(e.entityId));
  let eligible=false,time=0;
- station=createStationEncounter({world,bindings:b,physics:game.physics,navigation:game.navigation,player:game.player,interactions:game.interactions,events,
+ station=createStationEncounter({...policy,world,bindings:b,physics:game.physics,navigation:game.navigation,player:game.player,interactions:game.interactions,events,
   ...(checkpoint?{checkpoint}:{}),eligible:()=>eligible,present:p=>poses.push(p),save:c=>saved.push(c),notify:m=>messages.push(m)});
  return {game,station,b,world,events,poses,saved,messages,captures,chases,physics,
   get time(){return time},
@@ -62,10 +64,10 @@ describe('first Nurse encounter on the actual station geometry',()=>{
    }
    expect(f.station.snapshot().phase).toBe('tension');expect(f.poses.some(p=>p.checkingPanel)).toBe(true);
    const action=f.poses.find(p=>p.checkingPanel)!;
-   expect(f.game.physics.hasLineOfSight({...f.b.observation,y:1.65},{...action.actor.position,y:1.6})).toBe(true);
+   expect(f.game.physics.hasLineOfSight({...f.b.patrol[3]!,y:1.65},{...action.actor.position,y:1.6})).toBe(true);
    f.tick(420);expect(f.station.snapshot().phase).toBe('tension');expect(f.chases).toEqual([]);expect(f.captures).toEqual([]);
    f.until('stealth');expect(f.saved.map(c=>c.phase)).toEqual(['introduction','tension','stealth']);
-   expect(f.physics.colliders.len()).toBe(bodyCount);expect(f.game.entities.getSnapshots()).toEqual([]);
+   expect(f.physics.colliders.len()).toBe(bodyCount+1);expect(f.game.entities.getSnapshots()).toEqual([]);
   }finally{f.dispose()}
  });
  it('uses real directional trolley occlusion, then allows actual perception and sound investigation after handoff',()=>{
@@ -124,4 +126,28 @@ describe('first Nurse encounter on the actual station geometry',()=>{
    expect(f.station.snapshot().actor.lastKnownPlayer).toBeNull();expect(f.station.canCapture).toBe(false);expect(f.chases).toEqual([]);
   }finally{f.dispose()}
  });
+});
+
+it('defers a visible entrance without allocating an invisible capsule, then starts when an unseen staging point is available',()=>{
+ let hidden=false;const f=fixture(undefined,{canStage:()=>hidden});try{
+  const count=f.physics.colliders.len();f.allow();f.place(f.b.observation);f.tick(600);
+  expect(f.station.snapshot().active).toBe(false);expect(f.station.snapshot().phase).toBe('waiting');expect(f.physics.colliders.len()).toBe(count);
+  hidden=true;f.tick(31);expect(f.station.snapshot().active).toBe(true);expect(f.station.snapshot().phase).toBe('introduction');expect(f.captures).toEqual([]);
+ }finally{f.dispose()}
+});
+it('reserves the same actor for autonomous AI and cancels stale encounter work without leaking ownership',()=>{
+ const coordinator=createExperienceCoordinator(),f=fixture({version:1,phase:'stealth'},{coordinator});try{
+  expect(coordinator.snapshot()).toEqual([{owner:'ai:shaw',resources:['nurse']}]);
+  expect(coordinator.acquire('conflicting-scene',['nurse'])).toBeNull();
+  coordinator.cancel();f.tick(300);expect(f.captures).toEqual([]);expect(coordinator.snapshot()).toEqual([]);
+ }finally{f.dispose();coordinator.dispose()}
+});
+
+it('finishes the authored introduction when a stationary reader occupies the preferred panel stance, without walking through them',()=>{
+ const f=fixture();try{
+  f.allow();f.place(f.b.patrol[0]!);f.until('tension',4500);
+  expect(f.poses.some(p=>p.checkingPanel&&p.contactReady===false)).toBe(true);
+  expect(f.captures).toEqual([]);expect(f.station.snapshot().actor.lastKnownPlayer).toBeNull();
+  for(const p of f.poses.filter(p=>p.visible))expect(Math.hypot(p.actor.position.x-f.b.patrol[0]!.x,p.actor.position.z-f.b.patrol[0]!.z)).toBeGreaterThan(.55);
+ }finally{f.dispose()}
 });

@@ -22,6 +22,7 @@ export interface SaveRecord {
 export const ROOM_104_CHECKPOINT = { id: 'nw:checkpoint:room-104-wake', label: 'Room 104 · Ward 4 West' } as const;
 function openingLabel(opening: OpeningCheckpoint): string {
   if (opening.station?.phase === 'complete') return 'West Ward · Station cleared';
+  if ((opening.narrative?.step??0)>=3 && !opening.station) return 'Nurses’ Station · Night register';
   if (opening.station) return 'Nurses’ Station · Shaw’s round';
   return opening.milestone === 'station-approach' ? 'Nurses’ Station · West Ward' : 'Room 104 · Door released';
 }

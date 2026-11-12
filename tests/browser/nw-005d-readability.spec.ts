@@ -2,7 +2,7 @@ import {expect,test} from '@playwright/test';
 import {writeFile} from 'node:fs/promises';
 import type {Application} from '../../src/integration/application';
 const snap=(page:import('@playwright/test').Page)=>page.evaluate(()=>window.nightWardTest!.snapshot());
-test('assisted visual inspection of final card, intercom, Nurse and rebuilt ceiling at shipping Low resolution',async({page},info)=>{
+test('assisted visual inspection of card, intercom, empty corridor and rebuilt ceiling at shipping Low resolution',async({page},info)=>{
  test.setTimeout(600_000);const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
  page.on('console',m=>{if(m.type()==='error')errors.push(m.text());});
  await page.addInitScript(()=>localStorage.setItem('night-ward:settings:v1',JSON.stringify({quality:'low',motion:'reduce',subtitles:true})));
@@ -26,8 +26,9 @@ test('assisted visual inspection of final card, intercom, Nurse and rebuilt ceil
  await page.screenshot({path:info.outputPath('02-reader-and-intercom.png')});
  const view=a['nurse-first-sight-view']!.position;
  await pose({x:view.x,y:0.003,z:view.z},{...a['nurse-first-sight']!.position,y:1.4});
- await expect.poll(async()=>(await snap(page)).opening!.state.sightingSeen,{timeout:90_000}).toBe(true);
- await page.screenshot({path:info.outputPath('03-nurse-first-sight.png')});
+ expect((await snap(page)).opening!.state.sightingSeen).toBe(false);
+ expect((await snap(page)).station!.active).toBe(false);
+ await page.screenshot({path:info.outputPath('03-empty-corridor.png')});
  // These are producer-authored inspection coordinates for the remodelled collapse, not progression triggers.
  await pose({x:-10,y:0.003,z:0.2},{x:-9.4,y:2.72,z:-.35});
  await page.screenshot({path:info.outputPath('04-ceiling-collapse.png')});

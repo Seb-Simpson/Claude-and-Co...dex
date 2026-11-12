@@ -49,11 +49,13 @@ async function interact(page: Page, text: string) {
   await expect.poll(async () => (await snap(page)).events.filter(e => e.type === 'interaction:completed').length, wait).toBeGreaterThan(count);
 }
 test.describe.configure({ timeout: 900_000 });
-test('normal title-to-station keyboard route: no teleport, safe card-first exploration, crouching, reader and distant Nurse', async ({ page }, info) => {
+test('normal title-to-station keyboard route: no teleport, safe card-first exploration, crouching, reader and empty corridor', async ({ page }, info) => {
   const errors = await boot(page);
   // Disable positioning shortcuts so accidental future use fails this playthrough.
   await page.evaluate(() => { window.nightWardTest!.teleport = () => { throw new Error('Teleport forbidden in keyboard route'); }; window.nightWardTest!.aimAt = () => { throw new Error('Aim shortcut forbidden in keyboard route'); }; });
   await expect.poll(async () => (await snap(page)).opening!.state.awakened, wait).toBe(true);
+  const neutral=(await snap(page)).performance.simulatedSeconds;
+  await expect.poll(async () => (await snap(page)).performance.simulatedSeconds,wait).toBeGreaterThan(neutral+.5);
   expect((await snap(page)).opening!.phase).toBe('room-104');
   await page.screenshot({ path: info.outputPath('01-awake.png') });
   const a = (await snap(page)).opening!.anchors;
@@ -77,11 +79,14 @@ test('normal title-to-station keyboard route: no teleport, safe card-first explo
   const view = a['nurse-first-sight-view']!.position;
   await walk(page, { ...view, y: 0 });
   await look(page, { ...a['nurse-first-sight']!.position, y: 1.4 });
-  await expect.poll(async () => (await snap(page)).opening!.state.sightingSeen, wait).toBe(true);
+  expect((await snap(page)).opening!.state.sightingSeen).toBe(false);
+  expect((await snap(page)).station!.active).toBe(false);
   await page.screenshot({ path: info.outputPath('02-corridor.png') });
   await walk(page, a['room-106-door']!.stand!); await look(page, a['room-106-door']!.position); await interact(page, 'Try handle');
   await page.keyboard.down('Shift'); await walk(page, a['station-approach']!.position); await page.keyboard.up('Shift');
   await expect.poll(async () => (await snap(page)).opening!.phase, wait).toBe('stealth-onboarding');
+  expect((await snap(page)).opening!.narrative?.scene).toBe('station-discovery');
+  expect((await snap(page)).station!.active).toBe(false);
   await page.evaluate(() => window.nightWardTest!.captureForTest());
   const final = await snap(page);
   expect(final.state).toBe('playing'); expect(final.player!.captured).toBe(false); expect(final.entities).toEqual([]);

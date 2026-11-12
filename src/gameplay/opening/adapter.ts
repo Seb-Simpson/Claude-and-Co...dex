@@ -1,3 +1,4 @@
+import {stationRecordPoint,STATION_RECORD_ID} from '../encounters/storyBindings';
 import { BoxGeometry, Mesh, MeshBasicMaterial } from 'three';
 import type { HospitalWorld, InteractableMarker } from '../../contracts';
 import type { OpeningBindings } from './bindings';
@@ -7,6 +8,8 @@ export const OPENING_INTERACTIONS = {
 } as const;
 /** Raycast-only targets at producer-owned anchors. World geometry/resources are never replaced. */
 export function createOpeningInteractionAdapter(world: HospitalWorld, bindings: OpeningBindings): { world: HospitalWorld; dispose(): void } {
+  const record = stationRecordPoint(world);
+  if(world.root.getObjectByName('nw:stealth:observation')&&!record)throw new Error('The station needs its night-register binding before play.');
   const material = new MeshBasicMaterial({ colorWrite: false, depthWrite: false });
   const owned: Mesh[] = [];
   function marker(key: 'access-card' | 'card-reader' | 'intercom-speaker', id: string, prompt: string, size: readonly [number, number, number], range: number): InteractableMarker {
@@ -22,6 +25,11 @@ export function createOpeningInteractionAdapter(world: HospitalWorld, bindings: 
     marker('card-reader', OPENING_INTERACTIONS.reader, 'Use card reader', [0.18, 0.26, 0.1], 1.85),
     marker('intercom-speaker', OPENING_INTERACTIONS.intercom, 'Examine intercom', [0.23, 0.18, 0.1], 2),
   ];
+  if (record) {
+    const mesh = new Mesh(new BoxGeometry(.42,.09,.38),material);
+    mesh.name=STATION_RECORD_ID;mesh.position.copy(world.root.worldToLocal(record.clone()));world.root.add(mesh);owned.push(mesh);
+    additions.push({id:STATION_RECORD_ID,type:'inspect',object:mesh,prompt:'Examine night register',range:2.3});
+  }
   let disposed = false;
   return { world: { ...world, interactables: [...world.interactables, ...additions] }, dispose() {
     if (disposed) return;

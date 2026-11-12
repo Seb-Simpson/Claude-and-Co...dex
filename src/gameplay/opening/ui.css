@@ -94,3 +94,11 @@
 .nw-opening-ui__capture button:focus-visible { outline:1px solid #bac6ae; outline-offset:6px; }
 @keyframes nw-opening-capture-in {from {opacity:0} to {opacity:1}}
 @media(prefers-reduced-motion:reduce) {.nw-opening-ui__capture {animation-duration:.01s}}
+/* Brief printed feedback; no permanent instruction rail. */
+.nw-opening-ui__notification {left:50%;bottom:max(18%,115px);transform:translateX(-50%);max-width:min(34rem,82vw);text-align:center;white-space:pre-line;background-position:center bottom;font-size:.98rem;}
+.nw-opening-ui__capture {gap:1.35rem;background:#030606df;box-shadow:inset 0 0 18vw 6vw #000;animation-duration:1.1s;}
+.nw-opening-ui__capture-credit {font:400 .68rem var(--nw-mono,monospace);letter-spacing:.22em;text-transform:uppercase;color:#a3aca0;margin:0;}
+.nw-opening-ui__capture-skip {position:absolute;bottom:5%;font:400 .65rem var(--nw-mono,monospace);color:#9da699;}
+.nw-opening-ui__capture[data-phase='scare'] h2,.nw-opening-ui__capture[data-phase='scare'] button {visibility:hidden;}
+.nw-opening-ui__capture button:disabled {cursor:default;}
+.nw-reduce-motion .nw-opening-ui__capture {animation:none;}

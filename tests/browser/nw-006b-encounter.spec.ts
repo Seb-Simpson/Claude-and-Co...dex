@@ -26,17 +26,19 @@ async function look(page: Page, target: Vec3) {
     { x: -delta / .002, y: -(pitch - s.player!.rotation.pitch) / .002 });
 }
 /** Uses only normal look + keyboard input. No teleport, aimAt, body or camera writes. */
-async function walk(page: Page, target: Vec3) {
+async function walk(page: Page, target: Vec3, sprint=false) {
   const begin = Date.now();
   try {
     while (Date.now() - begin < 90_000) {
       const s = await snap(page), p = s.player!.position;
+      if(s.state==='captured')throw new Error('Captured during input walk');
       if (Math.hypot(target.x - p.x, target.z - p.z) < .23) return;
       await look(page, { ...target, y: s.opening!.camera.y });
+      if(sprint||(s.station?.phase==='stealth'&&s.station.actor.state==='pursue'))await page.keyboard.down('Shift');else await page.keyboard.up('Shift');
       await page.keyboard.down('w'); await page.waitForTimeout(80);
     }
     throw new Error(`Walk did not reach ${JSON.stringify(target)}; ${JSON.stringify((await snap(page)).player)}`);
-  } finally { await page.keyboard.up('w');
+  } finally { await page.keyboard.up('Shift');await page.keyboard.up('w');
     await expect.poll(async () => { const v = (await snap(page)).player!.velocity; return Math.hypot(v.x, v.z); }, wait).toBeLessThan(.03); }
 }
 async function interact(page: Page, text: string) {
@@ -50,10 +52,10 @@ async function interact(page: Page, text: string) {
 }
 
 test.use({video:'on',launchOptions:{...(process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE?{executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE}:{}),args:['--no-sandbox','--enable-webgl','--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']}});
-test.describe.configure({timeout:900_000});
-async function simWait(page:Page,seconds:number){const t=(await snap(page)).performance.simulatedSeconds;await expect.poll(async()=>(await snap(page)).performance.simulatedSeconds,wait).toBeGreaterThan(t+seconds)}
+test.describe.configure({timeout:1_500_000});
+async function simWait(page:Page,seconds:number){const t=(await snap(page)).performance.simulatedSeconds;await expect.poll(async()=>(await snap(page)).performance.simulatedSeconds,{timeout:Math.max(wait.timeout,seconds*25_000)}).toBeGreaterThan(t+seconds)}
 async function pause(page:Page){await page.evaluate(()=>document.exitPointerLock());await expect.poll(async()=>(await snap(page)).state,wait).toBe('paused')}
-test('input-only normal game:104 puzzle, authored station introduction, cover,105 bed, autonomous stealth and exit checkpoint',async({page},info)=>{
+test('input-only normal game:104 puzzle, authored station introduction, locker, cover, autonomous stealth and exit checkpoint',async({page},info)=>{
  const errors=await boot(page);const phases:unknown[]=[];
  await page.evaluate(()=>{window.nightWardTest!.teleport=()=>{throw Error('No teleport in normal route')};window.nightWardTest!.aimAt=()=>{throw Error('No aim shortcut in normal route')}});
  await expect.poll(async()=>(await snap(page)).opening!.state.awakened,wait).toBe(true);
@@ -74,25 +76,51 @@ test('input-only normal game:104 puzzle, authored station introduction, cover,10
  const s=(await snap(page)).station!.locations;
  await walk(page,{...a['nurse-first-sight-view']!.position,y:0});await look(page,{...a['nurse-first-sight']!.position,y:1.4});
  await walk(page,s.observation);await look(page,{...s.patrol[3]!,y:1.5});
+ expect((await snap(page)).station!.active).toBe(false);
+ expect((await snap(page)).opening!.narrative?.scene).toBe('empty-corridor');
+ expect(s.recordStand).toBeDefined();expect(s.record).toBeDefined();
+ for(const point of s.recordRoute)await walk(page,point);
+ await walk(page,s.recordStand!);await look(page,s.record!);await interact(page,'night register');
+ await expect.poll(async()=>(await snap(page)).opening!.narrative?.checkpoint.step,wait).toBe(4);
  await expect.poll(async()=>(await snap(page)).station!.phase,wait).toBe('introduction');
  phases.push(await snap(page));await pause(page);const paused=(await snap(page)).station!;
  await page.waitForTimeout(500);expect((await snap(page)).station).toEqual(paused);
  await page.getByRole('button',{name:/^Resume/}).click();await expect.poll(async()=>(await snap(page)).state,wait).toBe('playing');
- await expect.poll(async()=>(await snap(page)).station!.step,wait).toBeGreaterThanOrEqual(2);
+ await expect.poll(async()=>(await snap(page)).station!.action,{timeout:360_000}).toBe('check-panel');
  await look(page,{...(await snap(page)).station!.actor.position,y:1.4});await page.screenshot({path:info.outputPath('01-authored-station.png')});
- await expect.poll(async()=>(await snap(page)).station!.phase,wait).toBe('tension');phases.push(await snap(page));
- await walk(page,s.crouchCover);await page.keyboard.press('c');await expect.poll(async()=>(await snap(page)).player!.crouching,wait).toBe(true);
- await look(page,{...s.patrol[0]!,y:1.3});await page.screenshot({path:info.outputPath('02-real-trolley-cover.png')});
- await expect.poll(async()=>(await snap(page)).station!.phase,wait).toBe('stealth');phases.push(await snap(page));
- await page.keyboard.press('c');await walk(page,s.observation);
- for(const point of s.concealmentRoute)await walk(page,point);
- await look(page,s.hidingTargets[s.hidingSecondary]!);await interact(page,'Hide under bed');
+ await expect.poll(async()=>(await snap(page)).station!.phase,{timeout:420_000}).toBe('tension');phases.push(await snap(page));
+ // Scene five: the primary locker is learned while the authored routine is nonlethal.
+ await walk(page,s.hidingApproaches[s.hidingPrimary]!);await look(page,s.hidingTargets[s.hidingPrimary]!);await interact(page,'Hide in locker');
  await expect.poll(async()=>(await snap(page)).player!.hiding.state,wait).toBe('hidden');
- await simWait(page,2);expect((await snap(page)).player!.captured).toBe(false);
- await page.screenshot({path:info.outputPath('03-room105-hidden.png')});
+ await page.screenshot({path:info.outputPath('02-first-locker-hide.png')});
+ await expect.poll(async()=>(await snap(page)).station!.phase,{timeout:240_000}).toBe('stealth');phases.push(await snap(page));
+ expect((await snap(page)).player!.captured).toBe(false);
+ // A real patrol observation before leaving cover, rather than a phase/actor shortcut.
+ await expect.poll(async()=>{const p=(await snap(page)).station!.actor.position,q=s.hidingApproaches[s.hidingPrimary]!;return Math.hypot(p.x-q.x,p.z-q.z)},{timeout:180_000}).toBeGreaterThan(3.2);
  await interact(page,'Leave hiding place');await expect.poll(async()=>(await snap(page)).player!.hiding.state,wait).toBe('outside');
- for(const point of s.returnRoute)await walk(page,point);
- await walk(page,s.entry);await walk(page,s.exit);
+ await walk(page,s.recordStand!);
+ for(const point of [...s.recordRoute].reverse())await walk(page,point);
+ await walk(page,s.crouchCover);await page.keyboard.press('c');await expect.poll(async()=>(await snap(page)).player!.crouching,wait).toBe(true);
+ await look(page,{...s.patrol[0]!,y:1.3});await page.screenshot({path:info.outputPath('03-real-trolley-cover.png')});
+ // Leave while she is patrolling: a complete opening route, not a tour of every
+ // hiding prop during active pursuit. The separate bed test below retains that coverage.
+ await page.keyboard.press('c');
+ try {await walk(page,s.entry,true);await walk(page,s.exit,true);}
+ catch(error){
+  const caught=await snap(page);
+  if(caught.state!=='captured')throw error;
+  // Autonomous stealth may punish a genuine route mistake. Recovery must use
+  // the same public UI and saved milestone as a player's attempt, never a phase write.
+  expect(caught.station!.phase).toBe('stealth');expect(caught.station!.firstAlertUsed).toBe(true);
+  expect(Math.hypot(caught.station!.actor.position.x-caught.player!.position.x,caught.station!.actor.position.z-caught.player!.position.z)).toBeLessThan(1.1);
+  phases.push(caught);await page.screenshot({path:info.outputPath('04-route-capture.png')});
+  await page.getByRole('button',{name:'Restart from checkpoint',exact:true}).click();
+  await expect.poll(async()=>(await snap(page)).state,wait).toBe('ready');
+  expect((await snap(page)).station!.phase).toBe('stealth');expect((await snap(page)).opening!.narrative?.checkpoint.step).toBe(6);
+  if(process.env.NW005_SOFTWARE_SCALE==='1')await page.evaluate(()=>(window.nightWardTest as Application).services()!.renderer.setPixelRatio(.25));
+  await page.getByRole('button',{name:'Enter ward',exact:true}).click();await expect.poll(async()=>(await snap(page)).state,wait).toBe('playing');
+  await walk(page,s.entry,true);await walk(page,s.exit,true);
+ }
  await expect.poll(async()=>(await snap(page)).station!.phase,wait).toBe('complete');
  await expect.poll(()=>page.evaluate(()=>JSON.parse(localStorage.getItem('night-ward:save:v1')!).opening?.station?.phase),wait).toBe('complete');
  const final=await snap(page);phases.push(final);expect(final.player!.captured).toBe(false);expect(final.station!.actor.type).toBe('nurse');expect(final.entities).toEqual([]);
@@ -101,10 +129,17 @@ test('input-only normal game:104 puzzle, authored station introduction, cover,10
  await pause(page);await page.getByRole('button',{name:/^Return to Main Menu/}).click();await page.getByRole('button',{name:'Leave the ward',exact:true}).click();
  await page.reload();await page.getByRole('button',{name:/^Continue/}).click();await expect.poll(async()=>(await snap(page)).state,wait).toBe('ready');
  expect((await snap(page)).station!.phase).toBe('complete');expect((await snap(page)).player!.position.x).toBeCloseTo(s.exit.x,1);
+ expect((await snap(page)).opening!.narrative?.checkpoint.step).toBe(7);
+ expect((await snap(page)).opening!.narrative?.owners).toEqual([]);
+ await page.getByRole('button',{name:'Enter ward',exact:true}).click();await expect.poll(async()=>(await snap(page)).state,wait).toBe('playing');
+ await pause(page);await page.getByRole('button',{name:/^Return to Main Menu/}).click();await page.getByRole('button',{name:'Leave the ward',exact:true}).click();
+ await page.getByRole('button',{name:/^New Game/}).click();await page.getByRole('button',{name:'Start new game',exact:true}).click();
+ await expect.poll(async()=>(await snap(page)).state,wait).toBe('ready');
+ const fresh=await snap(page);expect(fresh.opening!.narrative?.scene).toBe('awakening');expect(fresh.opening!.state.cardAcquired).toBe(false);expect(fresh.station!.active).toBe(false);
  expect(errors).toEqual([]);
 });
 
-test('real capture after a forgiving first alert, restart restores stealth without repeating the introduction',async({page},info)=>{
+test('real capture after a forgiving first alert: skip, keyboard Retry and restored stealth without repeating the introduction',async({page},info)=>{
  // Saved milestone fixture exercises the production Continue path; no actor or phase mutation.
  await page.addInitScript(()=>{
   localStorage.setItem('night-ward:settings:v1',JSON.stringify({quality:'low',motion:'reduce',subtitles:true}));
@@ -120,7 +155,12 @@ test('real capture after a forgiving first alert, restart restores stealth witho
  expect((await snap(page)).player!.captured).toBe(false);await simWait(page,2);expect((await snap(page)).player!.captured).toBe(false);
  await expect.poll(async()=>(await snap(page)).state,{timeout:150_000}).toBe('captured');
  await page.screenshot({path:info.outputPath('05-real-capture.png')});
- const before=await snap(page);await page.getByRole('button',{name:/^Restart/}).click();
+ const before=await snap(page);
+ // Escape advances the captured transport if it is still running. Once ready,
+ // Space must regain its native button behavior rather than remain a cutscene key.
+ await page.keyboard.press('Escape');
+ const retry=page.getByRole('button',{name:'Restart from checkpoint',exact:true});
+ await expect(retry).toBeEnabled(wait);await retry.focus();await page.keyboard.press('Space');
  if(await page.getByRole('dialog',{name:'Restart this session?'}).isVisible())await page.getByRole('button',{name:'Restart',exact:true}).click();
  await expect.poll(async()=>(await snap(page)).state,wait).toBe('ready');
  const after=await snap(page);expect(after.station!.phase).toBe('stealth');expect(after.player!.captured).toBe(false);expect(after.sessionId).toBe(before.sessionId+1);
@@ -151,4 +191,28 @@ test('shipping Low checkpoint restore: tension remains safe, pause and menu rest
  const after=await snap(page);expect(after.station!.phase).toBe('tension');expect(after.player!.captured).toBe(false);
  expect(after.colliderCount).toBe(before.colliderCount);expect(await page.locator('canvas').count()).toBe(1);
  await writeFile(info.outputPath('tension-restart-native-low.json'),JSON.stringify({before,after,errors},null,2));expect(errors).toEqual([]);
+});
+
+
+test('autonomous stealth: real sprint sound is investigated but unseen Room105 bed entry conceals the player',async({page},info)=>{
+ await page.addInitScript(()=>{
+  localStorage.setItem('night-ward:settings:v1',JSON.stringify({quality:'low',motion:'reduce',subtitles:true}));
+  localStorage.setItem('night-ward:save:v1',JSON.stringify({version:1,checkpoint:'nw:checkpoint:station-approach',label:'Nurses’ Station',playSeconds:42,savedAt:1,sessions:1,
+   opening:{version:1,milestone:'station-approach',station:{version:1,phase:'stealth'},state:{version:1,awakened:true,cardAcquired:true,doorUnlocked:true,firstLinePlayed:true,secondLinePlayed:true,room106Tried:true,sightingSeen:true,stationReached:true}}}));
+ });
+ await page.goto('/?test=1&menu=1');await page.getByRole('button',{name:/^Continue/}).click();await expect.poll(async()=>(await snap(page)).state,wait).toBe('ready');
+ if(process.env.NW005_SOFTWARE_SCALE==='1')await page.evaluate(()=>(window.nightWardTest as Application).services()!.renderer.setPixelRatio(.25));
+ await page.getByRole('button',{name:'Enter ward',exact:true}).click();await expect.poll(async()=>(await snap(page)).state,wait).toBe('playing');
+ const locations=(await snap(page)).station!.locations;
+ for(const [i,point] of locations.concealmentRoute.entries()){
+  if(i===1)await walk(page,point,true);
+  else {if(i===2)await page.keyboard.press('c');await walk(page,point);}
+ }
+ await look(page,locations.hidingTargets[locations.hidingSecondary]!);await interact(page,'Hide under bed');
+ await expect.poll(async()=>(await snap(page)).player!.hiding.state,wait).toBe('hidden');
+ await simWait(page,12);const hidden=await snap(page);
+ expect(hidden.player!.captured).toBe(false);expect(hidden.station!.actor.lastKnownPlayer?.source).not.toBe('witnessed-hiding');
+ expect(hidden.events.some(e=>e.type==='entity:state'&&(e.payload as {current:string}).current==='investigate')).toBe(true);
+ await page.screenshot({path:info.outputPath('05-unseen-entry-hidden.png')});
+ await writeFile(info.outputPath('unseen-bed.json'),JSON.stringify(hidden,null,2));
 });

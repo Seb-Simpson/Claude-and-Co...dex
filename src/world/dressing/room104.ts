@@ -1,8 +1,9 @@
+import {disposeOwnedTextures} from '../../assets/disposeTextures';
 import {
   type Group, type Material, type Mesh, type MeshStandardMaterial, NoColorSpace, type Object3D, type Texture, TextureLoader,
 } from 'three';
 import { type GLTF, GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import { type PreloadEntry, takePreloaded } from '../../assets/preload';
+import { type PreloadEntry, readAssetBytes } from '../../assets/preload';
 import setManifest from './assets/room104_set.json';
 
 /** Built by src/world/dressing/pipeline (Blender): see README there. Vite fingerprints both files. */
@@ -67,11 +68,10 @@ export async function loadRoom104Set(options: LoadRoom104Options = {}): Promise<
   const timeout = options.timeoutMs ?? 20000;
   // Bytes the loading screen already streamed are parsed from memory (no second download).
   const loadGltf = options.loadGltf ?? ((url: string) => {
-    const buffer = takePreloaded(url);
-    return buffer ? new GLTFLoader().parseAsync(buffer, '') : new GLTFLoader().loadAsync(url);
+    return readAssetBytes(url).then(buffer=>new GLTFLoader().parseAsync(buffer, ''));
   });
   const loadTexture = options.loadTexture ?? (async (url: string) => {
-    const buffer = takePreloaded(url);
+    const buffer = await readAssetBytes(url);
     if (!buffer || typeof URL.createObjectURL !== 'function') return new TextureLoader().loadAsync(url);
     const blobUrl = URL.createObjectURL(new Blob([buffer], { type: 'image/jpeg' }));
     try { return await new TextureLoader().loadAsync(blobUrl); } finally { URL.revokeObjectURL(blobUrl); }
@@ -197,7 +197,7 @@ export async function loadRoom104Set(options: LoadRoom104Options = {}): Promise<
         o.traverse((c) => { const mesh = c as Mesh; if (mesh.isMesh) mesh.geometry.dispose(); });
       }
       for (const m of materials) m.dispose();
-      for (const t of textures) t.dispose();
+      disposeOwnedTextures(textures);
     },
   };
 }

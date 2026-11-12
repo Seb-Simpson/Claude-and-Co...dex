@@ -1,0 +1,65 @@
+
+> night-ward@0.0.0 test:browser
+> playwright test tests/browser/nw-006b-encounter.spec.ts tests/browser/nw-007a-reliability.spec.ts tests/browser/nw-007a-scenes.spec.ts -g input-only normal game|canonical assets survive|five real Nurse|a fresh page Continues|production discovery fixture
+
+[WebServer] (node:2192) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 5 tests using 1 worker
+
+(node:2211) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 tests/browser/nw-006b-encounter.spec.ts:57:1 › input-only normal game:104 puzzle, authored station introduction, locker, cover, autonomous stealth and exit checkpoint (10.6m)
+(node:2520) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  2 tests/browser/nw-007a-reliability.spec.ts:8:1 › canonical assets survive retry when a later asset request fails; no legacy playable fallback (16.9s)
+Verified capture/retry 1/5
+Verified capture/retry 2/5
+Verified capture/retry 3/5
+Verified capture/retry 4/5
+Verified capture/retry 5/5
+  ✓  3 tests/browser/nw-007a-reliability.spec.ts:64:1 › five real Nurse captures and UI retries preserve canonical assets, saved card and one actor; New Game resets fresh state (5.8m)
+  ✓  4 tests/browser/nw-007a-reliability.spec.ts:146:1 › a fresh page Continues a completed milestone with canonical assets, then New Game restores the visible card and locked door (45.5s)
+(node:2898) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  5 tests/browser/nw-007a-scenes.spec.ts:5:1 › production discovery fixture: empty corridor, physical record range, clue-gated unseen entrance and pause ownership (35.5s)
+
+
+  1) tests/browser/nw-006b-encounter.spec.ts:57:1 › input-only normal game:104 puzzle, authored station introduction, locker, cover, autonomous stealth and exit checkpoint 
+
+    Error: Walk did not reach {"x":-4.2,"y":0,"z":0.2}; {"id":"player","position":{"x":-7.982358619079435,"y":0.0029999985098838862,"z":0.7940355749325695},"rotation":{"yaw":4.866388980384688,"pitch":0},"velocity":{"x":0,"y":0,"z":0},"movement":"captured","crouching":false,"grounded":true,"hiding":{"state":"outside","spotId":null},"captured":true}
+
+      37 |       await page.keyboard.down('w'); await page.waitForTimeout(80);
+      38 |     }
+    > 39 |     throw new Error(`Walk did not reach ${JSON.stringify(target)}; ${JSON.stringify((await snap(page)).player)}`);
+         |           ^
+      40 |   } finally { await page.keyboard.up('Shift');await page.keyboard.up('w');
+      41 |     await expect.poll(async () => { const v = (await snap(page)).player!.velocity; return Math.hypot(v.x, v.z); }, wait).toBeLessThan(.03); }
+      42 | }
+        at walk (/workspace/night-ward/tests/browser/nw-006b-encounter.spec.ts:39:11)
+        at /workspace/night-ward/tests/browser/nw-006b-encounter.spec.ts:107:2
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/nw-006b-encounter-input-on-75b23-stealth-and-exit-checkpoint/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/nw-006b-encounter-input-on-75b23-stealth-and-exit-checkpoint/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/nw-006b-encounter-input-on-75b23-stealth-and-exit-checkpoint/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/nw-006b-encounter-input-on-75b23-stealth-and-exit-checkpoint/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/nw-006b-encounter-input-on-75b23-stealth-and-exit-checkpoint/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  Slow test file: tests/browser/nw-006b-encounter.spec.ts (10.6m)
+  Slow test file: tests/browser/nw-007a-reliability.spec.ts (6.8m)
+  Consider running tests from slow files in parallel. See: https://playwright.dev/docs/test-parallel
+  1 failed
+    tests/browser/nw-006b-encounter.spec.ts:57:1 › input-only normal game:104 puzzle, authored station introduction, locker, cover, autonomous stealth and exit checkpoint 
+  4 passed (18.2m)

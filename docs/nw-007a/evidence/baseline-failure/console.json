@@ -1,0 +1,46 @@
+[
+  {
+    "type": "console",
+    "messageType": "warning",
+    "text": "NIGHT WARD: Room 104 visual set unavailable, using the procedural room: Failed to fetch",
+    "args": [
+      {
+        "preview": "NIGHT WARD: Room 104 visual set unavailable, using the procedural room:",
+        "value": "NIGHT WARD: Room 104 visual set unavailable, using the procedural room:"
+      },
+      {
+        "preview": "Failed to fetch",
+        "value": "Failed to fetch"
+      }
+    ],
+    "location": {
+      "url": "http://127.0.0.1:4173/src/world/hospital.module.ts",
+      "lineNumber": 22,
+      "columnNumber": 19
+    },
+    "time": 9930.431,
+    "pageId": "page@ec9a1db2b92be2315c559d0ff81a5afc"
+  },
+  {
+    "type": "console",
+    "messageType": "warning",
+    "text": "NIGHT WARD: Nurses\u2019 Station set unavailable, using the procedural stand-ins: Failed to fetch",
+    "args": [
+      {
+        "preview": "NIGHT WARD: Nurses\u2019 Station set unavailable, using the procedural stand-ins:",
+        "value": "NIGHT WARD: Nurses\u2019 Station set unavailable, using the procedural stand-ins:"
+      },
+      {
+        "preview": "Failed to fetch",
+        "value": "Failed to fetch"
+      }
+    ],
+    "location": {
+      "url": "http://127.0.0.1:4173/src/world/hospital.module.ts",
+      "lineNumber": 24,
+      "columnNumber": 19
+    },
+    "time": 9930.611,
+    "pageId": "page@ec9a1db2b92be2315c559d0ff81a5afc"
+  }
+]

@@ -1,11 +1,21 @@
 import { expect, type Page, test } from '@playwright/test';
+import type { Application } from '../../src/integration/application';
 import { bootHospital, enterWard, positionPlayer, snapshot } from './application';
 
 /**
  * Room 104 visual prototype in the real playable game (`/?test=1`, NW-002A's QA bridge), not the
- * dev preview. Player-eye screenshots of the Blender set and the same views with
- * `?nwSet=procedural`, plus renderer cost.
+ * dev preview. Player-eye screenshots and renderer cost, including verification
+ * that the obsolete procedural query cannot replace the canonical public environment.
  */
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => localStorage.setItem('night-ward:settings:v1', JSON.stringify({ quality: 'low', motion: 'reduce' })));
+});
+async function finishAwakening(page: Page): Promise<void> {
+  await expect.poll(async () => (await snapshot(page)).opening!.cinematic, { timeout: 40_000 }).toBe(true);
+  await page.keyboard.press('Space');
+  await expect.poll(async () => (await snapshot(page)).opening!.state.awakened, { timeout: 40_000 }).toBe(true);
+}
+
 const VIEWS: readonly { name: string; at: { x: number; y: number; z: number }; look: { x: number; y: number; z: number } }[] = [
   { name: 'wake-up', at: { x: -12.4, y: 0, z: 4.1 }, look: { x: -14.6, y: 0.9, z: 5.9 } },
   { name: 'bed-corner', at: { x: -12.6, y: 0, z: 3.0 }, look: { x: -15.3, y: 1.2, z: 6.2 } },
@@ -46,8 +56,9 @@ test('the playable game shows the Blender Room 104 and west corridor, with gamep
   expect(assets.map((a) => a.split(' ')[0])).toEqual(['200', '200']);
   expect(logs.some((l) => l.includes('Room 104 visual set loaded'))).toBe(true);
   expect(logs.some((l) => l.includes('visual set unavailable'))).toBe(false);
-  await enterWard(page);
   const ready = await snapshot(page);
+  await enterWard(page);
+  await finishAwakening(page);
   const info = await shoot(page, 'blender', (n) => testInfo.outputPath(n));
   const ms = await frameMs(page);
   testInfo.annotations.push({ type: 'renderer', description: JSON.stringify({ info, frameMs: ms, colliders: ready.colliderCount }) });
@@ -58,15 +69,20 @@ test('the playable game shows the Blender Room 104 and west corridor, with gamep
   expect(errors).toEqual([]);
 });
 
-test('?nwSet=procedural shows the old room for comparison and keeps identical gameplay', async ({ page }, testInfo) => {
+test('the obsolete procedural query preserves the canonical room and gameplay', async ({ page }, testInfo) => {
   test.setTimeout(420_000);
   await page.addInitScript(() => {
     if (!location.search.includes('nwSet')) history.replaceState(null, '', `${location.pathname}${location.search}${location.search ? '&' : '?'}nwSet=procedural`);
   });
   const errors = await bootHospital(page);
-  const procedural = await snapshot(page);
+  const canonical = await snapshot(page);
+  expect(await page.evaluate(() => {
+    const scene = (window.nightWardTest as Application).services()!.scene;
+    return ['nw:room104-set', 'nw:station-set', 'nw:opening:access-card-prop'].every(name => Boolean(scene.getObjectByName(name)));
+  })).toBe(true);
   await enterWard(page);
-  const info = await shoot(page, 'procedural', (n) => testInfo.outputPath(n));
-  testInfo.annotations.push({ type: 'renderer', description: JSON.stringify({ info, colliders: procedural.colliderCount }) });
+  await finishAwakening(page);
+  const info = await shoot(page, 'canonical-legacy-query', (n) => testInfo.outputPath(n));
+  testInfo.annotations.push({ type: 'renderer', description: JSON.stringify({ info, colliders: canonical.colliderCount }) });
   expect(errors).toEqual([]);
 });
