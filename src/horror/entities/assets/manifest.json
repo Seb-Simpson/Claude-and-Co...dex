@@ -408,11 +408,11 @@
    }
   ],
   "glb": "nurse.glb",
-  "triangles": 23547,
-  "vertices": 12747,
-  "bytes": 1843036,
+  "triangles": 23589,
+  "vertices": 12882,
+  "bytes": 1739524,
   "texture": 1024,
-  "height": 1.9005314111709595,
+  "height": 1.9241746664047241,
   "bones": [
    "hips",
    "spine",

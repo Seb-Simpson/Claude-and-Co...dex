@@ -84,8 +84,10 @@ CONTACTS = [(b, (ROT @ Vector(p).to_4d()).to_3d()) for b, p in CFG['contacts']]
 bpy.ops.wm.open_mainfile(filepath=SRC)
 scene = bpy.context.scene
 STAGE = ('Plane', 'cam', 'key', 'rim', 'fill', 'Cube', 'crack')
+# The Nurse's cap fold is a bevelled cube named 'Cube' (a head part, see HEAD_ONLY): not staging.
+KEEP = ('Cube',) if ENTITY == 'nurse' else ()
 for o in list(bpy.data.objects):
-    if o.type in ('LIGHT', 'CAMERA') or o.name.startswith(STAGE):
+    if o.type in ('LIGHT', 'CAMERA') or (o.name.startswith(STAGE) and not o.name.startswith(KEEP)):
         bpy.data.objects.remove(o, do_unlink=True)
 if ENTITY == 'reflection':  # undo the mirror-shot staging
     for o in bpy.data.objects:
@@ -128,7 +130,13 @@ for o in [o for o in bpy.data.objects if o.type == 'MESH']:
         SOURCES[o.name] = src.name
 
 # ---- Apply modifiers, rotate to face +Y, bake transforms.
-for o in [o for o in bpy.data.objects if o.type == 'MESH']:
+# NW-007B: two passes. Applying each object's modifiers and rotating it in the same loop let a
+# shrink-wrap be applied AFTER its target had already been rotated (object order is not creation
+# order: 'nurse' sorts before 'SRC_bandage'), so the game-mesh copies of the blindfold, cap and
+# hair wrapped onto the side of the rotated head. Every modifier is now applied against the
+# untouched sculpt first; only then is everything rotated.
+meshes = [o for o in bpy.data.objects if o.type == 'MESH']
+for o in meshes:
     bpy.ops.object.select_all(action='DESELECT')
     o.select_set(True)
     bpy.context.view_layer.objects.active = o
@@ -137,9 +145,29 @@ for o in [o for o in bpy.data.objects if o.type == 'MESH']:
             bpy.ops.object.modifier_apply(modifier=m.name)
         except RuntimeError:
             o.modifiers.remove(m)
+for o in meshes:
+    bpy.ops.object.select_all(action='DESELECT')
+    o.select_set(True)
+    bpy.context.view_layer.objects.active = o
     o.matrix_world = ROT @ o.matrix_world
     bpy.ops.object.transform_apply(location=True, rotation=True, scale=True)
 highs = [o for o in bpy.data.objects if o.type == 'MESH' and len(o.data.polygons) > 0 and not o.name.startswith('SRC_')]
+
+
+def nw_debug(stage, objs):
+    """NW_DEBUG=1: world-space bounding-box centre of each head-height part at an export stage."""
+    if not os.environ.get('NW_DEBUG'):
+        return
+    for o in objs:
+        pts = [o.matrix_world @ v.co for v in o.data.vertices]
+        if not pts or max(p.z for p in pts) < 1.55:
+            continue
+        lo = [min(p[i] for p in pts) for i in range(3)]
+        hi = [max(p[i] for p in pts) for i in range(3)]
+        print('NW_DEBUG', stage, o.name, 'centre', tuple(round((lo[i] + hi[i]) / 2, 3) for i in range(3)), 'size', tuple(round(hi[i] - lo[i], 3) for i in range(3)))
+
+
+nw_debug('applied', [o for o in bpy.data.objects if o.type == 'MESH'])
 
 def tris(o):
     return sum(len(p.vertices) - 2 for p in o.data.polygons)
@@ -157,8 +185,11 @@ def bone_set(o):
     n = o.name.lower()
     if n.startswith('h') and n[1:2].isdigit():  # converted hair strands
         return ['head', 'neck']
-    if n.startswith(HEAD_ONLY) or 'hair' in n:
-        return ['head', 'neck'] if 'hair' in n else ['head']
+    # Names are compared lower-case ('Cube', the Nurse's cap fold, never matched before).
+    if n.startswith(tuple(x.lower() for x in HEAD_ONLY)) or 'hair' in n:
+        # NW-007B: the Nurse's hair is a scalp shell and bun shrink-wrapped to the head (no loose
+        # hair over the neck): head-only, so it cannot slide against the cap and the blindfold.
+        return ['head', 'neck'] if 'hair' in n and ENTITY != 'nurse' else ['head']
     if 'shroud' in n:
         return ['head', 'neck', 'chest', 'shoulderL', 'shoulderR', 'upperArmL', 'upperArmR']
     # NW-007B: the Nurse's hip accessories (chatelaine rings, keys, pocket) hang from the hips; with
@@ -214,7 +245,17 @@ for h in highs:
             return True
         return not (b.startswith(('forearm', 'hand')) and v.co.z < J['chest'].z and
                     min(dist_to_seg(v.co, *segment(t)) for t in ('hips', 'spine')) < 0.145)
+    head_z = J['head'].z - 0.06  # chin level
     for v in low.data.vertices:
+        if ENTITY == 'nurse' and kind(h) == 'body' and 'head' in bones and v.co.z > head_z - 0.03:
+            # NW-007B: the face and cranium move rigidly with the head bone, exactly like the blindfold,
+            # cap and hair (head-only parts). Blended toward the neck, the face lagged behind its
+            # blindfold whenever she turned her head. Short blend under the chin.
+            k = min(1.0, max(0.0, (v.co.z - (head_z - 0.03)) / 0.05))
+            groups['head'].add([v.index], k, 'REPLACE')
+            if k < 1.0:
+                groups['neck'].add([v.index], 1.0 - k, 'REPLACE')
+            continue
         ds = sorted(((dist_to_seg(v.co, *segs[b]), b) for b in bones if on_surface(v, b)))[:3]
         ws = [(1.0 / (d + 0.004) ** 4, b) for d, b in ds]
         total = sum(w for w, _ in ws)
@@ -222,6 +263,14 @@ for h in highs:
             if w / total > 0.02:
                 groups[b].add([v.index], w / total, 'REPLACE')
     lows.append(low)
+    nw_debug('low', [low])
+    if ENTITY == 'nurse':
+        # NW-007B: tag each part (glTF custom attribute _NW_PART) so tests can check that the
+        # face coverings stay on the face: 0 skin, 1 dress/other, 2 blindfold, 3 cap, 4 hair/knot.
+        n = h.name.lower()
+        part = 2 if n.startswith('bandage') else 3 if n.startswith(('cap', 'cube')) else 4 if n.startswith(('hair', 'knot')) else 0 if n.split('.')[0] == ENTITY and n == ENTITY else 1
+        attr = low.data.attributes.new('_NW_PART', 'FLOAT', 'POINT')
+        attr.data.foreach_set('value', [float(part)] * len(low.data.vertices))
     h.hide_render = False
 
 # ---- Join lows, unwrap, bake colour + normal from the sculpt.
@@ -260,7 +309,15 @@ bpy.ops.object.select_all(action='DESELECT')
 game.select_set(True)
 bpy.context.view_layer.objects.active = game
 bake.use_selected_to_active = False
+# NW-007B: the high-poly sources lie on (almost) the same surface as the game mesh. Left renderable,
+# they occluded the skin material's ambient-occlusion term in a noisy pattern during this colour
+# bake (the black-and-white streaks on the Nurse's face and neck). Hide them for the colour bake
+# only; the normal bake below still projects from them.
+for h in highs:
+    h.hide_render = True
 bpy.ops.object.bake(type='DIFFUSE', pass_filter={'COLOR'})
+for h in highs:
+    h.hide_render = False
 # Normal: project the sculpt's detail onto the game mesh.
 mat = bpy.data.materials.new(f'{ENTITY}_game')
 mat.use_nodes = True
@@ -406,6 +463,7 @@ bpy.ops.export_scene.gltf(
     export_animations=True, export_animation_mode='ACTIONS', export_force_sampling=True, export_frame_step=1,
     export_skins=True, export_def_bones=True, export_morph=False, export_image_format='JPEG', export_jpeg_quality=82,
     export_optimize_animation_size=True, export_reset_pose_bones=True, export_materials='EXPORT',
+    export_attributes=(ENTITY == 'nurse'),
 )
 bbox = [rig.matrix_world @ Vector(c) for c in game.bound_box]
 manifest.update({
