@@ -3,7 +3,8 @@
 Audited before combining branches. The repository remote is `https://github.com/Seb-Simpson/Claude-and-Co...dex.git`.
 
 - Start: NW-007A PR #23, `5f4b2c76a1dae44135b9cca1d4d560d30d96368d`.
-- Pinned asset source: NW-007B PR #22, `dbebd306dbe52e9f7142873995b7935ae83a502b`, fetched and checked against the current PR head. No later asset changes are implicitly included.
+- Initially pinned asset source: NW-007B PR #22, `dbebd306dbe52e9f7142873995b7935ae83a502b`, fetched and checked against the current PR head. No later asset changes are implicitly included.
+- Final asset pin: NW-007B PR #22, `ec4ed996db34f3608d0583393fa7c408f951ef99`, fetched after Claude published the targeted head-export repair during verification. Its clips, staging and audio contracts are unchanged. No subsequent commits are implicitly included.
 - Common ancestor: `0097264bf07a21b22ca7b5b1ac14ddaff951a046`.
 - New branch: `feat/nw-007c-cinematic-integration`. No main merge or NW-008 implementation.
 
@@ -19,7 +20,7 @@ B's original staging browser spec deliberately adds an isolated evidence actor a
 
 ## Release blocker
 
-At the pinned head, B's report explicitly says the blindfold/cap/hair are displaced from the face and the face/neck albedo is streaked. No verified repair is present in that source history. Keep the integration draft and mark this blocker outstanding; inspect the integrated model independently. Do not repair/rebuild character geometry under this task or silently mark it fixed.
+At the initial pin `dbebd30`, B's report explicitly says the blindfold/cap/hair are displaced from the face and the face/neck albedo is streaked. The initial six-scenario browser batch independently reproduced these defects. Evidence in `evidence/pre-repair/` and `evidence/director-fixture/` is explicitly historical. At 15:56 UTC the current PR head check found Claude's new repair `ec4ed99`; the just-started public regression batch was cancelled (no completed scenarios counted) before changing production source. The repair merged cleanly and is being independently reverified. This integration imports the producer's targeted fix; it does not author character geometry or expand into NW-008. Keep the PR draft.
 
 ## Preserved systems
 
