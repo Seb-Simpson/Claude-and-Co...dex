@@ -108,7 +108,7 @@ Only milestones save: 104 exit, discovery/record, authored transitions and compl
 
 The same engine camera uses the existing cinematic transport. Full awakening lasts 9 seconds with eased orient/sit/stand beats; Reduced Motion uses a 3.2 second restrained blend. Space skips safely; pause/settings stop transport time. Changing to Reduced Motion during awakening takes the safe skip blend. Walking bob is at most 8 mm downward, distance-based and disabled by the existing Reduced Motion/OS preference; no roll or physics displacement.
 
-Footsteps use actual grounded travel/noise intensity and the existing SFX mixer. Capture changes no body position or narrative state: bounded focus (no more than 0.42 rad yaw / 2° FOV), quiet cloth/tension cue, short fade and focused retry. Reduced Motion removes focus movement; Space/Escape advances to retry. A captured hidden pose that cannot lease the camera still receives retry. The player stays captured until a fresh attempt is built.
+Footsteps use actual grounded travel/noise intensity and the existing SFX mixer. Capture changes no body position or narrative state: bounded focus (no more than 0.42 rad yaw / 2° FOV), quiet cloth/tension cue, short fade and focused retry. Reduced Motion removes focus movement; Space/Escape advances to retry. A captured hidden pose that cannot lease the camera still receives retry. The player stays captured until a fresh attempt is built. Skip keys are intercepted only during active captured playback; after it settles, the focused Retry button regains normal Space/Enter activation.
 
 The Phase 1 byte store owns immutable source bytes, never scenes. Every attempt parses fresh objects. Canonical Room 104/station/card are mandatory; missing critical assets give the existing error path rather than obsolete procedural gameplay. This is the safe critical-loading fallback. Optional new animations fall back to existing states. Texture owners dispose GPU maps and close shared ImageBitmap backing stores once; model instances dispose skeleton bone textures; audio voices/listeners/leases are scoped and released. No new animation loop, camera, renderer or AudioContext is created.
 
@@ -183,3 +183,10 @@ represented as active in this baseline-compatible branch.
 Contracts, `main.ts`, the registry and Blender source files remain unchanged. The small
 world/model loader edits are the necessary shared environment lifecycle fix, not environment
 redesign or visual asset authoring.
+
+Import locations for these exports: `src/gameplay/directors/narrative.ts`,
+`src/gameplay/directors/experience.ts`, `src/gameplay/directors/cues.ts`,
+`src/gameplay/encounters/nursesStation.ts`,
+`src/gameplay/encounters/animationContract.ts`, `src/gameplay/opening/awakening.ts`
+and `src/gameplay/opening/capture.ts`. The existing `src/gameplay/index.ts` remains
+the GameModule/runtime barrel; no shared contract or entry-point migration is needed.

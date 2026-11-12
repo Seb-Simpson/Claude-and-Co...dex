@@ -31,6 +31,7 @@ async function walk(page: Page, target: Vec3, sprint=false) {
   try {
     while (Date.now() - begin < 90_000) {
       const s = await snap(page), p = s.player!.position;
+      if(s.state==='captured')throw new Error('Captured during input walk');
       if (Math.hypot(target.x - p.x, target.z - p.z) < .23) return;
       await look(page, { ...target, y: s.opening!.camera.y });
       if(sprint||(s.station?.phase==='stealth'&&s.station.actor.state==='pursue'))await page.keyboard.down('Shift');else await page.keyboard.up('Shift');
@@ -103,8 +104,23 @@ test('input-only normal game:104 puzzle, authored station introduction, locker, 
  await look(page,{...s.patrol[0]!,y:1.3});await page.screenshot({path:info.outputPath('03-real-trolley-cover.png')});
  // Leave while she is patrolling: a complete opening route, not a tour of every
  // hiding prop during active pursuit. The separate bed test below retains that coverage.
- await page.keyboard.press('c');await walk(page,s.observation,true);
- await walk(page,s.entry,true);await walk(page,s.exit,true);
+ await page.keyboard.press('c');
+ try {await walk(page,s.entry,true);await walk(page,s.exit,true);}
+ catch(error){
+  const caught=await snap(page);
+  if(caught.state!=='captured')throw error;
+  // Autonomous stealth may punish a genuine route mistake. Recovery must use
+  // the same public UI and saved milestone as a player's attempt, never a phase write.
+  expect(caught.station!.phase).toBe('stealth');expect(caught.station!.firstAlertUsed).toBe(true);
+  expect(Math.hypot(caught.station!.actor.position.x-caught.player!.position.x,caught.station!.actor.position.z-caught.player!.position.z)).toBeLessThan(1.1);
+  phases.push(caught);await page.screenshot({path:info.outputPath('04-route-capture.png')});
+  await page.getByRole('button',{name:'Restart from checkpoint',exact:true}).click();
+  await expect.poll(async()=>(await snap(page)).state,wait).toBe('ready');
+  expect((await snap(page)).station!.phase).toBe('stealth');expect((await snap(page)).opening!.narrative?.checkpoint.step).toBe(6);
+  if(process.env.NW005_SOFTWARE_SCALE==='1')await page.evaluate(()=>(window.nightWardTest as Application).services()!.renderer.setPixelRatio(.25));
+  await page.getByRole('button',{name:'Enter ward',exact:true}).click();await expect.poll(async()=>(await snap(page)).state,wait).toBe('playing');
+  await walk(page,s.entry,true);await walk(page,s.exit,true);
+ }
  await expect.poll(async()=>(await snap(page)).station!.phase,wait).toBe('complete');
  await expect.poll(()=>page.evaluate(()=>JSON.parse(localStorage.getItem('night-ward:save:v1')!).opening?.station?.phase),wait).toBe('complete');
  const final=await snap(page);phases.push(final);expect(final.player!.captured).toBe(false);expect(final.station!.actor.type).toBe('nurse');expect(final.entities).toEqual([]);
@@ -123,7 +139,7 @@ test('input-only normal game:104 puzzle, authored station introduction, locker, 
  expect(errors).toEqual([]);
 });
 
-test('real capture after a forgiving first alert, restart restores stealth without repeating the introduction',async({page},info)=>{
+test('real capture after a forgiving first alert: skip, keyboard Retry and restored stealth without repeating the introduction',async({page},info)=>{
  // Saved milestone fixture exercises the production Continue path; no actor or phase mutation.
  await page.addInitScript(()=>{
   localStorage.setItem('night-ward:settings:v1',JSON.stringify({quality:'low',motion:'reduce',subtitles:true}));
@@ -139,7 +155,12 @@ test('real capture after a forgiving first alert, restart restores stealth witho
  expect((await snap(page)).player!.captured).toBe(false);await simWait(page,2);expect((await snap(page)).player!.captured).toBe(false);
  await expect.poll(async()=>(await snap(page)).state,{timeout:150_000}).toBe('captured');
  await page.screenshot({path:info.outputPath('05-real-capture.png')});
- const before=await snap(page);await page.getByRole('button',{name:/^Restart/}).click();
+ const before=await snap(page);
+ // Escape advances the captured transport if it is still running. Once ready,
+ // Space must regain its native button behavior rather than remain a cutscene key.
+ await page.keyboard.press('Escape');
+ const retry=page.getByRole('button',{name:'Restart from checkpoint',exact:true});
+ await expect(retry).toBeEnabled(wait);await retry.focus();await page.keyboard.press('Space');
  if(await page.getByRole('dialog',{name:'Restart this session?'}).isVisible())await page.getByRole('button',{name:'Restart',exact:true}).click();
  await expect.poll(async()=>(await snap(page)).state,wait).toBe('ready');
  const after=await snap(page);expect(after.station!.phase).toBe('stealth');expect(after.player!.captured).toBe(false);expect(after.sessionId).toBe(before.sessionId+1);

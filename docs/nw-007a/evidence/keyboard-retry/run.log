@@ -1,0 +1,14 @@
+
+> night-ward@0.0.0 test:browser
+> playwright test tests/browser/nw-006b-encounter.spec.ts -g real capture after a forgiving first alert
+
+[WebServer] (node:5064) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 1 test using 1 worker
+
+(node:5090) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 tests/browser/nw-006b-encounter.spec.ts:142:1 › real capture after a forgiving first alert: skip, keyboard Retry and restored stealth without repeating the introduction (1.4m)
+
+  1 passed (1.5m)

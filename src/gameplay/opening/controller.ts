@@ -160,7 +160,7 @@ export async function createOpeningSequence(context: ModuleContext, runtime: Gam
     audio.effect('wake');
   }
   function key(event: KeyboardEvent): void {
-    if(runtime.player.getSnapshot().captured && (event.code==='Space'||event.code==='Escape')&&!event.repeat){event.preventDefault();capturePresentation.skip();return;}
+    if(capturePresentation.active && runtime.player.getSnapshot().captured && (event.code==='Space'||event.code==='Escape')&&!event.repeat){event.preventDefault();capturePresentation.skip();return;}
     if (playing && playback && event.code === 'Space' && !event.repeat) { event.preventDefault(); playback.skip(); }
   }
   document.addEventListener('keydown', key);

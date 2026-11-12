@@ -1,69 +1,99 @@
-# NW-007A verification and handoff
+# NW-007A — verification and integration handoff
 
-## Scope
+## Scope and status
 
-**Core NW-007A systems are implemented; final revised-route verification is in progress.** The authoritative Shared Design Contract Revision 1 is supplied and implemented. Phase 1 was fixed, verified and committed before the cinematic expansion. The final results below distinguish those baseline proofs from verification of the redesigned sequence.
+The gameplay implementation follows [Shared Design Contract Revision 1](SHARED-DESIGN-CONTRACT.md). The complete public-game route and thirteen regressions passed; overall NW-007 acceptance is **not signed off**. Independent human playtesting, real-GPU verification and NW-007C integration of Claude's presentation remain outstanding.
 
-Baseline: `0097264bf07a21b22ca7b5b1ac14ddaff951a046` (PR #21, containing PRs #19/#20). Branch: `feat/nw-007a-cinematic-gameplay`. Draft targets `feat/nw-006b-nurse-stealth`. No merge and no PR #15 integration.
+Baseline: `0097264bf07a21b22ca7b5b1ac14ddaff951a046` (PR #21, includes #19/#20). Branch: `feat/nw-007a-cinematic-gameplay`. Draft [PR #23](https://github.com/Seb-Simpson/Claude-and-Co...dex/pull/23) targets `feat/nw-006b-nurse-stealth`. No merge, PR #15 integration, Patient activation, later chase, Blender edit or layout redesign.
 
-## Verified cause and correction
+## Implemented
 
-New Game/Continue preloaded binary sources; Retry consumed that one-shot cache and attempted fresh network loads. Failure/timing out silently published procedural Room 104/Station visuals. The physical access card was missing because it belongs to the Blender set. A browser regression fails on the original code and passes after the fix. See [implementation details](IMPLEMENTATION.md) and [original failure evidence](evidence/baseline-failure/expected-failure.md).
+- Canonical asset lifetime across New Game, Continue and Retry, with transactional world setup and no playable procedural fallback after critical browser asset failure.
+- Quiet initial corridor; physical station register discovery makes Shaw's authored arrival eligible. The existing Encounter Director controls one physical Nurse through entrance, panel/record/listening routine, nonlethal hiding opportunity, existing autonomous stealth and escape.
+- Narrative Director with ordered milestones, validated/migrated checkpoint state, and an Experience Coordinator for exclusive camera/Nurse/dialogue authority, interruption and clean attempt disposal. Small typed atmosphere cue interface; no adaptive Tension Director.
+- Smooth relative bed/orient/sit/stand camera transport, safe skip/handoff, actual movement footsteps and restrained optional walking motion using existing settings/mixer. Reduced Motion remains available.
+- Brief Nurse-specific captured focus/cloth/fade and accessible public checkpoint Retry. Presentation never revives the captured player; retry rebuilds the entire attempt.
+- Minimal contextual prompts and brief printed feedback using existing UI assets/fonts. No permanent instruction rail, objective journal, menu redesign, combat or replacement controller.
+- Optional producer animation metadata/hooks and a semantic-name shim for the actual published NW-007B station bindings. Existing assets work independently; new B clip/audio playback is not silently enabled.
 
-All entry paths now parse fresh scene instances from retained immutable asset bytes. Critical canonical-world failures reject setup; loaded owners are rolled back. This is a loader/lifecycle correction, not a missing-card respawn or reuse of stale Three.js scenes. Models, textures, lightmaps, layout, collision metadata and canonical clock artwork are unchanged.
+Exact APIs, six-scene transitions, state diagram, cancellation, checkpoint migration and NW-007C steps: [DIRECTORS.md](DIRECTORS.md). Audit/root-cause detail: [IMPLEMENTATION.md](IMPLEMENTATION.md). Play instructions: [PLAY.md](PLAY.md).
 
-## Commands and results
+## Restart regression: reproduced root cause
 
-- `npm run typecheck` — passed.
-- Final `npm test` — **584 passed, 1 skipped; 72 files passed, 1 skipped** (12 November). The skip is the existing optional Blender sampler. All previous unit tests retained.
-- The Phase 1 suite before cinematic expansion was **565 passed, 1 skipped**.
-- `npx vitest run tests/encounters/asset-lifetime.test.ts tests/encounters/canonical-world.test.ts tests/frontend/services.test.ts` — **23 passed**.
-- `npm run build` — passed; existing Three/Rapier chunk-size advisory.
-- `PLAYWRIGHT_CHROMIUM_EXECUTABLE=/usr/bin/chromium npm run test:browser -- tests/browser/nw-007a-reliability.spec.ts` (original one-test baseline repro) — **failed as intended** before the runtime fix; 1 passed after the fix.
-- `NW005_SOFTWARE_SCALE=1 PLAYWRIGHT_CHROMIUM_EXECUTABLE=/usr/bin/chromium npm run test:browser -- tests/browser/nw-007a-reliability.spec.ts` — **3 passed (6.3 minutes)**: original later-request failure regression, five actual AI capture/UI retry cycles followed by New Game, and fresh-page Continue of a completed milestone followed by New Game.
-- `NW005_REAL=1 NW005_SOFTWARE_SCALE=1 PLAYWRIGHT_CHROMIUM_EXECUTABLE=/usr/bin/chromium npm run test:browser -- tests/browser/nw-006b-encounter.spec.ts tests/browser/room104-prototype.spec.ts tests/browser/foundation.spec.ts tests/browser/nw-005b-opening.spec.ts tests/browser/nw-005c-onboarding.spec.ts -g 'input-only normal game|playable game shows|obsolete procedural|boots the renderer|context loss|awakening locks|locked door, two|saved station Continue|literal normal'` — **9 passed (18.5 minutes)**. Includes the complete input-only baseline opening/stealth/escape/Continue route, a literal public-root launch without QA bridge, opening dialogue/card/reader/pause/restart, canonical views/obsolete query, audio unlock, resize and WebGL cleanup.
+New Game/Continue preloaded binary sources, but the old one-shot cache was consumed. Retry then fetched again. A failed later room/station request entered a catch-and-warn path that reported a ready game with obsolete procedural visuals. The Blender card was absent; the clock's 03:17 artwork belongs to the canonical set, not a saved clock timer. World ID/collider counts alone missed this visual replacement.
 
-The browser results in this section are Phase 1 runs establishing the preserved baseline before cinematic changes. They do not verify the redesigned six scenes. Final revised-route results are tracked below.
+A new browser regression **failed on the original baseline before production changes**: room, station and physical card initially existed, then disappeared after restart when later requests were blocked. [Original failure](evidence/baseline-failure/expected-failure.md). The original human network trace is unavailable, so its exact transport failure is not asserted.
 
-The first extended retry test reached all five actual capture/retry assertions, then failed because the automation immediately requested pointer-lock exit before waiting for Enter ward to reach `playing`. It is not counted as a passing test. The test now awaits the actual lifecycle state before pausing. See its [retained error context](evidence/retry-exploration/automation-pause-race.md).
+Every parser now receives a fresh copy of retained immutable source bytes. Scene objects, pickup visibility and gameplay state are never cached across attempts. Critical loading errors reject setup; loaded owners are released. World/model edits are limited to this lifecycle boundary; binary art, textures, lightmaps, geometry and collider definitions are unchanged. This fix was committed/verified in Phase 1 before cinematic expansion (`5cd707e`).
 
-## What the new tests measure
+## Verified automated results
 
-Unit tests protect immutable source ownership, mutation isolation, six repeated reads without another fetch, concurrent read deduplication, retry after HTTP failure, cache release/generation invalidation, failure of either canonical visual set, missing card bindings, transactional setup cleanup and idempotent disposal.
+| Check | Actual result |
+| --- | --- |
+| `npm run typecheck` | Passed. |
+| `npm test` | **584 passed, 1 existing optional Blender sampler skipped; 72 files passed, 1 skipped.** |
+| `npm run build` | Passed; existing large Three/Rapier chunk advisory remains. |
+| Focused real-geometry station and B-name adapter tests | **17 passed.** |
+| Later asset-request failure regression, current code | Passed. No ready legacy room. |
+| Five actual AI captures + public UI retries + New Game/card pickup | Passed in **5.8 minutes**. No force-capture, actor writes or live phase mutation. |
+| Fresh-page Continue of a completed milestone, then New Game | Passed in **45.5 seconds**. |
+| Clue-gated discovery/arrival/pause fixture | Passed. Explicit diagnostic placement fixture, separate from the input-only walkthrough. |
+| Unseen Room 105 bed entry after real sprint noise | Passed in **3.2 minutes**; twelve simulated seconds concealed, Nurse searched the heard position. |
+| Retained public-game regressions and complete input-only route | **13 passed (32.9 minutes).** |
+| Captured transport skip and native Space-key Retry after the keyboard guard fix | **1 passed (1.5 minutes).** |
 
-The resource-fault browser test uses the actual frontend/game and blocks later canonical asset retrieval after initial successful loading. Its diagnostic restart call isolates the original lifecycle fault. Separate capture scenarios exercise real Nurse AI and the public retry button; no force-capture or actor-position writes are used in those scenarios. Saved checkpoint fixtures are explicitly identified as fixtures, not represented as a new full playthrough.
+All existing unit tests remain. Existing opening/browser tests were adapted where the shared contract intentionally removes the corridor Nurse. This is selected applicable browser coverage, not a claim that every historical sandbox spec was run.
 
-A canonical scene check counts the room, station, physical card and one Nurse model, compares graph shape across attempts and verifies new object UUIDs. A saved acquired card must remain hidden; New Game must show a fresh card and reset unlock/voice flags. GPU resource observations and scene/collider counts are finite-run checks, not proof of absence of every memory/listener leak.
+Exact current browser commands (Chromium software rendering):
 
-## Capture/retry measurements
+```sh
+NW005_SOFTWARE_SCALE=1 PLAYWRIGHT_CHROMIUM_EXECUTABLE=/usr/bin/chromium npm run test:browser -- tests/browser/nw-006b-encounter.spec.ts -g 'input-only normal game|autonomous stealth: real sprint'
 
-The five real capture snapshots each report **303 renderer geometries and 84 textures**; all five restored attempts report **230 colliders**, one canonical room, one station, one physical card and one Nurse model. Every restored object UUID differs from the previous attempt. The saved acquired card remains hidden, and New Game restores a visible card and a locked exit. The post-initial-load asset-fault route intercepted **zero requests** during those retries/New Game: parsers used retained source bytes. No page errors were recorded.
+NW005_SOFTWARE_SCALE=1 PLAYWRIGHT_CHROMIUM_EXECUTABLE=/usr/bin/chromium npm run test:browser -- tests/browser/nw-006b-encounter.spec.ts tests/browser/nw-007a-reliability.spec.ts tests/browser/nw-007a-scenes.spec.ts -g 'input-only normal game|canonical assets survive|five real Nurse|a fresh page Continues|production discovery fixture'
 
-Ready-state snapshots can precede the next rendered world frame (some therefore report the loading scene's 1 geometry/1 texture); those samples must not be interpreted as a measured GPU allocation reduction. The 303/84 comparison uses the fully rendered capture snapshots. This is evidence against growth over five attempts, not a long-session leak or hardware-performance certification.
+NW005_REAL=1 NW005_SOFTWARE_SCALE=1 PLAYWRIGHT_CHROMIUM_EXECUTABLE=/usr/bin/chromium npm run test:browser -- tests/browser/nw-006b-encounter.spec.ts tests/browser/nw-005b-opening.spec.ts tests/browser/foundation.spec.ts tests/browser/nw-005c-onboarding.spec.ts tests/browser/room104-prototype.spec.ts tests/browser/nw-005d-readability.spec.ts -g 'input-only normal game|awakening locks|locked door, two|saved station Continue|boots the renderer|context loss|literal normal|playable game shows|obsolete procedural|normal title-to-station|three minutes|assisted visual inspection|shipping Low checkpoint'
+```
 
-[Raw five-cycle telemetry](evidence/reliability/nw-007a-reliability-five-r-71c71-New-Game-resets-fresh-state/five-retries.json) · [Real capture UI](evidence/reliability/nw-007a-reliability-five-r-71c71-New-Game-resets-fresh-state/01-real-capture.png)
+The first command yielded **1 passed, 1 failed (15.3 minutes)**: unseen bed entry passed; the old combined sightseeing route was captured between its prompt and delayed input. The second yielded **4 passed, 1 failed (18.2 minutes)**: reliability/discovery all passed, while the bot doubled back into pursuit. Those failures remain in [route-attempt evidence](evidence/final-route-attempt/) and [the core run log](evidence/final-reliability/run.log). The final normal route removes the unnecessary backtrack and, if caught, requires real public Retry before completing escape. Production AI detection, capture grace, navigation and memory were not weakened to satisfy the bot. The third command then passed all **13** cases, including both exploration orders, three minutes of safe exploration, actual plain-root startup, native Low, audio unlock, WebGL cleanup, and the complete opening/encounter/escape/Continue/New Game route. [Public run log](evidence/final-public/run.log).
 
-## Limitations
+Phase 1 evidence is retained separately: **565 unit passes/1 skip, three reliability browser passes and nine preserved-baseline browser passes**, including the earlier input-only route. Those are pre-cinematic proofs, not claimed as final six-scene acceptance. [Baseline route](evidence/baseline-normal-route/) · [Initial five-cycle evidence](evidence/reliability/).
 
-- Quiet exploration, clue-gated six-scene progression, directors/coordinator, eased awakening, reduced-motion walking and captured presentation are now implemented; revised browser acceptance is in progress. See DIRECTORS.md for exact behavior.
-- Existing Room 104 voice assets are temporary. Claude's NW-007B interfaces/assets are available in separate draft PR #22 at `dbebd306dbe52e9f7142873995b7935ae83a502b`; they are inspected read-only, not merged here. The adapter accepts its published station node names. Bespoke clip playback, contact timing, audio cues and close capture staging await NW-007C integration; see DIRECTORS.md. No unverified asset path or clip name is assumed.
-- Chromium uses ANGLE SwiftShader; there is no real GPU (`/dev/dri` unavailable). Most functional routes reduce only renderer pixel ratio to 0.25 via the QA bridge; game input, fixed-step simulation, physics, navigation and AI clocks remain real. Real-GPU performance and the historic laptop lag report remain unverified.
-- No independent human playtest has occurred. Browser recordings, when present, are silent automation evidence.
-- Resident source bytes intentionally persist across menu returns for the application lifetime; frontend disposal clears them. This uses bounded CPU memory for the current eight binary asset URLs, not persistent GPU scenes.
-- A genuinely unavailable/corrupt canonical set now produces the existing error presentation instead of a misleading ready game. An uncached network/HTTP failure can recover when subsequent retrieval succeeds. A corrupt retained source requires a page reload to retry from a fresh byte store. No offline installation/service worker is added.
+## Resource and performance observations
 
-## Launch and next integration
+The **current** five-cycle run reports the same **303 geometries, 84 textures, 258 draw calls and 155,719 triangles** in each fully rendered capture snapshot. Each restored attempt has **230 colliders**, one canonical room, one station, one physical card and one Nurse visual. UUIDs change each attempt. Saved possession/one-shot/unlock flags and narrative step 6 survive. New Game restores a visible usable card and locked exit. The post-initial-load fault route intercepted **zero requests**; no page errors were recorded.
 
-See [PLAY.md](PLAY.md). Use the normal root route, New Game/Continue, Enter ward; no harness required.
+[Raw current five-cycle telemetry](evidence/final-reliability/nw-007a-reliability-five-r-71c71-New-Game-resets-fresh-state/five-retries.json) · [Room 104 after five retries](evidence/final-reliability/nw-007a-reliability-five-r-71c71-New-Game-resets-fresh-state/03-room104-after-five-retries.png) · [Capture UI](evidence/final-reliability/nw-007a-reliability-five-r-71c71-New-Game-resets-fresh-state/01-real-capture.png).
 
-Review this draft under Shared Design Contract Revision 1. NW-007C should integrate Claude's separate asset draft using the published metadata and the documented optional hooks. No automatic merge.
+These finite observations are evidence against resource growth over five attempts, not proof that every leak/spike is absent. Ready snapshots can precede the first new-world render; the comparison uses rendered capture frames, not transient loading-scene counters.
 
-## Revised sequence QA (in progress)
+Passing [unseen-bed telemetry](evidence/unseen-bed/unseen-bed.json) records a median frame interval of **883.4 ms**, fixed work **1.2 ms**, physics **0.3 ms**, presentation update **0.5 ms**, maximum render submission/warmup **2138.4 ms**. The software GPU, tracing and recording are slow. This is **not** a hardware frame-rate benchmark or a verified resolution of the historic laptop slowdown. No `/dev/dri`/real GPU is available. Most functional cases change only renderer pixel ratio to 0.25; simulation, navigation, AI and input timings remain unchanged. Native Low cases explicitly assert the shipped 0.75 ratio. No new renderer, loop or AudioContext is added.
 
-- Final full suite: **584 unit tests passed, 1 existing optional test skipped**; typecheck and production build passed. The focused station/marker compatibility suite passed **17 tests**. The real-geometry awakening clearance regression is included in the full suite.
-- New production discovery fixture: **passed (31 seconds)**. It verifies quiet exploration, real range/LOS, readable register, clue-gated unseen entrance, owned channels, pause/resume and physical movement. This fixture uses diagnostic placement explicitly; it is separate from the input-only walkthrough.
-- The first revised input-only run exposed a real obstruction: the stationary reader blocked the preferred panel stance. The run was interrupted; it does not count as passed. The actual director now supports a nearby clear noncontact inspection stance, protected by a real-physics regression.
-- A later bot run hid under the 105 bed while visibly followed and was captured with `lastKnownPlayer.source='witnessed-hiding'`. This is expected gameplay, not an omniscience fix. The walkthrough now verifies recovery from that witnessed mistake, while a separate unseen-entry case verifies fair concealment.
-- Final full route, five retries with the new capture flow, unseen hiding and retained browser regressions are running. No independent human playtest or hardware-GPU measurement is claimed.
+## Known limitations and next integration
 
-The existing card-first keyboard route and native-Low visual inspection remain tests; their obsolete early-Nurse assertions now require an empty corridor and dormant Nurse. Software Chromium flags are consistent across the test configuration; this is not a production rendering change.
+- Claude's separate [PR #22](https://github.com/Seb-Simpson/Claude-and-Co...dex/pull/22), inspected at **`dbebd306dbe52e9f7142873995b7935ae83a502b`**, is not merged/cherry-picked. Its named stance/record nodes are supported, but bespoke panel/record/capture clip playback, producer durations and new audio cues await NW-007C. Current actors use baseline locomotion/observation states. Close-up Nurse mesh/head/cap presentation remains visibly imperfect; this branch does not author character geometry or start NW-008.
+- The two Room 104 voice recordings remain explicitly temporary. No final voice performance is claimed; no new production asset or paid service is introduced. Existing image-based ink/rule UI and fonts are reused.
+- No independent human playtest has occurred. Automated navigation/interaction evidence does not certify subjective pacing, clue discoverability or atmosphere. A first-time human review must assess those, especially the physical register and escape readability.
+- Source bytes persist across menu returns for the frontend lifetime, trading bounded CPU memory for reliable retry; disposal clears them. A truly unavailable critical set gives an error, not old art. Corrupt retained bytes require a fresh page to refetch; no offline/service-worker installation is added.
+- Browser recordings are silent automation evidence. They must not be presented as a human or real-GPU playthrough.
+
+Launch through the normal root URL with `npm install && npm run dev`; New Game → Enter ward. No harness is needed. [PLAY.md](PLAY.md) gives the complete sequence, controls and retry/Continue behavior. Keep this and the asset draft separate and unmerged pending review.
+
+
+## Complete normal-game walkthrough evidence
+
+[Silent recording](evidence/cinematic-normal-route/video.webm) · [Raw phase snapshots](evidence/cinematic-normal-route/normal-route.json) · [Authored station action](evidence/cinematic-normal-route/01-authored-station.png) · [First locker concealment](evidence/cinematic-normal-route/02-first-locker-hide.png) · [Trolley](evidence/cinematic-normal-route/03-real-trolley-cover.png) · [Escape](evidence/cinematic-normal-route/04-escape.png).
+
+This is the normal frontend/root game with the read-only QA snapshot bridge enabled. Position/aim shortcuts throw if called; movement, looking, interacting, hiding, pause, capture, public Retry and menu actions use normal inputs. It begins with New Game/full awakening, solves the door-first card puzzle, reads the physical register, observes the authored routine, hides in the locker and enters real stealth. The bot then makes one route mistake and is captured through actual sight/pursuit: the snapshot records vision knowledge, about 0.62 m separation and capture about eight simulated seconds after the first chase event. The public Retry restores the stealth checkpoint; the player escapes, saves step 7 with no remaining director leases, returns to menu, Continues the completed state and starts New Game again. There were no page errors. This is **one capture and recovery**, not a claim of a death-free human stealth run.
+
+The recording is 800×450, 8 fps, **10:22.5** long, silently re-encoded from Playwright's 25 fps capture without cuts or speed changes (the frame-cadence rounding removes 0.06 seconds at the end). Most functional rendering uses the documented 0.25 pixel ratio for SwiftShader; native Low visual evidence is separate. Its wall duration must not be treated as an estimated first-time-player duration.
+
+The final unit/typecheck/build run after the capture-keyboard guard change again passed **584 tests / 1 existing skip** and the production build. The keyboard follow-up verifies Escape advances the active captured transport and that Space activates the focused Retry button once the animation releases input. The guard now handles skip keys only while the captured transport is active; it no longer suppresses native button activation forever.
+
+
+Final keyboard follow-up command:
+
+```sh
+NW005_SOFTWARE_SCALE=1 PLAYWRIGHT_CHROMIUM_EXECUTABLE=/usr/bin/chromium npm run test:browser -- tests/browser/nw-006b-encounter.spec.ts -g 'real capture after a forgiving first alert'
+```
+
+**1 passed (1.5 minutes)** after the one-line skip-key guard correction; the prior 13-case public batch remained frozen until completion. [Keyboard run log](evidence/keyboard-retry/run.log) · [Actual capture and restored state](evidence/keyboard-retry/capture-retry.json). Across these final runs, **19 distinct selected Chromium scenarios passed** (13 public regressions, three reliability cases, discovery, unseen-bed concealment and keyboard capture/retry). Earlier failed bot attempts remain documented and are not counted as passes. Representative screenshots are retained with the complete logs/explicit JSON outputs; redundant view captures are omitted from the commit.
