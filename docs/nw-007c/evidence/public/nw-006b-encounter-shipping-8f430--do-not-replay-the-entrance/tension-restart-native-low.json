@@ -1,0 +1,996 @@
+{
+  "before": {
+    "state": "paused",
+    "sessionId": 1,
+    "worldId": "nw:hospital:ward-4-west",
+    "player": {
+      "id": "player",
+      "position": {
+        "x": -4.704830411835285,
+        "y": 0.0029999985098838862,
+        "z": -0.38017141200296495
+      },
+      "rotation": {
+        "yaw": -0.49641604396650163,
+        "pitch": -0.05
+      },
+      "velocity": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "movement": "idle",
+      "crouching": false,
+      "grounded": true,
+      "hiding": {
+        "state": "outside",
+        "spotId": null
+      },
+      "captured": false
+    },
+    "entities": [],
+    "colliderCount": 230,
+    "frameCount": 35,
+    "renderer": {
+      "calls": 202,
+      "triangles": 184991,
+      "geometries": 316,
+      "textures": 86
+    },
+    "audioState": "suspended",
+    "events": [
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:station-hum",
+          "action": "play",
+          "position": {
+            "x": -4.37,
+            "y": 0.82,
+            "z": -5.99
+          },
+          "volume": 0.28,
+          "loop": true
+        }
+      },
+      {
+        "type": "entity:state",
+        "payload": {
+          "entityId": "nw:entity:nurse",
+          "previous": "idle",
+          "current": "patrol"
+        }
+      }
+    ],
+    "doorStates": {
+      "nw:door:room-101": "closed",
+      "nw:door:room-103": "closed",
+      "nw:door:room-105": "open",
+      "nw:door:treatment": "closed",
+      "nw:door:room-107": "closed",
+      "nw:door:storage": "closed",
+      "nw:door:room-102": "open",
+      "nw:door:room-104": "closed",
+      "nw:door:room-106": "locked",
+      "nw:door:room-108": "open",
+      "nw:door:room-110": "closed",
+      "nw:door:maintenance-west": "closed",
+      "nw:door:maintenance-east": "closed",
+      "nw:door:stairwell-b": "locked",
+      "nw:door:smoke-north": "open",
+      "nw:door:smoke-south": "open"
+    },
+    "prompt": null,
+    "error": null,
+    "station": {
+      "active": true,
+      "action": null,
+      "phase": "tension",
+      "elapsed": 2.4333333333333296,
+      "step": 1,
+      "actor": {
+        "id": "nw:entity:nurse",
+        "type": "nurse",
+        "position": {
+          "x": -2.0449543370405556,
+          "y": 0.0029999985098838862,
+          "z": -4.822149380422774
+        },
+        "state": "patrol",
+        "lastKnownPlayer": null
+      },
+      "canCapture": false,
+      "firstAlertUsed": false,
+      "locations": {
+        "record": {
+          "x": -3.8,
+          "y": 0.76,
+          "z": -5.93
+        },
+        "recordStand": {
+          "x": -3.8716258132403336,
+          "y": 0,
+          "z": -4.832334412091888
+        },
+        "recordRoute": [
+          {
+            "x": -9,
+            "y": 0,
+            "z": 0.45
+          },
+          {
+            "x": -1.1499999999999986,
+            "y": 0,
+            "z": -0.9499999999999993
+          },
+          {
+            "x": -0.8999999999999986,
+            "y": 0,
+            "z": -1.6999999999999993
+          },
+          {
+            "x": -0.8999999999999986,
+            "y": 0,
+            "z": -2.6999999999999993
+          },
+          {
+            "x": -2.6499999999999986,
+            "y": 0,
+            "z": -4.449999999999999
+          },
+          {
+            "x": -3.8716258132403336,
+            "y": 0,
+            "z": -4.832334412091888
+          }
+        ],
+        "observation": {
+          "x": -9,
+          "y": 0,
+          "z": 0.45
+        },
+        "entry": {
+          "x": -4.2,
+          "y": 0,
+          "z": 0.2
+        },
+        "crouchCover": {
+          "x": -4.6,
+          "y": 0,
+          "z": -0.42
+        },
+        "concealment": {
+          "x": -7.85,
+          "y": 0,
+          "z": -3.75
+        },
+        "exit": {
+          "x": 4.6,
+          "y": 0,
+          "z": 0.2
+        },
+        "patrol": [
+          {
+            "x": -3.6,
+            "y": 0,
+            "z": -4.6
+          },
+          {
+            "x": -1.5,
+            "y": 0,
+            "z": -4.9
+          },
+          {
+            "x": -0.8,
+            "y": 0,
+            "z": -3.2
+          },
+          {
+            "x": -0.75,
+            "y": 0,
+            "z": -1
+          },
+          {
+            "x": -3.8,
+            "y": 0,
+            "z": 0
+          },
+          {
+            "x": -10.5,
+            "y": 0,
+            "z": 0
+          },
+          {
+            "x": -3.8,
+            "y": 0,
+            "z": 0
+          },
+          {
+            "x": -0.75,
+            "y": 0,
+            "z": -1
+          },
+          {
+            "x": -0.8,
+            "y": 0,
+            "z": -3.2
+          },
+          {
+            "x": -1.5,
+            "y": 0,
+            "z": -4.9
+          }
+        ],
+        "hidingPrimary": "nw:hiding:nurses-staff",
+        "hidingSecondary": "nw:hiding:room-105-bed-b",
+        "concealmentRoute": [
+          {
+            "x": -9,
+            "y": 0,
+            "z": 0.45
+          },
+          {
+            "x": -7.899999999999999,
+            "y": 0,
+            "z": -1.1999999999999993
+          },
+          {
+            "x": -7.85,
+            "y": 0,
+            "z": -3.75
+          }
+        ],
+        "returnRoute": [
+          {
+            "x": -7.85,
+            "y": 0,
+            "z": -3.75
+          },
+          {
+            "x": -7.899999999999999,
+            "y": 0,
+            "z": -0.9499999999999993
+          },
+          {
+            "x": -9,
+            "y": 0,
+            "z": 0.45
+          }
+        ],
+        "hidingTargets": {
+          "nw:hiding:room-105-bed-b": {
+            "x": -7.85,
+            "y": 0.41999999999999993,
+            "z": -5.3500000000000005
+          },
+          "nw:hiding:nurses-staff": {
+            "x": -6.402499998658895,
+            "y": 0.9812499761581419,
+            "z": -4.15
+          }
+        },
+        "hidingApproaches": {
+          "nw:hiding:room-105-bed-b": {
+            "x": -7.85,
+            "y": 0,
+            "z": -3.75
+          },
+          "nw:hiding:nurses-staff": {
+            "x": -5.625,
+            "y": 0,
+            "z": -4.15
+          }
+        }
+      }
+    },
+    "opening": {
+      "nurse": {
+        "action": null,
+        "clip": null,
+        "time": 2.4333333333333296,
+        "elapsed": 2.4333333333333296,
+        "duration": 0,
+        "finished": false,
+        "available": false,
+        "contactReady": false,
+        "rightHand": {
+          "x": -1.6975253286062548,
+          "y": 1.1323741277655932,
+          "z": -4.863769245779651
+        },
+        "leftHand": {
+          "x": -1.7087118777161208,
+          "y": 1.1188759757547766,
+          "z": -4.936046759696646
+        },
+        "footContacts": 0,
+        "panelPresses": 0,
+        "paperTurns": 0,
+        "humActive": true
+      },
+      "narrative": {
+        "scene": "first-hiding",
+        "checkpoint": {
+          "version": 1,
+          "step": 5
+        },
+        "owners": [
+          {
+            "owner": "encounter:shaw",
+            "resources": [
+              "nurse",
+              "dialogue"
+            ]
+          }
+        ]
+      },
+      "phase": "stealth-onboarding",
+      "state": {
+        "version": 1,
+        "awakened": true,
+        "cardAcquired": true,
+        "doorUnlocked": true,
+        "firstLinePlayed": true,
+        "secondLinePlayed": true,
+        "room106Tried": true,
+        "sightingSeen": true,
+        "stationReached": true
+      },
+      "cinematic": false,
+      "anchors": {
+        "player-spawn": {
+          "position": {
+            "x": -12.4,
+            "y": 0,
+            "z": 4.1
+          }
+        },
+        "room-104-door": {
+          "position": {
+            "x": -12,
+            "y": 1.05,
+            "z": 1.475
+          },
+          "stand": {
+            "x": -12,
+            "y": 0,
+            "z": 2.3
+          }
+        },
+        "card-reader": {
+          "position": {
+            "x": -12.85,
+            "y": 1.15,
+            "z": 1.575
+          },
+          "stand": {
+            "x": -12.85,
+            "y": 0,
+            "z": 2.25
+          }
+        },
+        "access-card": {
+          "position": {
+            "x": -12.9,
+            "y": 0.006,
+            "z": 3.2
+          },
+          "stand": {
+            "x": -12.6,
+            "y": 0,
+            "z": 3.75
+          }
+        },
+        "intercom-speaker": {
+          "position": {
+            "x": -12,
+            "y": 2.42,
+            "z": 1.6
+          }
+        },
+        "room-106-door": {
+          "position": {
+            "x": -7.6,
+            "y": 1.05,
+            "z": 1.475
+          },
+          "stand": {
+            "x": -7.6,
+            "y": 0,
+            "z": 0.6
+          }
+        },
+        "room-106-handle": {
+          "position": {
+            "x": -8.05,
+            "y": 1,
+            "z": 1.4024999999999999
+          },
+          "stand": {
+            "x": -8.05,
+            "y": 0,
+            "z": 0.75
+          }
+        },
+        "nurse-first-sight": {
+          "position": {
+            "x": -1.2,
+            "y": 0,
+            "z": 0
+          }
+        },
+        "nurse-first-sight-view": {
+          "position": {
+            "x": -12,
+            "y": 1.6,
+            "z": 0.55
+          },
+          "target": {
+            "x": -1.2,
+            "y": 1.5,
+            "z": 0
+          }
+        },
+        "station-approach": {
+          "position": {
+            "x": -4.2,
+            "y": 0,
+            "z": 0.2
+          }
+        }
+      },
+      "camera": {
+        "x": -4.704830411835285,
+        "y": 1.6529999985098838,
+        "z": -0.38017141200296495
+      }
+    },
+    "performance": {
+      "fixedMaxMs": 9.300000000745058,
+      "updateMaxMs": 53.899999998509884,
+      "frameDeltaMaxMs": 100,
+      "simulatedSeconds": 2.433333333333329,
+      "engine": {
+        "sampleCount": 35,
+        "capacity": 240,
+        "totalFrames": 35,
+        "totalSubsteps": 157,
+        "frameIntervalMs": {
+          "last": 1883.300000000003,
+          "mean": 2554.308176470588,
+          "p50": 2699.9000000000015,
+          "p95": 5349.799999999996,
+          "max": 8216.400000000001
+        },
+        "frameCpuMs": {
+          "last": 8.300000000745058,
+          "mean": 212.505714285693,
+          "p50": 11.199999999254942,
+          "p95": 1752,
+          "max": 5205.5
+        },
+        "fixedMs": {
+          "last": 1.5,
+          "mean": 2.625714286310332,
+          "p50": 1.699999999254942,
+          "p95": 9.200000002980232,
+          "max": 11.400000002235174
+        },
+        "physicsMs": {
+          "last": 0.19999999925494194,
+          "mean": 0.9371428564190865,
+          "p50": 0.4000000022351742,
+          "p95": 4.5,
+          "max": 11.300000000745058
+        },
+        "updateMs": {
+          "last": 0.3999999985098839,
+          "mean": 3.654285714030266,
+          "p50": 0.8999999985098839,
+          "p95": 35.30000000074506,
+          "max": 53.899999998509884
+        },
+        "renderMs": {
+          "last": 6.200000002980232,
+          "mean": 205.24571428596974,
+          "p50": 6.699999999254942,
+          "p95": 1747.300000000745,
+          "max": 5141.20000000298
+        },
+        "substeps": {
+          "last": 5,
+          "mean": 4.485714285714286,
+          "p50": 5,
+          "p95": 5,
+          "max": 5
+        }
+      }
+    }
+  },
+  "after": {
+    "state": "ready",
+    "sessionId": 2,
+    "worldId": "nw:hospital:ward-4-west",
+    "player": {
+      "id": "player",
+      "position": {
+        "x": -9,
+        "y": 0,
+        "z": 0.45
+      },
+      "rotation": {
+        "yaw": -1.5524160439665016,
+        "pitch": 0
+      },
+      "velocity": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "movement": "idle",
+      "crouching": false,
+      "grounded": false,
+      "hiding": {
+        "state": "outside",
+        "spotId": null
+      },
+      "captured": false
+    },
+    "entities": [],
+    "colliderCount": 230,
+    "frameCount": 38,
+    "renderer": {
+      "calls": 332,
+      "triangles": 193799,
+      "geometries": 303,
+      "textures": 85
+    },
+    "audioState": "running",
+    "events": [],
+    "doorStates": {
+      "nw:door:room-101": "closed",
+      "nw:door:room-103": "closed",
+      "nw:door:room-105": "open",
+      "nw:door:treatment": "closed",
+      "nw:door:room-107": "closed",
+      "nw:door:storage": "closed",
+      "nw:door:room-102": "open",
+      "nw:door:room-104": "closed",
+      "nw:door:room-106": "locked",
+      "nw:door:room-108": "open",
+      "nw:door:room-110": "closed",
+      "nw:door:maintenance-west": "closed",
+      "nw:door:maintenance-east": "closed",
+      "nw:door:stairwell-b": "locked",
+      "nw:door:smoke-north": "open",
+      "nw:door:smoke-south": "open"
+    },
+    "prompt": null,
+    "error": null,
+    "station": {
+      "active": true,
+      "action": null,
+      "phase": "tension",
+      "elapsed": 0,
+      "step": 0,
+      "actor": {
+        "id": "nw:entity:nurse",
+        "type": "nurse",
+        "position": {
+          "x": -3.6,
+          "y": 0,
+          "z": -4.6
+        },
+        "state": "idle",
+        "lastKnownPlayer": null
+      },
+      "canCapture": false,
+      "firstAlertUsed": false,
+      "locations": {
+        "record": {
+          "x": -3.8,
+          "y": 0.76,
+          "z": -5.93
+        },
+        "recordStand": {
+          "x": -3.8716258132403336,
+          "y": 0,
+          "z": -4.832334412091888
+        },
+        "recordRoute": [
+          {
+            "x": -9,
+            "y": 0,
+            "z": 0.45
+          },
+          {
+            "x": -1.1499999999999986,
+            "y": 0,
+            "z": -0.9499999999999993
+          },
+          {
+            "x": -0.8999999999999986,
+            "y": 0,
+            "z": -1.6999999999999993
+          },
+          {
+            "x": -0.8999999999999986,
+            "y": 0,
+            "z": -2.6999999999999993
+          },
+          {
+            "x": -2.6499999999999986,
+            "y": 0,
+            "z": -4.449999999999999
+          },
+          {
+            "x": -3.8716258132403336,
+            "y": 0,
+            "z": -4.832334412091888
+          }
+        ],
+        "observation": {
+          "x": -9,
+          "y": 0,
+          "z": 0.45
+        },
+        "entry": {
+          "x": -4.2,
+          "y": 0,
+          "z": 0.2
+        },
+        "crouchCover": {
+          "x": -4.6,
+          "y": 0,
+          "z": -0.42
+        },
+        "concealment": {
+          "x": -7.85,
+          "y": 0,
+          "z": -3.75
+        },
+        "exit": {
+          "x": 4.6,
+          "y": 0,
+          "z": 0.2
+        },
+        "patrol": [
+          {
+            "x": -3.6,
+            "y": 0,
+            "z": -4.6
+          },
+          {
+            "x": -1.5,
+            "y": 0,
+            "z": -4.9
+          },
+          {
+            "x": -0.8,
+            "y": 0,
+            "z": -3.2
+          },
+          {
+            "x": -0.75,
+            "y": 0,
+            "z": -1
+          },
+          {
+            "x": -3.8,
+            "y": 0,
+            "z": 0
+          },
+          {
+            "x": -10.5,
+            "y": 0,
+            "z": 0
+          },
+          {
+            "x": -3.8,
+            "y": 0,
+            "z": 0
+          },
+          {
+            "x": -0.75,
+            "y": 0,
+            "z": -1
+          },
+          {
+            "x": -0.8,
+            "y": 0,
+            "z": -3.2
+          },
+          {
+            "x": -1.5,
+            "y": 0,
+            "z": -4.9
+          }
+        ],
+        "hidingPrimary": "nw:hiding:nurses-staff",
+        "hidingSecondary": "nw:hiding:room-105-bed-b",
+        "concealmentRoute": [
+          {
+            "x": -9,
+            "y": 0,
+            "z": 0.45
+          },
+          {
+            "x": -7.899999999999999,
+            "y": 0,
+            "z": -1.1999999999999993
+          },
+          {
+            "x": -7.85,
+            "y": 0,
+            "z": -3.75
+          }
+        ],
+        "returnRoute": [
+          {
+            "x": -7.85,
+            "y": 0,
+            "z": -3.75
+          },
+          {
+            "x": -7.899999999999999,
+            "y": 0,
+            "z": -0.9499999999999993
+          },
+          {
+            "x": -9,
+            "y": 0,
+            "z": 0.45
+          }
+        ],
+        "hidingTargets": {
+          "nw:hiding:room-105-bed-b": {
+            "x": -7.85,
+            "y": 0.41999999999999993,
+            "z": -5.3500000000000005
+          },
+          "nw:hiding:nurses-staff": {
+            "x": -6.402499998658895,
+            "y": 0.9812499761581419,
+            "z": -4.15
+          }
+        },
+        "hidingApproaches": {
+          "nw:hiding:room-105-bed-b": {
+            "x": -7.85,
+            "y": 0,
+            "z": -3.75
+          },
+          "nw:hiding:nurses-staff": {
+            "x": -5.625,
+            "y": 0,
+            "z": -4.15
+          }
+        }
+      }
+    },
+    "opening": {
+      "nurse": {
+        "action": null,
+        "clip": null,
+        "time": 0,
+        "elapsed": 0,
+        "duration": 0,
+        "finished": false,
+        "available": false,
+        "contactReady": false,
+        "rightHand": {
+          "x": -3.609990338352051,
+          "y": 1.128388492492747,
+          "z": -4.250108788108104
+        },
+        "leftHand": {
+          "x": -3.536519396669602,
+          "y": 1.1394747164656645,
+          "z": -4.246242639016916
+        },
+        "footContacts": 0,
+        "panelPresses": 0,
+        "paperTurns": 0,
+        "humActive": false
+      },
+      "narrative": {
+        "scene": "first-hiding",
+        "checkpoint": {
+          "version": 1,
+          "step": 5
+        },
+        "owners": [
+          {
+            "owner": "encounter:shaw",
+            "resources": [
+              "nurse",
+              "dialogue"
+            ]
+          }
+        ]
+      },
+      "phase": "stealth-onboarding",
+      "state": {
+        "version": 1,
+        "awakened": true,
+        "cardAcquired": true,
+        "doorUnlocked": true,
+        "firstLinePlayed": true,
+        "secondLinePlayed": true,
+        "room106Tried": true,
+        "sightingSeen": true,
+        "stationReached": true
+      },
+      "cinematic": false,
+      "anchors": {
+        "player-spawn": {
+          "position": {
+            "x": -12.4,
+            "y": 0,
+            "z": 4.1
+          }
+        },
+        "room-104-door": {
+          "position": {
+            "x": -12,
+            "y": 1.05,
+            "z": 1.475
+          },
+          "stand": {
+            "x": -12,
+            "y": 0,
+            "z": 2.3
+          }
+        },
+        "card-reader": {
+          "position": {
+            "x": -12.85,
+            "y": 1.15,
+            "z": 1.575
+          },
+          "stand": {
+            "x": -12.85,
+            "y": 0,
+            "z": 2.25
+          }
+        },
+        "access-card": {
+          "position": {
+            "x": -12.9,
+            "y": 0.006,
+            "z": 3.2
+          },
+          "stand": {
+            "x": -12.6,
+            "y": 0,
+            "z": 3.75
+          }
+        },
+        "intercom-speaker": {
+          "position": {
+            "x": -12,
+            "y": 2.42,
+            "z": 1.6
+          }
+        },
+        "room-106-door": {
+          "position": {
+            "x": -7.6,
+            "y": 1.05,
+            "z": 1.475
+          },
+          "stand": {
+            "x": -7.6,
+            "y": 0,
+            "z": 0.6
+          }
+        },
+        "room-106-handle": {
+          "position": {
+            "x": -8.05,
+            "y": 1,
+            "z": 1.4024999999999999
+          },
+          "stand": {
+            "x": -8.05,
+            "y": 0,
+            "z": 0.75
+          }
+        },
+        "nurse-first-sight": {
+          "position": {
+            "x": -1.2,
+            "y": 0,
+            "z": 0
+          }
+        },
+        "nurse-first-sight-view": {
+          "position": {
+            "x": -12,
+            "y": 1.6,
+            "z": 0.55
+          },
+          "target": {
+            "x": -1.2,
+            "y": 1.5,
+            "z": 0
+          }
+        },
+        "station-approach": {
+          "position": {
+            "x": -4.2,
+            "y": 0,
+            "z": 0.2
+          }
+        }
+      },
+      "camera": {
+        "x": -9,
+        "y": 1.65,
+        "z": 0.45
+      }
+    },
+    "performance": {
+      "fixedMaxMs": 0,
+      "updateMaxMs": 6.800000000745058,
+      "frameDeltaMaxMs": 100,
+      "simulatedSeconds": 0,
+      "engine": {
+        "sampleCount": 3,
+        "capacity": 240,
+        "totalFrames": 3,
+        "totalSubsteps": 5,
+        "frameIntervalMs": {
+          "last": 16.60000000000582,
+          "mean": 958.3000000000029,
+          "p50": 16.60000000000582,
+          "p95": 1900,
+          "max": 1900
+        },
+        "frameCpuMs": {
+          "last": 9,
+          "mean": 638.6666666654249,
+          "p50": 10.599999997764826,
+          "p95": 1896.3999999985099,
+          "max": 1896.3999999985099
+        },
+        "fixedMs": {
+          "last": 0,
+          "mean": 0,
+          "p50": 0,
+          "p95": 0,
+          "max": 0
+        },
+        "physicsMs": {
+          "last": 0,
+          "mean": 1.1666666666666667,
+          "p50": 0,
+          "p95": 3.5,
+          "max": 3.5
+        },
+        "updateMs": {
+          "last": 0.3999999985098839,
+          "mean": 2.566666666418314,
+          "p50": 0.5,
+          "p95": 6.800000000745058,
+          "max": 6.800000000745058
+        },
+        "renderMs": {
+          "last": 8.600000001490116,
+          "mean": 634.9333333323399,
+          "p50": 8.600000001490116,
+          "p95": 1889.5999999977648,
+          "max": 1889.5999999977648
+        },
+        "substeps": {
+          "last": 0,
+          "mean": 1.6666666666666667,
+          "p50": 0,
+          "p95": 5,
+          "max": 5
+        }
+      }
+    }
+  },
+  "errors": []
+}

@@ -9,6 +9,8 @@ npm run dev
 
 Open the printed root URL (normally http://localhost:5173/). Use the normal menu: New Game → Enter ward. No harness, QA URL or developer positioning is needed. A previous save can be Continued; New Game deliberately resets it after confirmation.
 
+For an unbiased first-time review, give the tester only the launch steps and controls first. Use the walkthrough below afterward for structured QA; it reveals the puzzle. Note where they hesitate or miss the card, record, locker or escape direction.
+
 1. Watch the Room 104 awakening, or Space to skip. Pause and settings should remain available. Check the stopped 03:17 clock, card, reader and intercom.
 2. Explore slowly. Try the door and find Shaw's staff card beside the bed (crouch if needed), use the reader and open the door. Card-first exploration is also valid. Each of the two temporary intercom lines should play once.
 3. Explore the empty corridor and Room 106 handle. Reach the station and examine the Room 104 observations record. No Nurse is waiting visibly in the corridor.

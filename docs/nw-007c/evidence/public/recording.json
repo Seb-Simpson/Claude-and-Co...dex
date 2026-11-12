@@ -1,0 +1,21 @@
+{
+  "programs": [],
+  "stream_groups": [],
+  "streams": [
+    {
+      "codec_name": "vp9",
+      "width": 800,
+      "height": 450,
+      "r_frame_rate": "8/1"
+    }
+  ],
+  "format": {
+    "duration": "691.125000",
+    "size": "2834445"
+  },
+  "sourceDurationSeconds": 691.16,
+  "sourceBytes": 48975954,
+  "source": "Playwright normal public-game input-only route; Full Motion, SwiftShader; includes actual capture/Retry, escape, Continue and New Game",
+  "transcode": "VP9, 8 fps; no cut, no speed change; silent source recording",
+  "sha256": "faab51385779000ddebf0645e14915afde927b1d3ccde616064ee340991d5bf4"
+}

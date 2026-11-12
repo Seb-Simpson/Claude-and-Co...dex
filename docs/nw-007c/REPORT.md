@@ -41,7 +41,7 @@ The same physical actor/capsule walks through actual geometry. Animation does no
 
 ## Verification
 
-The repaired-model asset/reliability batch completed: **7 passed in 21.2 minutes**. The 15-case public regression batch is still running; no unfinished case is counted as passed.
+The repaired-model asset/reliability batch completed: **7 passed in 21.2 minutes**. The public regression batch completed: **15 passed in 40.2 minutes**. That is **22 distinct selected Chromium scenarios passed**, including all relevant NW-007A reliability/public-route cases plus the B staging/head and new integrated-actor coverage. The older pre-repair runs are not added to this final pass count. No production source changed during these final browser runs.
 
 ```sh
 NW007B_HEAD=/tmp/nw007c-head-repaired NW005_SOFTWARE_SCALE=1 PLAYWRIGHT_CHROMIUM_EXECUTABLE=/usr/bin/chromium npm run test:browser -- tests/browser/nw-007c-integration.spec.ts tests/browser/nw-007b-staging.spec.ts tests/browser/nw-007b-head.spec.ts tests/browser/nw-007a-reliability.spec.ts tests/browser/nw-007a-scenes.spec.ts
@@ -99,3 +99,48 @@ Final Nurse GLB SHA-256: `dcd42fc80654f2b5b9ab271a48aa09ccec381f445609302aabddf2
 Final actual-actor fixture's last engine sampling window (208 frames, capacity 240): fixed work p95 **3.9 ms**, physics p95 **0.8 ms**, update p95 **1.7 ms**, render submission p95 **37.5 ms**. Software-rendered frame interval p95 **999.9 ms**; this is visibly slow and **not a hardware performance pass**. The sample includes pause/native-resolution diagnostic redraws, not a steady hardware benchmark. Whole-fixture fixed/update peaks were **52.0 / 42.4 ms**; renderer inventory after exploring diagnostic views was 402 geometries / 99 textures versus the same-view retry inventory above. Visibility/lazy uploads mean counts across different views are not a valid leak comparison. No claim of complete heap/GPU leak certification.
 
 The opening's two existing intercom recordings remain explicitly temporary `.temporary.wav` assets. B's station/heel/cloth/key/paper/capture sounds are original procedural synthesis through the existing mixer; this integration adds no paid service or final voice acting. Event timing and settings/cancellation are automated checks; subjective audibility, mix, animation weight and foot sliding on real hardware still need human playtesting.
+
+## Normal-game walkthrough and usability limits
+
+The complete fresh-start input-only route **passed in 11.6 minutes wall time**. It watches full-motion awakening, tries the locked door, crouches/takes the physical card, uses the reader, opens the actual door, explores the empty corridor, examines the station record, watches the real panel routine, walks to/enters the locker, observes records/listening/tension, then plays autonomous stealth with actual trolley cover. The position and aim shortcut methods throw in this test; mouse-look is sent through input events and movement uses keys.
+
+The bot made a route mistake during autonomous escape and was captured **13.05 simulated seconds after stealth began**, after the first-alert recovery opportunity. It used the **public Retry button**, restored the saved stealth milestone, sprinted to the semantic exit and completed the encounter. It then returned to menu, reloaded/Continued the completion checkpoint and started a clean New Game. This is **a complete route with one capture/recovery**, not a death-free first attempt. No page errors. No actor/phase/position write or teleport between phases.
+
+The phase snapshots record first-attempt capture at 88.33 simulated engine seconds and retry escape at 3.93 seconds in its fresh session. These are engine counters across two attempts, **not measured human playtime or pure player-controlled duration**. Software rendering and the engine's bounded delta make wall time much longer. The full video additionally includes loading, pauses, waits and post-escape menu validation.
+
+An actual behind-player capture is visible in the route evidence: the real actor's capture clip/sound run, but the existing bounded camera turn does not necessarily bring Shaw into frame. Reduced Motion intentionally keeps that camera still. The isolated head/capture preview proves the asset pose, not guaranteed framing of every live capture. This remains a presentation limitation for review; the integration does not teleport Shaw or snap the player around to disguise it.
+
+Automated routes establish reachable interactions, ordered eligibility, safe exploration and recoverable progression. Their read-only access to semantic anchors does **not** establish blind first-time discoverability. Human review should assess the floor card, motivation to inspect the station record, locker cue, cue audibility/mix, escape readability and live capture framing. Give the tester launch/controls before the spoiler walkthrough in [PLAY.md](PLAY.md).
+
+
+## Final public regression command and evidence
+
+```sh
+NW005_REAL=1 NW005_SOFTWARE_SCALE=1 PLAYWRIGHT_CHROMIUM_EXECUTABLE=/usr/bin/chromium npm run test:browser -- tests/browser/nw-006b-encounter.spec.ts tests/browser/nw-005b-opening.spec.ts tests/browser/foundation.spec.ts tests/browser/nw-005c-onboarding.spec.ts tests/browser/room104-prototype.spec.ts tests/browser/nw-005d-readability.spec.ts -g 'input-only normal game|awakening locks|locked door, two|saved station Continue|boots the renderer|context loss|literal normal|playable game shows|obsolete procedural|normal title-to-station|three minutes|assisted visual inspection|shipping Low checkpoint|real capture after a forgiving first alert|autonomous stealth: real sprint'
+```
+
+**15 passed**. Includes literal public URL startup without the QA bridge; engine/WebGL context-loss cleanup; full-motion awakening/pause/settings/skip/handoff; door-first and card-first puzzle, one-shot intercom, reader/door/corridor; safe three-minute dwell/denial/restart; Continue/menu/reload/New Game; native-Low visual checks; canonical room and ignored obsolete procedural query; complete input-only encounter route; keyboard capture skip/Retry; restored safe tension; real sprint-noise investigation/unseen under-bed concealment. These selected files are the applicable opening regressions, not a claim that every historical prototype/legacy browser spec was run.
+
+- [Public batch log](evidence/public/run.log), [route summary](evidence/public/normal-route-summary.json), [complete route snapshots](evidence/public/nw-006b-encounter-input-on-75b23-stealth-and-exit-checkpoint/normal-route.json).
+- [Complete input-only recording](evidence/public/normal-route.webm): 800×450, software rendering; full timing retained, silent Playwright video, reduced to eight encoded frames/second for a reviewable file. It includes the real capture/Retry, escape, Continue and fresh New Game validation. No cut or speed-up. This recording uses Full Motion; separate tests verify Reduced Motion.
+- [Actual station action](evidence/public/nw-006b-encounter-input-on-75b23-stealth-and-exit-checkpoint/01-authored-station.png), [locker](evidence/public/nw-006b-encounter-input-on-75b23-stealth-and-exit-checkpoint/02-first-locker-hide.png), [trolley cover](evidence/public/nw-006b-encounter-input-on-75b23-stealth-and-exit-checkpoint/03-real-trolley-cover.png), [live capture from behind](evidence/public/nw-006b-encounter-input-on-75b23-stealth-and-exit-checkpoint/04-route-capture.png), [escape](evidence/public/nw-006b-encounter-input-on-75b23-stealth-and-exit-checkpoint/04-escape.png). These functional screenshots use renderer pixel ratio 0.25 for SwiftShader; they are not native-resolution quality/performance proofs.
+- [Native-Low card](evidence/public/nw-005d-readability-assist-22717--at-shipping-Low-resolution/01-card-from-wake.png), [native-Low corridor](evidence/public/nw-005d-readability-assist-22717--at-shipping-Low-resolution/03-empty-corridor.png), [native-Low collapse](evidence/public/nw-005d-readability-assist-22717--at-shipping-Low-resolution/04-ceiling-collapse.png). These assisted observer views preserve shipping Low pixel ratio 0.75; they are explicitly separate from the input-only walkthrough.
+- [Unseen bed investigation](evidence/public/nw-006b-encounter-autonomo-c4b69-d-entry-conceals-the-player/unseen-bed.json), [keyboard capture/Retry](evidence/public/nw-006b-encounter-real-cap-a8d7f--repeating-the-introduction/capture-retry.json), [safe tension restoration](evidence/public/nw-006b-encounter-shipping-8f430--do-not-replay-the-entrance/tension-restart-native-low.json).
+
+## Explicit acceptance status
+
+| Requirement | Status |
+| --- | --- |
+| Canonical Room 104/03:17/card across New Game, Continue and five actual retries | Verified in final integrated browser run. |
+| Quiet corridor, ordered physical clue, safe authored introduction, real panel/records/listen clips | Verified, with one actual gameplay actor. |
+| Locker, directional trolley cover, autonomous sound/vision/search, unseen Room 105 hiding and escape/recovery | Unit and public browser checks passed. |
+| Real clip completion, pause, cancellation, no repeated owned hum/gesture after retry | Verified by actual actor clocks, audio diagnostics and unit tests. |
+| Original face-cover/head-export and striped face/neck bake defect | Specifically verified repaired on pinned `ec4ed99`; before/after retained. |
+| Convincing hand-to-prop contact | **Incomplete**: hovering in sampled actual work poses; producer staging/animation correction required. |
+| Capture framing from every angle | **Limited**: behind-player capture can remain off-screen; no forced teleport/snap is used. |
+| Final Nurse voice acting | **Incomplete**: existing two intercom recordings remain marked temporary. |
+| Real-GPU performance and full heap/GPU leak certification | **Unverified**; only software-rendered timings and bounded repeated-attempt inventories. |
+| Independent human clarity/atmosphere/animation/mix playtest | **Not performed**; instructions provided. |
+| Full NW-007 acceptance / release readiness | **Not complete**. Keep PR #24 draft and unmerged. |
+
+PR #22 was rechecked at delivery and still points to the final tested pin. All production source and tests remain identical to the tree after importing the repair (`eec5099`); later integration commits add documentation/evidence only. No automatic merges and no NW-008 work.
