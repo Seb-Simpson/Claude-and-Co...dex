@@ -4,6 +4,7 @@ import { type AnimationProfile, Animator, type FootstepEvent, resolveVisualState
 import { CRAWLER_ANIMATION, CRAWLER_CONTACTS, CRAWLER_DIMS, crawlerParts } from './crawler';
 import { CRAWLER_MATERIALS, createMaterialSet, type EntityMaterialSet, NURSE_MATERIALS, PATIENT_MATERIALS, WATCHER_MATERIALS } from './materials';
 import { NURSE_ANIMATION, NURSE_DIMS, nurseParts } from './nurse';
+import { NURSE_CLIPS } from './nurseClips';
 import { PATIENT_ANIMATION, PATIENT_DIMS, patientParts } from './patient';
 import { createRig, type JointName, type Rig } from './rig';
 import { WATCHER_ANIMATION, WATCHER_DIMS, WATCHER_POSES, watcherParts } from './watcher';
@@ -35,11 +36,26 @@ export interface EntityVisual {
   update(deltaSeconds: number, input: EntityVisualInput): readonly FootstepEvent[];
   /** Presentation override for cinematics or previews; `null` returns control to `update` input. */
   forceState(state: VisualState | null, variant?: number): void;
+  /**
+   * NW-007B: play an authored clip by name (see nurseClips.ts / docs/NW-007B.md) until `null`
+   * returns control to `update` input. In place: never moves the actor. Returns false when the
+   * clip is unknown, in which case the clip's documented fallback state is used if one exists.
+   */
+  playClip?(name: string | null, options?: PlayClipOptions): boolean;
+  /** NW-007B: the authored clip currently playing, its time and whether a one-shot has finished. */
+  readonly clip?: { readonly name: string; readonly time: number; readonly duration: number; readonly finished: boolean } | null;
   /** 1 = solid. Used for reveals and disappearances. */
   setOpacity(value: number): void;
   /** World-space position of a bone (head for sight lines, feet for footsteps and footprints). */
   bonePosition(bone: JointName, target?: Vector3): Vector3;
   dispose(): void;
+}
+
+export interface PlayClipOptions {
+  /** Cross-fade seconds from the current clip (default 0.45; capture uses ~0.15). */
+  readonly fade?: number;
+  /** Restart a one-shot even if it is already the playing clip. */
+  readonly restart?: boolean;
 }
 
 interface Definition {
@@ -118,6 +134,14 @@ export function createEntityVisual(type: BodiedEntityType, options: CreateEntity
       forced = state;
       if (variant !== undefined) animator.variant = variant;
     },
+    // Procedural body: authored clips are not available, so a clip plays its documented fallback state.
+    playClip(name) {
+      if (name === null) { forced = null; return true; }
+      const spec = type === 'nurse' ? NURSE_CLIPS.find((c) => c.name === name) : undefined;
+      if (spec) forced = spec.fallback;
+      return false;
+    },
+    clip: null,
     setOpacity(value) { materials.setOpacity(value); },
     bonePosition(bone, target = new Vector3()) {
       rig.bones[bone].updateWorldMatrix(true, false);

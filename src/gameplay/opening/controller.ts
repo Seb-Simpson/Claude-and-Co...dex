@@ -1,3 +1,5 @@
+import {nurseClip} from '../encounters/nursePresentation';
+import type {NursePerformance} from '../encounters/nursePresentation';
 import {createCapturePresentation} from './capture';
 import {awakeningPath} from './awakening';
 import {createNarrativeDirector,migrateNarrative} from '../directors/narrative';
@@ -37,6 +39,8 @@ export interface OpeningSequence {
   readonly coordinator: ExperienceCoordinator;
   canStageNurse(position:import('../../contracts').Vec3):boolean;
   directNurse(pose: StationActorPose): void;
+  nursePerformance():NursePerformance;
+  cancelNurse():void;
   saveStation(checkpoint: StationCheckpoint): void;
   readonly onboarding: OnboardingGate;
   readonly state: OpeningState;
@@ -58,7 +62,7 @@ export async function createOpeningSequence(context: ModuleContext, runtime: Gam
   let scene: Awaited<ReturnType<typeof createOpeningScene>> | undefined;
   let audio: Awaited<ReturnType<typeof createOpeningAudio>>;
   try {
-    scene = await createOpeningScene(world, bindings, runtime.physics,sceneOptions);
+    scene = await createOpeningScene(world, bindings, runtime.physics,{...sceneOptions,events:context.events});
     audio = await createOpeningAudio(context.engine.audio, line => ui.subtitle(line));
   } catch (error) { scene?.dispose(); ui.dispose(); throw error; }
   const presentation = scene;
@@ -113,7 +117,7 @@ export async function createOpeningSequence(context: ModuleContext, runtime: Gam
     },
   });
   let captureLease:ExperienceLease|null=null;
-  const capturePresentation=createCapturePresentation({camera,reduced:()=>prefersReducedMotion(settings.get()),
+  const capturePresentation=createCapturePresentation({camera,durationSeconds:nurseClip('capture').duration,reduced:()=>prefersReducedMotion(settings.get()),
     actor:()=>runtime.station?.snapshot().actor.position??world.root.getObjectByName('nw:opening:nurse-sighting')?.getWorldPosition(new Vector3())??null,
     acquire:()=>{
       captureLease=coordinator.acquire('encounter:capture',['camera','nurse','dialogue']);
@@ -168,10 +172,12 @@ export async function createOpeningSequence(context: ModuleContext, runtime: Gam
   let captureStarted=false;
   const offCapture = context.events.on('player:captured', event => {
     const player=runtime.player.getSnapshot();
-    if(event.playerId===player.id && player.captured&&!captureStarted) {captureStarted=true;coordinator.cancel();audio.pause();audio.effect('capture');ui.capture(onRestart,true);capturePresentation.start();}
+    if(event.playerId===player.id && player.captured&&!captureStarted) {captureStarted=true;coordinator.cancel();audio.pause();presentation.cancelNurse();if(lastNursePose)presentation.directNurse({...lastNursePose,deltaSeconds:0,action:'capture',speed:0,checkingPanel:false});ui.capture(onRestart,true);capturePresentation.start();}
   });
   return {
     onboarding,narrative,coordinator,
+    nursePerformance:()=>presentation.nursePerformance(),
+    cancelNurse:()=>presentation.cancelNurse(),
     canStageNurse:position=>canStageUnseen(camera,runtime.physics,position),
     directNurse(pose){lastNursePose=pose;presentation.directNurse(pose);},
     saveStation(cp) {
@@ -212,7 +218,7 @@ export async function createOpeningSequence(context: ModuleContext, runtime: Gam
       lastInteraction = timeSeconds;
       if (id===STATION_RECORD_ID) {
         if(narrative.commit('station-found'))dispatch('reach-station');narrative.commit('record-read');
-        ui.notify('NIGHT REGISTER · Patient 104\nAdmitted: yesterday. Prior admission: 17 June 1998.\nAttending: E. Shaw. Discharge withheld.',9);
+        ui.notify('ROOM 104 · OBSERVATIONS\nAdmitted: yesterday. Prior admission: 17 June 1998.\nAttending: E. Shaw. Discharge withheld.',9);
       } else if (command === 'use-reader' && state.doorUnlocked) { presentation.feedback('reader-accepted'); audio.effect('accepted'); }
       else if (command) dispatch(command);
       else ui.notify('NURSE CALL · Room 104. Assistance: West Ward station.');
@@ -227,7 +233,7 @@ export async function createOpeningSequence(context: ModuleContext, runtime: Gam
       if(disposed)return;
       if(runtime.player.getSnapshot().captured){
         if(lastNursePose)presentation.directNurse({...lastNursePose,deltaSeconds:delta,action:'capture',speed:0,checkingPanel:false});
-        capturePresentation.update(delta);return;
+        capturePresentation.update(delta);ui.captureProgress(capturePresentation.progress);return;
       }
       if(!playing)return;
       if (!started) awaken();

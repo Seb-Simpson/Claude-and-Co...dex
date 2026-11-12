@@ -102,3 +102,6 @@
 .nw-opening-ui__capture[data-phase='scare'] h2,.nw-opening-ui__capture[data-phase='scare'] button {visibility:hidden;}
 .nw-opening-ui__capture button:disabled {cursor:default;}
 .nw-reduce-motion .nw-opening-ui__capture {animation:none;}
+
+/* Follow the actor/camera simulation clock, including slow frames and pause. */
+.nw-opening-ui__capture {animation:none;background:rgb(3 6 6 / var(--nw-capture-fade,.87));}

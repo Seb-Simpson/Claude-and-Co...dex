@@ -282,7 +282,7 @@ export function createGameplayModule(options: GameplayOptions = {}): GameModule 
             ...(checkpoint?.station ? {checkpoint:checkpoint.station} : {}),
             eligible:()=>sequence.state.awakened && sequence.state.doorUnlocked && !sequence.cinematic && sequence.narrative.nurseEligible,
             coordinator:sequence.coordinator,canStage:p=>sequence.canStageNurse(p),
-            present:pose=>sequence.directNurse(pose),save:cp=>sequence.saveStation(cp),notify:m=>sequence.notify(m)});
+            performance:()=>sequence.nursePerformance(),cancelPresentation:()=>sequence.cancelNurse(),present:pose=>sequence.directNurse(pose),save:cp=>sequence.saveStation(cp),notify:m=>sequence.notify(m)});
         }
         const gameplay = runtime;
         const sequence = opening;

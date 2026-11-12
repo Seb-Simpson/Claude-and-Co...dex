@@ -1,0 +1,16 @@
+
+> night-ward@0.0.0 test:browser
+> playwright test tests/browser/nw-007c-integration.spec.ts
+
+[WebServer] (node:7418) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 1 test using 1 worker
+
+(node:7437) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 tests/browser/nw-007c-integration.spec.ts:7:1 › integrated director fixture: one actual Nurse performs panel, records and listening; sound ownership survives pause and handoff (6.0m)
+
+  Slow test file: tests/browser/nw-007c-integration.spec.ts (6.0m)
+  Consider running tests from slow files in parallel. See: https://playwright.dev/docs/test-parallel
+  1 passed (6.0m)

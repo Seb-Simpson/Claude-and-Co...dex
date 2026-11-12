@@ -5,8 +5,9 @@ import { ENTITY_PROFILES } from '../../../src/entities';
 import { createNavigationProvider, createPhysicsAdapter } from '../../../src/physics';
 import { createHospitalWorld } from '../../../src/world';
 import { ROOMS } from '../../../src/world/layout';
-import { EYE, NURSE_EYE, STATION_PROPS, STEALTH } from '../../../src/world/stealth/layout';
-import { getNursesStationStealth } from '../../../src/world/stealth/nursesStation';
+import { EYE, NURSE_EYE, STATION_INTERACTIONS, STATION_PROPS, STEALTH } from '../../../src/world/stealth/layout';
+import { NURSE_CLIP_NAMES } from '../../../src/horror/entities/nurseClips';
+import { getNursesStationStealth, getStationStaging } from '../../../src/world/stealth/nursesStation';
 
 /**
  * NW-006A: the Nurses' Station stealth space, on Codex's real physics and navigation (read-only).
@@ -264,6 +265,68 @@ describe('Nurses’ Station stealth: along her whole route (sampled every 0.25 m
       for (const p of routeSamples(STEALTH.patrolWaypoints).filter((q) => q.z < -1.6)) {
         expect(f.physics.isPositionFree({ x: p.x, y: 0.003, z: p.z }, NURSE.radius, NURSE.height), JSON.stringify(p)).toBe(true);
       }
+    } finally { f.dispose(); }
+  });
+});
+
+describe('NW-007B: Nurse Shaw’s station staging', () => {
+  it('publishes the panel and records actions and their props as named nodes, with known clips', () => {
+    const f = fixture();
+    try {
+      const st = getStationStaging(f.h.world);
+      for (const key of ['panel', 'records'] as const) {
+        const a = st[key];
+        expect(a.stand).toEqual(STATION_INTERACTIONS[key].stand);
+        expect(NURSE_CLIP_NAMES).toContain(a.clip);
+        // Facing (gameplay convention, 0 = -Z) points at the target.
+        const facing = Math.atan2(-(a.target.x - a.stand.x), -(a.target.z - a.stand.z));
+        expect(Math.abs(facing - a.yaw), key).toBeLessThan(0.15);
+      }
+      expect(dist(st.callConsole, st.panel.target)).toBe(0);
+      expect(dist(st.record104, st.records.target)).toBe(0);
+    } finally { f.dispose(); }
+  });
+
+  it('lets her stand at both actions (radius 0.3 m), within reach of the desk, and walk there from her route and back', () => {
+    const f = fixture();
+    try {
+      const st = getStationStaging(f.h.world);
+      const s = getNursesStationStealth(f.h.world);
+      const reach: Record<string, number> = {};
+      for (const key of ['panel', 'records'] as const) {
+        const a = st[key];
+        expect(f.physics.isPositionFree({ ...a.stand, y: 0.003 }, NURSE.radius, NURSE.height), key).toBe(true);
+        expect(f.physics.hasSupport({ ...a.stand, y: 0.003 }, NURSE.radius), key).toBe(true);
+        // Horizontal hand reach from a 0.3 m body to the target: under 0.65 m (arm + hand).
+        reach[key] = Math.hypot(a.target.x - a.stand.x, a.target.z - a.stand.z);
+        expect(reach[key], key).toBeLessThan(0.65);
+        for (const w of [s.patrolWaypoints[0]!, s.patrolWaypoints[1]!]) {
+          expect(f.navigation.findPath({ from: { ...w.position, y: 0.003 }, to: { ...a.stand, y: 0.003 }, agent: NURSE })?.reachesGoal, `${w.key} → ${key}`).toBe(true);
+          expect(f.navigation.findPath({ from: { ...a.stand, y: 0.003 }, to: { ...w.position, y: 0.003 }, agent: NURSE })?.reachesGoal, `${key} → ${w.key}`).toBe(true);
+        }
+      }
+      record('stationActions', { reach });
+    } finally { f.dispose(); }
+  });
+
+  it('leaves the station locker behind her shoulder while she works the panel (outside her field of view)', () => {
+    const f = fixture();
+    try {
+      const st = getStationStaging(f.h.world);
+      const locker = f.h.world.hidingLocations.find((h) => h.id === STEALTH.hidingPrimary)!;
+      const approach = locker.exitCandidates[0]!.position;
+      const fov = ENTITY_PROFILES.nurse.fieldOfViewRadians;
+      const angleTo = (p: { x: number; z: number }) => {
+        const a = st.panel;
+        const fx = -Math.sin(a.yaw);
+        const fz = -Math.cos(a.yaw);
+        const dx = p.x - a.stand.x;
+        const dz = p.z - a.stand.z;
+        return Math.acos((fx * dx + fz * dz) / Math.hypot(dx, dz));
+      };
+      const lockerAngle = angleTo(approach);
+      record('panelVsLocker', { lockerApproachAngleDeg: Number((lockerAngle * 180 / Math.PI).toFixed(1)), halfFovDeg: Number((fov * 90 / Math.PI).toFixed(1)) });
+      expect(lockerAngle).toBeGreaterThan(fov / 2);
     } finally { f.dispose(); }
   });
 });

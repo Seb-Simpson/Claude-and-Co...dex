@@ -80,7 +80,7 @@ test('input-only normal game:104 puzzle, authored station introduction, locker, 
  expect((await snap(page)).opening!.narrative?.scene).toBe('empty-corridor');
  expect(s.recordStand).toBeDefined();expect(s.record).toBeDefined();
  for(const point of s.recordRoute)await walk(page,point);
- await walk(page,s.recordStand!);await look(page,s.record!);await interact(page,'night register');
+ await walk(page,s.recordStand!);await look(page,s.record!);await interact(page,'Room 104 record');
  await expect.poll(async()=>(await snap(page)).opening!.narrative?.checkpoint.step,wait).toBe(4);
  await expect.poll(async()=>(await snap(page)).station!.phase,wait).toBe('introduction');
  phases.push(await snap(page));await pause(page);const paused=(await snap(page)).station!;
@@ -88,11 +88,17 @@ test('input-only normal game:104 puzzle, authored station introduction, locker, 
  await page.getByRole('button',{name:/^Resume/}).click();await expect.poll(async()=>(await snap(page)).state,wait).toBe('playing');
  await expect.poll(async()=>(await snap(page)).station!.action,{timeout:360_000}).toBe('check-panel');
  await look(page,{...(await snap(page)).station!.actor.position,y:1.4});await page.screenshot({path:info.outputPath('01-authored-station.png')});
- await expect.poll(async()=>(await snap(page)).station!.phase,{timeout:420_000}).toBe('tension');phases.push(await snap(page));
- // Scene five: the primary locker is learned while the authored routine is nonlethal.
+ // The real panel routine creates the chance to enter the locker, freeing the records stance.
+ expect((await snap(page)).opening!.nurse?.clip).toBe('panel_check');
+ expect((await snap(page)).opening!.nurse?.available).toBe(true);
  await walk(page,s.hidingApproaches[s.hidingPrimary]!);await look(page,s.hidingTargets[s.hidingPrimary]!);await interact(page,'Hide in locker');
  await expect.poll(async()=>(await snap(page)).player!.hiding.state,wait).toBe('hidden');
  await page.screenshot({path:info.outputPath('02-first-locker-hide.png')});
+ await expect.poll(async()=>(await snap(page)).opening!.nurse?.clip,wait).toBe('records_read');
+ await expect.poll(async()=>(await snap(page)).opening!.nurse?.paperTurns,wait).toBe(1);
+ expect((await snap(page)).opening!.nurse?.panelPresses).toBe(1);
+ phases.push(await snap(page));
+ await expect.poll(async()=>(await snap(page)).station!.phase,{timeout:420_000}).toBe('tension');phases.push(await snap(page));
  await expect.poll(async()=>(await snap(page)).station!.phase,{timeout:240_000}).toBe('stealth');phases.push(await snap(page));
  expect((await snap(page)).player!.captured).toBe(false);
  // A real patrol observation before leaving cover, rather than a phase/actor shortcut.
@@ -156,6 +162,9 @@ test('real capture after a forgiving first alert: skip, keyboard Retry and resto
  await expect.poll(async()=>(await snap(page)).state,{timeout:150_000}).toBe('captured');
  await page.screenshot({path:info.outputPath('05-real-capture.png')});
  const before=await snap(page);
+ expect(before.opening!.nurse?.clip).toBe('capture');
+ expect(before.opening!.nurse?.available).toBe(true);
+ expect(await page.locator('.nw-opening-ui__capture').evaluate(el=>getComputedStyle(el).animationName)).toBe('none');
  // Escape advances the captured transport if it is still running. Once ready,
  // Space must regain its native button behavior rather than remain a cutscene key.
  await page.keyboard.press('Escape');

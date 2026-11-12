@@ -28,7 +28,7 @@ test('production discovery fixture: empty corridor, physical record range, clue-
  const placed=await page.evaluate(p=>window.nightWardTest!.teleport(p),locations.recordStand!);expect(placed).toBe(true);
  await page.evaluate(p=>window.nightWardTest!.aimAt(p),locations.record!);
  await expect.poll(async()=>(await snap(page)).opening!.narrative?.scene).toBe('station-discovery');
- await expect(page.locator('.nw-opening-ui__prompt')).toContainText('night register',{timeout:50_000});
+ await expect(page.locator('.nw-opening-ui__prompt')).toContainText('Room 104 record',{timeout:50_000});
  const t=(await snap(page)).performance.simulatedSeconds;
  await expect.poll(async()=>(await snap(page)).performance.simulatedSeconds,{timeout:60_000}).toBeGreaterThan(t+.7);
  await page.keyboard.press('e');await expect(page.locator('.nw-opening-ui__notification')).toContainText('1998');

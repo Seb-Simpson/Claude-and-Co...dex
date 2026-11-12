@@ -53,6 +53,8 @@ export default {
     const lights = rig;
     const sound = ambience;
     const music = score;
+    const previousDiagnostics=world.root.userData.nwSoundDiagnostics;
+    world.root.userData.nwSoundDiagnostics=()=>sound.diagnostics();
     const fog = scene.fog as FogExp2;
     const behaviours = new Map<string, EntityBehaviourState>();
     let activeChases = 0;
@@ -67,11 +69,11 @@ export default {
     context.events.on('atmosphere:lighting', (event) => { lights.apply(event); });
     context.events.on('atmosphere:sound', (event) => {
       const key = `${event.cueId}@${event.position ? `${event.position.x},${event.position.z}` : 'global'}`;
-      if (event.action === 'stop') { sound.stopLoop(key); return; }
+      if (event.action === 'stop') { sound.stopCue(event.cueId,event.position); return; }
       // Mix control cues from the horror presentation.
       if (event.cueId === 'nw:mix:duck') { sound.duck(event.volume, 3.5); return; }
       if (event.cueId === 'nw:mix:silence') { sound.silence(6); music.cut(6); return; }
-      const options = { position: event.position, volume: event.volume };
+      const options = { position: event.position, volume: event.volume,...(event.cueId==='nw:station-hum'?{duration:4}:{}) };
       if (event.loop) sound.loop(key, event.cueId, options);
       else sound.play(event.cueId, options);
     });
@@ -123,6 +125,7 @@ export default {
       dispose() {
         offRig();
         sound.dispose();
+        world.root.userData.nwSoundDiagnostics=previousDiagnostics;
         music.dispose();
         lights.dispose();
         scene.fog = previousFog;

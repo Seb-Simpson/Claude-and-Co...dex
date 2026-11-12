@@ -1,3 +1,7 @@
+import {createNursePresentation} from '../encounters/nursePresentation';
+import type {NursePerformance} from '../encounters/nursePresentation';
+import type {GameEvents} from '../../contracts';
+import {getStationStaging} from '../../world/stealth/nursesStation';
 import type {StationActorPose} from '../encounters/nursesStation';
 import {
   BoxGeometry, BufferAttribute, Color, DoubleSide, Group, Mesh, MeshBasicMaterial, MeshStandardMaterial,
@@ -16,6 +20,8 @@ import type { OpeningBindings } from './bindings';
 export type OpeningFeedback = 'handle-104' | 'handle-106' | 'reader-denied' | 'reader-accepted';
 export interface OpeningScene {
   directNurse(pose: StationActorPose): void;
+  nursePerformance():NursePerformance;
+  cancelNurse():void;
   setCardTaken(value: boolean): void;
   feedback(id: OpeningFeedback): void;
   update(deltaSeconds: number, playerPosition: Vec3, camera: PerspectiveCamera, unlocked: boolean): { sawNurse: boolean; atStation: boolean };
@@ -24,6 +30,7 @@ export interface OpeningScene {
 }
 export interface OpeningSceneOptions {
   /** Optional NW007B adapter: receives semantic actions, not guessed animation names. */
+  readonly events?:GameEvents;
   readonly onNurseAction?: (pose:StationActorPose)=>void;
   /** Tests may supply an owned visual. Production loads the existing Blender Nurse, never a proxy. */
   readonly loadNurse?: () => Promise<EntityVisual>;
@@ -109,14 +116,16 @@ async function loadNurse(): Promise<EntityVisual> {
   if (!model) { const reason = library.failures.nurse; library.dispose(); throw new Error(`Opening Nurse model could not load: ${reason}`); }
   try {
     const visual = createModelVisual('nurse', model, { seed: 104 });
-    return { ...visual, dispose() { visual.dispose(); library.dispose(); } };
+    return Object.defineProperties({}, {...Object.getOwnPropertyDescriptors(visual),dispose:{value:()=>{visual.dispose();library.dispose();},enumerable:true}}) as EntityVisual;
   } catch (error) { library.dispose(); throw error; }
 }
 
 /** Opening presentation only: no AI, collisions, independent clock or frame loop. */
 export async function createOpeningScene(world: HospitalWorld, bindings: OpeningBindings,
   physics: Pick<PhysicsAdapter, 'hasLineOfSight'>, options: OpeningSceneOptions = {}): Promise<OpeningScene> {
+  const staging=world.root.getObjectByName('nw:station:nurse-panel')?getStationStaging(world):null;
   const nurse = await (options.loadNurse ?? loadNurse)();
+  const performance=createNursePresentation(nurse,options.events,staging?.callConsole??openingPosition(bindings['station-approach']));
   const owned = new Group(); owned.name = 'nw:opening:gameplay-presentation';
   world.root.add(owned);
   const resources: { dispose(): void }[] = [];
@@ -139,7 +148,7 @@ export async function createOpeningScene(world: HospitalWorld, bindings: Opening
     nurse.object.visible = false;
     nurse.forceState('idle');
     nurse.update(0, { behaviour: 'idle', speed: 0, observed: false });
-    resources.push(nurse);
+    resources.push(nurse,performance);
 
     const indicatorMaterial = new MeshBasicMaterial({ color: 0x75653d, side: DoubleSide, depthWrite: false });
     const indicatorGeometry = new PlaneGeometry(0.026, 0.012);
@@ -176,9 +185,10 @@ export async function createOpeningScene(world: HospitalWorld, bindings: Opening
         nurse.object.visible = pose.visible !== false;
         nurse.object.position.copy(owned.worldToLocal(new Vector3().copy(pose.actor.position)));
         nurse.object.quaternion.copy(owned.getWorldQuaternion(new Quaternion()).invert()).multiply(new Quaternion().setFromAxisAngle(new Vector3(0,1,0),pose.yaw));
-        nurse.forceState(pose.action==='capture'?'idle':pose.checkingPanel ? 'observe' : null);
-        nurse.update(pose.deltaSeconds,{behaviour:pose.actor.state,speed:pose.speed,observed:false});
+        performance.present(pose);
       },
+      nursePerformance:()=>performance.read(),
+      cancelNurse:()=>performance.cancel(),
       setCardTaken(value) { if (!disposed && card) card.visible = value ? false : cardVisible; },
       feedback(id) {
         if (disposed) return;

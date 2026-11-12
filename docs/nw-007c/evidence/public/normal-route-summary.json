@@ -1,0 +1,132 @@
+{
+  "kind": "normal root game; keyboard/mouse movement only; no positioning or phase shortcuts",
+  "errors": [],
+  "snapshots": [
+    {
+      "state": "playing",
+      "session": 1,
+      "phase": "introduction",
+      "action": "approach",
+      "simulatedSeconds": 25.84999999999979,
+      "captured": false,
+      "clip": null
+    },
+    {
+      "state": "playing",
+      "session": 1,
+      "phase": "introduction",
+      "action": "inspect-records",
+      "simulatedSeconds": 58.166666666664625,
+      "captured": false,
+      "clip": "records_read"
+    },
+    {
+      "state": "playing",
+      "session": 1,
+      "phase": "tension",
+      "action": null,
+      "simulatedSeconds": 65.36666666666422,
+      "captured": false,
+      "clip": null
+    },
+    {
+      "state": "playing",
+      "session": 1,
+      "phase": "stealth",
+      "action": null,
+      "simulatedSeconds": 75.28333333333032,
+      "captured": false,
+      "clip": null
+    },
+    {
+      "state": "captured",
+      "session": 1,
+      "phase": "stealth",
+      "action": null,
+      "simulatedSeconds": 88.33333333332958,
+      "captured": true,
+      "clip": "capture"
+    },
+    {
+      "state": "playing",
+      "session": 2,
+      "phase": "complete",
+      "action": null,
+      "simulatedSeconds": 3.9333333333331097,
+      "captured": false,
+      "clip": null
+    }
+  ],
+  "final": {
+    "state": "playing",
+    "worldId": "nw:hospital:ward-4-west",
+    "colliderCount": 230,
+    "renderer": {
+      "calls": 204,
+      "triangles": 53345,
+      "geometries": 306,
+      "textures": 86
+    },
+    "performance": {
+      "fixedMaxMs": 140.30000000074506,
+      "updateMaxMs": 41.5,
+      "frameDeltaMaxMs": 100,
+      "simulatedSeconds": 3.9333333333331097,
+      "engine": {
+        "sampleCount": 51,
+        "capacity": 240,
+        "totalFrames": 51,
+        "totalSubsteps": 246,
+        "frameIntervalMs": {
+          "last": 450,
+          "mean": 832.9676399999996,
+          "p50": 516.5,
+          "p95": 1266.5999999999767,
+          "max": 12082.881999999983
+        },
+        "frameCpuMs": {
+          "last": 9.699999999254942,
+          "mean": 322.31568627439293,
+          "p50": 12.300000000745058,
+          "p95": 150,
+          "max": 12073.199999999255
+        },
+        "fixedMs": {
+          "last": 5.099999997764826,
+          "mean": 8.590196078022322,
+          "p50": 3.600000001490116,
+          "p95": 34.399999998509884,
+          "max": 142.80000000447035
+        },
+        "physicsMs": {
+          "last": 0,
+          "mean": 0.5058823531749201,
+          "p50": 0.3999999985098839,
+          "p95": 1.7000000029802322,
+          "max": 4.399999998509884
+        },
+        "updateMs": {
+          "last": 0.4000000022351742,
+          "mean": 2.0627450982437416,
+          "p50": 0.6999999992549419,
+          "p95": 6.300000000745058,
+          "max": 41.5
+        },
+        "renderMs": {
+          "last": 4.199999999254942,
+          "mean": 311.1470588233833,
+          "p50": 4.5,
+          "p95": 49.80000000074506,
+          "max": 12066
+        },
+        "substeps": {
+          "last": 5,
+          "mean": 4.823529411764706,
+          "p50": 5,
+          "p95": 5,
+          "max": 5
+        }
+      }
+    }
+  }
+}

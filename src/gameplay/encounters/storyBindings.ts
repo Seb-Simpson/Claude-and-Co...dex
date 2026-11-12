@@ -1,3 +1,5 @@
+import {getStationStaging} from '../../world/stealth/nursesStation';
+import {nurseClip} from './nursePresentation';
 import {Box3, Vector3} from 'three';
 import type {Mesh} from 'three';
 import type {HospitalWorld, Vec3, NavigationProvider} from '../../contracts';
@@ -37,6 +39,8 @@ export function stationChoreography(world:HospitalWorld,b:StationBindings,nav:Na
   };
   const binding=(id:string)=>world.root.getObjectByName(aliases[id]??id)??world.root.getObjectByName(id);
   const point=(id:string,fallback:Vec3)=>binding(id)?.getWorldPosition(new Vector3())??new Vector3().copy(fallback);
+  const published=world.root.getObjectByName('nw:station:call-console')?getStationStaging(world):null;
+  if(published&&(published.panel.clip!==nurseClip('panel_check').name||published.records.clip!==nurseClip('records_read').name))throw Error('Station animation metadata differs from the published Nurse contract');
   const panel=world.root.getObjectByName('station_annunciator');
   const panelLook=point('nw:cinematic:shaw-panel-target',panel?new Box3().setFromObject(panel).getCenter(new Vector3()):b.patrol[0]!);
   const recordLook=stationRecordPoint(world)??new Vector3().copy(b.patrol[1]!);
@@ -50,7 +54,8 @@ export function stationChoreography(world:HospitalWorld,b:StationBindings,nav:Na
     }
     return {...near};
   }
-  return {panelLook:{...panelLook},recordLook:{...recordLook},
+  return {panelYaw:published?.panel.yaw,recordYaw:published?.records.yaw,
+    panelLook:{...panelLook},recordLook:{...recordLook},
     panelStand:stand('nw:cinematic:shaw-panel-stand',panelLook,b.patrol[0]!),
     recordStand:stand('nw:cinematic:shaw-record-stand',recordLook,b.patrol[2]!),
     staging:[point('nw:cinematic:shaw-entry',b.patrol[5]??b.spawn.position),new Vector3().copy(b.exit),new Vector3().copy(b.spawn.position),new Vector3().copy(b.patrol[1]!)].map(p=>({...p}))};

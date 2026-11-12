@@ -1,0 +1,33 @@
+
+> night-ward@0.0.0 test:browser
+> playwright test tests/browser/nw-006b-encounter.spec.ts tests/browser/nw-005b-opening.spec.ts tests/browser/foundation.spec.ts tests/browser/nw-005c-onboarding.spec.ts tests/browser/room104-prototype.spec.ts tests/browser/nw-005d-readability.spec.ts -g input-only normal game|awakening locks|locked door, two|saved station Continue|boots the renderer|context loss|literal normal|playable game shows|obsolete procedural|normal title-to-station|three minutes|assisted visual inspection|shipping Low checkpoint|real capture after a forgiving first alert|autonomous stealth: real sprint
+
+[WebServer] (node:12629) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 15 tests using 1 worker
+
+(node:12647) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 tests/browser/foundation.spec.ts:7:1 › boots the renderer, Rapier and registered world, unlocks audio, and resizes the canvas (1.2m)
+  ✓   2 tests/browser/foundation.spec.ts:43:1 › reports WebGL context loss and disposes the registered modules and renderer (46.4s)
+  ✓   3 tests/browser/nw-005b-opening.spec.ts:70:1 › awakening locks movement, pauses with settings, skips smoothly and hands back control (35.7s)
+  ✓   4 tests/browser/nw-005b-opening.spec.ts:102:1 › locked door, two one-shot Shaw cues, card reader, normal door, corridor and checkpoint retry (2.9m)
+  ✓   5 tests/browser/nw-005b-opening.spec.ts:172:1 › saved station Continue, menu return, reload and New Game use the existing frontend slot (40.7s)
+  ✓   6 tests/browser/nw-005c-onboarding.spec.ts:52:1 › normal title-to-station keyboard route: no teleport, safe card-first exploration, crouching, reader and empty corridor (3.8m)
+  ✓   7 tests/browser/nw-005c-onboarding.spec.ts:99:1 › three minutes of safe Room104 exploration, locked-door introduction, denial, pause and puzzle restart (4.4m)
+  ✓   8 tests/browser/nw-005c-onboarding.spec.ts:132:1 › literal normal URL launches the integrated opening without a QA bridge or development harness (41.7s)
+  ✓   9 tests/browser/nw-005d-readability.spec.ts:5:1 › assisted visual inspection of card, intercom, empty corridor and rebuilt ceiling at shipping Low resolution (2.3m)
+  ✓  10 tests/browser/room104-prototype.spec.ts:49:1 › the playable game shows the Blender Room 104 and west corridor, with gameplay intact (2.3m)
+  ✓  11 tests/browser/room104-prototype.spec.ts:72:1 › the obsolete procedural query preserves the canonical room and gameplay (2.0m)
+(node:13464) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  12 tests/browser/nw-006b-encounter.spec.ts:58:1 › input-only normal game:104 puzzle, authored station introduction, locker, cover, autonomous stealth and exit checkpoint (11.6m)
+  ✓  13 tests/browser/nw-006b-encounter.spec.ts:148:1 › real capture after a forgiving first alert: skip, keyboard Retry and restored stealth without repeating the introduction (1.5m)
+  ✓  14 tests/browser/nw-006b-encounter.spec.ts:180:1 › shipping Low checkpoint restore: tension remains safe, pause and menu restart do not replay the entrance (1.9m)
+  ✓  15 tests/browser/nw-006b-encounter.spec.ts:206:1 › autonomous stealth: real sprint sound is investigated but unseen Room105 bed entry conceals the player (3.4m)
+
+  Slow test file: tests/browser/nw-006b-encounter.spec.ts (18.3m)
+  Slow test file: tests/browser/nw-005c-onboarding.spec.ts (8.8m)
+  Consider running tests from slow files in parallel. See: https://playwright.dev/docs/test-parallel
+  15 passed (40.2m)

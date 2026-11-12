@@ -1,0 +1,36 @@
+
+> night-ward@0.0.0 test:browser
+> playwright test tests/browser/nw-007c-integration.spec.ts tests/browser/nw-007b-staging.spec.ts tests/browser/nw-007b-head.spec.ts tests/browser/nw-007a-reliability.spec.ts tests/browser/nw-007a-scenes.spec.ts
+
+[WebServer] (node:11316) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 7 tests using 1 worker
+
+(node:11335) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 tests/browser/nw-007a-reliability.spec.ts:8:1 › canonical assets survive retry when a later asset request fails; no legacy playable fallback (14.3s)
+Verified capture/retry 1/5
+Verified capture/retry 2/5
+Verified capture/retry 3/5
+Verified capture/retry 4/5
+Verified capture/retry 5/5
+  ✓  2 tests/browser/nw-007a-reliability.spec.ts:64:1 › five real Nurse captures and UI retries preserve canonical assets, saved card and one actor; New Game resets fresh state (6.2m)
+  ✓  3 tests/browser/nw-007a-reliability.spec.ts:153:1 › a fresh page Continues a completed milestone with canonical assets, then New Game restores the visible card and locked door (37.9s)
+(node:11682) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  4 tests/browser/nw-007a-scenes.spec.ts:5:1 › production discovery fixture: empty corridor, physical record range, clue-gated unseen entrance and pause ownership (30.9s)
+(node:11878) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  5 tests/browser/nw-007b-head.spec.ts:23:1 › NW-007B: Nurse Shaw head assembly renders aligned in the actual game (2.1m)
+(node:12096) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  6 tests/browser/nw-007b-staging.spec.ts:42:1 › NW-007B: Nurse Shaw posed with each authored clip at the station, in the real game (4.9m)
+(node:12333) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  7 tests/browser/nw-007c-integration.spec.ts:7:1 › integrated director fixture: one actual Nurse performs panel, records and listening; sound ownership survives pause and handoff (6.3m)
+
+  Slow test file: tests/browser/nw-007a-reliability.spec.ts (7.1m)
+  Slow test file: tests/browser/nw-007c-integration.spec.ts (6.3m)
+  Consider running tests from slow files in parallel. See: https://playwright.dev/docs/test-parallel
+  7 passed (21.2m)

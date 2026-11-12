@@ -39,11 +39,14 @@ wrists = []
 for s in (-1, 1):
     sh0 = j((s * 0.08, -0.01, 1.46), 0.048)
     sh = j((s * 0.16, 0.0, 1.43), 0.046)
-    el = j((s * 0.19, 0.02, 1.18), 0.034)
-    fore = j((s * 0.13, -0.08, 1.06), 0.03)
-    wr = j((s * 0.05, -0.15, 1.0), 0.024)
+    # NW-007B: elbows out and the clasped hands further forward, clear of the hips (was elbow
+    # (0.19, 0.02, 1.18), wrist (0.05, -0.15, 1.0): the forearms rested on the pelvis, so any arm
+    # lift tore the dress at the hips). Same pose and silhouette.
+    el = j((s * 0.215, 0.025, 1.19), 0.034)
+    fore = j((s * 0.17, -0.1, 1.08), 0.03)
+    wr = j((s * 0.065, -0.21, 1.02), 0.024)
     chain(upper, sh0, sh, el, fore, wr)
-    wrists.append((s, Vector((s * 0.05, -0.15, 1.0))))
+    wrists.append((s, Vector((s * 0.065, -0.21, 1.02))))
     hip = j((s * 0.08, 0, 0.92), 0.075)
     thigh = j((s * 0.085, -0.01, 0.72), 0.06)
     knee = j((s * 0.085, -0.02, 0.5), 0.045)
@@ -60,11 +63,13 @@ forms = [body,
          E3('chin', (hx * 1.15, -0.11, 1.67), (0.018, 0.016, 0.018)),
          E3('nose', (hx * 1.05, -0.115, 1.74), (0.008, 0.012, 0.02)),
          E3('bun', (hx * 0.6, 0.075, 1.8), (0.045, 0.04, 0.045))]
+# NW-007B: each hand stays on its own side of the centre line (the fingers used to cross it and the
+# remesh fused both hands into one surface, which tore whenever the hands parted). Still clasped.
 for s, w in wrists:
-    forms.append(E3('hand', tuple(w + Vector((-s * 0.03, -0.02, -0.03))), (0.04, 0.018, 0.045), rot=(0, 0, math.radians(s * 40))))
+    forms.append(E3('hand', tuple(w + Vector((-s * 0.016, -0.02, -0.03))), (0.034, 0.018, 0.045), rot=(0, 0, math.radians(s * 30))))
     for f in range(4):
-        base = w + Vector((-s * (0.03 + f * 0.012), -0.03, -0.055))
-        forms.append(nw.tube_curve('finger', [tuple(base), tuple(base + Vector((-s * 0.03, -0.01, -0.025))), tuple(base + Vector((-s * 0.045, 0.005, -0.04)))], 0.0065, taper_end=0.6))
+        base = w + Vector((-s * (0.012 + f * 0.01), -0.03, -0.055))
+        forms.append(nw.tube_curve('finger', [tuple(base), tuple(base + Vector((-s * 0.01, -0.012, -0.025))), tuple(base + Vector((-s * 0.014, 0.004, -0.045)))], 0.0065, taper_end=0.6))
 for s in (-1, 1):
     forms.append(E3('shoe', (s * 0.085, -0.06, 0.03), (0.038, 0.1, 0.03)))
     forms.append(E3('heel', (s * 0.085, 0.03, 0.025), (0.022, 0.022, 0.028)))
@@ -74,7 +79,9 @@ nw.push(body, (hx * 1.1, -0.1, 1.745), 0.06, (0, 1, 0), 0.008)
 nw.displace(body, 0.002, 0.03, name='pores')
 nw.apply_all(body)
 
-skin = nw.mat_skin('nurse_skin', (0.26, 0.235, 0.21), (0.17, 0.14, 0.13), rough=0.5, sss=0.2)
+# NW-007B: pale, waxy skin (was a dark grey-brown 0.26 that read as a dark mass at the capture
+# distance and as a corpse from afar). Still bloodless; the blindfold now reads against it.
+skin = nw.mat_skin('nurse_skin', (0.5, 0.465, 0.42), (0.37, 0.32, 0.3), rough=0.5, sss=0.2)
 stocking = nw.mat_simple('stocking', (0.02, 0.018, 0.018), rough=0.55)
 shoe = nw.mat_simple('shoe', (0.008, 0.007, 0.007), rough=0.18)
 hair = nw.mat_hair('hair', (0.035, 0.028, 0.022))
@@ -132,7 +139,7 @@ def in_bodice(v):
         return False
     if p.z < 1.25 and abs(p.x) > 0.13 and p.y > -0.06:  # keep sleeves down the forearms
         return True
-    near_wrist = min((p - Vector((sx * 0.05, -0.15, 1.0))).length for sx in (-1, 1))
+    near_wrist = min((p - Vector((sx * 0.065, -0.21, 1.02))).length for sx in (-1, 1))
     return near_wrist > 0.045
 bmesh.ops.delete(bm, geom=[v for v in bm.verts if not in_bodice(v)], context='VERTS')
 bm.normal_update()

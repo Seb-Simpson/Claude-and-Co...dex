@@ -1,0 +1,117 @@
+{
+  "nurse": {
+    "hidden": [
+      "nw:opening:nurse-first-sight",
+      "nw:opening:nurse-first-sight-view",
+      "nw:opening:nurse-sighting"
+    ],
+    "triangles": 23589,
+    "clips": [
+      "alert",
+      "capture",
+      "idle",
+      "investigate",
+      "listen",
+      "listen_brief",
+      "look_around",
+      "panel_check",
+      "records_read",
+      "run",
+      "search",
+      "turn",
+      "walk"
+    ]
+  },
+  "views": {
+    "01-station-arrival": {
+      "clip": "panel_check",
+      "time": 0.9,
+      "calls": 163,
+      "triangles": 213210
+    },
+    "02-panel-reads-annunciator": {
+      "clip": "panel_check",
+      "time": 0.95,
+      "calls": 174,
+      "triangles": 208768
+    },
+    "03-panel-presses-reset": {
+      "clip": "panel_check",
+      "time": 3.5,
+      "calls": 167,
+      "triangles": 208362
+    },
+    "04-records-104": {
+      "clip": "records_read",
+      "time": 2.2,
+      "calls": 145,
+      "triangles": 195800
+    },
+    "05-walk": {
+      "clip": "walk",
+      "time": 0.45,
+      "calls": 138,
+      "triangles": 199386
+    },
+    "06-turn-and-look": {
+      "clip": "look_around",
+      "time": 1.4,
+      "calls": 164,
+      "triangles": 213040
+    },
+    "07-listen-brief": {
+      "clip": "listen_brief",
+      "time": 1.2,
+      "calls": 164,
+      "triangles": 213040
+    },
+    "08-investigate": {
+      "clip": "investigate",
+      "time": 1,
+      "calls": 140,
+      "triangles": 199448
+    },
+    "09-locker-behind-her": {
+      "clip": "panel_check",
+      "time": 3.4,
+      "calls": 184,
+      "triangles": 194624
+    },
+    "10-crouched-at-trolley": {
+      "clip": "panel_check",
+      "time": 1,
+      "calls": 129,
+      "triangles": 205400
+    },
+    "11-torch-by-lockers": {
+      "clip": null,
+      "time": null,
+      "calls": 188,
+      "triangles": 186529
+    },
+    "12-annunciator": {
+      "clip": null,
+      "time": null,
+      "calls": 51,
+      "triangles": 148057
+    },
+    "13-record-and-console": {
+      "clip": null,
+      "time": null,
+      "calls": 61,
+      "triangles": 149369
+    },
+    "14-capture": {
+      "clip": "capture",
+      "time": 1.4,
+      "calls": 60,
+      "triangles": 176784
+    }
+  },
+  "renderer": {
+    "calls": 60,
+    "triangles": 176784,
+    "geometries": 301,
+    "textures": 85
+  }
+}
