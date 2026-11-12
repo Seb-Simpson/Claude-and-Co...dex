@@ -60,6 +60,87 @@ CUPBOARD = (WEST_X + 0.23, -5.2, HALF_PI)
 OBS = (-0.42, -5.3, -0.6)
 ANNUNCIATOR = (-5.49, 1.72, BACK_Z)
 GLOVES = (EAST_X, 1.35, -1.82)          # beside the way in, clear of the noticeboard (z -3.35..-2.25)
+# NW-007B: nurse-call master station and the Room 104 record on the back desk (her interaction
+# targets; stand points are published by src/world/stealth/layout.ts STATION_INTERACTIONS).
+CONSOLE = (-4.4, BACK_Z + 0.43)         # centre x, z on the desk (desk front edge z -5.725)
+RECORD = (-3.8, BACK_Z + 0.47)
+LABEL_W, LABEL_H = 1024, 1024
+R_FACE = (0, 0, 1024, 368)              # annunciator faceplate print (0.50 x 0.18 m)
+R_COVER = (0, 400, 384, 912)            # Room 104 folder cover (0.24 x 0.32 m)
+R_CHART = (400, 400, 768, 908)          # observation chart sheet (0.21 x 0.29 m)
+R_KEYS = (800, 400, 1024, 490)          # console keypad print (0.2 x 0.08 m)
+
+
+def label_sheet(path):
+    """Printed surfaces of the station (Pillow): readable room numbers, the record, the keypad."""
+    from PIL import Image, ImageDraw, ImageFont
+    def font(size, bold=False, mono=False):
+        name = 'DejaVuSansMono-Bold.ttf' if mono else ('DejaVuSans-Bold.ttf' if bold else 'DejaVuSans.ttf')
+        try:
+            return ImageFont.truetype('/usr/share/fonts/truetype/dejavu/' + name, size)
+        except OSError:
+            return ImageFont.load_default()
+    im = Image.new('RGB', (LABEL_W, LABEL_H), (200, 196, 186))
+    d = ImageDraw.Draw(im)
+    # Annunciator faceplate: title strip, eight cells, room numbers under the lamps.
+    x0, y0, x1, y1 = R_FACE
+    d.rectangle(R_FACE, fill=(214, 212, 204))
+    d.rectangle((x0, y0, x1, y0 + 62), fill=(52, 58, 60))
+    d.text((x0 + 26, y0 + 12), 'NURSE CALL  \u00b7  WARD 4 WEST', font=font(34, bold=True), fill=(222, 222, 214))
+    for k in range(8):
+        cx = x0 + (0.07 + (k % 4) * 0.12) / 0.5 * (x1 - x0)
+        cy = y0 + (1 - (0.105 - (k // 4) * 0.06) / 0.18) * (y1 - y0)
+        d.rectangle((cx - 58, cy - 34, cx + 58, cy + 34), outline=(120, 120, 114), width=3)
+        d.text((cx - 34, cy + 40), str(101 + k), font=font(36, bold=True), fill=(36, 36, 34))
+    # Room 104 folder cover (buff card, typed label, red sticker).
+    x0, y0, x1, y1 = R_COVER
+    d.rectangle(R_COVER, fill=(186, 158, 110))
+    d.rectangle((x0 + 30, y0 + 40, x1 - 30, y0 + 220), fill=(232, 228, 214), outline=(120, 100, 70), width=3)
+    for i, (t, f) in enumerate((('WARD 4 WEST', font(30, bold=True)), ('ROOM 104', font(52, bold=True)), ('OBSERVATIONS', font(28)))):
+        d.text((x0 + 48, y0 + 54 + i * 52 + (8 if i == 2 else 0)), t, font=f, fill=(30, 28, 26))
+    d.ellipse((x1 - 130, y1 - 150, x1 - 40, y1 - 60), fill=(170, 40, 34))
+    d.text((x1 - 116, y1 - 118), 'NBM', font=font(26, bold=True), fill=(240, 230, 220))
+    # Observation chart: ruled grid, times down the side, the last entry circled.
+    x0, y0, x1, y1 = R_CHART
+    d.rectangle(R_CHART, fill=(236, 234, 224))
+    d.text((x0 + 16, y0 + 12), 'OBS CHART  -  RM 104', font=font(24, bold=True), fill=(40, 40, 40))
+    times = ['20:00', '22:00', '00:00', '01:00', '02:00', '03:00', '03:17']
+    for i, t in enumerate(times):
+        yy = y0 + 70 + i * 58
+        d.line((x0 + 10, yy + 44, x1 - 10, yy + 44), fill=(170, 176, 190), width=2)
+        d.text((x0 + 16, yy + 6), t, font=font(26, mono=True), fill=(50, 50, 60))
+        if i < 6:
+            d.text((x0 + 130, yy + 6), ['asleep', 'asleep', 'asleep', 'restless', 'asleep', 'asleep'][i], font=font(24), fill=(40, 60, 120))
+    yy = y0 + 70 + 6 * 58
+    d.ellipse((x0 + 6, yy - 6, x0 + 116, yy + 46), outline=(180, 30, 26), width=4)
+    d.text((x0 + 130, yy + 6), '', font=font(24), fill=(40, 60, 120))
+    # Console keypad print.
+    x0, y0, x1, y1 = R_KEYS
+    d.rectangle(R_KEYS, fill=(60, 64, 66))
+    for i, t in enumerate(('CALL', 'CANCEL', 'RESET')):
+        d.rectangle((x0 + 8 + i * 72, y0 + 50, x0 + 70 + i * 72, y0 + 84), outline=(150, 150, 140), width=2)
+        d.text((x0 + 14 + i * 72, y0 + 58), t, font=font(13, bold=True), fill=(225, 225, 215))
+    im.save(path)
+    # The console display (emissive): the outstanding call.
+    lcd = Image.new('RGB', (256, 96), (6, 10, 6))
+    dl = ImageDraw.Draw(lcd)
+    dl.text((14, 8), 'CALL  RM 104', font=font(30, mono=True), fill=(150, 230, 120))
+    dl.text((14, 50), '03:17  WAITING', font=font(26, mono=True), fill=(110, 190, 90))
+    lpath = path.replace('.png', '_lcd.png')
+    lcd.save(lpath)
+    return path, lpath
+
+
+def rect_plane(name, col, mat, w, h, center, normal, rect, size=(LABEL_W, LABEL_H)):
+    """A printed rectangle: plane UVs remapped to a pixel rect (x0, y0, x1, y1) of the label sheet."""
+    W_, H_ = size
+    x0, y0, x1, y1 = rect
+    u0, u1, v0, v1 = x0 / W_, x1 / W_, 1 - y1 / H_, 1 - y0 / H_
+    ob = nw.plane(name, col, w, h, center, normal=normal, mat=mat)
+    uv = ob.data.uv_layers.get('UVMap') or ob.data.uv_layers.new(name='UVMap')
+    for dd in uv.data:
+        dd.uv = (u0 + dd.uv.x * (u1 - u0), v0 + dd.uv.y * (v1 - v0))
+    return ob
 
 nw.reset()
 scene = bpy.context.scene
@@ -340,17 +421,14 @@ def records_corner():
     x, y, zw = ANNUNCIATOR
     a = Prop('station_annunciator', x, zw, 0.0)
     a.box('white', (0.52, 0.2, 0.035), (0, y, 0.018), bevel=0.006)
-    a.box('grey_abs', (0.48, 0.03, 0.006), (0, y + 0.07, 0.038), bevel=0.001)
     lamps = []
     for k in range(8):
         lx = -0.18 + (k % 4) * 0.12
         ly = y + 0.015 - (k // 4) * 0.06
-        if k == 1:
+        if k == 3:  # NW-007B: Room 104 (top row reads 101-104; the print is on the faceplate)
             lamps.append((lx, ly))
             continue
         a.box('grey_abs', (0.05, 0.03, 0.008), (lx, ly, 0.039), bevel=0.002)
-        a.box('paper', (0.05, 0.012, 0.002), (lx, ly - 0.025, 0.037), bevel=0.0)
-    a.box('paper', (0.05, 0.012, 0.002), (lamps[0][0], lamps[0][1] - 0.025, 0.037), bevel=0.0)
     a.tube('grey_abs', [(0.26, y - 0.06, 0.012), (0.3, y - 0.2, 0.012), (0.31, y - 0.6, 0.012), (0.31, 1.32, 0.012)], 0.006)
     out.append(a.finish())
     led = nw.box('station_call_led', LIGHTS, (0.05, 0.03, 0.01), (x + lamps[0][0], lamps[0][1], zw + 0.039), mat=LED_MAT, bevel=0.002)
@@ -412,11 +490,18 @@ def paperwork():
         p.box('white', (0.004, 0.08, 0.05), (-4.78 + i * 0.08, DESK_TOP + 0.2, BACK_Z + 0.312), bevel=0.0)
     y = DESK_TOP
     for i in range(7):
-        p.box('buff' if i % 4 else 'file_green', (0.26, 0.016, 0.34), (-4.15 + rnd.uniform(-0.03, 0.03), y + 0.008, -5.95 + rnd.uniform(-0.03, 0.03)), yaw=rnd.uniform(-0.2, 0.2), bevel=0.002)
+        p.box('buff' if i % 4 else 'file_green', (0.26, 0.016, 0.34), (-3.36 + rnd.uniform(-0.02, 0.02), y + 0.008, -5.95 + rnd.uniform(-0.02, 0.02)), yaw=rnd.uniform(-0.15, 0.15), bevel=0.002)
         y += 0.017
-    p.box('paper', (0.21, 0.003, 0.3), (-3.6, DESK_TOP + 0.002, -5.92), yaw=-0.3, bevel=0.0)
-    p.box('paper', (0.21, 0.003, 0.3), (-3.52, DESK_TOP + 0.005, -5.88), yaw=0.15, bevel=0.0)
-    p.cyl('grey_abs', 0.004, 0.14, (-3.45, DESK_TOP + 0.009, -5.85), axis='x', yaw=0.7, verts=6)
+    # The Room 104 record (NW-007B): a buff folder squared to the desk edge, its chart pulled half out.
+    p.box('buff', (0.245, 0.012, 0.325), (RECORD[0], DESK_TOP + 0.006, RECORD[1]), bevel=0.002)
+    p.box('paper', (0.215, 0.002, 0.295), (RECORD[0] + 0.1, DESK_TOP + 0.003, RECORD[1] - 0.05), yaw=-0.12, bevel=0.0)
+    p.cyl('grey_abs', 0.004, 0.14, (RECORD[0] + 0.2, DESK_TOP + 0.016, RECORD[1] + 0.12), axis='x', yaw=0.7, verts=6)
+    # The nurse-call master station: grey base, raked keypad and display, handset on its cradle.
+    cx, cz = CONSOLE
+    p.box('grey_abs', (0.27, 0.05, 0.18), (cx, DESK_TOP + 0.025, cz), bevel=0.008)
+    p.box('grey_abs', (0.27, 0.04, 0.12), (cx, DESK_TOP + 0.065, cz - 0.03), rot=(math.radians(25), 0, 0), bevel=0.006)
+    p.box('file_black', (0.05, 0.035, 0.19), (cx - 0.105, DESK_TOP + 0.075, cz), bevel=0.012, segments=3)
+    p.tube('file_black', [(cx - 0.13, DESK_TOP + 0.06, cz + 0.08), (cx - 0.17, DESK_TOP + 0.01, cz + 0.1), (cx - 0.2, DESK_TOP + 0.03, cz + 0.06), (cx - 0.16, DESK_TOP + 0.004, cz - 0.02)], 0.004)
     p.cyl('ceramic', 0.042, 0.095, (-2.5, DESK_TOP + 0.0475, -5.85), verts=18)
     p.cyl('tea', 0.037, 0.004, (-2.5, DESK_TOP + 0.08, -5.85), verts=18)
     p.tube('ceramic', [(-2.458, DESK_TOP + 0.075, -5.85), (-2.43, DESK_TOP + 0.05, -5.85), (-2.458, DESK_TOP + 0.025, -5.85)], 0.007)
@@ -445,6 +530,31 @@ def occluders():
     o.append(nw.box('occ_counter', OCC, (5.0, 1.12, 0.95), (-3.8, 0.56, -1.97), mat=OCC_MAT))
     o.append(nw.box('occ_corr_wall', OCC, (8.0, 3.0, 0.1), (-3.3, 1.5, 1.45), mat=OCC_MAT))
     return o
+
+
+def printed_surfaces():
+    """NW-007B: the readable print (annunciator faceplate, Room 104 folder and chart, keypad) on one
+    lit label material, and the console display on an emissive one. Not baked into the atlas."""
+    sheet, lcd_path = label_sheet(os.path.join(WORK, 'station_labels.png'))
+    mat = nw.image_material('station_labels', sheet, rough_value=0.7)
+    glow_mat = nw.image_material('station_lcd', lcd_path, rough_value=0.3, emissive=lcd_path, emissive_strength=1.0)
+    x, y, zw = ANNUNCIATOR
+    parts = [rect_plane('print_face', LIGHTS, mat, 0.5, 0.18, (x, y, zw + 0.0362), '+z', R_FACE)]
+    parts.append(rect_plane('print_cover', LIGHTS, mat, 0.24, 0.32, (RECORD[0], DESK_TOP + 0.0125, RECORD[1]), 'y', R_COVER))
+    parts.append(rect_plane('print_chart', LIGHTS, mat, 0.205, 0.285, (RECORD[0] + 0.1, DESK_TOP + 0.0042, RECORD[1] - 0.05), 'y', R_CHART))
+    chart = parts[-1]
+    chart.rotation_euler = (0, 0, -0.12)
+    cx, cz = CONSOLE
+    keys = rect_plane('print_keys', LIGHTS, mat, 0.16, 0.06, (cx + 0.035, DESK_TOP + 0.0875, cz - 0.045), 'y', R_KEYS)
+    keys.rotation_euler = (math.radians(25), 0, 0)
+    parts.append(keys)
+    lcd = rect_plane('station_call_lcd', LIGHTS, glow_mat, 0.1, 0.035, (cx + 0.035, DESK_TOP + 0.0885, cz - 0.0), 'y', (0, 0, 256, 96), size=(256, 96))
+    lcd.rotation_euler = (math.radians(25), 0, 0)
+    for o in parts + [lcd]:
+        nw.select_only([o])
+        bpy.ops.object.transform_apply(location=True, rotation=True, scale=True)
+    printed = nw.join(parts, 'station_print')
+    return printed, lcd
 
 
 # ---------------------------------------------------------------------------------------------
@@ -552,17 +662,18 @@ def main():
     props = [linen_trolley(), obs_machine(), glove_dispenser(), paperwork()]
     corner, led = records_corner()
     props = corner + props
+    printed, glow = printed_surfaces()
     shadows = contact_shadows()
     occ = occluders()
-    for o in [led, shadows]:
+    for o in [led, shadows, printed, glow]:
         o.hide_render = True
     bake_atlas(props)
-    for o in [led, shadows]:
+    for o in [led, shadows, printed, glow]:
         o.hide_render = False
     for o in occ:
         o.hide_render = True
     bpy.ops.wm.save_as_mainfile(filepath=os.path.join(OUT, 'station_set.blend'))
-    exported = props + [led, shadows]
+    exported = props + [led, shadows, printed, glow]
     nw.select_only(exported)
     glb = os.path.join(OUT, 'station_set.glb')
     bpy.ops.export_scene.gltf(filepath=glb, export_format='GLB', use_selection=True, export_apply=True, export_yup=True,

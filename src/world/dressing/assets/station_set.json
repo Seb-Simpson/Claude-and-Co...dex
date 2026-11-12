@@ -1,23 +1,27 @@
 {
  "glb": "station_set.glb",
- "bytes": 1363820,
- "triangles": 29328,
+ "bytes": 1446924,
+ "triangles": 29922,
  "meshes": {
   "station_cabinet_a": 1940,
   "station_cabinet_b": 3584,
   "station_supply_cupboard": 2904,
-  "station_annunciator": 1356,
+  "station_annunciator": 1152,
   "station_linen_trolley": 12112,
   "station_obs_machine": 3824,
   "station_glove_dispenser": 1240,
-  "station_paperwork": 2252,
+  "station_paperwork": 3040,
   "station_call_led": 108,
-  "station_contact_shadows": 8
+  "station_contact_shadows": 8,
+  "station_print": 8,
+  "station_call_lcd": 2
  },
  "materials": [
   "call_led",
   "station_atlas",
-  "station_contact_shadow"
+  "station_contact_shadow",
+  "station_labels",
+  "station_lcd"
  ],
  "atlas": 1024,
  "aoSamples": 64

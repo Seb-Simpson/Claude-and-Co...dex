@@ -63,3 +63,33 @@ export const STATION_PROPS = {
   /** Parked observations machine by the east wall. */
   obsMachine: { centre: v(-0.42, 0.65, -5.3), size: { x: 0.56, y: 1.3, z: 0.56 } },
 } as const;
+
+/**
+ * NW-007B staging for Nurse Shaw's authored station actions (art: dressing/pipeline/station_set.py).
+ * `stand` is where her capsule stands (free for radius 0.3 m, tested), `yaw` her facing in the
+ * gameplay convention (0 = facing -Z, as `atan2(-dx, -dz)`), `target` what her hands reach, `lookAt`
+ * where her eyes go, `clip` the clip to play there (horror/entities/nurseClips.ts).
+ */
+export const STATION_INTERACTIONS = {
+  panel: {
+    stand: v(-4.4, 0, -5.42), yaw: 0, clip: 'panel_check',
+    /** The reset key on the nurse-call master station on the back desk. */
+    target: v(-4.37, 0.82, -5.99),
+    /** The annunciator lamp for Room 104 (lit), up and to her left. */
+    lookAt: v(-5.31, 1.735, -6.36),
+  },
+  records: {
+    stand: v(-3.8, 0, -5.42), yaw: 0, clip: 'records_read',
+    /** The Room 104 observation record lying on the desk. */
+    target: v(-3.8, 0.76, -5.93),
+    lookAt: v(-3.75, 0.76, -5.95),
+  },
+} as const;
+
+/** NW-007B: the dropped torch by the staff lockers (rooms/stealthStation.ts addStationPractical). */
+export const STATION_PRACTICAL = {
+  /** On the floor in front of the lockers, lens toward the hiding locker's door. */
+  torch: { at: v(-5.78, 0, -3.72), aim: v(-6.15, 0, -4.1) },
+  /** The light sits just ahead of the lens, low, so it washes the locker doors from below. */
+  light: v(-5.95, 0.12, -3.9),
+} as const;
