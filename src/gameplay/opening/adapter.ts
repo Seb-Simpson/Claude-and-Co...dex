@@ -28,7 +28,7 @@ export function createOpeningInteractionAdapter(world: HospitalWorld, bindings: 
   if (record) {
     const mesh = new Mesh(new BoxGeometry(.42,.09,.38),material);
     mesh.name=STATION_RECORD_ID;mesh.position.copy(world.root.worldToLocal(record.clone()));world.root.add(mesh);owned.push(mesh);
-    additions.push({id:STATION_RECORD_ID,type:'inspect',object:mesh,prompt:'Examine night register',range:2.3});
+    additions.push({id:STATION_RECORD_ID,type:'inspect',object:mesh,prompt:'Examine Room 104 record',range:2.3});
   }
   let disposed = false;
   return { world: { ...world, interactables: [...world.interactables, ...additions] }, dispose() {

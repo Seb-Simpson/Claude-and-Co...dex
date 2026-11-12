@@ -1,3 +1,4 @@
+import {getStationStaging} from '../../src/world/stealth/nursesStation';
 import {createExperienceCoordinator} from '../../src/gameplay/directors/experience';
 import type {StationOptions} from '../../src/gameplay/encounters/nursesStation';
 import RAPIER from '@dimforge/rapier3d-compat';
@@ -12,7 +13,7 @@ import type {StationCheckpoint} from '../../src/gameplay/encounters/checkpoint';
 import {resolveStationBindings} from '../../src/gameplay/encounters/stationBindings';
 import {createEventBus} from '../../src/integration/events';
 beforeAll(async()=>{await RAPIER.init()});
-function fixture(checkpoint?:StationCheckpoint,policy:Partial<Pick<StationOptions,'canStage'|'coordinator'>>={}){
+function fixture(checkpoint?:StationCheckpoint,policy:Partial<Pick<StationOptions,'canStage'|'coordinator'|'cancelPresentation'>>={}){
  const hospital=createHospitalWorld({textures:false}),world=hospital.world,events=createEventBus();
  const physics=new RAPIER.World({x:0,y:-9.81,z:0});
  const engine={physics,scene:new Scene(),camera:new PerspectiveCamera(70,1,.05,100),renderer:{domElement:{}},audio:{context:null}} as unknown as EngineServices;
@@ -145,9 +146,26 @@ it('reserves the same actor for autonomous AI and cancels stale encounter work w
 
 it('finishes the authored introduction when a stationary reader occupies the preferred panel stance, without walking through them',()=>{
  const f=fixture();try{
-  f.allow();f.place(f.b.patrol[0]!);f.until('tension',4500);
+  f.allow();f.place(getStationStaging(f.world).panel.stand);f.until('tension',4500);
   expect(f.poses.some(p=>p.checkingPanel&&p.contactReady===false)).toBe(true);
   expect(f.captures).toEqual([]);expect(f.station.snapshot().actor.lastKnownPlayer).toBeNull();
-  for(const p of f.poses.filter(p=>p.visible))expect(Math.hypot(p.actor.position.x-f.b.patrol[0]!.x,p.actor.position.z-f.b.patrol[0]!.z)).toBeGreaterThan(.55);
+  for(const p of f.poses.filter(p=>p.visible))expect(Math.hypot(p.actor.position.x-f.game.player.getSnapshot().position.x,p.actor.position.z-f.game.player.getSnapshot().position.z)).toBeGreaterThan(.55);
  }finally{f.dispose()}
+});
+
+it('cancels the actual presentation synchronously when its director lease is interrupted',()=>{
+ let cancelled=0;const coordinator=createExperienceCoordinator(),f=fixture({version:1,phase:'stealth'},{coordinator,cancelPresentation:()=>cancelled++});try{
+  coordinator.cancel('ai:shaw');expect(cancelled).toBe(1);
+  const next=coordinator.acquire('encounter:capture',['nurse']);expect(next).not.toBeNull();
+  f.tick(30);expect(cancelled).toBe(1);expect(f.captures).toEqual([]);
+  next!.release();
+ }finally{f.dispose();coordinator.dispose()}
+});
+it('does not overwrite the capture owner with a stale normal AI presentation in the capture tick',()=>{
+ const f=fixture({version:1,phase:'stealth'});let capturePoseCount:number|undefined;
+ const off=f.events.on('player:captured',()=>{capturePoseCount=f.poses.length});try{
+  f.place(f.b.patrol[3]!);for(let i=0;i<4000&&!f.captures.length;i++)f.tick();
+  expect(f.captures).toEqual(['nw:entity:nurse']);expect(capturePoseCount).toBeDefined();
+  expect(f.poses.length).toBe(capturePoseCount);
+ }finally{off();f.dispose()}
 });

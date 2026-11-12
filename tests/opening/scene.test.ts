@@ -45,7 +45,7 @@ describe('opening scene presentation', () => {
   it('shows one directed actor continuously rather than retiring it when the player looks away', async () => {
     const f=fixture(),scene=await createOpeningScene(f.world,f.bindings,{hasLineOfSight:f.hasLineOfSight},{loadNurse:async()=>f.nurse});
     const actor={id:'shaw',type:'nurse' as const,position:{x:0,y:0,z:-10},state:'idle' as const,lastKnownPlayer:null};
-    scene.directNurse({actor,deltaSeconds:.1,yaw:0,speed:0,checkingPanel:true,visible:true});
+    scene.directNurse({actor,deltaSeconds:.1,yaw:0,speed:0,checkingPanel:true,action:'check-panel',contactReady:true,visible:true});
     expect(scene.update(.1,{x:0,y:0,z:0},f.camera,true).sawNurse).toBe(true);
     f.camera.rotation.y=Math.PI;f.camera.updateMatrixWorld(true);
     scene.update(.1,{x:0,y:0,z:0},f.camera,true);expect(f.nurse.object.visible).toBe(true);

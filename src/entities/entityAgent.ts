@@ -13,6 +13,7 @@ export interface EntityDirective {
   readonly target: Vec3 | null;
   readonly speed: number;
   readonly yaw?: number;
+  readonly arriveDistance?:number;
 }
 export interface EntityAgentOptions {
   readonly perceptionEnabled?: () => boolean;
@@ -129,9 +130,9 @@ export function createEntityAgent(options: EntityAgentOptions): EntityAgent {
       machine.transition('idle');
     }
   }
-  function move(goal: Vec3, speed: number, dt: number, allowed: boolean): boolean {
+  function move(goal: Vec3, speed: number, dt: number, allowed: boolean,arrival=.22): boolean {
     const at = position();
-    if (distance(at, goal) < 0.22) return true;
+    if (distance(at, goal) < arrival) return true;
     if (!allowed) return false;
     if (now >= replanAt || !pathGoal || distance(pathGoal, goal) > 0.35 || stuckSeconds > 0.6) {
       const localApproach = options.getDoorApproach?.(copy(at), copy(goal), true);
@@ -162,7 +163,7 @@ export function createEntityAgent(options: EntityAgentOptions): EntityAgent {
       replanAt = now + profile.pathRefreshSeconds;
       stuckSeconds = 0;
     }
-    while (waypointIndex < waypoints.length && distance(position(), waypoints[waypointIndex]!) < 0.2) waypointIndex += 1;
+    while (waypointIndex < waypoints.length && distance(position(), waypoints[waypointIndex]!) < (waypointIndex===waypoints.length-1?arrival:.2)) waypointIndex += 1;
     const target = waypoints[waypointIndex];
     if (!target) return false; // No path means wait/recover, never a direct steering fallback.
     const dx = target.x - at.x;
@@ -175,7 +176,7 @@ export function createEntityAgent(options: EntityAgentOptions): EntityAgent {
     grounded = result.grounded;
     const actual = horizontalDistance(at, result.position);
     stuckSeconds = travel > 0.005 && actual < travel * 0.1 ? stuckSeconds + dt : 0;
-    return distance(position(), goal) < 0.22;
+    return distance(position(), goal) < arrival;
   }
   function advancePatrol(): void {
     const route = options.route;
@@ -214,6 +215,7 @@ export function createEntityAgent(options: EntityAgentOptions): EntityAgent {
     setDirective(next) {
       if (next && (!Number.isFinite(next.speed) || next.speed < 0 ||
           (next.yaw !== undefined && !Number.isFinite(next.yaw)) ||
+          (next.arriveDistance!==undefined&&(!Number.isFinite(next.arriveDistance)||next.arriveDistance<.01||next.arriveDistance>.22)) ||
           (next.target && ![next.target.x,next.target.y,next.target.z].every(Number.isFinite)))) throw new Error('Invalid entity directive');
       if (disposed) return;
       const changed = Boolean(next) !== Boolean(directive);
@@ -244,9 +246,9 @@ export function createEntityAgent(options: EntityAgentOptions): EntityAgent {
       if (directive) {
         verticalSpeed = grounded ? -0.4 : Math.max(-12, verticalSpeed - 9.81 * dt);
         bodyMovedThisTick = false;
-        const moving = directive.target && distance(position(), directive.target) >= 0.22;
+        const moving = directive.target && distance(position(), directive.target) >= (directive.arriveDistance??.22);
         machine.transition(moving ? 'patrol' : 'idle');
-        if (directive.target) move(directive.target, directive.speed, dt, true);
+        if (directive.target) move(directive.target, directive.speed, dt, true,directive.arriveDistance??.22);
         if (!bodyMovedThisTick) grounded = body.move({x:0,y:verticalSpeed*dt,z:0}).grounded;
         if (!moving && directive.yaw !== undefined) {
           const turn = Math.atan2(Math.sin(directive.yaw-yaw),Math.cos(directive.yaw-yaw));

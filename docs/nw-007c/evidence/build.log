@@ -1,0 +1,92 @@
+
+> night-ward@0.0.0 build
+> npm run typecheck && vite build
+
+
+> night-ward@0.0.0 typecheck
+> tsc --noEmit
+
+vite v7.3.7 building client environment for production...
+transforming...
+✓ 190 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                                                     1.01 kB │ gzip:   0.55 kB
+dist/assets/load_clock-D-1h7zZF.webp                               11.31 kB
+dist/assets/ibm-plex-mono-latin-400-normal-CvHOgSBP.woff           13.14 kB
+dist/assets/ibm-plex-mono-latin-500-normal-CB9ihrfo.woff           13.16 kB
+dist/assets/load_reflection-BI5-b8rS.webp                          13.50 kB
+dist/assets/ibm-plex-mono-latin-400-normal-DMJ8VG8y.woff2          14.71 kB
+dist/assets/ibm-plex-mono-latin-500-normal-DSY6xOcd.woff2          14.89 kB
+dist/assets/load_crawler-CLgzmhg3.webp                             17.37 kB
+dist/assets/poster_dark-zQEPjfCS.webp                              17.53 kB
+dist/assets/barlow-condensed-latin-400-normal-BXL2z6Kg.woff        18.52 kB
+dist/assets/barlow-condensed-latin-500-normal-HIEiP5Ov.woff        18.60 kB
+dist/assets/barlow-condensed-latin-600-normal-BFJEwTuo.woff        18.89 kB
+dist/assets/poster_figure-CPGQndSC.webp                            19.89 kB
+dist/assets/load_patient_doorway-mEqBK6i1.webp                     20.48 kB
+dist/assets/load_rot-piXVnISt.webp                                 20.56 kB
+dist/assets/figure-CJZBna7E.webp                                   20.62 kB
+dist/assets/barlow-condensed-latin-400-normal-Dc2u_eUW.woff2       21.16 kB
+dist/assets/barlow-condensed-latin-500-normal-BgYH2mbd.woff2       21.42 kB
+dist/assets/barlow-condensed-latin-600-normal-DepVgxBB.woff2       22.31 kB
+dist/assets/cormorant-garamond-latin-700-normal-DajfzrDU.woff2     22.34 kB
+dist/assets/cormorant-garamond-latin-500-normal-BsRWmXhO.woff2     23.31 kB
+dist/assets/load_nurse-DV9ki-Tq.webp                               23.33 kB
+dist/assets/cormorant-garamond-latin-600-normal-Co1r35X9.woff2     23.40 kB
+dist/assets/cormorant-garamond-latin-500-italic-Y14P-dkT.woff2     23.92 kB
+dist/assets/door-BUp0jo5s.webm                                     24.55 kB
+dist/assets/strip_1-HKhJdUXq.webp                                  27.36 kB
+dist/assets/strip_2-spx0oWLP.webp                                  27.44 kB
+dist/assets/strip_3-g5vDLBru.webp                                  28.30 kB
+dist/assets/strip_glow-DOsWAqtL.webp                               29.03 kB
+dist/assets/metal_3-COlleI6p.webm                                  29.60 kB
+dist/assets/cormorant-garamond-latin-700-normal-O25Qpphb.woff      30.25 kB
+dist/assets/cormorant-garamond-latin-600-normal-2CBVLo0M.woff      31.30 kB
+dist/assets/cormorant-garamond-latin-500-normal-zIXX3Q-H.woff      31.37 kB
+dist/assets/load_room104-Co_i4PsG.webp                             32.09 kB
+dist/assets/cormorant-garamond-latin-500-italic-DhNIfkTX.woff      33.18 kB
+dist/assets/presence-vt7r8SaW.webm                                 37.86 kB
+dist/assets/metal_1-CFth30Ku.webm                                  39.44 kB
+dist/assets/exit-wxBkQtNn.webp                                     39.78 kB
+dist/assets/far-SQxLtC6W.webp                                      40.38 kB
+dist/assets/poster_lit-DxuDS30t.webp                               40.80 kB
+dist/assets/main_b-D7G0H5NU.webp                                   41.26 kB
+dist/assets/metal_2-DjeKN2lW.webm                                  43.03 kB
+dist/assets/main_a-2EcG2qXA.webp                                   43.40 kB
+dist/assets/ambient-BQSfulsk.webp                                  43.73 kB
+dist/assets/door-DMdV0bwj.m4a                                      46.20 kB
+dist/assets/metal_1-BbhXuQZC.m4a                                   55.32 kB
+dist/assets/motif_low-BQMxVdUo.webm                                56.07 kB
+dist/assets/seal-Be-LwPzb.webp                                     56.43 kB
+dist/assets/metal_3-Cg53DhfT.m4a                                   57.05 kB
+dist/assets/rock-salt-latin-400-normal-ATTG4WQR.woff2              58.67 kB
+dist/assets/metal_2-CxPZOAuE.m4a                                   59.03 kB
+dist/assets/rock-salt-latin-400-normal-1xRqa3fS.woff               59.14 kB
+dist/assets/presence-DqRGX9Dg.m4a                                  63.35 kB
+dist/assets/motif_low-DUSV8BHu.m4a                                 95.04 kB
+dist/assets/motif-C3Mf24Nn.webm                                   106.25 kB
+dist/assets/motif-GuJ3FGt4.m4a                                    135.36 kB
+dist/assets/shaw-return-to-bed.temporary-DhWX4Rw4.wav             153.55 kB
+dist/assets/title-Dm7W5rO0.webp                                   159.78 kB
+dist/assets/shaw-not-authorised.temporary-Cl02qmmJ.wav            168.98 kB
+dist/assets/bed-CHV8KV3K.webm                                     356.99 kB
+dist/assets/bed-BQAhpveG.m4a                                      611.59 kB
+dist/assets/reflection-qM1Wx9e4.glb                               910.35 kB
+dist/assets/room104_lightmap-B1NB04zR.jpg                         913.38 kB
+dist/assets/crawler-BQpvZLcf.glb                                1,146.10 kB
+dist/assets/watcher-CJf9k_Xr.glb                                1,179.56 kB
+dist/assets/station_set-Se4UI-zy.glb                            1,446.92 kB
+dist/assets/patient-DM73rwxX.glb                                1,694.33 kB
+dist/assets/nurse-BmQwgn_s.glb                                  1,843.04 kB
+dist/assets/room104_set-CE76PD4i.glb                            9,155.98 kB
+dist/assets/index-GQ1e8r22.css                                     35.37 kB │ gzip:   8.50 kB
+dist/assets/index-B9zwFaEA.js                                     519.26 kB │ gzip: 173.78 kB
+dist/assets/three-B3PHROnm.js                                     590.60 kB │ gzip: 151.48 kB
+dist/assets/rapier-DBjBuyhF.js                                  2,237.38 kB │ gzip: 830.44 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 3.31s

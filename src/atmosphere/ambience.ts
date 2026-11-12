@@ -13,13 +13,13 @@ export type CueId =
   | 'nw:wheel-creak' | 'nw:brownout'
   | 'nw:chase-stinger' | 'nw:heartbeat' | 'nw:reveal' | 'nw:power-down' | 'nw:power-up' | 'nw:presence-out' | 'nw:distant-steps'
   // NW-007B: Nurse Shaw and the station (docs/NW-007B.md, "Audio cues").
-  | 'nw:shaw-steps' | 'nw:shaw-keys' | 'nw:shaw-rustle' | 'nw:call-panel' | 'nw:paper' | 'nw:station-hum' | 'nw:capture';
+  | 'nw:shaw-step' | 'nw:shaw-steps' | 'nw:shaw-keys' | 'nw:shaw-rustle' | 'nw:call-panel' | 'nw:paper' | 'nw:station-hum' | 'nw:capture';
 
 export const CUE_IDS: readonly CueId[] = [
   'nw:pipe-knock', 'nw:distant-door', 'nw:drip', 'nw:trolley', 'nw:lift-chime', 'nw:lift-doors', 'nw:metal-creak', 'nw:settle',
   'nw:light-pop', 'nw:static', 'nw:curtain', 'nw:vent-breath', 'nw:monitor-beep', 'nw:flatline', 'nw:wheel-creak', 'nw:brownout',
   'nw:chase-stinger', 'nw:heartbeat', 'nw:reveal', 'nw:power-down', 'nw:power-up', 'nw:presence-out', 'nw:distant-steps',
-  'nw:shaw-steps', 'nw:shaw-keys', 'nw:shaw-rustle', 'nw:call-panel', 'nw:paper', 'nw:station-hum', 'nw:capture',
+  'nw:shaw-step', 'nw:shaw-steps', 'nw:shaw-keys', 'nw:shaw-rustle', 'nw:call-panel', 'nw:paper', 'nw:station-hum', 'nw:capture',
 ];
 
 export interface PlayOptions {
@@ -28,7 +28,7 @@ export interface PlayOptions {
   readonly duration?: number;
 }
 
-interface Voice { readonly stop: () => void; readonly endsAt: number }
+interface Voice { readonly cue:string; readonly key:string; readonly stop: () => void; readonly endsAt: number }
 
 const EMITTER_CUES: Record<SoundEmitter['kind'], readonly CueId[]> = {
   pipes: ['nw:pipe-knock', 'nw:metal-creak', 'nw:pipe-knock'],
@@ -182,8 +182,8 @@ export class Ambience {
     return src;
   }
 
-  private track(stopFns: (() => void)[], endsAt: number): Voice {
-    const voice: Voice = { stop: () => stopFns.forEach((s) => { try { s(); } catch { /* already stopped */ } }), endsAt };
+  private track(stopFns: (() => void)[], endsAt: number,cue:string,key:string): Voice {
+    const voice: Voice = {cue,key, stop: () => stopFns.forEach((s) => { try { s(); } catch { /* already stopped */ } }), endsAt };
     this.voices.add(voice);
     return voice;
   }
@@ -500,15 +500,16 @@ export class Ambience {
       }
       // ---- NW-007B: Nurse Shaw and the station. All positional when a position is given; levels are
       // deliberately low (the player should strain to hear her before seeing her).
+      case 'nw:shaw-step':
       case 'nw:shaw-steps': {
         // A ward sister's heels on vinyl, approaching: `duration` seconds of steps (default 5),
         // one every ~0.62 s (her patrol pace), each a little louder, keys now and then.
         const dur = options.duration ?? 5;
         const pace = 0.6 + this.random() * 0.06;
-        const count = Math.max(2, Math.round(dur / pace));
+        const count = cue==='nw:shaw-step'?1:Math.max(2, Math.round(dur / pace));
         for (let i = 0; i < count; i++) {
           const at = t + i * pace * (0.96 + this.random() * 0.08);
-          const near = 0.45 + 0.55 * (i / Math.max(1, count - 1));
+          const near = cue==='nw:shaw-step'?1:0.45 + 0.55 * (i / Math.max(1, count - 1));
           noiseBurst(at, 0.022, filt('highpass', 2600), vol * 0.32 * near);
           noiseBurst(at + 0.004, 0.06, filt('bandpass', 1650, 6), vol * 0.22 * near);
           const o = osc('sine', 95);
@@ -660,7 +661,8 @@ export class Ambience {
         if (out !== this.master) out.disconnect();
         return false;
     }
-    this.track(stops, end);
+    if(out!==this.master)stops.push(()=>out.disconnect());
+    this.track(stops, end,cue,`${cue}@${options.position?`${options.position.x},${options.position.z}`:'global'}`);
     if (out !== this.master) setTimeout(() => { try { out.disconnect(); } catch { /* closed */ } }, Math.max(0, (end - ctx.currentTime) * 1000 + 300));
     return true;
   }
@@ -702,6 +704,14 @@ export class Ambience {
 
   stopLoop(key: string): void { this.loops.delete(key); }
 
+  /** Stop the active tail as well as future repeats. Global stop addresses all positions of a cue. */
+  stopCue(cue:string,position?:{x:number;z:number}):void {
+    const key=position?`${cue}@${position.x},${position.z}`:null;
+    for(const [id,entry] of this.loops)if(key?id===key:entry.cue===cue)this.loops.delete(id);
+    for(const voice of this.voices)if(key?voice.key===key:voice.cue===cue){voice.stop();this.voices.delete(voice);}
+  }
+  diagnostics(){return {voices:this.voices.size,loops:[...this.loops.values()].map(v=>v.cue),
+    cinematicVoices:[...this.voices].filter(v=>v.cue.startsWith('nw:shaw-')||['nw:station-hum','nw:call-panel','nw:paper','nw:capture'].includes(v.cue)).map(v=>v.cue)};}
   stopAll(): void {
     for (const v of this.voices) v.stop();
     this.voices.clear();

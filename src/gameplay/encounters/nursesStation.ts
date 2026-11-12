@@ -1,3 +1,5 @@
+import {nurseClip} from './nursePresentation';
+import type {NursePerformance} from './nursePresentation';
 import {emitAuthoredCue} from '../directors/cues';
 import {STATION_RECORD_ID,stationChoreography} from './storyBindings';
 import type {ExperienceCoordinator,ExperienceLease} from '../directors/experience';
@@ -52,6 +54,8 @@ export interface StationEncounter {
   dispose(): void;
 }
 export interface StationOptions {
+  readonly performance?:()=>NursePerformance;
+  readonly cancelPresentation?:()=>void;
   readonly coordinator?: ExperienceCoordinator;
   readonly canStage?: (position:Vec3)=>boolean;
   readonly world: HospitalWorld;
@@ -81,20 +85,25 @@ export function createStationEncounter(o: StationOptions): StationEncounter {
   let previousPlayer={...o.player.getSnapshot().position};
   let lastPosition:Vec3;
   let pendingCheckpoint: StationCheckpoint | null=null;
-  let nextStepSound=0,stageRetry=0,concealmentTime=0;
+  let stageRetry=0,concealmentTime=0;
   let encounterLease:ExperienceLease|null=null;
   let authoredAction:StationActorPose['action']=null;
   let stalled=0,lastGoalDistance=Infinity,lastAuthoredStep=-1,contactReady=false;
   const choreography=stationChoreography(o.world,b,o.navigation);
   const sound=(cueId:string,position:Vec3,volume=.25) => emitAuthoredCue(o.events,{kind:'sound',value:
     {cueId,position:{...position},volume,action:'play',loop:false}});
+  function takeLease(owner:'encounter:shaw'|'ai:shaw'):ExperienceLease|null {
+    const lease=o.coordinator?.acquire(owner,owner==='ai:shaw'?['nurse']:['nurse','dialogue'])??null;
+    lease?.signal.addEventListener('abort',()=>o.cancelPresentation?.(),{once:true});
+    return lease;
+  }
   const director=createEncounterDirector(STATION_PHASES,o.checkpoint?.phase,(_previous,phase)=>{
     step=0;hold=0;action=false;
-    if(phase==='introduction') sound('nw:wheel-creak',b.initial,.35);
+
     if(phase==='tension') {
-      sound('nw:curtain',b.crouchCover,.25);
+      sound('nw:shaw-rustle',b.crouchCover,.20);
     }
-    if(phase==='stealth') { encounterLease?.release();encounterLease=o.coordinator?.acquire('ai:shaw',['nurse'])??null;graceUntil=time+3; nurse.setDirective(null); }
+    if(phase==='stealth') { encounterLease?.release();encounterLease=takeLease('ai:shaw');graceUntil=time+3; nurse.setDirective(null); }
     if(phase==='escape') {
       encounterLease?.release();encounterLease=null;
       nurse.setDirective({target:b.patrol[0]!,speed:.75});
@@ -124,31 +133,30 @@ export function createStationEncounter(o: StationOptions): StationEncounter {
     profile:{patrolSpeed:.75,pursuitSpeed:2.55,detectionSeconds:1.35,captureGraceSeconds:2.5,captureDwellSeconds:.75},
     onAudioCue:cue=>{
       if(director.phase==='waiting') return;
-      if(cue.kind==='footstep' && time>=nextStepSound) {sound('nw:distant-steps',cue.position,.18);nextStepSound=time+2.7;}
-      if(cue.kind==='listen') sound('nw:curtain',cue.position,.16);
+      if(cue.kind==='listen') sound('nw:shaw-rustle',cue.position,.16);
     }});
   const unsub=o.events.on('chase:started',event=>{
     if(event.entityId!==spawn.entityId || firstAlertUsed) return;
     firstAlertUsed=true; graceUntil=Math.max(graceUntil,time+6);
-    sound('nw:curtain',o.player.getSnapshot().position,.13);
+    sound('nw:shaw-rustle',actorSnapshot().position,.13);
   });
   const actorSnapshot=():EntitySnapshot=>nurse.getSnapshots()[0]??{id:spawn.entityId,type:'nurse',position:{...spawn.position},state:'idle',lastKnownPlayer:null};
   function stage():boolean {
-    if(o.coordinator&&!encounterLease){encounterLease=o.coordinator.acquire('encounter:shaw',['nurse','dialogue']);if(!encounterLease)return false;}
+    if(o.coordinator&&!encounterLease){encounterLease=takeLease('encounter:shaw');if(!encounterLease)return false;}
     const candidate=choreography.staging.find(p=>(o.canStage?.(p)??true)&&navigation.isPositionValid(p,ENTITY_PROFILES.nurse.agent));
     if(!candidate){encounterLease?.release();encounterLease=null;return false;}
     nurse.stage({...spawn,position:candidate});nurse.activate();
     nurse.setDirective({target:null,speed:0,yaw:spawn.yaw});lastPosition={...candidate};
-    sound('nw:distant-steps',candidate,.22);
+
     return true;
   }
   try {
     if(restored&&restored!=='introduction') {
       nurse.stage();nurse.activate();
       if(restored!=='stealth'){
-        if(restored==='tension')encounterLease=o.coordinator?.acquire('encounter:shaw',['nurse','dialogue'])??null;
+        if(restored==='tension')encounterLease=takeLease('encounter:shaw');
         nurse.setDirective({target:null,speed:0,yaw:spawn.yaw});
-      }else {graceUntil=3;encounterLease=o.coordinator?.acquire('ai:shaw',['nurse'])??null;}
+      }else {graceUntil=3;encounterLease=takeLease('ai:shaw');}
     }
     lastPosition={...spawn.position};
     o.present({deltaSeconds:0,actor:actorSnapshot(),yaw:nurse.getYaw(),speed:0,checkingPanel:false,visible:nurse.phase==='active',action:null});
@@ -210,9 +218,9 @@ export function createStationEncounter(o: StationOptions): StationEncounter {
         const itinerary=[
           {goal:b.patrol[4]!,action:'approach',hold:0},
           {goal:b.patrol[3]!,action:'approach',hold:0},
-          {goal:choreography.panelStand,action:'check-panel',hold:2.5,look:choreography.panelLook},
-          {goal:choreography.recordStand,action:'inspect-records',hold:2.8,look:choreography.recordLook},
-          {goal:choreography.recordStand,action:'listen',hold:1.8,look:b.entry},
+          {goal:choreography.panelStand,action:'check-panel',hold:nurseClip('panel_check').duration,clip:'panel_check',look:choreography.panelLook,yaw:choreography.panelYaw},
+          {goal:choreography.recordStand,action:'inspect-records',hold:nurseClip('records_read').duration,clip:'records_read',look:choreography.recordLook,yaw:choreography.recordYaw},
+          {goal:choreography.recordStand,action:'listen',hold:nurseClip('listen_brief').duration,clip:'listen_brief',look:b.entry},
         ] as const;
         const beat=itinerary[step];
         if(beat){
@@ -222,15 +230,23 @@ export function createStationEncounter(o: StationOptions): StationEncounter {
           const look='look' in beat?beat.look:b.entry;
           const nearbyInspection=beat.action!=='approach'&&stalled>1.2&&remaining<.9&&distance(at,p)<1.2&&
             Math.hypot(at.x-look.x,at.z-look.z)<2.3&&o.physics.hasLineOfSight({...at,y:at.y+1.65},look);
-          contactReady=remaining<.26;
-          if(!contactReady&&!nearbyInspection&&hold===0){authoredAction='approach';nurse.setDirective({target:beat.goal,speed:.85});}
+          const work=beat.action!=='approach';
+          contactReady=remaining<(work?.065:.26);
+          if(!contactReady&&!nearbyInspection&&hold===0){authoredAction='approach';nurse.setDirective({target:beat.goal,speed:.85,...(work?{arriveDistance:.04}:{})});}
           else {
-            authoredAction=beat.action;
-            action=beat.action!=='approach';
-            const look='look' in beat?beat.look:b.entry;
-            nurse.setDirective({target:null,speed:0,yaw:Math.atan2(-(look.x-at.x),-(look.z-at.z))});
-            if(hold===0&&beat.action==='check-panel'){sound('nw:static',at,.10);if(b.lightingTarget)emitAuthoredCue(o.events,{kind:'light',value:{targetId:b.lightingTarget,effect:'flicker',durationSeconds:.4,intensity:.92}});}
-            hold+=dt;if(hold>=beat.hold){step++;hold=0;}
+            const facing='yaw' in beat&&beat.yaw!==undefined&&contactReady?beat.yaw:Math.atan2(-(look.x-at.x),-(look.z-at.z));
+            nurse.setDirective({target:null,speed:0,yaw:facing});
+            const aligned=Math.abs(Math.atan2(Math.sin(facing-nurse.getYaw()),Math.cos(facing-nurse.getYaw())))<.055;
+            if(aligned){
+              authoredAction=beat.action;action=work;
+              hold+=dt;
+              const performance=o.performance?.();
+              const spec='clip' in beat?nurseClip(beat.clip):null;
+              const matching=performance?.action===beat.action&&performance.available&&performance.clip===spec?.name;
+              const done=matching?(spec?.loop?performance.elapsed>=beat.hold:performance.finished):hold>=beat.hold;
+              // Presentation cannot hold progression indefinitely if a supplied clip stalls.
+              if(done||hold>=beat.hold+.75){step++;hold=0;}
+            }else authoredAction='approach';
           }
         }else director.advance('introduction');
       }
@@ -253,6 +269,9 @@ export function createStationEncounter(o: StationOptions): StationEncounter {
       if(director.phase==='escape') director.advance('escape');
       if(director.phase==='complete') nurse.setDirective({target:b.patrol[0]!,speed:.75,yaw:0});
       if(nurse.phase==='active')nurse.fixedUpdate(frame);
+      // Capture is emitted synchronously by AI. Its new owner has already selected
+      // the capture clip; never overwrite that presentation in this stale AI tick.
+      if(o.player.getSnapshot().captured)return;
       const actor=actorSnapshot();
       const speed=dt>0?Math.hypot(actor.position.x-lastPosition.x,actor.position.z-lastPosition.z)/dt:0;
       o.present({deltaSeconds:dt,actor,yaw:nurse.getYaw(),speed,checkingPanel:action,contactReady,visible:nurse.phase==='active',action:authoredAction});

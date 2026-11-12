@@ -13,6 +13,7 @@ export interface OpeningUiState {
 export interface OpeningUi {
   capture(onRestart?: () => void,delayed?:boolean): void;
   captureReady():void;
+  captureProgress(fraction:number):void;
   update(state: OpeningUiState, deltaSeconds: number): void;
   notify(text: string,seconds?:number): void;
   subtitle(line: DialogueSubtitle | null): void;
@@ -123,10 +124,16 @@ export function createOpeningUi(
     capture(onRestart,delayed=false) {
       if (disposed || !capture.hidden) return;
       current = {...current,playing:false}; restartAction = onRestart;
+      capture.style.setProperty('--nw-capture-fade',delayed?'.08':'.87');
       capture.hidden = false; restart.hidden = !onRestart; restart.disabled=delayed;captureSkip.hidden=!delayed;capture.dataset.phase=delayed?'scare':'retry'; render();
       if(onRestart&&!delayed) restart.focus({preventScroll:true});
     },
-    captureReady(){if(disposed||capture.hidden)return;restart.disabled=false;captureSkip.hidden=true;capture.dataset.phase='retry';if(restartAction)restart.focus({preventScroll:true});},
+    captureReady(){if(disposed||capture.hidden)return;restart.disabled=false;captureSkip.hidden=true;capture.dataset.phase='retry';capture.style.setProperty('--nw-capture-fade','.87');if(restartAction)restart.focus({preventScroll:true});},
+    captureProgress(fraction){
+      if(disposed||capture.hidden||capture.dataset.phase!=='scare'||!Number.isFinite(fraction))return;
+      const t=Math.max(0,Math.min(1,(fraction-.25)/.75));
+      capture.style.setProperty('--nw-capture-fade',String(.08+.79*t*t*(3-2*t)));
+    },
     update(state, deltaSeconds) {
       if (disposed) return;
       current = state;

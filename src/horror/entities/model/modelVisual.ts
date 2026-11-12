@@ -167,8 +167,8 @@ export function createModelVisual(type: BodiedEntityType, model: LoadedModel, op
       const active = current.clip;
       // Gait clips play at the rate that matches gameplay speed; the pursuit opens with a lunge.
       let scale = 1;
-      if (active.manifest.cycles > 0 && active.manifest.speed > 0 && current.state !== 'search' && current.state !== 'lost') {
-        scale = Math.min(2.2, Math.max(0.35, input.speed / active.manifest.speed));
+      if (active.manifest.cycles > 0 && active.manifest.speed > 0) {
+        scale = input.speed<.02?0:Math.min(2.2, Math.max(0.35, input.speed / active.manifest.speed));
       }
       if (current.state === 'run' && lungeTime < 0.7) {
         lungeTime += step;

@@ -91,3 +91,25 @@ describe('NW-007B Nurse and station cues', () => {
     expect(ambience.play('nw:station-hum', { duration: 4 })).toBe(true);
   });
 });
+
+// NW-007C integration: stop must cancel active tails, not just the repeat scheduler.
+it('NW-007C: clears only the addressed cue including its active positional tails over five retries',()=>{
+ const f=fakeContext(),a=new Ambience(()=>f.ctx,[],()=>.5);
+ a.play('nw:pipe-knock');const baseline=a.diagnostics().voices;
+ for(let i=0;i<5;i++){
+  a.loop('hum','nw:station-hum',{position:{x:1,y:1,z:1}});
+  a.play('nw:station-hum',{position:{x:1,y:1,z:1}});
+  expect(a.diagnostics().loops).toEqual(['nw:station-hum']);
+  const before=f.counts.stopped;a.stopCue('nw:station-hum');
+  expect(f.counts.stopped).toBeGreaterThan(before);expect(a.diagnostics().voices).toBe(baseline);
+  expect(a.diagnostics().loops).toEqual([]);
+ }
+ a.dispose();expect(a.diagnostics()).toEqual({voices:0,loops:[],cinematicVoices:[]});
+});
+it('NW-007C: a gait contact emits one heel instead of scheduling a second approaching footstep burst',()=>{
+ const f=fakeContext(),a=new Ambience(()=>f.ctx,[],()=>.5);a.play('nw:pipe-knock');
+ let before=f.counts.started;a.play('nw:shaw-step');const single=f.counts.started-before;
+ before=f.counts.started;a.play('nw:shaw-steps');const burst=f.counts.started-before;
+ expect(single).toBeGreaterThan(0);expect(single).toBeLessThan(burst);
+ a.stopCue('nw:shaw-step');expect(a.diagnostics().cinematicVoices).not.toContain('nw:shaw-step');a.dispose();
+});

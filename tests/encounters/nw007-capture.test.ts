@@ -23,3 +23,9 @@ it('disposes an interrupted capture without a late retry callback or leaked came
  const ready=vi.fn(),release=vi.fn();const p=createCapturePresentation({camera:new PerspectiveCamera(70,1,.05,100),reduced:()=>false,actor:()=>null,acquire:()=>({handoff:()=>true,release}),ready});
  p.start();p.dispose();p.dispose();p.update(5);expect(release).toHaveBeenCalledTimes(1);expect(ready).not.toHaveBeenCalled();
 });
+it('honors the integrated capture clip duration with reduced motion while keeping the camera still and allowing skip',()=>{
+ const camera=new PerspectiveCamera(70,1,.05,100),ready=vi.fn();
+ const p=createCapturePresentation({camera,durationSeconds:1.4,reduced:()=>true,actor:()=>({x:1,y:0,z:1}),acquire:()=>({handoff:()=>true,release:vi.fn()}),ready});
+ const q=camera.quaternion.clone();p.start();expect(p.progress).toBe(0);p.update(.4);expect(p.progress).toBeCloseTo(.4/1.4);expect(ready).not.toHaveBeenCalled();expect(camera.quaternion.angleTo(q)).toBe(0);
+ p.skip();p.update(.2);expect(ready).toHaveBeenCalledTimes(1);expect(p.progress).toBe(1);p.dispose();
+});

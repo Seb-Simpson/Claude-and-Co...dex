@@ -1,0 +1,4070 @@
+{
+  "kind": "production Continue fixture; player-only setup placement; sole real director actor",
+  "panel": {
+    "state": "playing",
+    "sessionId": 1,
+    "worldId": "nw:hospital:ward-4-west",
+    "player": {
+      "id": "player",
+      "position": {
+        "x": -1.5,
+        "y": 0.0029999985098838862,
+        "z": -4.9
+      },
+      "rotation": {
+        "yaw": 1.1497516984886498,
+        "pitch": -0.3394878083999091
+      },
+      "velocity": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "movement": "idle",
+      "crouching": false,
+      "grounded": true,
+      "hiding": {
+        "state": "outside",
+        "spotId": null
+      },
+      "captured": false
+    },
+    "entities": [],
+    "colliderCount": 230,
+    "frameCount": 337,
+    "renderer": {
+      "calls": 169,
+      "triangles": 181675,
+      "geometries": 175,
+      "textures": 69
+    },
+    "audioState": "running",
+    "events": [
+      {
+        "type": "interaction:completed",
+        "payload": {
+          "playerId": "player",
+          "targetId": "nw:opening:station-record",
+          "action": "inspect",
+          "outcome": "completed",
+          "position": {
+            "x": -3.8716258132403336,
+            "y": 0.0029999985098838862,
+            "z": -4.832334412091888
+          }
+        }
+      },
+      {
+        "type": "entity:state",
+        "payload": {
+          "entityId": "nw:entity:nurse",
+          "previous": "idle",
+          "current": "patrol"
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:station-hum",
+          "action": "play",
+          "position": {
+            "x": -4.37,
+            "y": 0.82,
+            "z": -5.99
+          },
+          "volume": 0.28,
+          "loop": true
+        }
+      },
+      {
+        "type": "entity:state",
+        "payload": {
+          "entityId": "nw:entity:nurse",
+          "previous": "patrol",
+          "current": "idle"
+        }
+      },
+      {
+        "type": "entity:state",
+        "payload": {
+          "entityId": "nw:entity:nurse",
+          "previous": "idle",
+          "current": "patrol"
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -3.9936944685251503,
+            "y": 0.06322171535465382,
+            "z": 0.06489333484133239
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -3.496707676884927,
+            "y": 0.05995037539006132,
+            "z": -0.24973457282378048
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -2.9754384128807754,
+            "y": 0.06274944165576102,
+            "z": -0.24353700130876155
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -2.4891512437470484,
+            "y": 0.059610250597561365,
+            "z": -0.5605455058745766
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -1.9460207629073454,
+            "y": 0.06153053534028552,
+            "z": -0.5644099080511702
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -1.4854479426673983,
+            "y": 0.05972610407776191,
+            "z": -0.8619529410597211
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -0.9702897139781425,
+            "y": 0.06274944165576102,
+            "z": -0.8512398724301657
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "entity:state",
+        "payload": {
+          "entityId": "nw:entity:nurse",
+          "previous": "patrol",
+          "current": "idle"
+        }
+      },
+      {
+        "type": "entity:state",
+        "payload": {
+          "entityId": "nw:entity:nurse",
+          "previous": "idle",
+          "current": "patrol"
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -0.913548310347125,
+            "y": 0.07086416422273484,
+            "z": -0.875309872039477
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -1.0447922981089346,
+            "y": 0.05994535379424748,
+            "z": -1.535586450798599
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -0.863824514599919,
+            "y": 0.06274944165576102,
+            "z": -2.0263871188365377
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -1.0923350216302685,
+            "y": 0.05983761060766529,
+            "z": -2.5321241933705196
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -1.2577610804119055,
+            "y": 0.06151576235003631,
+            "z": -3.0392431350280407
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -1.7013267133807306,
+            "y": 0.059698061054692,
+            "z": -3.3607021402680477
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -1.898501918214378,
+            "y": 0.06274944165576102,
+            "z": -3.8410293362791275
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -2.4094397328396546,
+            "y": 0.059650596904375686,
+            "z": -4.120945881679108
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -2.7504076341726558,
+            "y": 0.061375587768823514,
+            "z": -4.533841477376796
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -3.2801893459347973,
+            "y": 0.05961051342104562,
+            "z": -4.669829880754694
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -3.6180190961419685,
+            "y": 0.06274944165576102,
+            "z": -5.0508497398821
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -4.184726366473661,
+            "y": 0.059577809854903685,
+            "z": -5.204567142969837
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "entity:state",
+        "payload": {
+          "entityId": "nw:entity:nurse",
+          "previous": "patrol",
+          "current": "idle"
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-keys",
+          "action": "play",
+          "position": {
+            "x": -4.3540373256835085,
+            "y": 0.0029999985098838862,
+            "z": -5.392840625378148
+          },
+          "volume": 0.18,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-rustle",
+          "action": "play",
+          "position": {
+            "x": -4.3540373256835085,
+            "y": 0.0029999985098838862,
+            "z": -5.392840625378148
+          },
+          "volume": 0.19,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:call-panel",
+          "action": "play",
+          "position": {
+            "x": -4.37,
+            "y": 0.82,
+            "z": -5.99
+          },
+          "volume": 0.28,
+          "loop": false
+        }
+      }
+    ],
+    "doorStates": {
+      "nw:door:room-101": "closed",
+      "nw:door:room-103": "closed",
+      "nw:door:room-105": "open",
+      "nw:door:treatment": "closed",
+      "nw:door:room-107": "closed",
+      "nw:door:storage": "closed",
+      "nw:door:room-102": "open",
+      "nw:door:room-104": "closed",
+      "nw:door:room-106": "locked",
+      "nw:door:room-108": "open",
+      "nw:door:room-110": "closed",
+      "nw:door:maintenance-west": "closed",
+      "nw:door:maintenance-east": "closed",
+      "nw:door:stairwell-b": "locked",
+      "nw:door:smoke-north": "open",
+      "nw:door:smoke-south": "open"
+    },
+    "prompt": null,
+    "error": null,
+    "station": {
+      "active": true,
+      "action": "check-panel",
+      "phase": "introduction",
+      "elapsed": 25.31666666666651,
+      "step": 2,
+      "actor": {
+        "id": "nw:entity:nurse",
+        "type": "nurse",
+        "position": {
+          "x": -4.3540373256835085,
+          "y": 0.0029999985098838862,
+          "z": -5.392840625378148
+        },
+        "state": "idle",
+        "lastKnownPlayer": null
+      },
+      "canCapture": false,
+      "firstAlertUsed": false,
+      "locations": {
+        "record": {
+          "x": -3.8,
+          "y": 0.76,
+          "z": -5.93
+        },
+        "recordStand": {
+          "x": -3.8716258132403336,
+          "y": 0,
+          "z": -4.832334412091888
+        },
+        "recordRoute": [
+          {
+            "x": -9,
+            "y": 0,
+            "z": 0.45
+          },
+          {
+            "x": -1.1499999999999986,
+            "y": 0,
+            "z": -0.9499999999999993
+          },
+          {
+            "x": -0.8999999999999986,
+            "y": 0,
+            "z": -1.6999999999999993
+          },
+          {
+            "x": -0.8999999999999986,
+            "y": 0,
+            "z": -2.6999999999999993
+          },
+          {
+            "x": -2.6499999999999986,
+            "y": 0,
+            "z": -4.449999999999999
+          },
+          {
+            "x": -3.8716258132403336,
+            "y": 0,
+            "z": -4.832334412091888
+          }
+        ],
+        "observation": {
+          "x": -9,
+          "y": 0,
+          "z": 0.45
+        },
+        "entry": {
+          "x": -4.2,
+          "y": 0,
+          "z": 0.2
+        },
+        "crouchCover": {
+          "x": -4.6,
+          "y": 0,
+          "z": -0.42
+        },
+        "concealment": {
+          "x": -7.85,
+          "y": 0,
+          "z": -3.75
+        },
+        "exit": {
+          "x": 4.6,
+          "y": 0,
+          "z": 0.2
+        },
+        "patrol": [
+          {
+            "x": -3.6,
+            "y": 0,
+            "z": -4.6
+          },
+          {
+            "x": -1.5,
+            "y": 0,
+            "z": -4.9
+          },
+          {
+            "x": -0.8,
+            "y": 0,
+            "z": -3.2
+          },
+          {
+            "x": -0.75,
+            "y": 0,
+            "z": -1
+          },
+          {
+            "x": -3.8,
+            "y": 0,
+            "z": 0
+          },
+          {
+            "x": -10.5,
+            "y": 0,
+            "z": 0
+          },
+          {
+            "x": -3.8,
+            "y": 0,
+            "z": 0
+          },
+          {
+            "x": -0.75,
+            "y": 0,
+            "z": -1
+          },
+          {
+            "x": -0.8,
+            "y": 0,
+            "z": -3.2
+          },
+          {
+            "x": -1.5,
+            "y": 0,
+            "z": -4.9
+          }
+        ],
+        "hidingPrimary": "nw:hiding:nurses-staff",
+        "hidingSecondary": "nw:hiding:room-105-bed-b",
+        "concealmentRoute": [
+          {
+            "x": -9,
+            "y": 0,
+            "z": 0.45
+          },
+          {
+            "x": -7.899999999999999,
+            "y": 0,
+            "z": -1.1999999999999993
+          },
+          {
+            "x": -7.85,
+            "y": 0,
+            "z": -3.75
+          }
+        ],
+        "returnRoute": [
+          {
+            "x": -7.85,
+            "y": 0,
+            "z": -3.75
+          },
+          {
+            "x": -7.899999999999999,
+            "y": 0,
+            "z": -0.9499999999999993
+          },
+          {
+            "x": -9,
+            "y": 0,
+            "z": 0.45
+          }
+        ],
+        "hidingTargets": {
+          "nw:hiding:room-105-bed-b": {
+            "x": -7.85,
+            "y": 0.41999999999999993,
+            "z": -5.3500000000000005
+          },
+          "nw:hiding:nurses-staff": {
+            "x": -6.402499998658895,
+            "y": 0.9812499761581419,
+            "z": -4.15
+          }
+        },
+        "hidingApproaches": {
+          "nw:hiding:room-105-bed-b": {
+            "x": -7.85,
+            "y": 0,
+            "z": -3.75
+          },
+          "nw:hiding:nurses-staff": {
+            "x": -5.625,
+            "y": 0,
+            "z": -4.15
+          }
+        }
+      }
+    },
+    "opening": {
+      "nurse": {
+        "action": "check-panel",
+        "clip": "panel_check",
+        "time": 3.2833333333333266,
+        "elapsed": 3.2833333333333266,
+        "duration": 5,
+        "finished": false,
+        "available": true,
+        "contactReady": true,
+        "rightHand": {
+          "x": -4.232019583488009,
+          "y": 1.093314193231274,
+          "z": -5.852087843614507
+        },
+        "leftHand": {
+          "x": -4.524044572197357,
+          "y": 0.8454142965764913,
+          "z": -5.361200268551432
+        },
+        "footContacts": 19,
+        "panelPresses": 1,
+        "paperTurns": 0,
+        "humActive": true
+      },
+      "narrative": {
+        "scene": "shaw-introduction",
+        "checkpoint": {
+          "version": 1,
+          "step": 4
+        },
+        "owners": [
+          {
+            "owner": "encounter:shaw",
+            "resources": [
+              "nurse",
+              "dialogue"
+            ]
+          }
+        ]
+      },
+      "phase": "stealth-onboarding",
+      "state": {
+        "version": 1,
+        "awakened": true,
+        "cardAcquired": true,
+        "doorUnlocked": true,
+        "firstLinePlayed": true,
+        "secondLinePlayed": true,
+        "room106Tried": false,
+        "sightingSeen": true,
+        "stationReached": true
+      },
+      "cinematic": false,
+      "anchors": {
+        "player-spawn": {
+          "position": {
+            "x": -12.4,
+            "y": 0,
+            "z": 4.1
+          }
+        },
+        "room-104-door": {
+          "position": {
+            "x": -12,
+            "y": 1.05,
+            "z": 1.475
+          },
+          "stand": {
+            "x": -12,
+            "y": 0,
+            "z": 2.3
+          }
+        },
+        "card-reader": {
+          "position": {
+            "x": -12.85,
+            "y": 1.15,
+            "z": 1.575
+          },
+          "stand": {
+            "x": -12.85,
+            "y": 0,
+            "z": 2.25
+          }
+        },
+        "access-card": {
+          "position": {
+            "x": -12.9,
+            "y": 0.006,
+            "z": 3.2
+          },
+          "stand": {
+            "x": -12.6,
+            "y": 0,
+            "z": 3.75
+          }
+        },
+        "intercom-speaker": {
+          "position": {
+            "x": -12,
+            "y": 2.42,
+            "z": 1.6
+          }
+        },
+        "room-106-door": {
+          "position": {
+            "x": -7.6,
+            "y": 1.05,
+            "z": 1.475
+          },
+          "stand": {
+            "x": -7.6,
+            "y": 0,
+            "z": 0.6
+          }
+        },
+        "room-106-handle": {
+          "position": {
+            "x": -8.05,
+            "y": 1,
+            "z": 1.4024999999999999
+          },
+          "stand": {
+            "x": -8.05,
+            "y": 0,
+            "z": 0.75
+          }
+        },
+        "nurse-first-sight": {
+          "position": {
+            "x": -1.2,
+            "y": 0,
+            "z": 0
+          }
+        },
+        "nurse-first-sight-view": {
+          "position": {
+            "x": -12,
+            "y": 1.6,
+            "z": 0.55
+          },
+          "target": {
+            "x": -1.2,
+            "y": 1.5,
+            "z": 0
+          }
+        },
+        "station-approach": {
+          "position": {
+            "x": -4.2,
+            "y": 0,
+            "z": 0.2
+          }
+        }
+      },
+      "camera": {
+        "x": -1.5,
+        "y": 1.6529999985098838,
+        "z": -4.9
+      }
+    },
+    "performance": {
+      "fixedMaxMs": 53.59999999962747,
+      "updateMaxMs": 30.09999999962747,
+      "frameDeltaMaxMs": 100,
+      "simulatedSeconds": 26.416666666666423,
+      "engine": {
+        "sampleCount": 240,
+        "capacity": 240,
+        "totalFrames": 337,
+        "totalSubsteps": 1611,
+        "frameIntervalMs": {
+          "last": 650,
+          "mean": 546.1587499999999,
+          "p50": 533.2000000000116,
+          "p95": 1066.6000000000058,
+          "max": 1349.8999999999942
+        },
+        "frameCpuMs": {
+          "last": 7.199999999254942,
+          "mean": 9.969999999987582,
+          "p50": 7.300000000745058,
+          "p95": 39.69999999925494,
+          "max": 57.5
+        },
+        "fixedMs": {
+          "last": 2.300000000745058,
+          "mean": 2.534999999978269,
+          "p50": 1.400000000372529,
+          "p95": 5.099999999627471,
+          "max": 54.90000000037253
+        },
+        "physicsMs": {
+          "last": 0.19999999925494194,
+          "mean": 0.5470833333209157,
+          "p50": 0.2999999988824129,
+          "p95": 1.300000000745058,
+          "max": 32.100000001490116
+        },
+        "updateMs": {
+          "last": 0.7999999988824129,
+          "mean": 1.0966666666790843,
+          "p50": 0.599999999627471,
+          "p95": 4.100000001490116,
+          "max": 30.199999999254942
+        },
+        "renderMs": {
+          "last": 3.900000000372529,
+          "mean": 5.772083333344199,
+          "p50": 4.099999999627471,
+          "p95": 10,
+          "max": 41.40000000037253
+        },
+        "substeps": {
+          "last": 5,
+          "mean": 4.8,
+          "p50": 5,
+          "p95": 5,
+          "max": 5
+        }
+      }
+    }
+  },
+  "records": {
+    "state": "playing",
+    "sessionId": 1,
+    "worldId": "nw:hospital:ward-4-west",
+    "player": {
+      "id": "player",
+      "position": {
+        "x": -1.5,
+        "y": 0.0029999985098838862,
+        "z": -4.9
+      },
+      "rotation": {
+        "yaw": 1.1497516984886498,
+        "pitch": -0.3394878083999091
+      },
+      "velocity": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "movement": "idle",
+      "crouching": false,
+      "grounded": true,
+      "hiding": {
+        "state": "outside",
+        "spotId": null
+      },
+      "captured": false
+    },
+    "entities": [],
+    "colliderCount": 230,
+    "frameCount": 417,
+    "renderer": {
+      "calls": 169,
+      "triangles": 181675,
+      "geometries": 175,
+      "textures": 69
+    },
+    "audioState": "running",
+    "events": [
+      {
+        "type": "interaction:completed",
+        "payload": {
+          "playerId": "player",
+          "targetId": "nw:opening:station-record",
+          "action": "inspect",
+          "outcome": "completed",
+          "position": {
+            "x": -3.8716258132403336,
+            "y": 0.0029999985098838862,
+            "z": -4.832334412091888
+          }
+        }
+      },
+      {
+        "type": "entity:state",
+        "payload": {
+          "entityId": "nw:entity:nurse",
+          "previous": "idle",
+          "current": "patrol"
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:station-hum",
+          "action": "play",
+          "position": {
+            "x": -4.37,
+            "y": 0.82,
+            "z": -5.99
+          },
+          "volume": 0.28,
+          "loop": true
+        }
+      },
+      {
+        "type": "entity:state",
+        "payload": {
+          "entityId": "nw:entity:nurse",
+          "previous": "patrol",
+          "current": "idle"
+        }
+      },
+      {
+        "type": "entity:state",
+        "payload": {
+          "entityId": "nw:entity:nurse",
+          "previous": "idle",
+          "current": "patrol"
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -3.9936944685251503,
+            "y": 0.06322171535465382,
+            "z": 0.06489333484133239
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -3.496707676884927,
+            "y": 0.05995037539006132,
+            "z": -0.24973457282378048
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -2.9754384128807754,
+            "y": 0.06274944165576102,
+            "z": -0.24353700130876155
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -2.4891512437470484,
+            "y": 0.059610250597561365,
+            "z": -0.5605455058745766
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -1.9460207629073454,
+            "y": 0.06153053534028552,
+            "z": -0.5644099080511702
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -1.4854479426673983,
+            "y": 0.05972610407776191,
+            "z": -0.8619529410597211
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -0.9702897139781425,
+            "y": 0.06274944165576102,
+            "z": -0.8512398724301657
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "entity:state",
+        "payload": {
+          "entityId": "nw:entity:nurse",
+          "previous": "patrol",
+          "current": "idle"
+        }
+      },
+      {
+        "type": "entity:state",
+        "payload": {
+          "entityId": "nw:entity:nurse",
+          "previous": "idle",
+          "current": "patrol"
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -0.913548310347125,
+            "y": 0.07086416422273484,
+            "z": -0.875309872039477
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -1.0447922981089346,
+            "y": 0.05994535379424748,
+            "z": -1.535586450798599
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -0.863824514599919,
+            "y": 0.06274944165576102,
+            "z": -2.0263871188365377
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -1.0923350216302685,
+            "y": 0.05983761060766529,
+            "z": -2.5321241933705196
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -1.2577610804119055,
+            "y": 0.06151576235003631,
+            "z": -3.0392431350280407
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -1.7013267133807306,
+            "y": 0.059698061054692,
+            "z": -3.3607021402680477
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -1.898501918214378,
+            "y": 0.06274944165576102,
+            "z": -3.8410293362791275
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -2.4094397328396546,
+            "y": 0.059650596904375686,
+            "z": -4.120945881679108
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -2.7504076341726558,
+            "y": 0.061375587768823514,
+            "z": -4.533841477376796
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -3.2801893459347973,
+            "y": 0.05961051342104562,
+            "z": -4.669829880754694
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -3.6180190961419685,
+            "y": 0.06274944165576102,
+            "z": -5.0508497398821
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -4.184726366473661,
+            "y": 0.059577809854903685,
+            "z": -5.204567142969837
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "entity:state",
+        "payload": {
+          "entityId": "nw:entity:nurse",
+          "previous": "patrol",
+          "current": "idle"
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-keys",
+          "action": "play",
+          "position": {
+            "x": -4.3540373256835085,
+            "y": 0.0029999985098838862,
+            "z": -5.392840625378148
+          },
+          "volume": 0.18,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-rustle",
+          "action": "play",
+          "position": {
+            "x": -4.3540373256835085,
+            "y": 0.0029999985098838862,
+            "z": -5.392840625378148
+          },
+          "volume": 0.19,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:call-panel",
+          "action": "play",
+          "position": {
+            "x": -4.37,
+            "y": 0.82,
+            "z": -5.99
+          },
+          "volume": 0.28,
+          "loop": false
+        }
+      },
+      {
+        "type": "entity:state",
+        "payload": {
+          "entityId": "nw:entity:nurse",
+          "previous": "idle",
+          "current": "patrol"
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -4.303016530693574,
+            "y": 0.06245469278911192,
+            "z": -5.316316900080069
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "entity:state",
+        "payload": {
+          "entityId": "nw:entity:nurse",
+          "previous": "patrol",
+          "current": "idle"
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-keys",
+          "action": "play",
+          "position": {
+            "x": -3.858798675107195,
+            "y": 0.0029999985098838862,
+            "z": -5.417117639605716
+          },
+          "volume": 0.18,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-rustle",
+          "action": "play",
+          "position": {
+            "x": -3.858798675107195,
+            "y": 0.0029999985098838862,
+            "z": -5.417117639605716
+          },
+          "volume": 0.19,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:paper",
+          "action": "play",
+          "position": {
+            "x": -4.37,
+            "y": 0.82,
+            "z": -5.99
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      }
+    ],
+    "doorStates": {
+      "nw:door:room-101": "closed",
+      "nw:door:room-103": "closed",
+      "nw:door:room-105": "open",
+      "nw:door:treatment": "closed",
+      "nw:door:room-107": "closed",
+      "nw:door:storage": "closed",
+      "nw:door:room-102": "open",
+      "nw:door:room-104": "closed",
+      "nw:door:room-106": "locked",
+      "nw:door:room-108": "open",
+      "nw:door:room-110": "closed",
+      "nw:door:maintenance-west": "closed",
+      "nw:door:maintenance-east": "closed",
+      "nw:door:stairwell-b": "locked",
+      "nw:door:smoke-north": "open",
+      "nw:door:smoke-south": "open"
+    },
+    "prompt": null,
+    "error": null,
+    "station": {
+      "active": true,
+      "action": "inspect-records",
+      "phase": "introduction",
+      "elapsed": 31.499999999999492,
+      "step": 3,
+      "actor": {
+        "id": "nw:entity:nurse",
+        "type": "nurse",
+        "position": {
+          "x": -3.858798675107195,
+          "y": 0.0029999985098838862,
+          "z": -5.417117639605716
+        },
+        "state": "idle",
+        "lastKnownPlayer": null
+      },
+      "canCapture": false,
+      "firstAlertUsed": false,
+      "locations": {
+        "record": {
+          "x": -3.8,
+          "y": 0.76,
+          "z": -5.93
+        },
+        "recordStand": {
+          "x": -3.8716258132403336,
+          "y": 0,
+          "z": -4.832334412091888
+        },
+        "recordRoute": [
+          {
+            "x": -9,
+            "y": 0,
+            "z": 0.45
+          },
+          {
+            "x": -1.1499999999999986,
+            "y": 0,
+            "z": -0.9499999999999993
+          },
+          {
+            "x": -0.8999999999999986,
+            "y": 0,
+            "z": -1.6999999999999993
+          },
+          {
+            "x": -0.8999999999999986,
+            "y": 0,
+            "z": -2.6999999999999993
+          },
+          {
+            "x": -2.6499999999999986,
+            "y": 0,
+            "z": -4.449999999999999
+          },
+          {
+            "x": -3.8716258132403336,
+            "y": 0,
+            "z": -4.832334412091888
+          }
+        ],
+        "observation": {
+          "x": -9,
+          "y": 0,
+          "z": 0.45
+        },
+        "entry": {
+          "x": -4.2,
+          "y": 0,
+          "z": 0.2
+        },
+        "crouchCover": {
+          "x": -4.6,
+          "y": 0,
+          "z": -0.42
+        },
+        "concealment": {
+          "x": -7.85,
+          "y": 0,
+          "z": -3.75
+        },
+        "exit": {
+          "x": 4.6,
+          "y": 0,
+          "z": 0.2
+        },
+        "patrol": [
+          {
+            "x": -3.6,
+            "y": 0,
+            "z": -4.6
+          },
+          {
+            "x": -1.5,
+            "y": 0,
+            "z": -4.9
+          },
+          {
+            "x": -0.8,
+            "y": 0,
+            "z": -3.2
+          },
+          {
+            "x": -0.75,
+            "y": 0,
+            "z": -1
+          },
+          {
+            "x": -3.8,
+            "y": 0,
+            "z": 0
+          },
+          {
+            "x": -10.5,
+            "y": 0,
+            "z": 0
+          },
+          {
+            "x": -3.8,
+            "y": 0,
+            "z": 0
+          },
+          {
+            "x": -0.75,
+            "y": 0,
+            "z": -1
+          },
+          {
+            "x": -0.8,
+            "y": 0,
+            "z": -3.2
+          },
+          {
+            "x": -1.5,
+            "y": 0,
+            "z": -4.9
+          }
+        ],
+        "hidingPrimary": "nw:hiding:nurses-staff",
+        "hidingSecondary": "nw:hiding:room-105-bed-b",
+        "concealmentRoute": [
+          {
+            "x": -9,
+            "y": 0,
+            "z": 0.45
+          },
+          {
+            "x": -7.899999999999999,
+            "y": 0,
+            "z": -1.1999999999999993
+          },
+          {
+            "x": -7.85,
+            "y": 0,
+            "z": -3.75
+          }
+        ],
+        "returnRoute": [
+          {
+            "x": -7.85,
+            "y": 0,
+            "z": -3.75
+          },
+          {
+            "x": -7.899999999999999,
+            "y": 0,
+            "z": -0.9499999999999993
+          },
+          {
+            "x": -9,
+            "y": 0,
+            "z": 0.45
+          }
+        ],
+        "hidingTargets": {
+          "nw:hiding:room-105-bed-b": {
+            "x": -7.85,
+            "y": 0.41999999999999993,
+            "z": -5.3500000000000005
+          },
+          "nw:hiding:nurses-staff": {
+            "x": -6.402499998658895,
+            "y": 0.9812499761581419,
+            "z": -4.15
+          }
+        },
+        "hidingApproaches": {
+          "nw:hiding:room-105-bed-b": {
+            "x": -7.85,
+            "y": 0,
+            "z": -3.75
+          },
+          "nw:hiding:nurses-staff": {
+            "x": -5.625,
+            "y": 0,
+            "z": -4.15
+          }
+        }
+      }
+    },
+    "opening": {
+      "nurse": {
+        "action": "inspect-records",
+        "clip": "records_read",
+        "time": 3.049999999999994,
+        "elapsed": 3.049999999999994,
+        "duration": 6,
+        "finished": false,
+        "available": true,
+        "contactReady": true,
+        "rightHand": {
+          "x": -3.822506667923136,
+          "y": 0.9912523788061324,
+          "z": -5.823608834469179
+        },
+        "leftHand": {
+          "x": -3.9392303461542273,
+          "y": 0.9896143577453058,
+          "z": -5.8224092814972
+        },
+        "footContacts": 20,
+        "panelPresses": 1,
+        "paperTurns": 1,
+        "humActive": true
+      },
+      "narrative": {
+        "scene": "shaw-introduction",
+        "checkpoint": {
+          "version": 1,
+          "step": 4
+        },
+        "owners": [
+          {
+            "owner": "encounter:shaw",
+            "resources": [
+              "nurse",
+              "dialogue"
+            ]
+          }
+        ]
+      },
+      "phase": "stealth-onboarding",
+      "state": {
+        "version": 1,
+        "awakened": true,
+        "cardAcquired": true,
+        "doorUnlocked": true,
+        "firstLinePlayed": true,
+        "secondLinePlayed": true,
+        "room106Tried": false,
+        "sightingSeen": true,
+        "stationReached": true
+      },
+      "cinematic": false,
+      "anchors": {
+        "player-spawn": {
+          "position": {
+            "x": -12.4,
+            "y": 0,
+            "z": 4.1
+          }
+        },
+        "room-104-door": {
+          "position": {
+            "x": -12,
+            "y": 1.05,
+            "z": 1.475
+          },
+          "stand": {
+            "x": -12,
+            "y": 0,
+            "z": 2.3
+          }
+        },
+        "card-reader": {
+          "position": {
+            "x": -12.85,
+            "y": 1.15,
+            "z": 1.575
+          },
+          "stand": {
+            "x": -12.85,
+            "y": 0,
+            "z": 2.25
+          }
+        },
+        "access-card": {
+          "position": {
+            "x": -12.9,
+            "y": 0.006,
+            "z": 3.2
+          },
+          "stand": {
+            "x": -12.6,
+            "y": 0,
+            "z": 3.75
+          }
+        },
+        "intercom-speaker": {
+          "position": {
+            "x": -12,
+            "y": 2.42,
+            "z": 1.6
+          }
+        },
+        "room-106-door": {
+          "position": {
+            "x": -7.6,
+            "y": 1.05,
+            "z": 1.475
+          },
+          "stand": {
+            "x": -7.6,
+            "y": 0,
+            "z": 0.6
+          }
+        },
+        "room-106-handle": {
+          "position": {
+            "x": -8.05,
+            "y": 1,
+            "z": 1.4024999999999999
+          },
+          "stand": {
+            "x": -8.05,
+            "y": 0,
+            "z": 0.75
+          }
+        },
+        "nurse-first-sight": {
+          "position": {
+            "x": -1.2,
+            "y": 0,
+            "z": 0
+          }
+        },
+        "nurse-first-sight-view": {
+          "position": {
+            "x": -12,
+            "y": 1.6,
+            "z": 0.55
+          },
+          "target": {
+            "x": -1.2,
+            "y": 1.5,
+            "z": 0
+          }
+        },
+        "station-approach": {
+          "position": {
+            "x": -4.2,
+            "y": 0,
+            "z": 0.2
+          }
+        }
+      },
+      "camera": {
+        "x": -1.5,
+        "y": 1.6529999985098838,
+        "z": -4.9
+      }
+    },
+    "performance": {
+      "fixedMaxMs": 53.59999999962747,
+      "updateMaxMs": 30.09999999962747,
+      "frameDeltaMaxMs": 100,
+      "simulatedSeconds": 32.59999999999941,
+      "engine": {
+        "sampleCount": 76,
+        "capacity": 240,
+        "totalFrames": 76,
+        "totalSubsteps": 355,
+        "frameIntervalMs": {
+          "last": 50.10000000000582,
+          "mean": 566.4213333333335,
+          "p50": 583.2999999999884,
+          "p95": 1099.8000000000175,
+          "max": 1183.3000000000175
+        },
+        "frameCpuMs": {
+          "last": 5,
+          "mean": 9.399999999980393,
+          "p50": 7.199999999254942,
+          "p95": 39.600000001490116,
+          "max": 48.40000000037253
+        },
+        "fixedMs": {
+          "last": 1.700000001117587,
+          "mean": 2.1302631578016045,
+          "p50": 1.1000000014901161,
+          "p95": 6.200000001117587,
+          "max": 40.09999999962747
+        },
+        "physicsMs": {
+          "last": 0.19999999925494194,
+          "mean": 0.760526315946328,
+          "p50": 0.2999999988824129,
+          "p95": 0.599999999627471,
+          "max": 33.59999999962747
+        },
+        "updateMs": {
+          "last": 0.40000000037252903,
+          "mean": 1.0236842104380852,
+          "p50": 0.6000000014901161,
+          "p95": 3.400000000372529,
+          "max": 6.399999998509884
+        },
+        "renderMs": {
+          "last": 2.699999999254942,
+          "mean": 5.47763157898168,
+          "p50": 3.799999998882413,
+          "p95": 12.600000001490116,
+          "max": 41.40000000037253
+        },
+        "substeps": {
+          "last": 4,
+          "mean": 4.671052631578948,
+          "p50": 5,
+          "p95": 5,
+          "max": 5
+        }
+      }
+    }
+  },
+  "listening": {
+    "state": "playing",
+    "sessionId": 1,
+    "worldId": "nw:hospital:ward-4-west",
+    "player": {
+      "id": "player",
+      "position": {
+        "x": -6.425,
+        "y": 0,
+        "z": -4.15
+      },
+      "rotation": {
+        "yaw": 1.5707963267948966,
+        "pitch": -0.7103449562852143
+      },
+      "velocity": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "movement": "hidden",
+      "crouching": false,
+      "grounded": true,
+      "hiding": {
+        "state": "hidden",
+        "spotId": "nw:hiding:nurses-staff"
+      },
+      "captured": false
+    },
+    "entities": [],
+    "colliderCount": 230,
+    "frameCount": 476,
+    "renderer": {
+      "calls": 309,
+      "triangles": 194441,
+      "geometries": 401,
+      "textures": 98
+    },
+    "audioState": "running",
+    "events": [
+      {
+        "type": "interaction:completed",
+        "payload": {
+          "playerId": "player",
+          "targetId": "nw:opening:station-record",
+          "action": "inspect",
+          "outcome": "completed",
+          "position": {
+            "x": -3.8716258132403336,
+            "y": 0.0029999985098838862,
+            "z": -4.832334412091888
+          }
+        }
+      },
+      {
+        "type": "entity:state",
+        "payload": {
+          "entityId": "nw:entity:nurse",
+          "previous": "idle",
+          "current": "patrol"
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:station-hum",
+          "action": "play",
+          "position": {
+            "x": -4.37,
+            "y": 0.82,
+            "z": -5.99
+          },
+          "volume": 0.28,
+          "loop": true
+        }
+      },
+      {
+        "type": "entity:state",
+        "payload": {
+          "entityId": "nw:entity:nurse",
+          "previous": "patrol",
+          "current": "idle"
+        }
+      },
+      {
+        "type": "entity:state",
+        "payload": {
+          "entityId": "nw:entity:nurse",
+          "previous": "idle",
+          "current": "patrol"
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -3.9936944685251503,
+            "y": 0.06322171535465382,
+            "z": 0.06489333484133239
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -3.496707676884927,
+            "y": 0.05995037539006132,
+            "z": -0.24973457282378048
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -2.9754384128807754,
+            "y": 0.06274944165576102,
+            "z": -0.24353700130876155
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -2.4891512437470484,
+            "y": 0.059610250597561365,
+            "z": -0.5605455058745766
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -1.9460207629073454,
+            "y": 0.06153053534028552,
+            "z": -0.5644099080511702
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -1.4854479426673983,
+            "y": 0.05972610407776191,
+            "z": -0.8619529410597211
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -0.9702897139781425,
+            "y": 0.06274944165576102,
+            "z": -0.8512398724301657
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "entity:state",
+        "payload": {
+          "entityId": "nw:entity:nurse",
+          "previous": "patrol",
+          "current": "idle"
+        }
+      },
+      {
+        "type": "entity:state",
+        "payload": {
+          "entityId": "nw:entity:nurse",
+          "previous": "idle",
+          "current": "patrol"
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -0.913548310347125,
+            "y": 0.07086416422273484,
+            "z": -0.875309872039477
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -1.0447922981089346,
+            "y": 0.05994535379424748,
+            "z": -1.535586450798599
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -0.863824514599919,
+            "y": 0.06274944165576102,
+            "z": -2.0263871188365377
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -1.0923350216302685,
+            "y": 0.05983761060766529,
+            "z": -2.5321241933705196
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -1.2577610804119055,
+            "y": 0.06151576235003631,
+            "z": -3.0392431350280407
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -1.7013267133807306,
+            "y": 0.059698061054692,
+            "z": -3.3607021402680477
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -1.898501918214378,
+            "y": 0.06274944165576102,
+            "z": -3.8410293362791275
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -2.4094397328396546,
+            "y": 0.059650596904375686,
+            "z": -4.120945881679108
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -2.7504076341726558,
+            "y": 0.061375587768823514,
+            "z": -4.533841477376796
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -3.2801893459347973,
+            "y": 0.05961051342104562,
+            "z": -4.669829880754694
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -3.6180190961419685,
+            "y": 0.06274944165576102,
+            "z": -5.0508497398821
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -4.184726366473661,
+            "y": 0.059577809854903685,
+            "z": -5.204567142969837
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "entity:state",
+        "payload": {
+          "entityId": "nw:entity:nurse",
+          "previous": "patrol",
+          "current": "idle"
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-keys",
+          "action": "play",
+          "position": {
+            "x": -4.3540373256835085,
+            "y": 0.0029999985098838862,
+            "z": -5.392840625378148
+          },
+          "volume": 0.18,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-rustle",
+          "action": "play",
+          "position": {
+            "x": -4.3540373256835085,
+            "y": 0.0029999985098838862,
+            "z": -5.392840625378148
+          },
+          "volume": 0.19,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:call-panel",
+          "action": "play",
+          "position": {
+            "x": -4.37,
+            "y": 0.82,
+            "z": -5.99
+          },
+          "volume": 0.28,
+          "loop": false
+        }
+      },
+      {
+        "type": "entity:state",
+        "payload": {
+          "entityId": "nw:entity:nurse",
+          "previous": "idle",
+          "current": "patrol"
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -4.303016530693574,
+            "y": 0.06245469278911192,
+            "z": -5.316316900080069
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "entity:state",
+        "payload": {
+          "entityId": "nw:entity:nurse",
+          "previous": "patrol",
+          "current": "idle"
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-keys",
+          "action": "play",
+          "position": {
+            "x": -3.858798675107195,
+            "y": 0.0029999985098838862,
+            "z": -5.417117639605716
+          },
+          "volume": 0.18,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-rustle",
+          "action": "play",
+          "position": {
+            "x": -3.858798675107195,
+            "y": 0.0029999985098838862,
+            "z": -5.417117639605716
+          },
+          "volume": 0.19,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:paper",
+          "action": "play",
+          "position": {
+            "x": -4.37,
+            "y": 0.82,
+            "z": -5.99
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "hiding:state",
+        "payload": {
+          "playerId": "player",
+          "spotId": "nw:hiding:nurses-staff",
+          "previous": "outside",
+          "current": "entering",
+          "witnessedBy": []
+        }
+      },
+      {
+        "type": "interaction:completed",
+        "payload": {
+          "playerId": "player",
+          "targetId": "nw:locker:nurses-staff",
+          "action": "enter-hiding",
+          "outcome": "completed",
+          "position": {
+            "x": -6.425,
+            "y": 0,
+            "z": -4.15
+          }
+        }
+      },
+      {
+        "type": "hiding:state",
+        "payload": {
+          "playerId": "player",
+          "spotId": "nw:hiding:nurses-staff",
+          "previous": "entering",
+          "current": "hidden",
+          "witnessedBy": []
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-keys",
+          "action": "play",
+          "position": {
+            "x": -3.858798675107195,
+            "y": 0.0029999985098838862,
+            "z": -5.417117639605716
+          },
+          "volume": 0.18,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-rustle",
+          "action": "play",
+          "position": {
+            "x": -3.858798675107195,
+            "y": 0.0029999985098838862,
+            "z": -5.417117639605716
+          },
+          "volume": 0.19,
+          "loop": false
+        }
+      }
+    ],
+    "doorStates": {
+      "nw:door:room-101": "closed",
+      "nw:door:room-103": "closed",
+      "nw:door:room-105": "open",
+      "nw:door:treatment": "closed",
+      "nw:door:room-107": "closed",
+      "nw:door:storage": "closed",
+      "nw:door:room-102": "open",
+      "nw:door:room-104": "closed",
+      "nw:door:room-106": "locked",
+      "nw:door:room-108": "open",
+      "nw:door:room-110": "closed",
+      "nw:door:maintenance-west": "closed",
+      "nw:door:maintenance-east": "closed",
+      "nw:door:stairwell-b": "locked",
+      "nw:door:smoke-north": "open",
+      "nw:door:smoke-south": "open"
+    },
+    "prompt": {
+      "targetId": "nw:locker:nurses-staff",
+      "action": "exit-hiding",
+      "text": "Leave hiding place",
+      "available": true
+    },
+    "error": null,
+    "station": {
+      "active": true,
+      "action": "listen",
+      "phase": "introduction",
+      "elapsed": 36.29999999999922,
+      "step": 4,
+      "actor": {
+        "id": "nw:entity:nurse",
+        "type": "nurse",
+        "position": {
+          "x": -3.858798675107195,
+          "y": 0.0029999985098838862,
+          "z": -5.417117639605716
+        },
+        "state": "idle",
+        "lastKnownPlayer": null
+      },
+      "canCapture": false,
+      "firstAlertUsed": false,
+      "locations": {
+        "record": {
+          "x": -3.8,
+          "y": 0.76,
+          "z": -5.93
+        },
+        "recordStand": {
+          "x": -3.8716258132403336,
+          "y": 0,
+          "z": -4.832334412091888
+        },
+        "recordRoute": [
+          {
+            "x": -9,
+            "y": 0,
+            "z": 0.45
+          },
+          {
+            "x": -1.1499999999999986,
+            "y": 0,
+            "z": -0.9499999999999993
+          },
+          {
+            "x": -0.8999999999999986,
+            "y": 0,
+            "z": -1.6999999999999993
+          },
+          {
+            "x": -0.8999999999999986,
+            "y": 0,
+            "z": -2.6999999999999993
+          },
+          {
+            "x": -2.6499999999999986,
+            "y": 0,
+            "z": -4.449999999999999
+          },
+          {
+            "x": -3.8716258132403336,
+            "y": 0,
+            "z": -4.832334412091888
+          }
+        ],
+        "observation": {
+          "x": -9,
+          "y": 0,
+          "z": 0.45
+        },
+        "entry": {
+          "x": -4.2,
+          "y": 0,
+          "z": 0.2
+        },
+        "crouchCover": {
+          "x": -4.6,
+          "y": 0,
+          "z": -0.42
+        },
+        "concealment": {
+          "x": -7.85,
+          "y": 0,
+          "z": -3.75
+        },
+        "exit": {
+          "x": 4.6,
+          "y": 0,
+          "z": 0.2
+        },
+        "patrol": [
+          {
+            "x": -3.6,
+            "y": 0,
+            "z": -4.6
+          },
+          {
+            "x": -1.5,
+            "y": 0,
+            "z": -4.9
+          },
+          {
+            "x": -0.8,
+            "y": 0,
+            "z": -3.2
+          },
+          {
+            "x": -0.75,
+            "y": 0,
+            "z": -1
+          },
+          {
+            "x": -3.8,
+            "y": 0,
+            "z": 0
+          },
+          {
+            "x": -10.5,
+            "y": 0,
+            "z": 0
+          },
+          {
+            "x": -3.8,
+            "y": 0,
+            "z": 0
+          },
+          {
+            "x": -0.75,
+            "y": 0,
+            "z": -1
+          },
+          {
+            "x": -0.8,
+            "y": 0,
+            "z": -3.2
+          },
+          {
+            "x": -1.5,
+            "y": 0,
+            "z": -4.9
+          }
+        ],
+        "hidingPrimary": "nw:hiding:nurses-staff",
+        "hidingSecondary": "nw:hiding:room-105-bed-b",
+        "concealmentRoute": [
+          {
+            "x": -9,
+            "y": 0,
+            "z": 0.45
+          },
+          {
+            "x": -7.899999999999999,
+            "y": 0,
+            "z": -1.1999999999999993
+          },
+          {
+            "x": -7.85,
+            "y": 0,
+            "z": -3.75
+          }
+        ],
+        "returnRoute": [
+          {
+            "x": -7.85,
+            "y": 0,
+            "z": -3.75
+          },
+          {
+            "x": -7.899999999999999,
+            "y": 0,
+            "z": -0.9499999999999993
+          },
+          {
+            "x": -9,
+            "y": 0,
+            "z": 0.45
+          }
+        ],
+        "hidingTargets": {
+          "nw:hiding:room-105-bed-b": {
+            "x": -7.85,
+            "y": 0.41999999999999993,
+            "z": -5.3500000000000005
+          },
+          "nw:hiding:nurses-staff": {
+            "x": -6.402499998658895,
+            "y": 0.9812499761581419,
+            "z": -4.15
+          }
+        },
+        "hidingApproaches": {
+          "nw:hiding:room-105-bed-b": {
+            "x": -7.85,
+            "y": 0,
+            "z": -3.75
+          },
+          "nw:hiding:nurses-staff": {
+            "x": -5.625,
+            "y": 0,
+            "z": -4.15
+          }
+        }
+      }
+    },
+    "opening": {
+      "nurse": {
+        "action": "listen",
+        "clip": "listen_brief",
+        "time": 0.13333333333333333,
+        "elapsed": 0.13333333333333333,
+        "duration": 2.4,
+        "finished": false,
+        "available": true,
+        "contactReady": true,
+        "rightHand": {
+          "x": -3.8840250711056346,
+          "y": 1.0311968737916364,
+          "z": -5.101704717566556
+        },
+        "leftHand": {
+          "x": -3.780547472260636,
+          "y": 1.0264450969721124,
+          "z": -5.113389290854674
+        },
+        "footContacts": 20,
+        "panelPresses": 1,
+        "paperTurns": 1,
+        "humActive": true
+      },
+      "narrative": {
+        "scene": "shaw-introduction",
+        "checkpoint": {
+          "version": 1,
+          "step": 4
+        },
+        "owners": [
+          {
+            "owner": "encounter:shaw",
+            "resources": [
+              "nurse",
+              "dialogue"
+            ]
+          }
+        ]
+      },
+      "phase": "stealth-onboarding",
+      "state": {
+        "version": 1,
+        "awakened": true,
+        "cardAcquired": true,
+        "doorUnlocked": true,
+        "firstLinePlayed": true,
+        "secondLinePlayed": true,
+        "room106Tried": false,
+        "sightingSeen": true,
+        "stationReached": true
+      },
+      "cinematic": false,
+      "anchors": {
+        "player-spawn": {
+          "position": {
+            "x": -12.4,
+            "y": 0,
+            "z": 4.1
+          }
+        },
+        "room-104-door": {
+          "position": {
+            "x": -12,
+            "y": 1.05,
+            "z": 1.475
+          },
+          "stand": {
+            "x": -12,
+            "y": 0,
+            "z": 2.3
+          }
+        },
+        "card-reader": {
+          "position": {
+            "x": -12.85,
+            "y": 1.15,
+            "z": 1.575
+          },
+          "stand": {
+            "x": -12.85,
+            "y": 0,
+            "z": 2.25
+          }
+        },
+        "access-card": {
+          "position": {
+            "x": -12.9,
+            "y": 0.006,
+            "z": 3.2
+          },
+          "stand": {
+            "x": -12.6,
+            "y": 0,
+            "z": 3.75
+          }
+        },
+        "intercom-speaker": {
+          "position": {
+            "x": -12,
+            "y": 2.42,
+            "z": 1.6
+          }
+        },
+        "room-106-door": {
+          "position": {
+            "x": -7.6,
+            "y": 1.05,
+            "z": 1.475
+          },
+          "stand": {
+            "x": -7.6,
+            "y": 0,
+            "z": 0.6
+          }
+        },
+        "room-106-handle": {
+          "position": {
+            "x": -8.05,
+            "y": 1,
+            "z": 1.4024999999999999
+          },
+          "stand": {
+            "x": -8.05,
+            "y": 0,
+            "z": 0.75
+          }
+        },
+        "nurse-first-sight": {
+          "position": {
+            "x": -1.2,
+            "y": 0,
+            "z": 0
+          }
+        },
+        "nurse-first-sight-view": {
+          "position": {
+            "x": -12,
+            "y": 1.6,
+            "z": 0.55
+          },
+          "target": {
+            "x": -1.2,
+            "y": 1.5,
+            "z": 0
+          }
+        },
+        "station-approach": {
+          "position": {
+            "x": -4.2,
+            "y": 0,
+            "z": 0.2
+          }
+        }
+      },
+      "camera": {
+        "x": -6.375,
+        "y": 1.55,
+        "z": -4.15
+      }
+    },
+    "performance": {
+      "fixedMaxMs": 53.59999999962747,
+      "updateMaxMs": 30.09999999962747,
+      "frameDeltaMaxMs": 100,
+      "simulatedSeconds": 37.39999999999914,
+      "engine": {
+        "sampleCount": 135,
+        "capacity": 240,
+        "totalFrames": 135,
+        "totalSubsteps": 643,
+        "frameIntervalMs": {
+          "last": 449.9000000000233,
+          "mean": 564.7776119402986,
+          "p50": 550,
+          "p95": 1116.6999999999825,
+          "max": 1233.3000000000175
+        },
+        "frameCpuMs": {
+          "last": 3.699999999254942,
+          "mean": 18.69851851846885,
+          "p50": 7.799999998882413,
+          "p95": 39.600000001490116,
+          "max": 1143.199999999255
+        },
+        "fixedMs": {
+          "last": 0.8000000007450581,
+          "mean": 1.97111111101177,
+          "p50": 1.099999999627471,
+          "p95": 6.200000001117587,
+          "max": 40.09999999962747
+        },
+        "physicsMs": {
+          "last": 0.19999999925494194,
+          "mean": 0.5829629630264309,
+          "p50": 0.2999999988824129,
+          "p95": 0.599999999627471,
+          "max": 33.59999999962747
+        },
+        "updateMs": {
+          "last": 0.2000000011175871,
+          "mean": 0.965925925914888,
+          "p50": 0.5,
+          "p95": 3.5,
+          "max": 8.299999998882413
+        },
+        "renderMs": {
+          "last": 2.399999998509884,
+          "mean": 15.170370370397965,
+          "p50": 4.299999998882413,
+          "p95": 36.59999999962747,
+          "max": 1131.5
+        },
+        "substeps": {
+          "last": 5,
+          "mean": 4.762962962962963,
+          "p50": 5,
+          "p95": 5,
+          "max": 5
+        }
+      }
+    }
+  },
+  "end": {
+    "state": "playing",
+    "sessionId": 1,
+    "worldId": "nw:hospital:ward-4-west",
+    "player": {
+      "id": "player",
+      "position": {
+        "x": -6.425,
+        "y": 0,
+        "z": -4.15
+      },
+      "rotation": {
+        "yaw": 1.5707963267948966,
+        "pitch": -0.7103449562852143
+      },
+      "velocity": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "movement": "hidden",
+      "crouching": false,
+      "grounded": true,
+      "hiding": {
+        "state": "hidden",
+        "spotId": "nw:hiding:nurses-staff"
+      },
+      "captured": false
+    },
+    "entities": [],
+    "colliderCount": 230,
+    "frameCount": 626,
+    "renderer": {
+      "calls": 309,
+      "triangles": 194441,
+      "geometries": 401,
+      "textures": 98
+    },
+    "audioState": "running",
+    "events": [
+      {
+        "type": "interaction:completed",
+        "payload": {
+          "playerId": "player",
+          "targetId": "nw:opening:station-record",
+          "action": "inspect",
+          "outcome": "completed",
+          "position": {
+            "x": -3.8716258132403336,
+            "y": 0.0029999985098838862,
+            "z": -4.832334412091888
+          }
+        }
+      },
+      {
+        "type": "entity:state",
+        "payload": {
+          "entityId": "nw:entity:nurse",
+          "previous": "idle",
+          "current": "patrol"
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:station-hum",
+          "action": "play",
+          "position": {
+            "x": -4.37,
+            "y": 0.82,
+            "z": -5.99
+          },
+          "volume": 0.28,
+          "loop": true
+        }
+      },
+      {
+        "type": "entity:state",
+        "payload": {
+          "entityId": "nw:entity:nurse",
+          "previous": "patrol",
+          "current": "idle"
+        }
+      },
+      {
+        "type": "entity:state",
+        "payload": {
+          "entityId": "nw:entity:nurse",
+          "previous": "idle",
+          "current": "patrol"
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -3.9936944685251503,
+            "y": 0.06322171535465382,
+            "z": 0.06489333484133239
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -3.496707676884927,
+            "y": 0.05995037539006132,
+            "z": -0.24973457282378048
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -2.9754384128807754,
+            "y": 0.06274944165576102,
+            "z": -0.24353700130876155
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -2.4891512437470484,
+            "y": 0.059610250597561365,
+            "z": -0.5605455058745766
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -1.9460207629073454,
+            "y": 0.06153053534028552,
+            "z": -0.5644099080511702
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -1.4854479426673983,
+            "y": 0.05972610407776191,
+            "z": -0.8619529410597211
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -0.9702897139781425,
+            "y": 0.06274944165576102,
+            "z": -0.8512398724301657
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "entity:state",
+        "payload": {
+          "entityId": "nw:entity:nurse",
+          "previous": "patrol",
+          "current": "idle"
+        }
+      },
+      {
+        "type": "entity:state",
+        "payload": {
+          "entityId": "nw:entity:nurse",
+          "previous": "idle",
+          "current": "patrol"
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -0.913548310347125,
+            "y": 0.07086416422273484,
+            "z": -0.875309872039477
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -1.0447922981089346,
+            "y": 0.05994535379424748,
+            "z": -1.535586450798599
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -0.863824514599919,
+            "y": 0.06274944165576102,
+            "z": -2.0263871188365377
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -1.0923350216302685,
+            "y": 0.05983761060766529,
+            "z": -2.5321241933705196
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -1.2577610804119055,
+            "y": 0.06151576235003631,
+            "z": -3.0392431350280407
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -1.7013267133807306,
+            "y": 0.059698061054692,
+            "z": -3.3607021402680477
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -1.898501918214378,
+            "y": 0.06274944165576102,
+            "z": -3.8410293362791275
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -2.4094397328396546,
+            "y": 0.059650596904375686,
+            "z": -4.120945881679108
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -2.7504076341726558,
+            "y": 0.061375587768823514,
+            "z": -4.533841477376796
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -3.2801893459347973,
+            "y": 0.05961051342104562,
+            "z": -4.669829880754694
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -3.6180190961419685,
+            "y": 0.06274944165576102,
+            "z": -5.0508497398821
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -4.184726366473661,
+            "y": 0.059577809854903685,
+            "z": -5.204567142969837
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "entity:state",
+        "payload": {
+          "entityId": "nw:entity:nurse",
+          "previous": "patrol",
+          "current": "idle"
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-keys",
+          "action": "play",
+          "position": {
+            "x": -4.3540373256835085,
+            "y": 0.0029999985098838862,
+            "z": -5.392840625378148
+          },
+          "volume": 0.18,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-rustle",
+          "action": "play",
+          "position": {
+            "x": -4.3540373256835085,
+            "y": 0.0029999985098838862,
+            "z": -5.392840625378148
+          },
+          "volume": 0.19,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:call-panel",
+          "action": "play",
+          "position": {
+            "x": -4.37,
+            "y": 0.82,
+            "z": -5.99
+          },
+          "volume": 0.28,
+          "loop": false
+        }
+      },
+      {
+        "type": "entity:state",
+        "payload": {
+          "entityId": "nw:entity:nurse",
+          "previous": "idle",
+          "current": "patrol"
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -4.303016530693574,
+            "y": 0.06245469278911192,
+            "z": -5.316316900080069
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "entity:state",
+        "payload": {
+          "entityId": "nw:entity:nurse",
+          "previous": "patrol",
+          "current": "idle"
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-keys",
+          "action": "play",
+          "position": {
+            "x": -3.858798675107195,
+            "y": 0.0029999985098838862,
+            "z": -5.417117639605716
+          },
+          "volume": 0.18,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-rustle",
+          "action": "play",
+          "position": {
+            "x": -3.858798675107195,
+            "y": 0.0029999985098838862,
+            "z": -5.417117639605716
+          },
+          "volume": 0.19,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:paper",
+          "action": "play",
+          "position": {
+            "x": -4.37,
+            "y": 0.82,
+            "z": -5.99
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "hiding:state",
+        "payload": {
+          "playerId": "player",
+          "spotId": "nw:hiding:nurses-staff",
+          "previous": "outside",
+          "current": "entering",
+          "witnessedBy": []
+        }
+      },
+      {
+        "type": "interaction:completed",
+        "payload": {
+          "playerId": "player",
+          "targetId": "nw:locker:nurses-staff",
+          "action": "enter-hiding",
+          "outcome": "completed",
+          "position": {
+            "x": -6.425,
+            "y": 0,
+            "z": -4.15
+          }
+        }
+      },
+      {
+        "type": "hiding:state",
+        "payload": {
+          "playerId": "player",
+          "spotId": "nw:hiding:nurses-staff",
+          "previous": "entering",
+          "current": "hidden",
+          "witnessedBy": []
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-keys",
+          "action": "play",
+          "position": {
+            "x": -3.858798675107195,
+            "y": 0.0029999985098838862,
+            "z": -5.417117639605716
+          },
+          "volume": 0.18,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-rustle",
+          "action": "play",
+          "position": {
+            "x": -3.858798675107195,
+            "y": 0.0029999985098838862,
+            "z": -5.417117639605716
+          },
+          "volume": 0.19,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-rustle",
+          "position": {
+            "x": -4.6,
+            "y": 0,
+            "z": -0.42
+          },
+          "volume": 0.2,
+          "action": "play",
+          "loop": false
+        }
+      },
+      {
+        "type": "entity:state",
+        "payload": {
+          "entityId": "nw:entity:nurse",
+          "previous": "idle",
+          "current": "patrol"
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -3.9193443287884118,
+            "y": 0.062395689212462246,
+            "z": -5.346027631126081
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -3.602171904244711,
+            "y": 0.059714633427045194,
+            "z": -4.860785725585283
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -3.2006992303839334,
+            "y": 0.06274944165576102,
+            "z": -4.755736276828774
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -2.6435794571409303,
+            "y": 0.059742306327705386,
+            "z": -4.933662229287757
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -2.1107337074441612,
+            "y": 0.06135694423022958,
+            "z": -4.800769341387807
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -1.8657108272746654,
+            "y": 0.05971423513834978,
+            "z": -4.841726925087601
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -2.3123370030886714,
+            "y": 0.06274944165576102,
+            "z": -5.089556422180098
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -2.8954835723831893,
+            "y": 0.05974188053051355,
+            "z": -5.044833260012524
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -3.3825514198595052,
+            "y": 0.06138532098201499,
+            "z": -5.296635797705772
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -3.9245850061623426,
+            "y": 0.05983618247217787,
+            "z": -5.247388437160692
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -4.11362299107846,
+            "y": 0.06274944165576102,
+            "z": -5.154890674767492
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -3.6517778351954138,
+            "y": 0.05955962840141221,
+            "z": -4.796243186632012
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "atmosphere:sound",
+        "payload": {
+          "cueId": "nw:shaw-step",
+          "action": "play",
+          "position": {
+            "x": -3.1737107522382906,
+            "y": 0.061421328446095436,
+            "z": -4.731156567447534
+          },
+          "volume": 0.25,
+          "loop": false
+        }
+      },
+      {
+        "type": "entity:state",
+        "payload": {
+          "entityId": "nw:entity:nurse",
+          "previous": "patrol",
+          "current": "idle"
+        }
+      }
+    ],
+    "doorStates": {
+      "nw:door:room-101": "closed",
+      "nw:door:room-103": "closed",
+      "nw:door:room-105": "open",
+      "nw:door:treatment": "closed",
+      "nw:door:room-107": "closed",
+      "nw:door:storage": "closed",
+      "nw:door:room-102": "open",
+      "nw:door:room-104": "closed",
+      "nw:door:room-106": "locked",
+      "nw:door:room-108": "open",
+      "nw:door:room-110": "closed",
+      "nw:door:maintenance-west": "closed",
+      "nw:door:maintenance-east": "closed",
+      "nw:door:stairwell-b": "locked",
+      "nw:door:smoke-north": "open",
+      "nw:door:smoke-south": "open"
+    },
+    "prompt": {
+      "targetId": "nw:locker:nurses-staff",
+      "action": "exit-hiding",
+      "text": "Leave hiding place",
+      "available": true
+    },
+    "error": null,
+    "station": {
+      "active": true,
+      "action": null,
+      "phase": "stealth",
+      "elapsed": 0.016666666666666666,
+      "step": 0,
+      "actor": {
+        "id": "nw:entity:nurse",
+        "type": "nurse",
+        "position": {
+          "x": -3.061410733261928,
+          "y": 0.0029999985098838862,
+          "z": -4.814011722172561
+        },
+        "state": "idle",
+        "lastKnownPlayer": null
+      },
+      "canCapture": false,
+      "firstAlertUsed": false,
+      "locations": {
+        "record": {
+          "x": -3.8,
+          "y": 0.76,
+          "z": -5.93
+        },
+        "recordStand": {
+          "x": -3.8716258132403336,
+          "y": 0,
+          "z": -4.832334412091888
+        },
+        "recordRoute": [
+          {
+            "x": -9,
+            "y": 0,
+            "z": 0.45
+          },
+          {
+            "x": -1.1499999999999986,
+            "y": 0,
+            "z": -0.9499999999999993
+          },
+          {
+            "x": -0.8999999999999986,
+            "y": 0,
+            "z": -1.6999999999999993
+          },
+          {
+            "x": -0.8999999999999986,
+            "y": 0,
+            "z": -2.6999999999999993
+          },
+          {
+            "x": -2.6499999999999986,
+            "y": 0,
+            "z": -4.449999999999999
+          },
+          {
+            "x": -3.8716258132403336,
+            "y": 0,
+            "z": -4.832334412091888
+          }
+        ],
+        "observation": {
+          "x": -9,
+          "y": 0,
+          "z": 0.45
+        },
+        "entry": {
+          "x": -4.2,
+          "y": 0,
+          "z": 0.2
+        },
+        "crouchCover": {
+          "x": -4.6,
+          "y": 0,
+          "z": -0.42
+        },
+        "concealment": {
+          "x": -7.85,
+          "y": 0,
+          "z": -3.75
+        },
+        "exit": {
+          "x": 4.6,
+          "y": 0,
+          "z": 0.2
+        },
+        "patrol": [
+          {
+            "x": -3.6,
+            "y": 0,
+            "z": -4.6
+          },
+          {
+            "x": -1.5,
+            "y": 0,
+            "z": -4.9
+          },
+          {
+            "x": -0.8,
+            "y": 0,
+            "z": -3.2
+          },
+          {
+            "x": -0.75,
+            "y": 0,
+            "z": -1
+          },
+          {
+            "x": -3.8,
+            "y": 0,
+            "z": 0
+          },
+          {
+            "x": -10.5,
+            "y": 0,
+            "z": 0
+          },
+          {
+            "x": -3.8,
+            "y": 0,
+            "z": 0
+          },
+          {
+            "x": -0.75,
+            "y": 0,
+            "z": -1
+          },
+          {
+            "x": -0.8,
+            "y": 0,
+            "z": -3.2
+          },
+          {
+            "x": -1.5,
+            "y": 0,
+            "z": -4.9
+          }
+        ],
+        "hidingPrimary": "nw:hiding:nurses-staff",
+        "hidingSecondary": "nw:hiding:room-105-bed-b",
+        "concealmentRoute": [
+          {
+            "x": -9,
+            "y": 0,
+            "z": 0.45
+          },
+          {
+            "x": -7.899999999999999,
+            "y": 0,
+            "z": -1.1999999999999993
+          },
+          {
+            "x": -7.85,
+            "y": 0,
+            "z": -3.75
+          }
+        ],
+        "returnRoute": [
+          {
+            "x": -7.85,
+            "y": 0,
+            "z": -3.75
+          },
+          {
+            "x": -7.899999999999999,
+            "y": 0,
+            "z": -0.9499999999999993
+          },
+          {
+            "x": -9,
+            "y": 0,
+            "z": 0.45
+          }
+        ],
+        "hidingTargets": {
+          "nw:hiding:room-105-bed-b": {
+            "x": -7.85,
+            "y": 0.41999999999999993,
+            "z": -5.3500000000000005
+          },
+          "nw:hiding:nurses-staff": {
+            "x": -6.402499998658895,
+            "y": 0.9812499761581419,
+            "z": -4.15
+          }
+        },
+        "hidingApproaches": {
+          "nw:hiding:room-105-bed-b": {
+            "x": -7.85,
+            "y": 0,
+            "z": -3.75
+          },
+          "nw:hiding:nurses-staff": {
+            "x": -5.625,
+            "y": 0,
+            "z": -4.15
+          }
+        }
+      }
+    },
+    "opening": {
+      "nurse": {
+        "action": null,
+        "clip": null,
+        "time": 10.033333333333411,
+        "elapsed": 10.033333333333411,
+        "duration": 0,
+        "finished": false,
+        "available": false,
+        "contactReady": false,
+        "rightHand": {
+          "x": -2.8271391064495974,
+          "y": 0.8999824187475709,
+          "z": -4.725740242710788
+        },
+        "leftHand": {
+          "x": -3.042287652768788,
+          "y": 0.8377989987637485,
+          "z": -4.91089928201562
+        },
+        "footContacts": 33,
+        "panelPresses": 1,
+        "paperTurns": 1,
+        "humActive": true
+      },
+      "narrative": {
+        "scene": "autonomous-stealth",
+        "checkpoint": {
+          "version": 1,
+          "step": 6
+        },
+        "owners": [
+          {
+            "owner": "ai:shaw",
+            "resources": [
+              "nurse"
+            ]
+          }
+        ]
+      },
+      "phase": "stealth-onboarding",
+      "state": {
+        "version": 1,
+        "awakened": true,
+        "cardAcquired": true,
+        "doorUnlocked": true,
+        "firstLinePlayed": true,
+        "secondLinePlayed": true,
+        "room106Tried": false,
+        "sightingSeen": true,
+        "stationReached": true
+      },
+      "cinematic": false,
+      "anchors": {
+        "player-spawn": {
+          "position": {
+            "x": -12.4,
+            "y": 0,
+            "z": 4.1
+          }
+        },
+        "room-104-door": {
+          "position": {
+            "x": -12,
+            "y": 1.05,
+            "z": 1.475
+          },
+          "stand": {
+            "x": -12,
+            "y": 0,
+            "z": 2.3
+          }
+        },
+        "card-reader": {
+          "position": {
+            "x": -12.85,
+            "y": 1.15,
+            "z": 1.575
+          },
+          "stand": {
+            "x": -12.85,
+            "y": 0,
+            "z": 2.25
+          }
+        },
+        "access-card": {
+          "position": {
+            "x": -12.9,
+            "y": 0.006,
+            "z": 3.2
+          },
+          "stand": {
+            "x": -12.6,
+            "y": 0,
+            "z": 3.75
+          }
+        },
+        "intercom-speaker": {
+          "position": {
+            "x": -12,
+            "y": 2.42,
+            "z": 1.6
+          }
+        },
+        "room-106-door": {
+          "position": {
+            "x": -7.6,
+            "y": 1.05,
+            "z": 1.475
+          },
+          "stand": {
+            "x": -7.6,
+            "y": 0,
+            "z": 0.6
+          }
+        },
+        "room-106-handle": {
+          "position": {
+            "x": -8.05,
+            "y": 1,
+            "z": 1.4024999999999999
+          },
+          "stand": {
+            "x": -8.05,
+            "y": 0,
+            "z": 0.75
+          }
+        },
+        "nurse-first-sight": {
+          "position": {
+            "x": -1.2,
+            "y": 0,
+            "z": 0
+          }
+        },
+        "nurse-first-sight-view": {
+          "position": {
+            "x": -12,
+            "y": 1.6,
+            "z": 0.55
+          },
+          "target": {
+            "x": -1.2,
+            "y": 1.5,
+            "z": 0
+          }
+        },
+        "station-approach": {
+          "position": {
+            "x": -4.2,
+            "y": 0,
+            "z": 0.2
+          }
+        }
+      },
+      "camera": {
+        "x": -6.375,
+        "y": 1.55,
+        "z": -4.15
+      }
+    },
+    "performance": {
+      "fixedMaxMs": 53.59999999962747,
+      "updateMaxMs": 30.09999999962747,
+      "frameDeltaMaxMs": 100,
+      "simulatedSeconds": 49.716666666665105,
+      "engine": {
+        "sampleCount": 240,
+        "capacity": 240,
+        "totalFrames": 285,
+        "totalSubsteps": 1382,
+        "frameIntervalMs": {
+          "last": 499.8999999999651,
+          "mean": 534.9787499999999,
+          "p50": 516.6999999999534,
+          "p95": 1016.5999999999767,
+          "max": 1233.3000000000175
+        },
+        "frameCpuMs": {
+          "last": 9.699999999254942,
+          "mean": 14.77374999995033,
+          "p50": 6.800000000745058,
+          "p95": 40,
+          "max": 1143.199999999255
+        },
+        "fixedMs": {
+          "last": 2.199999997392297,
+          "mean": 1.4041666667054717,
+          "p50": 0.900000000372529,
+          "p95": 2.900000000372529,
+          "max": 36.69999999925494
+        },
+        "physicsMs": {
+          "last": 0.10000000149011612,
+          "mean": 0.47458333331160246,
+          "p50": 0.2999999988824129,
+          "p95": 0.599999999627471,
+          "max": 33.59999999962747
+        },
+        "updateMs": {
+          "last": 2,
+          "mean": 0.6720833333053936,
+          "p50": 0.40000000037252903,
+          "p95": 2.299999998882413,
+          "max": 8.299999998882413
+        },
+        "renderMs": {
+          "last": 5.400000000372529,
+          "mean": 12.214999999982926,
+          "p50": 4.699999999254942,
+          "p95": 37.69999999925494,
+          "max": 1131.5
+        },
+        "substeps": {
+          "last": 5,
+          "mean": 4.9125,
+          "p50": 5,
+          "p95": 5,
+          "max": 5
+        }
+      }
+    }
+  },
+  "inspect": {
+    "nurseCount": 1,
+    "console": {
+      "x": -4.37,
+      "y": 0.82,
+      "z": -5.99
+    },
+    "record": {
+      "x": -3.8,
+      "y": 0.76,
+      "z": -5.93
+    },
+    "sound": {
+      "voices": 4,
+      "loops": [
+        "nw:station-hum"
+      ],
+      "cinematicVoices": [
+        "nw:station-hum",
+        "nw:station-hum",
+        "nw:shaw-step",
+        "nw:station-hum"
+      ]
+    }
+  },
+  "errors": []
+}

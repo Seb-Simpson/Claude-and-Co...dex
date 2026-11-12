@@ -1,0 +1,13 @@
+
+> night-ward@0.0.0 test
+> vitest run
+
+
+ RUN  v4.1.12 /workspace/night-ward
+
+
+ Test Files  76 passed | 1 skipped (77)
+      Tests  617 passed | 1 skipped (618)
+   Start at  15:55:09
+   Duration  41.31s (transform 1.70s, setup 0ms, import 7.82s, tests 24.71s, environment 6ms)
+
