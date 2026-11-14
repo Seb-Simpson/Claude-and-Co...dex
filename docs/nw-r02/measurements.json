@@ -1,0 +1,343 @@
+{
+ "generated": "2026-11-14",
+ "method": "Autopilot in the running game (Chromium, SwiftShader), real input, walk speed 2.4 m/s, crouch 1.1 m/s; no teleports; no artificial waiting.",
+ "routeLength": 431,
+ "measured": {
+  "totalSeconds": 208.1,
+  "movingSeconds": 197.8,
+  "idleSeconds": 10.4,
+  "controlSeconds": 4.6,
+  "exploringSeconds": 6.1,
+  "crouchedSeconds": 28.1,
+  "distance": 425.3,
+  "crouchedDistance": 29.8,
+  "simulatedSeconds": 208.1,
+  "wallClockSeconds": 351.8
+ },
+ "legs": [
+  {
+   "step": 1,
+   "scene": "S01",
+   "label": "Wake in Room 104",
+   "routeLength": 0,
+   "distance": 0,
+   "seconds": 0,
+   "movingSeconds": 0,
+   "controlSeconds": 0,
+   "crouchedSeconds": 0
+  },
+  {
+   "step": 2,
+   "scene": "S02",
+   "label": "Leave Room 104",
+   "routeLength": 5.5,
+   "distance": 5.1,
+   "seconds": 2.4,
+   "movingSeconds": 2.3,
+   "controlSeconds": 0,
+   "crouchedSeconds": 0
+  },
+  {
+   "step": 3,
+   "scene": "S03",
+   "label": "West ward; survive E1 (placeholder markers) to the lobby",
+   "routeLength": 25.6,
+   "distance": 25.5,
+   "seconds": 10.8,
+   "movingSeconds": 10.8,
+   "controlSeconds": 0,
+   "crouchedSeconds": 0
+  },
+  {
+   "step": 4,
+   "scene": "S04",
+   "label": "Answer the payphone (optional, encouraged)",
+   "routeLength": 5.1,
+   "distance": 5.2,
+   "seconds": 2.5,
+   "movingSeconds": 2.4,
+   "controlSeconds": 0.8,
+   "crouchedSeconds": 0
+  },
+  {
+   "step": 5,
+   "scene": "S05",
+   "label": "Nurse's Office: try the north door; read the transfer notice",
+   "routeLength": 12.5,
+   "distance": 12.2,
+   "seconds": 6.7,
+   "movingSeconds": 5.3,
+   "controlSeconds": 0.7,
+   "crouchedSeconds": 0
+  },
+  {
+   "step": 6,
+   "scene": "S06",
+   "label": "South corridor to the stores",
+   "routeLength": 43.5,
+   "distance": 42.9,
+   "seconds": 18.2,
+   "movingSeconds": 18.2,
+   "controlSeconds": 0,
+   "crouchedSeconds": 0
+  },
+  {
+   "step": 7,
+   "scene": "S07",
+   "label": "Porters' room: docket and sign-out sheet",
+   "routeLength": 20.9,
+   "distance": 20.7,
+   "seconds": 9.3,
+   "movingSeconds": 9.3,
+   "controlSeconds": 0.6,
+   "crouchedSeconds": 0
+  },
+  {
+   "step": 8,
+   "scene": "S08",
+   "label": "E2 Stores (placeholder): to the crawlway hatch",
+   "routeLength": 3.7,
+   "distance": 3.3,
+   "seconds": 1.5,
+   "movingSeconds": 1.5,
+   "controlSeconds": 0,
+   "crouchedSeconds": 0
+  },
+  {
+   "step": 9,
+   "scene": "S09",
+   "label": "E3 Crawlway (crouched) to the ES2 grille",
+   "routeLength": 21,
+   "distance": 20.1,
+   "seconds": 18.4,
+   "movingSeconds": 17.8,
+   "controlSeconds": 0,
+   "crouchedSeconds": 17.4
+  },
+  {
+   "step": 10,
+   "scene": "S10",
+   "label": "Branches: Plant 2 is locked",
+   "routeLength": 49.4,
+   "distance": 49.2,
+   "seconds": 20.7,
+   "movingSeconds": 20.7,
+   "controlSeconds": 0,
+   "crouchedSeconds": 0
+  },
+  {
+   "step": 11,
+   "scene": "S11",
+   "label": "E4 Loop: take Shaw's keys (developer placeholder)",
+   "routeLength": 40.9,
+   "distance": 40.1,
+   "seconds": 17.5,
+   "movingSeconds": 17.4,
+   "controlSeconds": 0.6,
+   "crouchedSeconds": 0
+  },
+  {
+   "step": 12,
+   "scene": "S12",
+   "label": "Plant 2 and the maintenance passage; the valve",
+   "routeLength": 80.2,
+   "distance": 79.6,
+   "seconds": 38.9,
+   "movingSeconds": 37.6,
+   "controlSeconds": 0.6,
+   "crouchedSeconds": 6.7
+  },
+  {
+   "step": 13,
+   "scene": "S13",
+   "label": "The bulkhead (crank placeholder)",
+   "routeLength": 16.1,
+   "distance": 15.7,
+   "seconds": 8.5,
+   "movingSeconds": 6.8,
+   "controlSeconds": 0.7,
+   "crouchedSeconds": 0
+  },
+  {
+   "step": 14,
+   "scene": "S14",
+   "label": "E6 Chase route to the NT doors",
+   "routeLength": 75.6,
+   "distance": 74.7,
+   "seconds": 39.6,
+   "movingSeconds": 34.6,
+   "controlSeconds": 0,
+   "crouchedSeconds": 4
+  },
+  {
+   "step": 15,
+   "scene": "S15",
+   "label": "North Wing: the far side of the barricade",
+   "routeLength": 31,
+   "distance": 31,
+   "seconds": 13.1,
+   "movingSeconds": 13.1,
+   "controlSeconds": 0.6,
+   "crouchedSeconds": 0
+  }
+ ],
+ "zones": {
+  "west": {
+   "seconds": 14.1,
+   "distance": 32.6
+  },
+  "lobby": {
+   "seconds": 11.4,
+   "distance": 22.8
+  },
+  "office": {
+   "seconds": 2.8,
+   "distance": 5.8
+  },
+  "south": {
+   "seconds": 14.1,
+   "distance": 33.3
+  },
+  "stores": {
+   "seconds": 10.5,
+   "distance": 21.9
+  },
+  "crawl": {
+   "seconds": 15.9,
+   "distance": 16.5
+  },
+  "east": {
+   "seconds": 9.5,
+   "distance": 22.1
+  },
+  "loop": {
+   "seconds": 7,
+   "distance": 14.7
+  },
+  "branch-s": {
+   "seconds": 11.2,
+   "distance": 25.6
+  },
+  "branch-n": {
+   "seconds": 30.7,
+   "distance": 70.3
+  },
+  "plant": {
+   "seconds": 3.4,
+   "distance": 8
+  },
+  "maintenance": {
+   "seconds": 27.6,
+   "distance": 48
+  },
+  "chase": {
+   "seconds": 26.1,
+   "distance": 52.9
+  },
+  "old-north": {
+   "seconds": 9.9,
+   "distance": 17.7
+  },
+  "north-wing": {
+   "seconds": 14,
+   "distance": 33
+  },
+  "chapter2": {
+   "seconds": 0,
+   "distance": 0
+  }
+ },
+ "visited": [
+  "R104",
+  "WC",
+  "LOBBY",
+  "OFFICE",
+  "SC",
+  "ST1",
+  "ST2",
+  "CE",
+  "V1W",
+  "V1A",
+  "V2E",
+  "V3C",
+  "V4",
+  "CX",
+  "ES2",
+  "SB",
+  "EJ",
+  "NBR",
+  "LEC",
+  "LOFF",
+  "M0",
+  "M1A",
+  "M1B",
+  "M2",
+  "M3",
+  "M4",
+  "M5",
+  "M6A",
+  "M6B",
+  "M6C",
+  "M6D",
+  "M6E",
+  "M7",
+  "M8",
+  "M8C",
+  "NL",
+  "NB",
+  "NB1"
+ ],
+ "flags": [
+  "bulkhead-cranked",
+  "chapter-end",
+  "payphone",
+  "route-plant2",
+  "route-stores",
+  "shaw-keys",
+  "valve-open"
+ ],
+ "futureControls": [
+  {
+   "id": "payphone",
+   "sets": "payphone",
+   "futureSeconds": 45,
+   "note": "Ruth's call, then Shaw (S04)"
+  },
+  {
+   "id": "office-notice",
+   "sets": "route-stores",
+   "futureSeconds": 20,
+   "note": "Read the notice; Standing Orders"
+  },
+  {
+   "id": "porters-docket",
+   "sets": "route-plant2",
+   "futureSeconds": 30,
+   "note": "Read the docket and sign-out sheet"
+  },
+  {
+   "id": "key-theft",
+   "sets": "shaw-keys",
+   "futureSeconds": 285,
+   "note": "E4 expected 4:45 (observe, choose an approach, take the keys)"
+  },
+  {
+   "id": "valve",
+   "sets": "valve-open",
+   "futureSeconds": 45,
+   "note": "Follow the banded pipe to its valve"
+  },
+  {
+   "id": "bulkhead-crank",
+   "sets": "bulkhead-cranked",
+   "futureSeconds": 4,
+   "note": "Hold to crank; bell; chase starts"
+  },
+  {
+   "id": "barricade",
+   "sets": "chapter-end",
+   "futureSeconds": 90,
+   "note": "S15: barricade, glass, PA, Ruth’s knitting"
+  }
+ ]
+}

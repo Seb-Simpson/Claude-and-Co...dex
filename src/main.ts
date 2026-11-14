@@ -3,6 +3,7 @@ import { createFrontend, type Frontend } from './frontend/frontend';
 import { discoverModules } from './integration';
 import { createApplication } from './integration/application';
 import { settings } from './settings/settings';
+import { createGreyboxModule, createGreyboxProgress, greyboxInspectionText, type GreyboxApi } from './world/greybox/greyboxModule';
 
 const container = document.querySelector<HTMLElement>('#app');
 const uiRoot = document.querySelector<HTMLElement>('#nw-frontend');
@@ -10,11 +11,23 @@ if (!container || !uiRoot) throw new Error('Missing NIGHT WARD application shell
 
 const params = new URLSearchParams(location.search);
 const testMode = params.get('test') === '1';
-const modules = discoverModules();
+// NW-R02: `?level=greybox` runs the Chapter 1 architectural greybox (world + gameplay modules only;
+// no atmosphere, horror or entities). The default game is unchanged.
+const greybox = params.get('level') === 'greybox';
+const progress = createGreyboxProgress();
+const discovered = discoverModules();
+const modules = greybox
+  ? [createGreyboxModule({
+    progress,
+    teleport: (position, yaw) => application.teleport(position, yaw),
+    onReady: (api) => { if (testMode) (window as Window & { nightWardGreybox?: GreyboxApi }).nightWardGreybox = api; },
+  }), ...discovered.filter((module) => module.kind === 'gameplay')]
+  : discovered;
 // One application (one engine, one loop); the frontend drives its lifecycle and never boots its own.
 let frontend: Frontend | null = null;
 const application = createApplication({
   container, modules,
+  ...(greybox ? { gameplayOptions: { activeEntityTypes: [], hasRequirement: (id: string) => progress.has(id), inspectionText: greyboxInspectionText } } : {}),
   onStatus: (message, isError) => frontend?.onStatus(message, isError),
   onState: (state) => frontend?.onState(state),
   onProgress: (progress) => frontend?.onProgress(progress),

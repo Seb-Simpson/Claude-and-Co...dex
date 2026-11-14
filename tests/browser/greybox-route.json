@@ -1,0 +1,582 @@
+{
+ "generatedFrom": "tests/greybox/route.ts",
+ "totalLength": 431,
+ "legs": [
+  {
+   "step": 1,
+   "scene": "S01",
+   "label": "Wake in Room 104",
+   "points": [],
+   "length": 0
+  },
+  {
+   "step": 2,
+   "scene": "S02",
+   "label": "Leave Room 104",
+   "points": [
+    {
+     "x": -33.2,
+     "z": 2.8499999999999996,
+     "crouch": false,
+     "door": "R104-door"
+    },
+    {
+     "x": -33.2,
+     "z": 0.29999999999999993,
+     "crouch": false
+    },
+    {
+     "x": -33.2,
+     "z": 0,
+     "crouch": false
+    }
+   ],
+   "length": 5.541189328159574
+  },
+  {
+   "step": 3,
+   "scene": "S03",
+   "label": "West ward; survive E1 (placeholder markers) to the lobby",
+   "points": [
+    {
+     "x": -7.6,
+     "z": 0,
+     "crouch": false
+    }
+   ],
+   "length": 25.6
+  },
+  {
+   "step": 4,
+   "scene": "S04",
+   "label": "Answer the payphone (optional, encouraged)",
+   "points": [
+    {
+     "x": -4.749999999999997,
+     "z": 1.2500000000000029,
+     "crouch": false
+    },
+    {
+     "x": -4.6,
+     "z": 3.2,
+     "crouch": false
+    }
+   ],
+   "length": 5.067833985479882,
+   "control": {
+    "id": "payphone",
+    "interactableId": "nw:inspect:gb-payphone",
+    "x": -5.4,
+    "z": 3.6,
+    "sets": "payphone"
+   }
+  },
+  {
+   "step": 5,
+   "scene": "S05",
+   "label": "Nurse's Office: try the north door; read the transfer notice",
+   "points": [
+    {
+     "x": 0,
+     "z": -3.35,
+     "crouch": false,
+     "door": "office-lobby",
+     "open": [
+      "nw:door:gb-office-lobby"
+     ]
+    },
+    {
+     "x": 0,
+     "z": -5.9,
+     "crouch": false
+    },
+    {
+     "x": 1.8,
+     "z": -6.6,
+     "crouch": false
+    }
+   ],
+   "length": 12.485226088373858,
+   "control": {
+    "id": "office-notice",
+    "interactableId": "nw:inspect:gb-office-notice",
+    "x": 2.4,
+    "z": -6.4,
+    "sets": "route-stores"
+   }
+  },
+  {
+   "step": 6,
+   "scene": "S06",
+   "label": "South corridor to the stores",
+   "points": [
+    {
+     "x": 0,
+     "z": -6.65,
+     "crouch": false,
+     "door": "office-lobby",
+     "open": [
+      "nw:door:gb-office-lobby"
+     ]
+    },
+    {
+     "x": 0,
+     "z": -4.1,
+     "crouch": false
+    },
+    {
+     "x": 0.6500000000000015,
+     "z": 31.05,
+     "crouch": false
+    },
+    {
+     "x": 4.6,
+     "z": 31.2,
+     "crouch": false
+    }
+   ],
+   "length": 43.45955082936882
+  },
+  {
+   "step": 7,
+   "scene": "S07",
+   "label": "Porters' room: docket and sign-out sheet",
+   "points": [
+    {
+     "x": 5.949999999999999,
+     "z": 31.2,
+     "crouch": false,
+     "door": "ST1-door"
+    },
+    {
+     "x": 8.9,
+     "z": 31.2,
+     "crouch": false
+    },
+    {
+     "x": 14.05,
+     "z": 33.45,
+     "crouch": false
+    },
+    {
+     "x": 17.850000000000005,
+     "z": 31.65000000000001,
+     "crouch": false
+    },
+    {
+     "x": 18.35,
+     "z": 31,
+     "crouch": false,
+     "door": "ST2-door"
+    },
+    {
+     "x": 20.9,
+     "z": 31,
+     "crouch": false
+    },
+    {
+     "x": 23.05,
+     "z": 29.65000000000001,
+     "crouch": false
+    },
+    {
+     "x": 23,
+     "z": 28.8,
+     "crouch": false
+    }
+   ],
+   "length": 20.88504333545152,
+   "control": {
+    "id": "porters-docket",
+    "interactableId": "nw:inspect:gb-porters-docket",
+    "x": 23,
+    "z": 27.6,
+    "sets": "route-plant2"
+   }
+  },
+  {
+   "step": 8,
+   "scene": "S08",
+   "label": "E2 Stores (placeholder): to the crawlway hatch",
+   "points": [
+    {
+     "x": 24.8,
+     "z": 32,
+     "crouch": false
+    }
+   ],
+   "length": 3.671511950137164
+  },
+  {
+   "step": 9,
+   "scene": "S09",
+   "label": "E3 Crawlway (crouched) to the ES2 grille",
+   "points": [
+    {
+     "x": 25.45,
+     "z": 32,
+     "crouch": true,
+     "door": "hatch"
+    },
+    {
+     "x": 26.55,
+     "z": 32,
+     "crouch": true
+    },
+    {
+     "x": 27.450000000000006,
+     "z": 31.850000000000012,
+     "crouch": true
+    },
+    {
+     "x": 27.450000000000006,
+     "z": 28.850000000000012,
+     "crouch": true
+    },
+    {
+     "x": 28.05,
+     "z": 28.450000000000006,
+     "crouch": true
+    },
+    {
+     "x": 32.25,
+     "z": 28.450000000000006,
+     "crouch": true
+    },
+    {
+     "x": 32.45,
+     "z": 28.05,
+     "crouch": true
+    },
+    {
+     "x": 32.45,
+     "z": 23.250000000000004,
+     "crouch": true
+    },
+    {
+     "x": 33.05,
+     "z": 23.05,
+     "crouch": true
+    },
+    {
+     "x": 34.45,
+     "z": 23,
+     "crouch": true,
+     "door": "grille"
+    },
+    {
+     "x": 35.55,
+     "z": 23,
+     "crouch": true
+    },
+    {
+     "x": 37.2,
+     "z": 24.2,
+     "crouch": true
+    }
+   ],
+   "length": 21.00430691109368
+  },
+  {
+   "step": 10,
+   "scene": "S10",
+   "label": "Branches: Plant 2 is locked",
+   "points": [
+    {
+     "x": 38.2,
+     "z": 23.65,
+     "crouch": false,
+     "door": "ES2-door"
+    },
+    {
+     "x": 38.2,
+     "z": 21.1,
+     "crouch": false
+    },
+    {
+     "x": 38.2,
+     "z": -24.6,
+     "crouch": false
+    }
+   ],
+   "length": 49.39127122105133
+  },
+  {
+   "step": 11,
+   "scene": "S11",
+   "label": "E4 Loop: take Shaw's keys (developer placeholder)",
+   "points": [
+    {
+     "x": 37.45,
+     "z": -0.3499999999999986,
+     "crouch": false
+    },
+    {
+     "x": 27.849999999999998,
+     "z": 1.2500000000000029,
+     "crouch": false
+    },
+    {
+     "x": 28.25,
+     "z": 1.6,
+     "crouch": false,
+     "door": "LOFF-east"
+    },
+    {
+     "x": 25.700000000000003,
+     "z": 1.6,
+     "crouch": false
+    },
+    {
+     "x": 24.250000000000004,
+     "z": 0.4500000000000057,
+     "crouch": false
+    },
+    {
+     "x": 23.6,
+     "z": -1.4,
+     "crouch": false
+    }
+   ],
+   "length": 40.88706521258202,
+   "control": {
+    "id": "key-theft",
+    "interactableId": "nw:inspect:gb-key-theft",
+    "x": 23.6,
+    "z": -2.3,
+    "sets": "shaw-keys"
+   }
+  },
+  {
+   "step": 12,
+   "scene": "S12",
+   "label": "Plant 2 and the maintenance passage; the valve",
+   "points": [
+    {
+     "x": 24.950000000000003,
+     "z": 1.6,
+     "crouch": false,
+     "door": "LOFF-east"
+    },
+    {
+     "x": 27.5,
+     "z": 1.6,
+     "crouch": false
+    },
+    {
+     "x": 31.65000000000001,
+     "z": 0.05,
+     "crouch": false
+    },
+    {
+     "x": 38.05,
+     "z": -1.1499999999999957,
+     "crouch": false
+    },
+    {
+     "x": 38.2,
+     "z": -24.35,
+     "crouch": false,
+     "door": "plant2-door",
+     "open": [
+      "nw:door:gb-plant2-door"
+     ]
+    },
+    {
+     "x": 38.2,
+     "z": -26.9,
+     "crouch": false
+    },
+    {
+     "x": 37.45,
+     "z": -43.150000000000006,
+     "crouch": false
+    },
+    {
+     "x": 21.850000000000005,
+     "z": -42.95,
+     "crouch": true
+    },
+    {
+     "x": 19.450000000000006,
+     "z": -40.95,
+     "crouch": false
+    },
+    {
+     "x": 16.8,
+     "z": -40.4,
+     "crouch": false
+    }
+   ],
+   "length": 80.23093533826201,
+   "control": {
+    "id": "valve",
+    "interactableId": "nw:inspect:gb-valve",
+    "x": 16,
+    "z": -39.6,
+    "sets": "valve-open"
+   }
+  },
+  {
+   "step": 13,
+   "scene": "S13",
+   "label": "The bulkhead (crank placeholder)",
+   "points": [
+    {
+     "x": 17.05,
+     "z": -43,
+     "crouch": false,
+     "door": "steam",
+     "open": [
+      "nw:door:gb-steam"
+     ]
+    },
+    {
+     "x": 14.1,
+     "z": -43,
+     "crouch": false
+    },
+    {
+     "x": 3.6,
+     "z": -42.6,
+     "crouch": false
+    }
+   ],
+   "length": 16.069607862664537,
+   "control": {
+    "id": "bulkhead-crank",
+    "interactableId": "nw:inspect:gb-bulkhead-crank",
+    "x": 3,
+    "z": -42,
+    "sets": "bulkhead-cranked"
+   }
+  },
+  {
+   "step": 14,
+   "scene": "S14",
+   "label": "E6 Chase route to the NT doors",
+   "points": [
+    {
+     "x": 3.65,
+     "z": -43,
+     "crouch": false,
+     "door": "bulkhead",
+     "open": [
+      "nw:door:gb-bulkhead"
+     ]
+    },
+    {
+     "x": 1.1,
+     "z": -43,
+     "crouch": false
+    },
+    {
+     "x": -4.349999999999999,
+     "z": -43.35,
+     "crouch": false
+    },
+    {
+     "x": -5.149999999999996,
+     "z": -48.75,
+     "crouch": false
+    },
+    {
+     "x": -8.95,
+     "z": -49.150000000000006,
+     "crouch": false
+    },
+    {
+     "x": -14.349999999999998,
+     "z": -48.95,
+     "crouch": false
+    },
+    {
+     "x": -15.349999999999998,
+     "z": -44.95,
+     "crouch": false
+    },
+    {
+     "x": -20.35,
+     "z": -44.8,
+     "crouch": false,
+     "door": "barred"
+    },
+    {
+     "x": -22.9,
+     "z": -44.8,
+     "crouch": false
+    },
+    {
+     "x": -31.75,
+     "z": -44.75,
+     "crouch": true
+    },
+    {
+     "x": -32.8,
+     "z": -34.65,
+     "crouch": false,
+     "door": "M9",
+     "open": [
+      "nw:door:gb-M9"
+     ]
+    },
+    {
+     "x": -32.8,
+     "z": -32.1,
+     "crouch": false
+    },
+    {
+     "x": -29.15,
+     "z": -31.15,
+     "crouch": false
+    },
+    {
+     "x": -17.45,
+     "z": -31.2,
+     "crouch": false,
+     "door": "NT",
+     "open": [
+      "nw:door:gb-NT-a",
+      "nw:door:gb-NT-b"
+     ]
+    },
+    {
+     "x": -15.1,
+     "z": -31.2,
+     "crouch": false
+    },
+    {
+     "x": -13.6,
+     "z": -31.2,
+     "crouch": false
+    }
+   ],
+   "length": 75.64961471205682
+  },
+  {
+   "step": 15,
+   "scene": "S15",
+   "label": "North Wing: the far side of the barricade",
+   "points": [
+    {
+     "x": -0.14999999999999575,
+     "z": -30.349999999999998,
+     "crouch": false
+    },
+    {
+     "x": 0,
+     "z": -12.8,
+     "crouch": false
+    }
+   ],
+   "length": 31.027472985878063,
+   "control": {
+    "id": "barricade",
+    "interactableId": "nw:inspect:gb-barricade",
+    "x": 0,
+    "z": -12.2,
+    "sets": "chapter-end"
+   }
+  }
+ ]
+}
