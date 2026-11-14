@@ -11,6 +11,8 @@ export interface PlayerInput {
   readonly right: number;
   readonly sprint: boolean;
   readonly crouch: boolean;
+  /** The interact key is held (hold-to-interact). Ignored by movement. */
+  readonly interact?: boolean;
 }
 
 export interface PlayerConfig {

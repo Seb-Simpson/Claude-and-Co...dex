@@ -20,7 +20,7 @@ export function createSettingsPanel(store: SettingsStore, sound: UiSound): Setti
   let previousFocus: HTMLElement | null = null;
   const controls: { sync(s: Settings): void }[] = [];
 
-  function slider(key: 'masterVolume' | 'musicVolume' | 'sfxVolume' | 'mouseSensitivity' | 'effects', label: string, min: number, max: number, step: number, format: (v: number) => string): HTMLElement {
+  function slider(key: 'masterVolume' | 'musicVolume' | 'sfxVolume' | 'voiceVolume' | 'mouseSensitivity' | 'effects', label: string, min: number, max: number, step: number, format: (v: number) => string): HTMLElement {
     const id = `nw-set-${key}`;
     const input = el('input', { id, type: 'range', min, max, step, class: 'nw-range' });
     const out = el('output', { for: id, class: 'nw-field__value' });
@@ -30,7 +30,7 @@ export function createSettingsPanel(store: SettingsStore, sound: UiSound): Setti
     input.addEventListener('input', () => input.style.setProperty('--fill', String((Number(input.value) - min) / (max - min))));
     return el('div', { class: 'nw-field' }, el('label', { for: id, class: 'nw-field__label', text: label }), input, out);
   }
-  function toggle(key: 'subtitles' | 'invertY', label: string, note?: string): HTMLElement {
+  function toggle(key: 'subtitles' | 'invertY' | 'directionalCaptions', label: string, note?: string): HTMLElement {
     const id = `nw-set-${key}`;
     const input = el('input', { id, type: 'checkbox', role: 'switch', class: 'nw-switch' });
     input.addEventListener('change', () => { store.update({ [key]: input.checked } as Partial<Settings>); sound.play('move'); });
@@ -72,7 +72,8 @@ export function createSettingsPanel(store: SettingsStore, sound: UiSound): Setti
     section('Audio',
       slider('masterVolume', 'Master volume', 0, 1, 0.01, pct),
       slider('musicVolume', 'Music', 0, 1, 0.01, pct),
-      slider('sfxVolume', 'Sound effects', 0, 1, 0.01, pct)),
+      slider('sfxVolume', 'Sound effects', 0, 1, 0.01, pct),
+      slider('voiceVolume', 'Voices', 0, 1, 0.01, pct)),
     section('Controls',
       slider('mouseSensitivity', 'Mouse sensitivity', 0.25, 3, 0.05, (v) => `${v.toFixed(2)}×`),
       toggle('invertY', 'Invert vertical look')),
@@ -82,6 +83,9 @@ export function createSettingsPanel(store: SettingsStore, sound: UiSound): Setti
       el('div', { class: 'nw-field' }, el('span', { class: 'nw-field__label', text: 'Fullscreen' }), fsButton)),
     section('Accessibility',
       toggle('subtitles', 'Subtitles', 'Captions for spoken lines and important sounds.'),
+      toggle('directionalCaptions', 'Directional captions', 'Says where a voice comes from: ahead, behind, left or right.'),
+      choice<Settings['holdInteractions']>('holdInteractions', 'Long interactions', [{ value: 'hold', label: 'Hold E' }, { value: 'toggle', label: 'Press E' }],
+        (s) => s.holdInteractions, (v) => store.update({ holdInteractions: v }), (v) => (v === 'hold' ? 'Hold E until the action finishes.' : 'Press E to start; it finishes by itself. Press E again to stop.')),
       choice<Settings['motion']>('motion', 'Motion', [{ value: 'system', label: 'System' }, { value: 'reduce', label: 'Reduced' }, { value: 'full', label: 'Full' }],
         (s) => s.motion, (v) => store.update({ motion: v }), (v) => (v === 'system' ? 'Follows your operating system’s reduced-motion preference.' : v === 'reduce' ? 'No flicker, camera drift or animated transitions in menus and effects.' : 'All motion and flicker effects.')),
       slider('effects', 'Screen effects', 0, 1, 0.05, pct)),

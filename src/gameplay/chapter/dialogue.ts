@@ -108,7 +108,7 @@ export function validateDialogueCue(cue: DialogueCue): DialogueCue {
   if (!cue || !validLabel(cue.id) || !validLabel(cue.speaker) || !validLabel(cue.text)) throw new Error('Invalid dialogue identity or text');
   if (!Number.isFinite(cue.durationSeconds) || cue.durationSeconds <= 0 || cue.durationSeconds > 3600) throw new Error('Invalid dialogue duration');
   if (!['not-recorded', 'temporary', 'recorded', 'approved'].includes(cue.recordingStatus)) throw new Error('Invalid recording status');
-  if (cue.bus !== 'sfx' && cue.bus !== 'music') throw new Error('Dialogue must use an existing mixer bus');
+  if (cue.bus !== 'sfx' && cue.bus !== 'music' && cue.bus !== 'voice') throw new Error('Dialogue must use an existing mixer bus');
   if (cue.recordingStatus !== 'not-recorded' && !validLabel(cue.assetUrl ?? '')) throw new Error('Recorded dialogue requires an asset reference');
   if (cue.recordingStatus === 'not-recorded' && cue.assetUrl !== undefined) throw new Error('Unrecorded dialogue cannot claim an audio asset');
   if (!Array.isArray(cue.segments) || cue.segments.length === 0 || cue.segments.length > 1024) throw new Error('Invalid subtitle segments');
@@ -133,6 +133,8 @@ export function validateDialogueCue(cue: DialogueCue): DialogueCue {
 export function createBufferedDialogueVoiceAdapter(
   context: BaseAudioContext,
   recordings: ReadonlyMap<string, AudioBuffer>,
+  /** Optional per-cue destination (e.g. a positional or telephone chain that ends on the cue's bus). */
+  output: (cue: DialogueCue) => AudioNode = (cue) => audioOutput(context, cue.bus),
 ): (cue: DialogueCue) => DialogueVoice {
   return (input) => {
     const cue = validateDialogueCue(input);
@@ -160,7 +162,7 @@ export function createBufferedDialogueVoiceAdapter(
       if (context.state !== 'running') throw new Error('Dialogue audio context is not running');
       const next = context.createBufferSource();
       next.buffer = buffer;
-      next.connect(audioOutput(context, cue.bus));
+      next.connect(output(cue));
       source = next;
       startedAt = context.currentTime;
       next.onended = () => {

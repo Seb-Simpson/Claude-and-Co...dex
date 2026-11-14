@@ -30,6 +30,10 @@ export interface GameplayOptions {
   readonly attachControls?: boolean;
   readonly showHud?: boolean;
   readonly hasRequirement?: (id: string) => boolean;
+  /** Hold-to-interact mode: 'hold' (default) or 'toggle' (press to start, press again to cancel). */
+  readonly holdMode?: () => 'hold' | 'toggle';
+  /** Called once with the runtime after setup (host modules use it for trusted door/state restore). */
+  readonly onRuntime?: (runtime: GameplayRuntime) => void;
 }
 export interface GameplayRuntime extends ModuleInstance {
   readonly player: PlayerController;
@@ -85,6 +89,8 @@ export function createGameplayRuntime(context: ModuleContext, options: GameplayO
       world, player, physics, events: context.events,
       witnesses: (spot) => entities?.witnessesFor(spot) ?? [],
       ...(options.hasRequirement === undefined ? {} : { hasRequirement: options.hasRequirement }),
+      isInteractHeld: () => latestInput.interact === true,
+      ...(options.holdMode === undefined ? {} : { holdMode: options.holdMode }),
     });
     cleanup.push(() => interactions.dispose());
     cleanup.push(context.events.on('interaction:completed', (event) => {
@@ -115,6 +121,7 @@ export function createGameplayRuntime(context: ModuleContext, options: GameplayO
     const presentation = createEntityPresentation(context.engine.scene, entities);
     cleanup.push(() => presentation.dispose());
     let pendingInteraction = false;
+    let latestInput: PlayerInput = idleInput;
     const canvas = context.engine.renderer.domElement;
     const input = options.input ?? (options.attachControls === false ? null : createBrowserInput({
       element: canvas,
@@ -168,6 +175,7 @@ export function createGameplayRuntime(context: ModuleContext, options: GameplayO
       fixedUpdate(frame) {
         if (disposed) return;
         const requested = input?.read() ?? idleInput;
+        latestInput = player.controlsLocked ? idleInput : requested;
         if (awaitNeutralInput && requested.forward === 0 && requested.right === 0 && !requested.crouch && !requested.sprint) awaitNeutralInput = false;
         player.fixedUpdate(frame, player.controlsLocked || awaitNeutralInput ? idleInput : requested);
         if (player.controlsLocked) pendingInteraction = false;
@@ -186,6 +194,7 @@ export function createGameplayRuntime(context: ModuleContext, options: GameplayO
         hud?.update({
           locked: input?.locked ?? false, captured: snapshot.captured,
           hidden: snapshot.hiding.state !== 'outside', prompt: player.controlsLocked ? null : interactions.getPrompt(),
+          hold: interactions.getHold(),
         });
       },
       notify(message) { hud?.notify(message); },
@@ -194,6 +203,7 @@ export function createGameplayRuntime(context: ModuleContext, options: GameplayO
         if (errors.length) throw new AggregateError(errors, 'NIGHT WARD gameplay cleanup failed');
       },
     };
+    options.onRuntime?.(runtime);
     return runtime;
   } catch (error) {
     const errors = release();

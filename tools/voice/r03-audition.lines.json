@@ -1,0 +1,21 @@
+{
+  "set": "r03-audition",
+  "purpose": "NW-R03 pipeline check: five contrasting Sister Shaw states. TEMPORARY audio, never final performance.",
+  "lines": [
+    { "id": "shaw.r03.calm", "speaker": "Sister Shaw", "stage": "composure", "presentation": "intercom",
+      "text": "Night staff. The final round begins at three-seventeen. All patients will be in their beds.",
+      "settings": { "exaggeration": 0.35, "cfg_weight": 0.5, "temperature": 0.7, "seed": 1987 } },
+    { "id": "shaw.r03.suspicious", "speaker": "Sister Shaw", "stage": "suspicion", "presentation": "positional",
+      "text": "I know someone's been in here. The lamp's still warm.",
+      "settings": { "exaggeration": 0.45, "cfg_weight": 0.45, "temperature": 0.75, "seed": 1987 } },
+    { "id": "shaw.r03.pleading", "speaker": "Sister Shaw", "stage": "desperation", "presentation": "positional",
+      "text": "Your mother went through. Ruth went through, and I couldn't... Please, love. Come back to the ward.",
+      "settings": { "exaggeration": 0.65, "cfg_weight": 0.35, "temperature": 0.8, "seed": 1987 } },
+    { "id": "shaw.r03.shouting", "speaker": "Sister Shaw", "stage": "aggression", "presentation": "positional",
+      "text": "Stop! You are not going through those doors!",
+      "settings": { "exaggeration": 0.9, "cfg_weight": 0.3, "temperature": 0.8, "seed": 1987 } },
+    { "id": "shaw.r03.fear", "speaker": "Sister Shaw", "stage": "fear", "presentation": "positional",
+      "text": "Listen to me. Whatever you hear in there... don't answer it when it calls you.",
+      "settings": { "exaggeration": 0.3, "cfg_weight": 0.55, "temperature": 0.7, "seed": 1987 } }
+  ]
+}

@@ -75,6 +75,8 @@ export function createBrowserInput(options: BrowserInputOptions): BrowserInput {
         right: Number(pressed.has('KeyD')) - Number(pressed.has('KeyA')),
         sprint: pressed.has('ShiftLeft') || pressed.has('ShiftRight'),
         crouch: crouchToggled || pressed.has('ControlLeft') || pressed.has('ControlRight'),
+        // Only present while held, so the snapshot shape is unchanged for every other input.
+        ...(pressed.has('KeyE') ? { interact: true } : {}),
       };
     },
     dispose() {

@@ -10,3 +10,6 @@ test-results/
 playwright-report/
 src/world/dressing/pipeline/.work/
 **/__pycache__/
+
+# NW-R03: locally generated TEMPORARY voice audio (provenance not cleared for source control)
+public/voice-temp/

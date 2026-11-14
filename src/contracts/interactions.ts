@@ -5,6 +5,23 @@ export type InteractionType = 'door' | 'drawer' | 'cabinet' | 'locker' | 'bed' |
 export type InteractionAction = 'open' | 'close' | 'inspect' | 'enter-hiding' | 'exit-hiding';
 export type DoorState = 'closed' | 'opening' | 'open' | 'closing' | 'locked' | 'blocked';
 export type HidingState = 'outside' | 'entering' | 'hidden' | 'exiting';
+/** Noise an interaction makes (heard by entities through `player:noise`). `null` on a marker means silent. */
+export interface InteractionNoise {
+  readonly radius: number;
+  readonly intensity: number;
+}
+/**
+ * Hold-to-interact. The action completes after `seconds` of continuous holding while the player
+ * keeps looking at the target, stays in place and in range. Releasing, looking away or moving
+ * cancels it. A toggle mode (accessibility) replaces holding with press-to-start, press-to-cancel.
+ */
+export interface InteractionHold {
+  readonly seconds: number;
+  /** The player must be crouched (e.g. a hatch at floor level). */
+  readonly crouch?: boolean;
+  /** Verb shown in the prompt while holding ("Unscrewing…"). */
+  readonly progressLabel?: string;
+}
 export interface InteractionRequirement {
   readonly id: string;
   readonly description: string;
@@ -19,6 +36,10 @@ export interface InteractableMarker {
   readonly range: number;
   readonly requirements?: readonly InteractionRequirement[];
   readonly colliderIds?: readonly ObjectId[];
+  /** Hold-to-interact (inspect markers only). */
+  readonly hold?: InteractionHold;
+  /** Overrides the default interaction noise; `null` is silent. */
+  readonly noise?: InteractionNoise | null;
 }
 /** Door object origin is its hinge; visual transforms and physical colliders must move together. */
 export interface DoorMarker extends InteractableMarker {
@@ -54,7 +75,8 @@ export interface InteractionRequest {
   readonly action: InteractionAction;
 }
 export interface InteractionEvent extends InteractionRequest {
-  readonly outcome: 'completed' | 'blocked' | 'denied';
+  /** `cancelled`: a hold was released, interrupted or abandoned before completing. */
+  readonly outcome: 'completed' | 'blocked' | 'denied' | 'cancelled';
   readonly reason?: string;
   readonly position: Vec3;
 }

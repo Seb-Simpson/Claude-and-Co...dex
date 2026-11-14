@@ -23,10 +23,23 @@ export interface InteractionOptions {
   readonly events: GameEvents;
   readonly hasRequirement?: (id: string) => boolean;
   readonly witnesses?: (spot: HidingLocation) => readonly string[];
+  /** Whether the interact key is currently held (hold-to-interact). */
+  readonly isInteractHeld?: () => boolean;
+  /** 'hold' (default) or 'toggle' (accessibility: press to start, press again to cancel). */
+  readonly holdMode?: () => 'hold' | 'toggle';
+}
+export interface InteractionHoldState {
+  readonly targetId: string;
+  readonly progress: number;
+  readonly seconds: number;
+  readonly label: string;
+  readonly mode: 'hold' | 'toggle';
 }
 export interface InteractionSystem {
   readonly hiding: HidingSystem;
   getPrompt(): InteractionPrompt | null;
+  /** The hold in progress, if any (for HUD progress). */
+  getHold(): InteractionHoldState | null;
   interact(timeSeconds: number): void;
   fixedUpdate(frame: FrameContext): void;
   getDoorState(id: string): DoorState | undefined;
@@ -115,12 +128,21 @@ export function createInteractionSystem(options: InteractionOptions): Interactio
       ...request, outcome, ...(reason ? { reason } : {}), position: { ...player.getSnapshot().position },
     });
   }
-  function noise(timeSeconds: number): void {
+  function noise(timeSeconds: number, marker?: InteractableMarker): void {
+    if (marker?.noise === null) return;
     const snapshot = player.getSnapshot();
     events.emit('player:noise', {
       playerId: snapshot.id, position: { ...snapshot.position }, kind: 'interaction',
-      radius: 6, intensity: 0.5, timeSeconds,
+      radius: marker?.noise?.radius ?? 6, intensity: marker?.noise?.intensity ?? 0.5, timeSeconds,
     });
+  }
+  interface HoldRuntime { readonly request: InteractionRequest; readonly marker: InteractableMarker; readonly origin: Vector3; readonly mode: 'hold' | 'toggle'; elapsed: number }
+  let hold: HoldRuntime | null = null;
+  function cancelHold(reason: string): void {
+    if (!hold) return;
+    const ended = hold;
+    hold = null;
+    emitResult(ended.request, 'cancelled', reason);
   }
   function occupiedDoor(door: DoorRuntime): boolean {
     const snapshot = player.getSnapshot();
@@ -173,6 +195,9 @@ export function createInteractionSystem(options: InteractionOptions): Interactio
       text = action === 'open' ? 'Open door' : 'Close door';
       if (door.state === 'locked') reason = 'Locked';
       else if (occupiedDoor(door)) reason = 'Hiding place occupied';
+    } else if (marker.hold) {
+      text = hold?.marker === marker ? `${marker.hold.progressLabel ?? marker.prompt}…` : marker.prompt;
+      if (!reason && marker.hold.crouch && !player.getSnapshot().crouching) reason = 'Crouch to reach it';
     } else if (marker.type === 'locker' || marker.type === 'bed') {
       action = 'enter-hiding';
       text = marker.type === 'bed' ? 'Hide under bed' : 'Hide in locker';
@@ -223,6 +248,12 @@ export function createInteractionSystem(options: InteractionOptions): Interactio
       return;
     }
     const door = doors.get(request.targetId);
+    const marker = world.interactables.find((candidate) => candidate.id === request.targetId);
+    if (!door && marker?.hold && request.action === 'inspect') {
+      if (hold) return; // one hold at a time; toggle-cancel is handled by interact()
+      hold = { request, marker, origin: vector(player.getSnapshot().position), mode: options.holdMode?.() ?? 'hold', elapsed: 0 };
+      return;
+    }
     if (door) {
       if (door.pending) emitResult(door.pending, 'blocked', 'Door movement reversed');
       door.pending = request;
@@ -231,7 +262,24 @@ export function createInteractionSystem(options: InteractionOptions): Interactio
       noise(timeSeconds);
     } else {
       emitResult(request, 'completed');
-      noise(timeSeconds);
+      noise(timeSeconds, marker);
+    }
+  }
+  function updateHold(frame: FrameContext): void {
+    if (!hold) return;
+    const snapshot = player.getSnapshot();
+    if (snapshot.captured || snapshot.hiding.state !== 'outside' || player.controlsLocked) { cancelHold('Interrupted'); return; }
+    if (hold.mode === 'hold' && !(options.isInteractHeld?.() ?? false)) { cancelHold('Released'); return; }
+    if (vector(snapshot.position).distanceTo(hold.origin) > 0.35) { cancelHold('Moved away'); return; }
+    const prompt = getPrompt();
+    if (!prompt || prompt.targetId !== hold.marker.id) { cancelHold('Looked away'); return; }
+    if (!prompt.available) { cancelHold(prompt.reason ?? 'Unavailable'); return; }
+    hold.elapsed += Math.max(0, frame.deltaSeconds);
+    if (hold.elapsed + 1e-9 >= hold.marker.hold!.seconds) {
+      const done = hold;
+      hold = null;
+      emitResult(done.request, 'completed');
+      noise(frame.elapsedSeconds, done.marker);
     }
   }
 
@@ -258,7 +306,13 @@ export function createInteractionSystem(options: InteractionOptions): Interactio
   return {
     hiding,
     getPrompt,
+    getHold() {
+      if (!hold) return null;
+      return { targetId: hold.marker.id, progress: Math.min(1, hold.elapsed / hold.marker.hold!.seconds), seconds: hold.marker.hold!.seconds,
+        label: hold.marker.hold!.progressLabel ?? hold.marker.prompt, mode: hold.mode };
+    },
     interact(timeSeconds) {
+      if (hold) { if (hold.mode === 'toggle') cancelHold('Cancelled'); return; }
       const prompt = getPrompt();
       if (prompt) execute({ playerId: player.getSnapshot().id, targetId: prompt.targetId, action: prompt.action }, timeSeconds);
     },
@@ -266,6 +320,7 @@ export function createInteractionSystem(options: InteractionOptions): Interactio
       if (disposed) return;
       hiding.fixedUpdate(frame);
       for (const request of requests.splice(0, 8)) execute(request, frame.elapsedSeconds);
+      updateHold(frame);
       const concealment = player.getSnapshot().hiding;
       for (const hinge of lockerHinges) {
         const passingDoor = concealment.spotId === hinge.spotId && (concealment.state === 'entering' || concealment.state === 'exiting');
@@ -331,6 +386,7 @@ export function createInteractionSystem(options: InteractionOptions): Interactio
     dispose() {
       if (disposed) return;
       disposed = true;
+      hold = null;
       unsubscribe();
       requests.length = 0;
       hiding.dispose();

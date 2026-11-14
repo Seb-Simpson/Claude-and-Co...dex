@@ -1,0 +1,48 @@
+{
+ "final": {
+  "beats": [
+   "woke",
+   "left-room-104",
+   "lights-out-survived",
+   "stores-entered",
+   "stores-encounter-resolved",
+   "crawlway-exited",
+   "keys-taken",
+   "plant2-opened",
+   "valve-closed",
+   "link-evidence-seen",
+   "bulkhead-unlocked",
+   "bulkhead-opened"
+  ],
+  "knowledge": [
+   "link-closure-order"
+  ],
+  "items": [
+   "shaw-keys"
+  ],
+  "flags": [],
+  "suspicion": 0,
+  "encounters": {
+   "E1": "completed",
+   "E2": "completed",
+   "E3": "completed",
+   "E4": "completed",
+   "E5": "completed",
+   "E6": "active"
+  },
+  "linesPlayed": [
+   "shaw.r03.reaction"
+  ],
+  "objective": "escape",
+  "objectiveText": "Get away from Sister Shaw. Get to the North Wing.",
+  "restoredFrom": "checkpoint",
+  "checkpoint": "CP7",
+  "activeLine": null
+ },
+ "log": [
+  {
+   "step": "voice",
+   "caption": "Sister Shaw (temp voice): [intercom] Your mother went through. Ruth went through, and I couldn't... Please, love. Come back to the ward."
+  }
+ ]
+}

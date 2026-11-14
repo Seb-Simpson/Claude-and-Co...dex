@@ -119,6 +119,8 @@ export function createFrontend(options: FrontendOptions): Frontend {
   let subtitleTimer = 0;
   const onSubtitle = (event: Event): void => {
     const line = (event as CustomEvent<SubtitleLine>).detail;
+    // An empty line clears the caption (a voice line finished or was interrupted).
+    if (line && !line.text) { window.clearTimeout(subtitleTimer); subtitle.hidden = true; return; }
     if (!settings.get().subtitles || !line?.text) return;
     subtitle.replaceChildren(...(line.speaker ? [el('span', { class: 'nw-subtitles__speaker', text: `${line.speaker}: ` })] : []), line.text);
     subtitle.hidden = false;

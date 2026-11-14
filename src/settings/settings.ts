@@ -13,11 +13,17 @@ export interface Settings {
   readonly masterVolume: number;
   readonly musicVolume: number;
   readonly sfxVolume: number;
+  /** Dialogue (character voices, intercom, telephone). */
+  readonly voiceVolume: number;
   /** Multiplier on the gameplay look sensitivity, 0.25..3. */
   readonly mouseSensitivity: number;
   readonly invertY: boolean;
   readonly quality: QualityPreset;
   readonly subtitles: boolean;
+  /** Prefix captions with where a voice comes from ("behind", "left"). */
+  readonly directionalCaptions: boolean;
+  /** 'toggle' replaces press-and-hold interactions with press to start, press to stop. */
+  readonly holdInteractions: 'hold' | 'toggle';
   readonly motion: MotionPreference;
   /** Strength of screen effects (grain, vignette pulses, flashes), 0..1. */
   readonly effects: number;
@@ -27,10 +33,13 @@ export const DEFAULT_SETTINGS: Readonly<Settings> = Object.freeze({
   masterVolume: 0.8,
   musicVolume: 0.7,
   sfxVolume: 0.9,
+  voiceVolume: 0.9,
   mouseSensitivity: 1,
   invertY: false,
   quality: 'high',
   subtitles: true,
+  directionalCaptions: false,
+  holdInteractions: 'hold',
   motion: 'system',
   effects: 1,
 });
@@ -55,10 +64,13 @@ export function sanitizeSettings(raw: unknown): Settings {
     masterVolume: clamp(r.masterVolume, 0, 1, d.masterVolume),
     musicVolume: clamp(r.musicVolume, 0, 1, d.musicVolume),
     sfxVolume: clamp(r.sfxVolume, 0, 1, d.sfxVolume),
+    voiceVolume: clamp(r.voiceVolume, 0, 1, d.voiceVolume),
     mouseSensitivity: clamp(r.mouseSensitivity, 0.25, 3, d.mouseSensitivity),
     invertY: typeof r.invertY === 'boolean' ? r.invertY : d.invertY,
     quality: oneOf(r.quality, ['low', 'medium', 'high', 'ultra'], d.quality),
     subtitles: typeof r.subtitles === 'boolean' ? r.subtitles : d.subtitles,
+    directionalCaptions: typeof r.directionalCaptions === 'boolean' ? r.directionalCaptions : d.directionalCaptions,
+    holdInteractions: oneOf(r.holdInteractions, ['hold', 'toggle'], d.holdInteractions),
     motion: oneOf(r.motion, ['system', 'reduce', 'full'], d.motion),
     effects: clamp(r.effects, 0, 1, d.effects),
   };

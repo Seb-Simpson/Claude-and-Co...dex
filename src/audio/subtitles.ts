@@ -9,6 +9,9 @@ export interface SubtitleLine {
   readonly seconds?: number;
 }
 
+/** Clears the current caption (a voice line ended or was interrupted). */
+export const CLEAR_SUBTITLE: SubtitleLine = Object.freeze({ text: '' });
+
 export const SUBTITLE_EVENT = 'night-ward:subtitle';
 
 export function emitSubtitle(line: SubtitleLine): void {

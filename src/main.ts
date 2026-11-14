@@ -2,6 +2,7 @@ import './style.css';
 import { createFrontend, type Frontend } from './frontend/frontend';
 import { discoverModules } from './integration';
 import { createApplication } from './integration/application';
+import type { GameplayRuntime } from './gameplay/runtime';
 import { settings } from './settings/settings';
 import { createGreyboxModule, createGreyboxProgress, greyboxInspectionText, type GreyboxApi } from './world/greybox/greyboxModule';
 
@@ -14,12 +15,18 @@ const testMode = params.get('test') === '1';
 // NW-R02: `?level=greybox` runs the Chapter 1 architectural greybox (world + gameplay modules only;
 // no atmosphere, horror or entities). The default game is unchanged.
 const greybox = params.get('level') === 'greybox';
+// NW-R03: Chapter 1 foundations demo inside the greybox (`?level=greybox&r03=1`).
+const r03 = greybox && params.get('r03') === '1';
+let gameplayRuntime: GameplayRuntime | null = null;
 const progress = createGreyboxProgress();
 const discovered = discoverModules();
 const modules = greybox
   ? [createGreyboxModule({
     progress,
     teleport: (position, yaw) => application.teleport(position, yaw),
+    r03,
+    notify: (message) => gameplayRuntime?.notify(message),
+    directionalCaptions: () => settings.get().directionalCaptions,
     onReady: (api) => { if (testMode) (window as Window & { nightWardGreybox?: GreyboxApi }).nightWardGreybox = api; },
   }), ...discovered.filter((module) => module.kind === 'gameplay')]
   : discovered;
@@ -27,7 +34,11 @@ const modules = greybox
 let frontend: Frontend | null = null;
 const application = createApplication({
   container, modules,
-  ...(greybox ? { gameplayOptions: { activeEntityTypes: [], hasRequirement: (id: string) => progress.has(id), inspectionText: greyboxInspectionText } } : {}),
+  ...(greybox ? { gameplayOptions: {
+    activeEntityTypes: [], hasRequirement: (id: string) => progress.has(id), inspectionText: greyboxInspectionText,
+    holdMode: () => settings.get().holdInteractions,
+    onRuntime: (runtime: GameplayRuntime) => { gameplayRuntime = runtime; },
+  } } : {}),
   onStatus: (message, isError) => frontend?.onStatus(message, isError),
   onState: (state) => frontend?.onState(state),
   onProgress: (progress) => frontend?.onProgress(progress),

@@ -2,8 +2,11 @@
  * Builds the NW-R02 greybox as a standard HospitalWorld (floors, walls, ceilings, doors, colliders,
  * hiding, temporary progression controls, labels) from the data in level.ts.
  */
-import { AmbientLight, Color, HemisphereLight, Matrix4 } from 'three';
-import type { HospitalWorld, InteractableMarker, ObjectId, SpawnPoseForExit } from '../../contracts';
+import { AmbientLight, BoxGeometry, Color, HemisphereLight, Matrix4, Vector3 } from 'three';
+import type { DoorMarker, HospitalWorld, InteractableMarker, ObjectId, SpawnPoseForExit } from '../../contracts';
+import { deviceInteractableId, deviceRequirements } from '../../chapter1/devices';
+import type { DevicePlacement } from '../../chapter1/r03Demo';
+import { yawQuaternion } from '../core/geometry';
 import { door } from '../architecture';
 import { WorldBuilder } from '../core/builder';
 import type { MaterialKey } from '../core/materials';
@@ -132,7 +135,7 @@ function sideOf(layout: GreyboxLayout, connection: ConnectionDef, spaceId: strin
   return probe?.id === spaceId ? 'pos' : 'neg';
 }
 
-function buildConnections(b: WorldBuilder, layout: GreyboxLayout): void {
+function buildConnections(b: WorldBuilder, layout: GreyboxLayout, r03?: GreyboxR03Options): void {
   for (const connection of CONNECTIONS) {
     if (connection.kind === 'door' && connection.door) {
       const spec = connection.door;
@@ -147,7 +150,8 @@ function buildConnections(b: WorldBuilder, layout: GreyboxLayout): void {
       for (const leaf of leaves) {
         door(b, {
           name: leaf.name, roomId: roomIdOf(into), axis: connection.axis, at: connection.at, center: leaf.center, opening: leaf.opening,
-          hinge: leaf.hinge, swing, initial: spec.initial, vision: spec.vision ?? 'narrow',
+          hinge: leaf.hinge, swing, vision: spec.vision ?? 'narrow',
+          initial: spec.initial !== 'locked' && r03?.openDoors.has(`nw:door:${leaf.name}`) ? 'open' : spec.initial,
           ...(spec.requires ? { requirements: [{ id: spec.requires, description: spec.requiresText ?? `Requires ${spec.requires}` }] } : {}),
           ...(spec.prompt ? { prompt: spec.prompt } : {}),
           leafTint: spec.requires ? 0.75 : spec.initial === 'locked' ? 0.55 : 1,
@@ -191,8 +195,9 @@ function bedExits(layout: GreyboxLayout, space: string, x: number, z: number, ya
   return exits;
 }
 
-function buildFeatures(b: WorldBuilder, layout: GreyboxLayout, controls: GreyboxControl[], hiding: Map<string, string>): void {
+function buildFeatures(b: WorldBuilder, layout: GreyboxLayout, controls: GreyboxControl[], hiding: Map<string, string>, skip: readonly string[]): void {
   for (const feature of FEATURES as readonly FeatureDef[]) {
+    if (skip.includes(feature.id)) continue;
     const roomId = roomIdOf(feature.space);
     if (layout.spaceAt(feature.x, feature.z)?.id !== feature.space) throw new Error(`Feature "${feature.id}" is not inside ${feature.space}`);
     switch (feature.kind) {
@@ -259,7 +264,85 @@ function buildFeatures(b: WorldBuilder, layout: GreyboxLayout, controls: Greybox
   }
 }
 
-export function createGreyboxWorld(options: { textures?: boolean } = {}): GreyboxWorldBuild {
+/** NW-R03 additions (only in `?level=greybox&r03=1`; the R02 greybox is unchanged without them). */
+export interface GreyboxR03Options {
+  readonly devices: readonly DevicePlacement[];
+  /** Door leaf ids to build already open (restored from a checkpoint). */
+  readonly openDoors: ReadonlySet<string>;
+  /** R02 developer flag posts to leave out (replaced by real devices). */
+  readonly skipControls: readonly string[];
+  readonly spawn?: { readonly x: number; readonly z: number; readonly yaw: number };
+  /** Requirement id for the crawlway hatch cover (built only in R03 mode). */
+  readonly hatchRequirement?: { readonly id: string; readonly description: string };
+}
+
+/** R03 devices: real interactables (hold, noise, requirements) with simple readable shapes. */
+function buildDevices(b: WorldBuilder, layout: GreyboxLayout, devices: readonly DevicePlacement[]): void {
+  for (const placement of devices) {
+    const { device, x, y, z } = placement;
+    if (layout.spaceAt(x, z)?.id !== placement.space) throw new Error(`Device "${device.id}" is not inside ${placement.space}`);
+    const id = deviceInteractableId(device.id);
+    switch (placement.look) {
+      case 'valve': case 'wrong-valve':
+        b.block('pipe', x, y, z, 0.12, 2 * y, 0.12, 0, { shade: 'flat' });
+        b.block(placement.look === 'valve' ? 'redPaint' : 'cabinetBlue', x, y, z + 0.08, 0.42, 0.42, 0.05, 0, { shade: 'flat' });
+        if (placement.look === 'valve') b.block('chrome', x, y, z + 0.11, 0.44, 0.06, 0.02, 0, { shade: 'flat' });
+        break;
+      case 'document':
+        b.block('steel', x, 0.45, z, 0.6, 0.9, 1.6, 0, { tint: 0.7 });
+        b.block('paper', x, y, z + 0.1, 0.21, 0.3, 0.01, 0, { shade: 'flat' });
+        break;
+      case 'padlock':
+        b.block('yellowPaint', x, y, z, 0.12, 0.14, 0.08, 0, { shade: 'flat' });
+        b.block('steel', x, y + 0.11, z, 0.09, 0.08, 0.02, 0, { shade: 'flat' });
+        break;
+      case 'crank':
+        b.block('steel', x, y, z, 0.08, 0.08, 0.5, 0, { shade: 'flat' });
+        b.block('black', x, y, z + 0.25, 0.3, 0.06, 0.06, 0, { shade: 'flat' });
+        break;
+    }
+    const object = proxy(b, id, { x, z, yaw: 0 }, [0.5, 0.5, 0.5], y);
+    const marker: InteractableMarker = {
+      id, type: 'inspect', object, prompt: device.prompt, range: 2.4,
+      requirements: deviceRequirements(device),
+      ...(device.hold ? { hold: device.hold } : {}),
+      ...(device.noise !== undefined ? { noise: device.noise } : {}),
+    };
+    b.interactables.push(marker);
+  }
+}
+
+/** R03: a hinged cover in the crawlway hatch (0.9 × 1.15 m), locked by its wing nuts. */
+function buildHatchCover(b: WorldBuilder, requirement: { id: string; description: string }, openDoors: ReadonlySet<string>): void {
+  const connection = CONNECTIONS.find((c) => c.id === 'hatch')!;
+  const id = 'nw:door:gb-r03-hatch';
+  const width = connection.width - 0.16, height = 1.08, thick = 0.04;
+  const hinge = new Vector3(connection.at, 0.02, connection.center - connection.width / 2 + 0.08);
+  const closedYaw = -Math.PI / 2;
+  const openYaw = 0; // swings into the crawlway (+x)
+  const group = b.mergedObject([
+    { material: 'steel', geometry: new BoxGeometry(width, height, thick), matrix: new Matrix4().makeTranslation(width / 2, height / 2, 0), options: { tint: 0.75 } },
+    { material: 'yellowPaint', geometry: new BoxGeometry(width - 0.1, 0.06, thick + 0.01), matrix: new Matrix4().makeTranslation(width / 2, height - 0.12, 0), options: { shade: 'flat' } },
+  ], id);
+  const open = openDoors.has(id);
+  group.position.copy(hinge);
+  group.rotation.set(0, open ? openYaw : closedYaw, 0);
+  b.attach(group);
+  const yaw = open ? openYaw : closedYaw;
+  const center = new Vector3(width / 2, height / 2, 0).applyAxisAngle(new Vector3(0, 1, 0), yaw).add(hinge);
+  const colliderId = b.solid(center.x, center.y, center.z, width, height, thick + 0.01, { yaw, scope: 'door', kind: 'gb-r03-hatch', bodyType: 'kinematic', interactableId: id });
+  const marker: DoorMarker = {
+    id, type: 'door', object: group, prompt: 'Open the hatch', range: 2.0, colliderIds: [colliderId],
+    initialState: open ? 'open' : 'closed',
+    closedPose: { position: { x: hinge.x, y: hinge.y, z: hinge.z }, rotation: yawQuaternion(closedYaw) },
+    openPose: { position: { x: hinge.x, y: hinge.y, z: hinge.z }, rotation: yawQuaternion(openYaw) },
+    durationSeconds: 0.8, requirements: [requirement],
+  };
+  b.interactables.push(marker);
+  b.doors.push(marker);
+}
+
+export function createGreyboxWorld(options: { textures?: boolean; r03?: GreyboxR03Options } = {}): GreyboxWorldBuild {
   const layout = buildLayout();
   const b = new WorldBuilder(0x6772, { ...(options.textures === undefined ? {} : { textures: options.textures }) });
   b.root.name = 'nw:greybox';
@@ -268,8 +351,10 @@ export function createGreyboxWorld(options: { textures?: boolean } = {}): Greybo
   try {
     buildSpaces(b);
     buildWalls(b, layout);
-    buildConnections(b, layout);
-    buildFeatures(b, layout, controls, hiding);
+    buildConnections(b, layout, options.r03);
+    buildFeatures(b, layout, controls, hiding, options.r03?.skipControls ?? []);
+    if (options.r03) buildDevices(b, layout, options.r03.devices);
+    if (options.r03?.hatchRequirement) buildHatchCover(b, options.r03.hatchRequirement, options.r03.openDoors);
     // Neutral greybox lighting only (no production lighting).
     const hemi = new HemisphereLight(0xf4f2ea, 0x55524a, 2.2);
     hemi.name = 'nw:greybox:hemisphere';
@@ -297,7 +382,9 @@ export function createGreyboxWorld(options: { textures?: boolean } = {}): Greybo
     hidingLocations: b.hidingLocations,
     entitySpawns: [],
     patrolRoutes: [],
-    playerSpawn: { position: { x: SPAWN.x, y: 0, z: SPAWN.z }, yaw: SPAWN.yaw },
+    playerSpawn: options.r03?.spawn
+      ? { position: { x: options.r03.spawn.x, y: 0, z: options.r03.spawn.z }, yaw: options.r03.spawn.yaw }
+      : { position: { x: SPAWN.x, y: 0, z: SPAWN.z }, yaw: SPAWN.yaw },
   };
   b.root.updateMatrixWorld(true);
   let disposed = false;
