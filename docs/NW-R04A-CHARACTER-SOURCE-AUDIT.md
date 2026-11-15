@@ -1,6 +1,75 @@
-# NIGHT WARD — NW-R04A: Nurse Shaw character source audit (Phase 0)
+# NIGHT WARD — NW-R04A: Nurse Shaw character source audit
 
-**Result: BLOCKED at Phase 0.** No approved visual reference exists, and the written design is incomplete and contradictory on points that decide the model (face, uniform colour, height, footwear). The brief says: *"If the approved reference images or design specifications cannot be recovered, STOP and report exactly what is missing. Do not substitute your own generic nurse design."* I have stopped. **No modelling has been done.**
+**Status: UNBLOCKED.** The user recovered the approved character sheet, which is now the authoritative visual reference:
+
+**`docs/nw-r04a/references/nurse-shaw-approved.jpg`**
+- 1774 × 887;
+- "NURSE SHAW — CHARACTER TURNAROUND";
+- front 3/4, front, side, back 3/4, back;
+- face, torso and hand close-ups;
+- five material swatches;
+- a height silhouette.
+
+## 0. Precedence rules
+
+1. **Appearance:** the approved image governs everything visual: body, proportions, clothing, materials, silhouette and posture. Where an older written description contradicts it, **the image wins** (see §0.3).
+2. **Personality and narrative:** **NW-R02B** (`docs/NW-R02B-GAMEPLAY-NARRATIVE-DESIGN.md` §2) stays authoritative: who she is, her motivation, fear and behaviour. Her look doesn't change that.
+3. **No redesign.** The model reproduces the sheet. Nothing is "improved", normalised or reinterpreted, and she isn't replaced with a realistic, normally proportioned nurse.
+
+### 0.1 What the approved image shows (recorded from the crops)
+
+| Area | Approved design |
+|---|---|
+| **Height** | **≈ 1.9 m (6′3″)**, stated on the sheet's height silhouette, to the top of the cap |
+| **Build and proportions** | Tall and **unnaturally thin**. Narrow shoulders, waist and hips. Long neck. **Elongated arms** whose hands hang to mid-thigh. **Very long, bony fingers.** Thin legs in dark stockings. |
+| **Posture** | Upright but slightly stooped. **Head tilted to her right and dropped forward**, an unsettling listening tilt. Arms hanging loose at her sides, fingers slightly curled, feet together. |
+| **Face** | **Completely obscured.** An asymmetrical covering of overlapping horizontal canvas/bandage strips with stitched edges and an **off-centre vertical seam**, fastened with small metal pins or studs. Grimy edges, a **blood streak** from the brow down the left of centre, drips. No features show through. An ear is visible at the side. |
+| **Hair** | **Dark, dishevelled**, roughly shoulder length. Wet-looking strands fall over the mask and at the sides. |
+| **Cap** | **Traditional folded nurse's cap**, off-white, **burgundy stripe** along the front band. Wedge-shaped in profile, upturned front edge, sitting back on the head. Stained. |
+| **Uniform dress** | **Burgundy, short-sleeved**, with turned-up cuffs, a pointed shirt collar, a button placket at the neck. Blood-darkened in patches. |
+| **Apron dress** | **Weathered off-white**, full length over the dress:<br>• bib with **two columns of about four buttons** plus corner buttons;<br>• wide shoulder straps crossing to a **V at the back**;<br>• **burgundy belt** at the waist;<br>• **large bow at the back** with long tails ending in torn points;<br>• a full skirt to mid-calf with a **jagged, torn hem**;<br>• a dark, torn underlayer visible below it;<br>• heavy **blood spatter and grime**, densest on the skirt front and hem. |
+| **Materials and condition** | **Frayed edges and distressed materials** throughout: torn hems and tails, stained cotton, blood (fresh red to dried brown), dirt. Sheet swatches: off-white cotton; burgundy; dark brown/black; blood-stained fabric; stained skin. |
+| **Arms and hands** | Pale, thin arms streaked with blood, increasing toward the hands. **Hands blood-red to the wrist**, with visible tendons and knuckles, long thin fingers, **dark pointed nails/claws**. |
+| **Legs and feet** | **Dark stockings** with stains. **Mary-Jane shoes** in burgundy-brown leather: ankle strap with a buckle, rounded toe, low block heel. |
+| **Silhouette** | A very tall, narrow vertical: small cap wedge, narrow shoulders, long hanging arms clear of the skirt, a full skirt flaring to the jagged hem, thin dark legs. **The bow's loops and tails break the back silhouette.** |
+
+### 0.2 Must be faithfully preserved
+
+These are the user's resume brief, item by item:
+- ≈1.9 m height;
+- tall, unnaturally thin body;
+- elongated arms and fingers;
+- completely obscured, asymmetrical fabric-covered face;
+- dark dishevelled hair;
+- traditional nurse's cap;
+- burgundy short-sleeved uniform;
+- weathered off-white apron dress;
+- frayed edges and distressed materials;
+- unsettling head tilt and posture;
+- the original silhouette.
+
+### 0.3 Earlier contradictions (§3 below), now resolved by the image
+
+| # | Resolution |
+|---|---|
+| C1 Height | **1.9 m, unnaturally thin, elongated limbs** (image). The R02B "not a monster" note stays a *personality* direction: she's a frightened human. Her *appearance* follows the sheet. |
+| C2 Uniform colour | **Burgundy** dress, off-white apron and cap with a burgundy stripe. Not navy or white. |
+| C3 Footwear | **Mary-Jane shoes with a low block heel** (supports the NW-007B "heels on vinyl" sound cue) |
+| C4 Apron and stockings | **Both present** (apron dress, dark stockings) |
+| C5 Posture | **Arms hanging, head tilted and dropped.** Not hands clasped. |
+| C6 Name | Unchanged: R01/R02B **Sister Margaret Shaw**. No name badge is visible on the sheet. |
+| C7 Skin | Pale and stained on the arms; blood-red hands. Face not visible. |
+| "Bandaged eyes" (S1–S5) | Superseded visually by the **full stitched fabric face covering**. The narrative's "unexplained covering" still holds. |
+| Cape, fob watch, key ring (S5) | **Not on the sheet**, so not modelled. They stay narrative or audio props (e.g. the key ring sound cue) until the user decides otherwise. |
+
+Production record: `docs/NW-R04A-NURSE-SHAW-PRODUCTION.md`.
+
+---
+
+## Historical record: Phase 0 audit (before the reference was recovered)
+
+
+**Result at the time: BLOCKED at Phase 0.** No approved visual reference exists, and the written design is incomplete and contradictory on points that decide the model (face, uniform colour, height, footwear). The brief says: *"If the approved reference images or design specifications cannot be recovered, STOP and report exactly what is missing. Do not substitute your own generic nurse design."* I have stopped. **No modelling has been done.**
 
 | | |
 |---|---|
@@ -10,7 +79,7 @@
 
 ---
 
-## 1. Sources found
+### 1. Sources found
 
 | # | Source (branch: path) | What it is | Status as a design source |
 |---|---|---|---|
@@ -27,7 +96,7 @@
 
 **Not found anywhere:** concept art, a mood board, a reference photo set, a character sheet (front/side/back), a face description, a colour palette, or any message or document recording a visual approval.
 
-## 2. Confirmed design decisions
+### 2. Confirmed design decisions
 
 These are consistent across the sources. Each source cited is a design document, not just the previous model.
 
@@ -47,7 +116,7 @@ These are consistent across the sources. Each source cited is a design document,
 | **A psychologically coherent, frightened human, not a monster**; becomes visibly terrified at the North Wing | S5 §2, locked by the NW-R03 brief |
 | Pushes a **trolley** on her round; walks about 0.9 m/s; rarely runs until stage 4 | S5 |
 
-## 3. Contradictions that need a decision
+### 3. Contradictions that need a decision
 
 | # | Topic | Conflict | Why it matters for the model |
 |---|---|---|---|
@@ -59,7 +128,7 @@ These are consistent across the sources. Each source cited is a design document,
 | C6 | **Name** | S8 "Evelyn" vs S4/S5 "Margaret" | Name badge text |
 | C7 | **Skin** | S6 "pale, waxy" was a **render fix** for the old model's dark face, not a design choice. No skin tone or complexion is specified. | Skin material |
 
-## 4. Missing: needed before modelling
+### 4. Missing: needed before modelling
 
 1. **A visual reference.** Concept art, or a reference board you approve: face, full body, palette.
 2. **Facial identity.** Face shape, features, complexion, the age detail at 58, and **hair colour and style** (S2 used a bun under the cap).
@@ -79,7 +148,7 @@ These are consistent across the sources. Each source cited is a design document,
 6. **Supernatural characteristics.** Is anything about her body unnatural, apart from the unexplained bandage? The approved direction (S5) suggests no, but S1 says yes.
 7. **Hands.** Gloves? Rings? A watch?
 
-## 5. Why the previous model was inadequate
+### 5. Why the previous model was inadequate
 
 Evidence: `docs/nw-r04a/previous-model-head-nw007b.jpg` and `previous-model-loading-render.jpg`.
 
@@ -94,7 +163,7 @@ Evidence: `docs/nw-r04a/previous-model-head-nw007b.jpg` and `previous-model-load
 
 The pipeline was technically sound (export, skinning, tests passed). The **modelling method** was the cause. A new model must not repeat it.
 
-## 6. Phase 1 preview: tooling found in this environment
+### 6. Phase 1 preview: tooling found in this environment
 
 This is a preliminary check only. No workflow was chosen or installed.
 
@@ -114,7 +183,7 @@ This is a preliminary check only. No workflow was chosen or installed.
   2. a licensed commercial base character with redistribution rights for a web game;
   3. a hybrid: the MPFB2 base plus an artist pass on the head and costume only.
 
-## 7. Questions for approval
+### 7. Questions for approval
 
 1. **A visual reference.** Do you have the concept images or references from the earlier approval? If so, where (a file, a chat, another repository)? If none exists, should I prepare a **reference proposal** for you to approve before modelling? That would be a written spec plus clearly labelled reference sketches or renders; no AI concept art would be presented as evidence.
 2. **Height and proportions (C1):** a realistic woman of about 1.63–1.68 m, as the R02B direction implies, or the original 1.9 m?

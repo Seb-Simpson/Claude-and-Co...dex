@@ -4,6 +4,7 @@ import { discoverModules } from './integration';
 import { createApplication } from './integration/application';
 import type { GameplayRuntime } from './gameplay/runtime';
 import { settings } from './settings/settings';
+import { createShawPreviewModule, type ShawPreviewApi } from './characters/shaw/preview';
 import { createGreyboxModule, createGreyboxProgress, greyboxInspectionText, type GreyboxApi } from './world/greybox/greyboxModule';
 
 const container = document.querySelector<HTMLElement>('#app');
@@ -17,6 +18,9 @@ const testMode = params.get('test') === '1';
 const greybox = params.get('level') === 'greybox';
 // NW-R03: Chapter 1 foundations demo inside the greybox (`?level=greybox&r03=1`).
 const r03 = greybox && params.get('r03') === '1';
+// NW-R04A: `?preview=shaw` adds the static Nurse Shaw model to the real ward for visual review
+// (camera presets, ward/studio lighting; no entities). The default game never loads it.
+const shawPreview = !greybox && params.get('preview') === 'shaw';
 let gameplayRuntime: GameplayRuntime | null = null;
 const progress = createGreyboxProgress();
 const discovered = discoverModules();
@@ -29,7 +33,11 @@ const modules = greybox
     directionalCaptions: () => settings.get().directionalCaptions,
     onReady: (api) => { if (testMode) (window as Window & { nightWardGreybox?: GreyboxApi }).nightWardGreybox = api; },
   }), ...discovered.filter((module) => module.kind === 'gameplay')]
-  : discovered;
+  : shawPreview
+    ? [...discovered, createShawPreviewModule({
+      onReady: (api) => { (window as Window & { nightWardShawPreview?: ShawPreviewApi }).nightWardShawPreview = api; },
+    })]
+    : discovered;
 // One application (one engine, one loop); the frontend drives its lifecycle and never boots its own.
 let frontend: Frontend | null = null;
 const application = createApplication({
@@ -38,7 +46,7 @@ const application = createApplication({
     activeEntityTypes: [], hasRequirement: (id: string) => progress.has(id), inspectionText: greyboxInspectionText,
     holdMode: () => settings.get().holdInteractions,
     onRuntime: (runtime: GameplayRuntime) => { gameplayRuntime = runtime; },
-  } } : {}),
+  } } : shawPreview ? { gameplayOptions: { activeEntityTypes: [] } } : {}),
   onStatus: (message, isError) => frontend?.onStatus(message, isError),
   onState: (state) => frontend?.onState(state),
   onProgress: (progress) => frontend?.onProgress(progress),

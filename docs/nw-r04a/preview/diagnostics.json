@@ -1,0 +1,128 @@
+{
+  "diagnostics": {
+    "ready": true,
+    "error": null,
+    "loadMs": 232.40000000037253,
+    "triangles": 71036,
+    "meshes": 12,
+    "materials": 12,
+    "textures": 21,
+    "heightMetres": 1.899999976158142,
+    "view": "front",
+    "lighting": "ward"
+  },
+  "frames": [
+    {
+      "lighting": "studio",
+      "view": "front",
+      "calls": 13,
+      "triangles": 71996,
+      "frameDeltaMaxMs": 100
+    },
+    {
+      "lighting": "studio",
+      "view": "front34",
+      "calls": 13,
+      "triangles": 71996,
+      "frameDeltaMaxMs": 100
+    },
+    {
+      "lighting": "studio",
+      "view": "side",
+      "calls": 13,
+      "triangles": 71996,
+      "frameDeltaMaxMs": 100
+    },
+    {
+      "lighting": "studio",
+      "view": "back34",
+      "calls": 13,
+      "triangles": 71996,
+      "frameDeltaMaxMs": 100
+    },
+    {
+      "lighting": "studio",
+      "view": "back",
+      "calls": 13,
+      "triangles": 71996,
+      "frameDeltaMaxMs": 100
+    },
+    {
+      "lighting": "studio",
+      "view": "face",
+      "calls": 9,
+      "triangles": 55984,
+      "frameDeltaMaxMs": 100
+    },
+    {
+      "lighting": "studio",
+      "view": "hands",
+      "calls": 7,
+      "triangles": 50344,
+      "frameDeltaMaxMs": 100
+    },
+    {
+      "lighting": "ward",
+      "view": "front",
+      "calls": 158,
+      "triangles": 162826,
+      "frameDeltaMaxMs": 100
+    },
+    {
+      "lighting": "ward",
+      "view": "front34",
+      "calls": 158,
+      "triangles": 162826,
+      "frameDeltaMaxMs": 100
+    },
+    {
+      "lighting": "ward",
+      "view": "side",
+      "calls": 131,
+      "triangles": 159432,
+      "frameDeltaMaxMs": 100
+    },
+    {
+      "lighting": "ward",
+      "view": "back34",
+      "calls": 320,
+      "triangles": 173456,
+      "frameDeltaMaxMs": 100
+    },
+    {
+      "lighting": "ward",
+      "view": "back",
+      "calls": 374,
+      "triangles": 181212,
+      "frameDeltaMaxMs": 100
+    },
+    {
+      "lighting": "ward",
+      "view": "face",
+      "calls": 374,
+      "triangles": 181212,
+      "frameDeltaMaxMs": 100
+    },
+    {
+      "lighting": "ward",
+      "view": "hands",
+      "calls": 112,
+      "triangles": 137986,
+      "frameDeltaMaxMs": 100
+    },
+    {
+      "lighting": "ward",
+      "view": "gameplay-near",
+      "calls": 88,
+      "triangles": 130346,
+      "frameDeltaMaxMs": 100
+    },
+    {
+      "lighting": "ward",
+      "view": "gameplay",
+      "calls": 162,
+      "triangles": 163922,
+      "frameDeltaMaxMs": 100
+    }
+  ]
+}
