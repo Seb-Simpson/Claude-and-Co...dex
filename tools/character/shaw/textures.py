@@ -34,6 +34,18 @@ def srgb_to_linear(c):
     return np.where(c <= 0.04045, c / 12.92, ((c + 0.055) / 1.055) ** 2.4)
 
 
+MASK_SEAMS = [0.10, 0.21, 0.33, 0.44, 0.56, 0.67, 0.79, 0.90]
+
+
+def mask_seam_v(i, u):
+    """Seam line i of the face covering at texture u (shared with the geometry in build_shaw)."""
+    return MASK_SEAMS[i] + 0.015 * np.sin(u * 7 + i) + 0.02 * (u - 0.5) * (1 if i % 2 else -1)
+
+
+def mask_vseam_u(v):
+    return 0.43 + 0.02 * np.sin(v * 9)
+
+
 def mask_texture(size=1024):
     h = w = size
     v = np.linspace(0, 1, h)[:, None] * np.ones((1, w))   # 0 = chin (bottom), 1 = brow (top)
@@ -44,11 +56,11 @@ def mask_texture(size=1024):
     height = 0.5 * n2
     rough = np.full((h, w), 0.9)
     # Horizontal strips (overlapping bandage panels), slightly slanted and wavy.
-    seams = [0.10, 0.21, 0.33, 0.44, 0.56, 0.67, 0.79, 0.90]
+    seams = MASK_SEAMS
     strip_id = np.zeros((h, w))
     seam_dist = np.full((h, w), 1.0)
     for i, s in enumerate(seams):
-        line = s + 0.015 * np.sin(u * 7 + i) + 0.02 * (u - 0.5) * (1 if i % 2 else -1)
+        line = mask_seam_v(i, u)
         d = np.abs(v - line)
         seam_dist = np.minimum(seam_dist, d)
         strip_id += (v > line)
@@ -57,7 +69,7 @@ def mask_texture(size=1024):
     tone *= 1 - 0.35 * np.exp(-(seam_dist / 0.006) ** 2)           # seam shadow
     height += 0.6 * np.exp(-(seam_dist / 0.01) ** 2)                # overlapping edge ridge
     # Off-centre vertical seam.
-    vline = 0.43 + 0.02 * np.sin(v * 9)
+    vline = mask_vseam_u(v)
     vd = np.abs(u - vline)
     tone *= 1 - 0.4 * np.exp(-(vd / 0.005) ** 2)
     height += 0.4 * np.exp(-(vd / 0.008) ** 2)
@@ -104,14 +116,14 @@ def cap_texture(w=1024, h=256):
     burg = srgb_to_linear([0.36, 0.07, 0.08])
     n1 = _noise(h, w, 40, seed=5); n2 = _noise(h, w, 6, seed=6)
     tone = 0.75 + 0.3 * n1 + 0.06 * n2
-    stripe = ((v > 0.50) & (v < 0.72)).astype(float)
+    stripe = ((v > 0.60) & (v < 0.72)).astype(float)
     rgb = base[None, None, :] * tone[..., None] * (1 - stripe[..., None]) + burg[None, None, :] * (0.8 + 0.3 * n1[..., None]) * stripe[..., None]
     # Stains and grime at the lower edge (sweat and blood).
     stain = np.clip((n1 - 0.62) * 4, 0, 1) * (1 - v * 0.5)
     rgb = rgb * (1 - 0.6 * stain[..., None]) + srgb_to_linear([0.30, 0.08, 0.06])[None, None, :] * 0.6 * stain[..., None]
     rgb *= (0.7 + 0.3 * np.clip(v / 0.2, 0, 1))[..., None]
     rgba = np.concatenate([rgb, np.ones((h, w, 1))], axis=-1)
-    height = 0.4 * n2 + 0.3 * np.exp(-((v - 0.50) / 0.01) ** 2) + 0.3 * np.exp(-((v - 0.72) / 0.01) ** 2)
+    height = 0.4 * n2 + 0.3 * np.exp(-((v - 0.60) / 0.01) ** 2) + 0.3 * np.exp(-((v - 0.72) / 0.01) ** 2)
     return rgba, height, np.full((h, w), 0.85)
 
 
@@ -130,3 +142,28 @@ def to_image(bpy, name, rgba, colorspace='sRGB'):
 def gray_image(bpy, name, arr):
     rgba = np.stack([arr, arr, arr, np.ones_like(arr)], axis=-1)
     return to_image(bpy, name, rgba, 'linear')
+
+
+def hair_texture(size=512):
+    """Dark, slightly wet hair: fine streaks running along v (root to tip), clumped tone, sheen."""
+    h = w = size
+    u = np.ones((h, 1)) * np.linspace(0, 1, w)[None, :]
+    rng = np.random.default_rng(41)
+    # Per-column strand tones, blurred a little across u.
+    cols = rng.random(w)
+    for _ in range(2):
+        cols = (np.roll(cols, 1) + np.roll(cols, -1) + 2 * cols) / 4
+    fine = rng.random(w)
+    clump = _noise(h, w, 90, seed=8)
+    along = _noise(h, w, 30, seed=9)
+    tone = 0.55 + 0.6 * cols[None, :] + 0.35 * fine[None, :] * 0.5 + 0.3 * clump + 0.15 * along
+    base = srgb_to_linear([0.135, 0.118, 0.108])
+    rgb = base[None, None, :] * tone[..., None]
+    # Grease/blood tint near the tips (lower v), very faint.
+    v = np.linspace(0, 1, h)[:, None] * np.ones((1, w))
+    tint = np.clip(0.25 - v, 0, 0.25) * 0.4
+    rgb = rgb * (1 - tint[..., None]) + srgb_to_linear([0.16, 0.05, 0.04])[None, None, :] * tint[..., None]
+    rough = np.clip(0.58 + 0.25 * clump + 0.12 * (1 - cols[None, :]), 0.4, 0.92)
+    rgba = np.concatenate([rgb, np.ones((h, w, 1))], axis=-1)
+    del u
+    return rgba, rough

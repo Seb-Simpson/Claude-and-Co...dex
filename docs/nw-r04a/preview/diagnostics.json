@@ -2,11 +2,11 @@
   "diagnostics": {
     "ready": true,
     "error": null,
-    "loadMs": 232.40000000037253,
-    "triangles": 71036,
+    "loadMs": 328.4000000001397,
+    "triangles": 39223,
     "meshes": 12,
     "materials": 12,
-    "textures": 21,
+    "textures": 23,
     "heightMetres": 1.899999976158142,
     "view": "front",
     "lighting": "ward"
@@ -16,112 +16,154 @@
       "lighting": "studio",
       "view": "front",
       "calls": 13,
-      "triangles": 71996,
+      "triangles": 40183,
       "frameDeltaMaxMs": 100
     },
     {
       "lighting": "studio",
       "view": "front34",
       "calls": 13,
-      "triangles": 71996,
+      "triangles": 40183,
       "frameDeltaMaxMs": 100
     },
     {
       "lighting": "studio",
       "view": "side",
       "calls": 13,
-      "triangles": 71996,
+      "triangles": 40183,
       "frameDeltaMaxMs": 100
     },
     {
       "lighting": "studio",
       "view": "back34",
       "calls": 13,
-      "triangles": 71996,
+      "triangles": 40183,
       "frameDeltaMaxMs": 100
     },
     {
       "lighting": "studio",
       "view": "back",
       "calls": 13,
-      "triangles": 71996,
+      "triangles": 40183,
       "frameDeltaMaxMs": 100
     },
     {
       "lighting": "studio",
       "view": "face",
       "calls": 9,
-      "triangles": 55984,
+      "triangles": 33935,
+      "frameDeltaMaxMs": 100
+    },
+    {
+      "lighting": "studio",
+      "view": "head-side",
+      "calls": 9,
+      "triangles": 33935,
+      "frameDeltaMaxMs": 100
+    },
+    {
+      "lighting": "studio",
+      "view": "head-back",
+      "calls": 9,
+      "triangles": 33935,
       "frameDeltaMaxMs": 100
     },
     {
       "lighting": "studio",
       "view": "hands",
       "calls": 7,
-      "triangles": 50344,
+      "triangles": 25421,
+      "frameDeltaMaxMs": 100
+    },
+    {
+      "lighting": "studio",
+      "view": "skirt-side",
+      "calls": 9,
+      "triangles": 28909,
       "frameDeltaMaxMs": 100
     },
     {
       "lighting": "ward",
       "view": "front",
       "calls": 158,
-      "triangles": 162826,
+      "triangles": 131013,
       "frameDeltaMaxMs": 100
     },
     {
       "lighting": "ward",
       "view": "front34",
       "calls": 158,
-      "triangles": 162826,
+      "triangles": 131013,
       "frameDeltaMaxMs": 100
     },
     {
       "lighting": "ward",
       "view": "side",
       "calls": 131,
-      "triangles": 159432,
+      "triangles": 127619,
       "frameDeltaMaxMs": 100
     },
     {
       "lighting": "ward",
       "view": "back34",
       "calls": 320,
-      "triangles": 173456,
+      "triangles": 141643,
       "frameDeltaMaxMs": 100
     },
     {
       "lighting": "ward",
       "view": "back",
       "calls": 374,
-      "triangles": 181212,
+      "triangles": 149399,
       "frameDeltaMaxMs": 100
     },
     {
       "lighting": "ward",
       "view": "face",
-      "calls": 374,
-      "triangles": 181212,
+      "calls": 112,
+      "triangles": 115937,
+      "frameDeltaMaxMs": 100
+    },
+    {
+      "lighting": "ward",
+      "view": "head-side",
+      "calls": 73,
+      "triangles": 109147,
+      "frameDeltaMaxMs": 100
+    },
+    {
+      "lighting": "ward",
+      "view": "head-back",
+      "calls": 73,
+      "triangles": 109147,
       "frameDeltaMaxMs": 100
     },
     {
       "lighting": "ward",
       "view": "hands",
-      "calls": 112,
-      "triangles": 137986,
+      "calls": 329,
+      "triangles": 137935,
+      "frameDeltaMaxMs": 100
+    },
+    {
+      "lighting": "ward",
+      "view": "skirt-side",
+      "calls": 88,
+      "triangles": 105423,
       "frameDeltaMaxMs": 100
     },
     {
       "lighting": "ward",
       "view": "gameplay-near",
-      "calls": 88,
-      "triangles": 130346,
+      "calls": 98,
+      "triangles": 111373,
       "frameDeltaMaxMs": 100
     },
     {
       "lighting": "ward",
       "view": "gameplay",
-      "calls": 162,
-      "triangles": 163922,
+      "calls": 200,
+      "triangles": 140221,
       "frameDeltaMaxMs": 100
     }
   ]

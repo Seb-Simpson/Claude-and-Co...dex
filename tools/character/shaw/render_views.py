@@ -36,13 +36,13 @@ r = bpy.data.objects.new('rim', rim); scene.collection.objects.link(r)
 r.location = (0, 3, 3); r.rotation_euler = (math.radians(-50), 0, 0)
 cam_data = bpy.data.cameras.new('cam'); cam_data.type = 'ORTHO'; cam_data.ortho_scale = 2.05
 cam = bpy.data.objects.new('cam', cam_data); scene.collection.objects.link(cam); scene.camera = cam
-views = {'front': 0, 'front34': -35, 'side': -90, 'back34': 145, 'back': 180, 'face': 0, 'face34': -35, 'hand': -90}
+views = {'front': 0, 'front34': -35, 'side': -90, 'back34': 145, 'back': 180, 'face': 0, 'face34': -35, 'faceside': -90, 'faceback': 160, 'hand': -90, 'skirtside': -90}
 only = [a for a in argv[3:] if a in views] or list(views)
 for name in only:
     a = math.radians(views[name])
-    target_z, scale = {'face': (1.72, 0.42), 'face34': (1.72, 0.42), 'hand': (0.86, 0.42)}.get(name, (0.97, 2.05))
+    target_z, scale = {'face': (1.72, 0.42), 'face34': (1.72, 0.42), 'faceside': (1.72, 0.42), 'faceback': (1.72, 0.42), 'hand': (0.86, 0.42), 'skirtside': (0.85, 1.0)}.get(name, (0.97, 2.05))
     cam_data.ortho_scale = scale
-    if name in ('face', 'face34', 'hand'):
+    if name in ('face', 'face34', 'faceside', 'faceback', 'hand', 'skirtside'):
         scene.render.resolution_x = scene.render.resolution_y = 700
     else:
         scene.render.resolution_x, scene.render.resolution_y = 420, 900

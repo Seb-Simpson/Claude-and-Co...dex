@@ -1,15 +1,116 @@
-# NIGHT WARD — NW-R04A: Nurse Shaw production, first visual checkpoint
+# NIGHT WARD — NW-R04A: Nurse Shaw production
 
-**Status: STOPPED at the visual approval gate.** The static model is built and running in an isolated in-game preview. It is recognisably the approved design, but it is still **noticeably different from the reference** in several areas (§5). That is the brief's stop condition, so I have stopped and am reporting.
+**Current status (NW-R04A.2): STOPPED for human visual inspection.** One focused refinement pass on the static model is complete, using the same free workflow (MakeHuman CC0 + Blender `bpy`, code-driven). **The model is not claimed as approved:** only you decide that.
 
-**Not started:**
-- no rigging or animation;
-- no gameplay AI;
-- the existing gameplay nurse model is untouched;
-- no merge and no PR.
+**Not done:**
+- no rigging, animation or gameplay AI;
+- no cape, keys or fob watch;
+- the gameplay nurse is untouched;
+- no PR or merge.
 
-**Your decision is needed before production continues (§8).**
+- §R2 below: this refinement pass.
+- §1–§8: the original NW-R04A first-checkpoint record, kept for history. Its numbers describe the R04A model.
 
+## R2. NW-R04A.2 reference-fidelity refinement
+
+### R2.1 What changed, in the brief's priority order
+
+| # | Area | Change (in `tools/character/shaw/`) | Result vs the sheet |
+|---|---|---|---|
+| 1 | **Cap** | Rebuilt as a **folded boat/wedge cap**: a band rising from the head and flaring outward. Tallest at the front (turned-up cuff), lowest at the back. Side corners stand out. **Burgundy trim** near the top edge. A closed, folded top that always clears the hair. | **Improved.** The side and back read as the sheet's wedge. From the front it is still rounder and more "pillbox" than the sheet's crisp, wide fold. |
+| | | *Reverted:* flat shading on the band. In game it rendered as a checkerboard of light and dark facets, which was worse. Now the band is smooth and only the folded top is crisp. | |
+| 2 | **Hair** | Replaced the sparse strand clumps with a **dense jaw-length bob**:<br>• a volume shell from the crown to the jaw, open over the face;<br>• 170 strand cards lying on it, about a quarter of them lifted as flyaways;<br>• ragged ends;<br>• 16 loose strands falling over the covering, more on her right;<br>• a painted strand texture (rougher, slightly wet). | **Improved: now a bob, not strings.** It is still smoother and more "helmet-like" than the sheet's wispy, separated strands. The ragged ends read as spikes from behind. The sheet shows her ear; ours is covered. |
+| 3 | **Skirt and bow** | Fixed a **root-cause bug**: the old skirt used the hip radius all the way up to the waist, so its back stood 5 cm off the belt. That was the boxy side silhouette. The skirt now:<br>• hangs from the belt with a slope-limited drape over the hips (never inside the body);<br>• has a fuller A-line flare (+36%);<br>• has broad, soft folds that deepen toward the hem;<br>• has fine gathers under the belt;<br>• has a hem that rises and falls with the folds.<br>Bow tails are laid onto the fabric (they floated 6 cm off it). Fixed an old underskirt bug (cumulative tear depth). | **Improved:**<br>• the side silhouette is a smooth A-line;<br>• the front shows a fitted waist and a full skirt;<br>• the tails lie on the skirt.<br>**Still different:**<br>• the sheet's tails are longer (to the knee) and wider;<br>• its loops are puffier;<br>• its folds are softer and deeper. |
+| 4 | **Face covering** | **Physical relief**, sharing the painted seam lines exactly (`textures.MASK_SEAMS`):<br>• each strip's lower edge forms a narrow overlapping lip over the strip below;<br>• the off-centre vertical seam is a raised ridge;<br>• pins and clips sit on the strip edges and along the seam.<br>The asymmetric layout is kept. *Tuned down* after the first in-game view, where a sawtooth profile read as puffy "quilted rolls". | **Improved:** layered strips are visible in game. **Still different:** it reads somewhat padded or quilted next to the sheet's flatter canvas plates. The lower edge forms a small lip at the jaw. |
+| 5 | **Hands** | Sculpted around the finger bones:<br>• thinner phalanx shafts;<br>• swollen knuckles at every joint (strongest on the back of the hand);<br>• extensor-tendon ridges along the metacarpals;<br>• claws lengthened and curved, hooking toward the palm. | **Improved:** bony, jointed, long and unsettling. **Still different:** the sheet's hand is more muscular and gnarled, with stronger tendons. Ours reads as glossy red rather than the sheet's dark, mottled maroon. |
+| 6 | **Materials** | The procedural fabric shader gained:<br>• **uneven weathering:** large yellowed blotches with darker tide-mark rims;<br>• **grime rising from the floor** toward the hem;<br>• **fine blood spatter** around the stains;<br>• a **woven texture** (a two-direction crosshatch instead of one-direction stripes);<br>• grime-driven roughness variation.<br>Heavier blood on the apron, more on the skin. | **Improved:** heavy, uneven blood and wear, like the sheet. **Still different:**<br>• the blood reads redder and pinker than the sheet's dark brown-red;<br>• there are no stitched seams or fibre-level fraying on garment edges (only torn geometry at the hem and tails). |
+| 7 | **Optimisation** | Removed skin that can never be seen (skull and face under the cap, hair and covering; eyes; feet inside the shoes). Decimated the under-scalp (to 30%), the shoes (to 50%), and the arms, legs and neck (unprotected parts halved; **hands kept at full detail**). Trimmed the skirt and mask grids. The underskirt now starts at the knee. | **71,036 → 39,223 triangles (−45%)** |
+
+### R2.2 Asset (measured)
+
+| | R04A | **R04A.2** |
+|---|---|---|
+| Triangles | 71,036 | **39,223** (12 meshes, one per material) |
+| Draw calls (Shaw alone, studio full body) | 13 | **13** |
+| Height | 1.900 m | **1.900 m** (measured in game). The export fits the assembled figure to 1.90 m (×1.025). |
+| GLB | 3.80 MB | **3.71 MB** (`src/characters/shaw/assets/shaw-r04a-preview.glb`) |
+| Textures | 21 | **23** (WebP) |
+| Load (fetch + parse, headless) | 279 ms | **328 ms** |
+
+Texture sizes:
+- skin and apron: 2048² (albedo, roughness, normal);
+- burgundy dress: 1024² (albedo, roughness, normal);
+- face covering: 1024² painted (albedo, roughness);
+- cap: 1024×256 painted;
+- **hair: 512² painted (albedo, roughness), new**;
+- underskirt, belt, leather: 512² (albedo, roughness, normal);
+- claws, buttons, pins: constant PBR.
+
+In the ward the whole scene draws 73–374 calls and 105k–150k triangles depending on the view (`docs/nw-r04a/preview/diagnostics.json`). The headless runs use SwiftShader software rendering, so frame times are not GPU performance figures.
+
+### R2.3 Evidence (genuine in-game screenshots, `docs/nw-r04a/preview/`)
+
+| Sheet | Contents |
+|---|---|
+| `before-after-body.jpg` | Reference / R04A / R04A.2: front, side, back (studio) |
+| `before-after-closeups.jpg` | Reference / R04A / R04A.2: face and hand |
+| `compare-turnaround.jpg`, `compare-three-quarter.jpg` | Reference vs in-game studio: front, side, back, ¾ front, ¾ back |
+| `compare-cap-hair.jpg` | Reference head front, side, back vs in-game (new head-side and head-back presets) |
+| `compare-mask.jpg` | Reference face-covering close-up vs in-game studio and ward |
+| `compare-hands.jpg` | Reference hand vs in-game studio and ward |
+| `compare-skirt-bow.jpg` | Reference skirt front, side, back vs in-game (including a new side close-up preset) |
+| `compare-ward-lighting.jpg` | **NIGHT WARD's actual lighting:** front, ¾ back, 3 m and 7 m gameplay distances |
+| `studio-*.jpg`, `ward-*.jpg`, `diagnostics.json` | Every raw view in both lightings |
+
+The preview gained the camera presets `head-side`, `head-back` and `skirt-side`. Open the game at `/?preview=shaw`.
+
+### R2.4 Remaining differences from the approved sheet (honest)
+
+1. **Cap front:** rounder and more cushion-like from the front. The sheet's cap is a crisp, wide fold with the front corners stepping out.
+2. **Hair:** the right bob shape and density, but too smooth and solid. The sheet has fine separated wisps and shows the ear. The ragged ends read as triangular spikes from behind.
+3. **Face covering:** layered and pinned as on the sheet, but slightly quilted and padded rather than flat canvas plates. A small lip sticks out at the jaw.
+4. **Bow:** the tails are shorter and narrower than on the sheet, and the loops are flatter.
+5. **Hands:** long and bony with knuckles, but less gnarled and muscular. The surface is too glossy and uniformly red.
+6. **Blood colour:** redder and pinker than the sheet's dark brown-red. The stockings and arms carry less staining than the sheet.
+7. **Fabric detail:** no stitched seams or edge fraying on the bib, straps and collar. Only the hem and tails are torn.
+8. **Collar:** small white slivers between the collar flaps in close-ups. This is a bake artefact on the thin flap rims (it was also present in R04A). Not fixed in this pass.
+9. **Overall:** this remains a code-built model on a stylised CC0 base. Close up, it doesn't have the sculpted, painterly richness of the sheet.
+
+**No passing score is assigned.** The R04A rubric (§6) is unchanged as a record. I'm not re-scoring this pass as a pass: the decision is yours.
+
+### R2.5 Tests (exact commands and results)
+
+| Command | Result |
+|---|---|
+| `npm run typecheck` | Passed (`tsc --noEmit`, exit 0) |
+| `npx vitest run` | **59 files passed, 1 skipped; 497 tests passed, 1 skipped** (includes `tests/characters/shaw-preview.test.ts`, 3 tests, which covers the new camera presets) |
+| `PLAYWRIGHT_CHROMIUM_EXECUTABLE=/opt/pw-browsers/chromium NW_R04A_EVIDENCE=1 npx playwright test tests/browser/nw-r04a-shaw-preview.spec.ts --trace off` | **1 passed** (3.2 min). Asserts: model loaded, no error, height 1.85–1.95 m (measured 1.900), no entities spawned, no page or console errors. 22 views captured. |
+
+`src/main.ts` was not changed in this pass, so the R04A regression run (foundation + greybox, 4 passed) still applies.
+
+### R2.6 Rebuild
+
+Run from `tools/character/shaw`:
+
+```
+$PY build_body.py -- --mh $MH --out $OUT
+$PY build_shaw.py -- $OUT/shaw_body.blend $OUT
+$PY export_shaw.py -- $OUT/shaw_dressed.blend $OUT/glb/shaw.glb
+```
+
+Then copy the GLB to `src/characters/shaw/assets/shaw-r04a-preview.glb`.
+
+Run from the repo root:
+
+```
+python3 tools/character/shaw/compare_ingame.py docs/nw-r04a/references/nurse-shaw-approved.jpg docs/nw-r04a/preview [<before_dir>]
+```
+
+---
+
+# NW-R04A first visual checkpoint (historical record)
+
+*The screenshot files named below were replaced by the R04A.2 captures. The R04A images survive in the `before-after-*.jpg` sheets and in git history (commit `46fe079`).*
 ## 1. Sources
 
 | Source | Use |

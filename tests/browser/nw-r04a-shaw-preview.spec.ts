@@ -44,8 +44,8 @@ test('the Shaw preview loads the static model into the real ward and renders eve
     frames.push({ lighting, view, calls: snap.renderer.calls, triangles: snap.renderer.triangles, frameDeltaMaxMs: snap.performance.frameDeltaMaxMs });
     if (EVIDENCE) await page.locator('canvas').first().screenshot({ path: `${OUT}/${lighting}-${view}.png` });
   };
-  for (const view of ['front', 'front34', 'side', 'back34', 'back', 'face', 'hands'] as const) await shoot('studio', view);
-  for (const view of ['front', 'front34', 'side', 'back34', 'back', 'face', 'hands', 'gameplay-near', 'gameplay'] as const) await shoot('ward', view);
+  for (const view of ['front', 'front34', 'side', 'back34', 'back', 'face', 'head-side', 'head-back', 'hands', 'skirt-side'] as const) await shoot('studio', view);
+  for (const view of ['front', 'front34', 'side', 'back34', 'back', 'face', 'head-side', 'head-back', 'hands', 'skirt-side', 'gameplay-near', 'gameplay'] as const) await shoot('ward', view);
 
   if (EVIDENCE) writeFileSync(`${OUT}/diagnostics.json`, `${JSON.stringify({ diagnostics, frames }, null, 2)}\n`);
   expect(errors).toEqual([]);

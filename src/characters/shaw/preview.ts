@@ -17,7 +17,7 @@ export const SHAW_PREVIEW_URL = new URL('./assets/shaw-r04a-preview.glb', import
 export const SHAW_POSITION = new Vector3(-11.5, 0, 0.9);
 export const SHAW_YAW = Math.PI / 2;
 
-export type ShawView = 'front' | 'front34' | 'side' | 'back34' | 'back' | 'face' | 'hands' | 'gameplay' | 'gameplay-near' | 'free';
+export type ShawView = 'front' | 'front34' | 'side' | 'back34' | 'back' | 'face' | 'head-side' | 'head-back' | 'hands' | 'skirt-side' | 'gameplay' | 'gameplay-near' | 'free';
 export type ShawLighting = 'ward' | 'studio';
 
 interface ViewPreset {
@@ -35,7 +35,10 @@ export const SHAW_VIEWS: Readonly<Record<Exclude<ShawView, 'free'>, ViewPreset>>
   back34: { eye: [-1.95, 1.05, 1.35], target: [0, 0.95, 0], fov: 60 },
   back: { eye: [-2.4, 1.0, 0], target: [0, 0.95, 0], fov: 60 },
   face: { eye: [0.72, 1.74, 0.12], target: [0, 1.71, 0.02], fov: 38 },
+  'head-side': { eye: [0.02, 1.76, 0.78], target: [0, 1.72, 0], fov: 38 },
+  'head-back': { eye: [-0.74, 1.78, 0.14], target: [0, 1.72, 0], fov: 38 },
   hands: { eye: [0.62, 0.98, 0.55], target: [0.02, 0.84, 0.22], fov: 40 },
+  'skirt-side': { eye: [0, 0.85, 1.55], target: [0, 0.82, 0], fov: 45 },
   gameplay: { eye: [7.0, 1.65, 0.9], target: [0, 1.2, 0], fov: 70 },
   'gameplay-near': { eye: [3.0, 1.65, 0.7], target: [0, 1.3, 0], fov: 70 },
 };

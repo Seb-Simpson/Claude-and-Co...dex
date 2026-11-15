@@ -29,8 +29,10 @@ def _n(nt, kind, x, y, **props):
     return node
 
 
-def make(name: str, base, rough=0.8, blood=0.0, blood_low=0.0, blood_z=None, grime=0.4, weave=0.0, bump=0.3, sheen=0.0, metallic=0.0, ss=0.0) -> bpy.types.Material:
-    """blood: overall stain density; blood_low: extra density lower down (hem) or below blood_z."""
+def make(name: str, base, rough=0.8, blood=0.0, blood_low=0.0, blood_z=None, grime=0.4, weave=0.0, bump=0.3, sheen=0.0, metallic=0.0, ss=0.0,
+         age=0.0, speckle=0.0, dirt_low=0.0) -> bpy.types.Material:
+    """blood: overall stain density; blood_low: extra density lower down (hem) or below blood_z.
+    age: uneven yellowing / tide marks; speckle: fine blood spatter; dirt_low: grime rising from the floor."""
     m = bpy.data.materials.new(name)
     m.use_nodes = True
     nt = m.node_tree
@@ -60,6 +62,44 @@ def make(name: str, base, rough=0.8, blood=0.0, blood_low=0.0, blood_z=None, gri
     base_mul.inputs['A'].default_value = (*base, 1)
     nt.links.new(gr.outputs['Color'], base_mul.inputs['B'])
     color = base_mul.outputs['Result']
+    sep_z = _n(nt, 'ShaderNodeSeparateXYZ', -1150, 600)
+    nt.links.new(tc.outputs['Object'], sep_z.inputs['Vector'])
+    if age > 0:
+        # Uneven weathering: large blotches of yellowed/greyed cloth with darker tide-mark rims.
+        a = _n(nt, 'ShaderNodeTexNoise', -1150, 750)
+        a.inputs['Scale'].default_value = 2.4
+        a.inputs['Detail'].default_value = 4.0
+        a.inputs['Distortion'].default_value = 0.8
+        nt.links.new(tc.outputs['Object'], a.inputs['Vector'])
+        ar = _n(nt, 'ShaderNodeValToRGB', -900, 750)
+        ar.color_ramp.elements[0].position = 0.42
+        ar.color_ramp.elements[0].color = (1, 1, 1, 1)
+        mid = ar.color_ramp.elements.new(0.52)
+        mid.color = (1 - 0.35 * age, 1 - 0.42 * age, 1 - 0.55 * age, 1)   # tide-mark rim
+        ar.color_ramp.elements[2].position = 0.60
+        ar.color_ramp.elements[2].color = (1 - 0.12 * age, 1 - 0.18 * age, 1 - 0.30 * age, 1)  # yellowed
+        nt.links.new(a.outputs['Fac'], ar.inputs['Fac'])
+        am = _n(nt, 'ShaderNodeMix', -500, 650, data_type='RGBA', blend_type='MULTIPLY')
+        am.inputs['Factor'].default_value = 1.0
+        nt.links.new(color, am.inputs['A']); nt.links.new(ar.outputs['Color'], am.inputs['B'])
+        color = am.outputs['Result']
+    if dirt_low > 0:
+        dz = _n(nt, 'ShaderNodeMapRange', -900, 900)
+        dz.inputs['From Min'].default_value = 0.75
+        dz.inputs['From Max'].default_value = 0.40
+        dz.inputs['To Min'].default_value = 1.0
+        dz.inputs['To Max'].default_value = 1 - 0.55 * dirt_low
+        nt.links.new(sep_z.outputs['Z'], dz.inputs['Value'])
+        dn = _n(nt, 'ShaderNodeMath', -700, 900, operation='MULTIPLY')
+        nt.links.new(dz.outputs['Result'], dn.inputs[0])
+        dn.inputs[1].default_value = 1.0
+        dc = _n(nt, 'ShaderNodeCombineColor', -550, 900)
+        for ch in ('Red', 'Green', 'Blue'):
+            nt.links.new(dn.outputs['Value'], dc.inputs[ch])
+        dm = _n(nt, 'ShaderNodeMix', -400, 850, data_type='RGBA', blend_type='MULTIPLY')
+        dm.inputs['Factor'].default_value = 1.0
+        nt.links.new(color, dm.inputs['A']); nt.links.new(dc.outputs['Color'], dm.inputs['B'])
+        color = dm.outputs['Result']
     if blood > 0 or blood_low > 0:
         # Splatter + smears: two noise scales thresholded, biased by height.
         b1 = _n(nt, 'ShaderNodeTexNoise', -1150, -50)
@@ -93,23 +133,52 @@ def make(name: str, base, rough=0.8, blood=0.0, blood_low=0.0, blood_z=None, gri
         nt.links.new(color, mix.inputs['A'])
         nt.links.new(bc.outputs['Result'], mix.inputs['B'])
         color = mix.outputs['Result']
+        if speckle > 0:
+            # Fine spatter: high-frequency noise peaks, denser near the large stains.
+            sp = _n(nt, 'ShaderNodeTexNoise', -1150, -700)
+            sp.inputs['Scale'].default_value = 95.0
+            sp.inputs['Detail'].default_value = 2.0
+            nt.links.new(tc.outputs['Object'], sp.inputs['Vector'])
+            sadd = _n(nt, 'ShaderNodeMath', -900, -700, operation='ADD')
+            nt.links.new(sp.outputs['Fac'], sadd.inputs[0])
+            nt.links.new(add.outputs['Value'], sadd.inputs[1])
+            sthr = _n(nt, 'ShaderNodeMapRange', -700, -700)
+            sthr.inputs['From Min'].default_value = 1.62 - 0.12 * speckle
+            sthr.inputs['From Max'].default_value = 1.66 - 0.12 * speckle
+            nt.links.new(sadd.outputs['Value'], sthr.inputs['Value'])
+            smix = _n(nt, 'ShaderNodeMix', 50, 250, data_type='RGBA', blend_type='MIX')
+            nt.links.new(sthr.outputs['Result'], smix.inputs['Factor'])
+            nt.links.new(color, smix.inputs['A'])
+            smix.inputs['B'].default_value = (*BLOOD_DRY, 1)
+            color = smix.outputs['Result']
         # Blood is glossier where fresh.
         rmix = _n(nt, 'ShaderNodeMapRange', -100, -150)
         rmix.inputs['To Min'].default_value = rough
         rmix.inputs['To Max'].default_value = max(0.25, rough - 0.35)
         nt.links.new(thr.outputs['Result'], rmix.inputs['Value'])
         nt.links.new(rmix.outputs['Result'], bsdf.inputs['Roughness'])
+    if not (blood > 0 or blood_low > 0):
+        rv = _n(nt, 'ShaderNodeMapRange', -400, -250)
+        rv.inputs['To Min'].default_value = min(1.0, rough + 0.08)
+        rv.inputs['To Max'].default_value = max(0.05, rough - 0.08)
+        nt.links.new(g.outputs['Fac'], rv.inputs['Value'])
+        nt.links.new(rv.outputs['Result'], bsdf.inputs['Roughness'])
     nt.links.new(color, bsdf.inputs['Base Color'])
     # Surface: weave (fabric) or pores/creases.
     bn = _n(nt, 'ShaderNodeBump', -100, -450)
     bn.inputs['Strength'].default_value = bump
     if weave > 0:
-        w = _n(nt, 'ShaderNodeTexWave', -400, -450, wave_type='BANDS')
-        w.inputs['Scale'].default_value = weave
-        w.inputs['Distortion'].default_value = 2.0
-        w.inputs['Detail'].default_value = 3.0
-        nt.links.new(tc.outputs['Object'], w.inputs['Vector'])
-        nt.links.new(w.outputs['Fac'], bn.inputs['Height'])
+        # Plain weave: warp (vertical) x weft (horizontal) bands, slightly irregular.
+        wa = _n(nt, 'ShaderNodeTexWave', -600, -450, wave_type='BANDS', bands_direction='Z')
+        wb = _n(nt, 'ShaderNodeTexWave', -600, -650, wave_type='BANDS', bands_direction='X')
+        for w in (wa, wb):
+            w.inputs['Scale'].default_value = weave
+            w.inputs['Distortion'].default_value = 1.2
+            w.inputs['Detail'].default_value = 2.0
+            nt.links.new(tc.outputs['Object'], w.inputs['Vector'])
+        wm = _n(nt, 'ShaderNodeMath', -400, -500, operation='MULTIPLY')
+        nt.links.new(wa.outputs['Fac'], wm.inputs[0]); nt.links.new(wb.outputs['Fac'], wm.inputs[1])
+        nt.links.new(wm.outputs['Value'], bn.inputs['Height'])
     else:
         p = _n(nt, 'ShaderNodeTexNoise', -400, -450)
         p.inputs['Scale'].default_value = 140.0
@@ -146,12 +215,12 @@ def image_material(name: str, albedo, height=None, rough=None, rough_value=0.85,
 
 def library() -> dict[str, bpy.types.Material]:
     return {
-        'skin': make('shaw_skin', SKIN, rough=0.62, blood=0.05, blood_low=0.55, blood_z=(0.78, 1.25), grime=0.5, bump=0.25, ss=0.08),
+        'skin': make('shaw_skin', SKIN, rough=0.62, blood=0.08, blood_low=0.55, blood_z=(0.78, 1.25), grime=0.55, bump=0.25, ss=0.08, speckle=0.6),
         'stocking': make('shaw_stocking', (0.035, 0.028, 0.025), rough=0.85, blood=0.08, blood_low=0.12, blood_z=(0.05, 0.5), grime=0.5, weave=180, bump=0.15),
-        'burgundy': make('shaw_burgundy', BURGUNDY, rough=0.78, blood=0.05, grime=0.45, weave=220, bump=0.2, sheen=0.3),
+        'burgundy': make('shaw_burgundy', BURGUNDY, rough=0.78, blood=0.07, grime=0.5, weave=220, bump=0.2, sheen=0.3, age=0.35, speckle=0.3),
         'belt': make('shaw_belt', (0.13, 0.025, 0.028), rough=0.6, blood=0.05, grime=0.4, bump=0.3),
-        'apron': make('shaw_apron', APRON, rough=0.88, blood=0.12, blood_low=0.22, blood_z=(0.45, 1.45), grime=0.75, weave=260, bump=0.25, sheen=0.25),
-        'under': make('shaw_underskirt', (0.07, 0.015, 0.018), rough=0.85, blood=0.05, grime=0.5, weave=200, bump=0.2),
+        'apron': make('shaw_apron', APRON, rough=0.88, blood=0.15, blood_low=0.28, blood_z=(0.45, 1.45), grime=0.8, weave=260, bump=0.3, sheen=0.25, age=0.75, speckle=0.8, dirt_low=0.55),
+        'under': make('shaw_underskirt', (0.07, 0.015, 0.018), rough=0.85, blood=0.05, grime=0.6, weave=200, bump=0.2, dirt_low=0.5),
         'mask': make('shaw_mask', CANVAS, rough=0.9, blood=0.18, blood_low=0.1, blood_z=(1.66, 1.76), grime=0.7, weave=300, bump=0.35),
         'cap': make('shaw_cap', (0.34, 0.28, 0.22), rough=0.85, blood=0.08, grime=0.6, weave=260, bump=0.2),
         'hair': make('shaw_hair', (0.012, 0.010, 0.009), rough=0.55, grime=0.2, weave=900, bump=0.4),
@@ -187,9 +256,16 @@ def assign(skin: bpy.types.Object, parts: dict) -> dict:
     lib['mask'] = image_material('shaw_mask', T.to_image(bpy, 'shaw_mask_albedo', rgba), T.gray_image(bpy, 'shaw_mask_height', height), T.gray_image(bpy, 'shaw_mask_rough', rough), bump=0.5)
     rgba, height, rough = T.cap_texture()
     lib['cap'] = image_material('shaw_cap', T.to_image(bpy, 'shaw_cap_albedo', rgba), T.gray_image(bpy, 'shaw_cap_height', height), None, 0.85, 0.3)
+    rgba, rough = T.hair_texture(512)
+    lib['hair'] = image_material('shaw_hair', T.to_image(bpy, 'shaw_hair_albedo', rgba), None, T.gray_image(bpy, 'shaw_hair_rough', rough))
     for key in ('mask', 'cap'):
         obj = parts.get(key)
         if obj is not None:
             obj.data.materials.clear()
             obj.data.materials.append(lib[key])
+    for key in ('hair', 'hair_strands', 'scalp'):
+        obj = parts.get(key)
+        if obj is not None:
+            obj.data.materials.clear()
+            obj.data.materials.append(lib['hair'])
     return lib

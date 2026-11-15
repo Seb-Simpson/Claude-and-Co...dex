@@ -20,11 +20,11 @@ TARGET_HEIGHT = 1.90   # metres, floor to top of cap (approved sheet)
 
 SIZES = {'shaw_skin': 2048, 'shaw_apron': 2048, 'shaw_burgundy': 1024, 'shaw_mask': 1024, 'shaw_cap': 512,
          'shaw_underskirt': 512, 'shaw_belt': 512, 'shaw_leather': 512}
-FLAT = {'shaw_hair', 'shaw_claw', 'shaw_button', 'shaw_metal'}   # small/thin parts: constant PBR values
-KEEP_UV = {'shaw_skin', 'shaw_mask', 'shaw_cap'}
+FLAT = {'shaw_claw', 'shaw_button', 'shaw_metal'}   # small/thin parts: constant PBR values
+KEEP_UV = {'shaw_skin', 'shaw_mask', 'shaw_cap', 'shaw_hair'}
 # Painted in textures.py on authored UV grids: exported directly (baking would let the solidified
 # inner shell, which shares the UVs, overwrite the outer surface).
-PAINTED = {'shaw_mask', 'shaw_cap'}
+PAINTED = {'shaw_mask', 'shaw_cap', 'shaw_hair'}
 
 
 def select_only(objs):
